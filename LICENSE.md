@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2024 M-Maps
+Copyright (c) 2024 Alexander von Minden, Amelie Humpe, Dennis Schielke, Janik Thiedke, Lisa Katrin Harms, Maurice Meise, Sofie Jans
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
