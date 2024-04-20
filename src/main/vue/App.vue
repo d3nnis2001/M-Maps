@@ -1,8 +1,13 @@
 <script setup>
 import {RouterView} from 'vue-router'
+import Login from "./pages/Login.vue"
+import {useRouter} from 'vue-router'
 
+const router = useRouter()
 
-
+const navigateToLogin = () => {
+    router.push('/login')
+}
 </script>
 <template>
   <q-layout view="hHh lpR fFf">
@@ -18,6 +23,7 @@ import {RouterView} from 'vue-router'
         <q-route-tab to="/page1" label="Page One"/>
         <q-route-tab to="/page2" label="Page Two"/>
         <q-route-tab to="/page3" label="Page Three"/>
+          <q-btn to="/login" label="Login"/>
       </q-tabs>
     </q-header>
 
