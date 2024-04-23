@@ -5,9 +5,6 @@ import {useRouter} from 'vue-router'
 
 const router = useRouter()
 
-const navigateToLogin = () => {
-    router.push('/login')
-}
 </script>
 <template>
   <q-layout view="hHh lpR fFf">

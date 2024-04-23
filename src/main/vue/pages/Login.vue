@@ -1,6 +1,6 @@
 <script setup>
 import {ref} from 'vue'
-import {useUserStore} from "../stores/users"
+import {useUserStore} from "../stores/LoginStore"
 import {useQuasar} from 'quasar'
 import {useRouter} from 'vue-router'
 
@@ -9,19 +9,21 @@ const router = useRouter()
 const userStore = useUserStore()
 
 const username = ref('')
-const password = ref('')
 
 function login() {
-    userStore.authenticate(username.value, password.value)
+    userStore.authenticate(username.value);
     if (userStore.authenticated) {
         router.push('/')
     } else {
         $q.notify({
             type: 'negative',
             message: 'Login Fehlgeschlagen',
-            caption: 'Falsches Passwort oder Benutzername'
+            caption: 'Diese Email-Adresse ist noch nicht registriert'
         })
     }
+}
+function navigateRegister() {
+    router.push("/register")
 }
 // https://www.figma.com/file/KE0rSr4lUzKzWQp7nY2jDZ/M-Maps-Prototyp?type=design&node-id=2-8&mode=design&t=atOavQXYG9PWr9Zr-4
 </script>
@@ -33,7 +35,7 @@ function login() {
                 <q-card class="q-pa-md">
                     <q-card-section class="inner-card">
                     <div class="row-auto text-align extra-padding">
-                        <img src="../../resources/public/Images/db-logo.png" alt="Nicht verfügbar">
+                        <img src="../../resources/db-logo.png" alt="Nicht verfügbar">
                     </div>
                     <div class="row-auto extra-padding">
                         <div class="text-h4 text-align ">Einloggen</div>
@@ -48,7 +50,7 @@ function login() {
                     </div>
                     <div class="row-auto text-align extra-padding">
                         <q-input class="email-input extra-padding" v-model="username" label="E-Mail Adresse"/>
-                        <div class="text-align extra-padding">
+                        <div class="text-align extra-padding" @click="navigateRegister">
                             Registrieren
                         </div>
                         <q-btn label="Anmelden" @click="login()" color="primary" class=""></q-btn>

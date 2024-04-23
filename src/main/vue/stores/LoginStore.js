@@ -4,8 +4,8 @@ import {ref} from 'vue'
 export const useUserStore = defineStore('users', () => {
     const authenticated = ref(null)
 
-    function authenticate(username, password) {
-        authenticated.value = (username === 'admin' && password === 'password')
+    function authenticate(username) {
+        authenticated.value = (username === 'admin')
     }
 
     function logout() {

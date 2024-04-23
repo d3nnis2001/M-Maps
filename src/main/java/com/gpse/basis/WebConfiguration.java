@@ -8,7 +8,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * Responsible for serving the SPA.
- * <p>
  * Serves the single page application (the vue frontend).
  */
 @Configuration
