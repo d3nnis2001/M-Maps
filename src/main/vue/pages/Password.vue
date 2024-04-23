@@ -10,20 +10,19 @@ const userStore = useUserStore()
 
 const username = ref('')
 
-function login() {
+function password() {
     userStore.authenticate(username.value);
-    if (!userStore.authenticated) {
-        router.push('/password')
+    if (userStore.authenticated) {
+        router.push('/karte')
     } else {
         $q.notify({
             type: 'negative',
             message: 'Login Fehlgeschlagen',
-            caption: 'Diese Email-Adresse ist noch nicht registriert'
+            caption: 'Dieses Password passt nicht mit den tatsächlichen Passwort überein'
         })
     }
 }
-function navigateRegister() {
-    router.push("/register")
+function navigateForgotPassword() {
 }
 // https://www.figma.com/file/KE0rSr4lUzKzWQp7nY2jDZ/M-Maps-Prototyp?type=design&node-id=2-8&mode=design&t=atOavQXYG9PWr9Zr-4
 </script>
@@ -34,30 +33,30 @@ function navigateRegister() {
             <div class="items-center">
                 <q-card class="q-pa-md">
                     <q-card-section class="inner-card">
-                    <div class="row-auto text-align extra-padding">
-                        <img src="../../resources/db-logo.png" alt="Nicht verfügbar">
-                    </div>
-                    <div class="row-auto extra-padding">
-                        <div class="text-h4 text-align ">Einloggen</div>
-                    </div>
-                    <div class="row-auto extra-padding">
-                        <div class="rectangle"></div>
-                    </div>
-                    <div class="row-auto extra-padding">
-                        <div class="text-align">
-                            Bitte geben Sie Ihre E-Mail-Adresse ein
+                        <div class="row-auto text-align extra-padding">
+                            <img src="../../resources/db-logo.png" alt="Nicht verfügbar">
                         </div>
-                    </div>
-                    <div class="row-auto text-align extra-padding">
-                        <q-input class="email-input extra-padding" v-model="username" label="E-Mail Adresse"/>
-                        <div class="text-align extra-padding" @click="navigateRegister">
-                            Registrieren
+                        <div class="row-auto extra-padding">
+                            <div class="text-h4 text-align ">Passwort Eingabe</div>
                         </div>
-                        <q-btn label="Anmelden" @click="login()" color="primary" class=""></q-btn>
-                    </div>
-                    <div class="bg-grey-4 impressum-padding">
-                        <div class="text-black text-align justify-center">Impressum</div>
-                    </div>
+                        <div class="row-auto extra-padding">
+                            <div class="rectangle"></div>
+                        </div>
+                        <div class="row-auto extra-padding">
+                            <div class="text-align">
+                                Bitte geben Sie Ihr Passwort ein
+                            </div>
+                        </div>
+                        <div class="row-auto text-align extra-padding">
+                            <q-input type="password" class="email-input extra-padding" v-model="username" label="Passwort"/>
+                            <div class="text-align extra-padding">
+                                Passwort Vergessen
+                            </div>
+                            <q-btn label="Anmelden" @click="password()" color="primary" class=""></q-btn>
+                        </div>
+                        <div class="bg-grey-4 impressum-padding">
+                            <div class="text-black text-align justify-center">Impressum</div>
+                        </div>
                     </q-card-section>
                 </q-card>
             </div>
