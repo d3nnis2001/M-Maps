@@ -1,29 +1,32 @@
-<script setup>
+<script>
 import {ref} from 'vue'
-import {useUserStore} from "../stores/LoginStore"
 import {useQuasar} from 'quasar'
 import {useRouter} from 'vue-router'
 
 const $q = useQuasar()
 const router = useRouter()
-const userStore = useUserStore()
 
-const username = ref('')
+const email = ref('')
 
-function password() {
-    userStore.authenticate(username.value);
-    if (userStore.authenticated) {
-        router.push('/karte')
-    } else {
-        $q.notify({
-            type: 'negative',
-            message: 'Login Fehlgeschlagen',
-            caption: 'Dieses Password passt nicht mit den tatsächlichen Passwort überein'
-        })
-    }
+function alert() {
+    $q.dialog({
+        dark: true,
+        title: 'Alert',
+        message: 'Some message',
+        ok: "OK"
+    })
 }
-function navigateForgotPassword() {
-    router.push("forgotPassword")
+
+export default {
+    setup () {
+        return {
+            alert: ref(false),
+            confirm: ref(false),
+            prompt: ref(false),
+
+            address: ref('')
+        }
+    }
 }
 // https://www.figma.com/file/KE0rSr4lUzKzWQp7nY2jDZ/M-Maps-Prototyp?type=design&node-id=2-8&mode=design&t=atOavQXYG9PWr9Zr-4
 </script>
@@ -38,22 +41,36 @@ function navigateForgotPassword() {
                             <img src="../../resources/db-logo.png" alt="Nicht verfügbar">
                         </div>
                         <div class="row-auto extra-padding">
-                            <div class="text-h4 text-align ">Passwort Eingabe</div>
+                            <div class="text-h4 text-align ">Passwort Zurücksetzen</div>
                         </div>
                         <div class="row-auto extra-padding">
                             <div class="rectangle"></div>
                         </div>
                         <div class="row-auto extra-padding">
                             <div class="text-align">
-                                Bitte geben Sie Ihr Passwort ein
+                                Bitte geben Sie die E-Mail-Adresse ein, mit der Sie sich registriert haben.
+                                Wir senden Ihnen eine E-Mail mit weiteren Schritten zum Zurücksetzen der Login-Daten.
                             </div>
                         </div>
                         <div class="row-auto text-align extra-padding">
-                            <q-input type="password" class="email-input extra-padding" v-model="username" label="Passwort"/>
-                            <div class="text-align extra-padding" @click=navigateForgotPassword()>
-                                Passwort Vergessen
-                            </div>
-                            <q-btn label="Anmelden" @click="password()" color="primary" class=""></q-btn>
+                            <q-input class="email-input extra-padding" v-model="email" label="E-Mail Adresse"/>
+                            <q-btn label="Passwort Zurücksetzen" @click="alert = true" color="primary" class=""></q-btn>
+                            <q-dialog v-model="alert">
+                                <q-card>
+                                    <q-card-section>
+                                        <div class="text-h6">E-Mail verschickt</div>
+                                    </q-card-section>
+
+                                    <q-card-section class="q-pt-none">
+                                        Bitte überprüfen Sie Ihr E-Mail Postfach, um mit der Zurücksetzung des Passworts
+                                        abzuschließen!
+                                    </q-card-section>
+
+                                    <q-card-actions align="right">
+                                        <q-btn flat label="OK" color="primary" v-close-popup />
+                                    </q-card-actions>
+                                </q-card>
+                            </q-dialog>
                         </div>
                         <div class="bg-grey-4 impressum-padding">
                             <div class="text-black text-align justify-center">Impressum</div>
