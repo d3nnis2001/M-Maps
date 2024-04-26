@@ -4,11 +4,8 @@ import StartView from '../views/Start.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    {
-      path: '/',
-      name: 'home',
-      component: StartView
-    },
+      {path: '/', name: 'home', component: StartView},
+
   ]
 })
 
