@@ -94,7 +94,6 @@ export default {
         },
         handleClick() {
             if (this.selectedFilesWithText.length == 0) {
-                //Benötigt "notify" in quasar.config.js framework/plugins
                 this.$q.notify({
                     message: "Bitte Dateien zum Importieren auswählen!",
                     timeout: 5000,
@@ -105,26 +104,21 @@ export default {
 
             this.selectedFilesWithText.forEach((f) => {
                 formData.append("files[]", f.file);
-                formData.append("additionalData[]", f.textInput);
+                formData.append("additionalData[]", f.textInput === "" ? "missing" : f.textInput);
             });
 
-            //todo: update post location
             axios
-                .post("http://localhost:3000/upload", formData, {
+                .post("http://localhost:8088/api/files/uploadFiles", formData, {
                     headers: {
                         "Content-Type": "multipart/form-data",
-                        // todo: für debugging, muss gelöscht werden
-                        "Access-Control-Allow-Origin": "*",
-                        "Access-Control-Allow-Headers": "*",
-                        "Access-Control-Allow-Credentials": "true",
                     },
                 })
                 .then((response) => {
-                    const { files } = response.data;
+                    const  files  = response.data;
                     console.log("Response:", files);
 
                     files.forEach((file) => {
-                        console.log(`File: ${file.name}, Accepted: ${file.accepted}`);
+                        console.log(`File: ${file.name}, Accepted: ${file.accepted}, Reason: ${file.reason}`);
                         const index = this.selectedFilesWithText.findIndex(
                             (f) => f.file.name === file.name
                         );
@@ -139,7 +133,7 @@ export default {
                 })
                 .catch((error) => {
                     console.error("Error uploading files:", error);
-                    // todo: Handle the error as needed
+                    // todo: error bearbeiten
                 });
         },
     },
