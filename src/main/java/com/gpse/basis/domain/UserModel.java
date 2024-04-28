@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.mapping.MongoId;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.io.Serial;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,16 +14,18 @@ import java.util.List;
 
 @Document
 public class UserModel implements UserDetails {
-  @MongoId
+    @Serial
+    private static final long serialVersionUID = 1L;
+    @MongoId
     private String email;
     @JsonIgnore
     private String password;
     private  String firstname;
     private String lastname;
-    private final boolean accountNonExpired = true;
-    private final boolean accountNonLocked = true;
-    private final boolean credentialsNonExpired = true;
-    private final boolean enabled = true;
+    private static final boolean accountNonExpired = true;
+    private static final boolean accountNonLocked = true;
+    private static final boolean credentialsNonExpired = true;
+    private static final boolean enabled = true;
 
     @JsonIgnore
     private transient ArrayList<String> roles;
