@@ -8,9 +8,11 @@ import java.io.Console;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 public class FileServiceImpl implements FileService {
+
     @Override
     public List<FileUploadResponse> handleImport(List<MultipartFile> files, List<String> streckenIds) {
         Iterator<MultipartFile> itr1 = files.iterator();
@@ -63,5 +65,23 @@ public class FileServiceImpl implements FileService {
 
             System.out.println(st);
             //todo: in mongo db einfügen (ID automatisch einfügen!!!)
+            //todo: files auslesen (parallelisieren)
+    }
+
+    @Override
+    public List<DataSet> getDataSets(String searchString) {
+        List<DataSet> s = new ArrayList<>();
+        if(searchString.toLowerCase().equals("all")) {
+            //todo get all datasets
+        }
+        else{
+            //todo get dataseats by search string
+        }
+        return s;
+    }
+
+    @Override
+    public void deleteDataSetsById(List<String> ids) {
+        //todo löschen in datenbank
     }
 }

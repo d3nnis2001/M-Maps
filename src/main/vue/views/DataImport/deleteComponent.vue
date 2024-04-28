@@ -12,7 +12,7 @@
                         <q-icon name="search" />
                     </template>
                     <template v-slot:append>
-                        <q-icon name="close" @click="text = ''" class="cursor-pointer" />
+                        <q-icon name="close" @click="searchString = ''" class="cursor-pointer" />
                     </template>
                 </q-input>
             </div>
@@ -30,6 +30,8 @@
                             </q-card-section>
                             <q-card-section>
                                 <div class="text-h6">{{ set.id }}</div>
+                                <div class="text-subtitle2">{{ set.streckenid }}</div>
+                                <div class="text-subtitle2">{{ set.fileName }}</div>
                                 <div class="text-subtitle2">{{ set.date }}</div>
                             </q-card-section>
                         </q-card-section>
@@ -79,14 +81,23 @@ export default {
                 return;
             }
             //todo: adresse nur zum testen!
+            this.datasets.splice(0, this.datasets.length);
             axios
-                .get("http://localhost:3000/data", {
+                .get("http://localhost:8088/api/files/getFiles", {
                     params: {
                         search: this.searchString,
                     },
                 })
                 .then((response) => {
-                    this.datasets = response.data;
+                    response.data.forEach((set) => {
+                        this.datasets.push( {
+                            id: set.id,
+                            streckenid: set.streckenId,
+                            fileName: set.fileName,
+                            date: set.uploadDate,
+                            checked: false,
+                        });
+                    });
                 })
                 .catch((error) => {
                     // todo: Fehler bearbeiten!
@@ -102,35 +113,35 @@ export default {
                 return;
             }
             const indicesToDelete = [];
+            const idToDelete = [];
             this.datasets.forEach((set, index) => {
                 if (set.checked) {
                     indicesToDelete.push(index);
+                    idToDelete.push(set.id);
                 }
             });
+            const formData = new FormData();
+            idToDelete.forEach((id) => {
+                formData.append("ids[]", id);
+            });
+
             this.datasets = this.datasets.filter((elem, idx) => {
                 return !indicesToDelete.includes(idx);
             });
 
-            const formData = new FormData();
 
-            indicesToDelete.forEach((idx) => {
-                formData.append("indices", idx);
-            });
             axios
-                .post("http://localhost:3000/delete", formData, {
+                .delete("http://localhost:8080/api/files/deleteFiles", {
+                    data: formData,
                     headers: {
                         "Content-Type": "multipart/form-data",
-
-                        // todo: für debugging, muss gelöscht werden
-                        "Access-Control-Allow-Origin": "*",
-                        "Access-Control-Allow-Headers": "*",
-                        "Access-Control-Allow-Credentials": "true",
                     },
                 })
                 .then((response) => {
                     console.log("Response:", response.data);
                 })
                 .catch((error) => {
+                    //todo fehler bearbeiten
                     console.error("Error:", error);
                 });
         },
@@ -141,8 +152,7 @@ export default {
 <style lang="sass">
 .example-col-gutter-mixed
     .my-content
-        padding: 10px 25px
         background: rgba(#999,.15)
         border: 1px solid rgba(#999,.2)
-        width: 250px
+        width: 100%
 </style>

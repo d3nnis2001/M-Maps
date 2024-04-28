@@ -2,12 +2,13 @@ package com.gpse.basis.domain;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.util.Date;
 
 @Document(collection = "dataSets")
 public class DataSet {
-    @Id
+    @MongoId
     private String id;
 
     private String fileName;

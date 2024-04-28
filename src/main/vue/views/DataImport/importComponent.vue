@@ -55,13 +55,7 @@
         </div>
     </div>
     <div>
-        <q-btn
-            push
-            color="red"
-            text-color="white"
-            label="Importieren"
-            @click="handleClick"
-        />
+        <q-btn :loading="loading" color="red" text-color="white" @click="handleClick" label="Importieren"></q-btn>
     </div>
 </template>
 
@@ -74,6 +68,7 @@ export default {
         return {
             selectedFiles: [],
             selectedFilesWithText: [],
+            loading: false,
         };
     },
     methods: {
@@ -93,13 +88,14 @@ export default {
             this.selectedFilesWithText.splice(index, 1);
         },
         handleClick() {
-            if (this.selectedFilesWithText.length == 0) {
+            if (this.selectedFilesWithText.length === 0) {
                 this.$q.notify({
                     message: "Bitte Dateien zum Importieren auswählen!",
                     timeout: 5000,
                 });
                 return;
             }
+            this.loading = true;
             const formData = new FormData();
 
             this.selectedFilesWithText.forEach((f) => {
@@ -123,16 +119,22 @@ export default {
                             (f) => f.file.name === file.name
                         );
                         console.log("------ " + index);
-                        if (file.accepted == false) {
-                            //todo: Grund überprüfen, wenn strecken id fehlt diese rot markieren in der list
-                            this.selectedFilesWithText[index].missingId = true;
+                        if (file.accepted === false) {
+                            if(file.reason === "Missing Track_ID") {
+                                this.selectedFilesWithText[index].missingId = true;
+                            }
+                            else {
+                                //todo: Grund überprüfen, wenn strecken id fehlt diese rot markieren in der list
+                            }
                         } else {
                             this.selectedFilesWithText.splice(index, 1);
                         }
                     });
+                    this.loading = false;
                 })
                 .catch((error) => {
                     console.error("Error uploading files:", error);
+                    this.loading = false;
                     // todo: error bearbeiten
                 });
         },
