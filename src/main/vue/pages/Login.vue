@@ -1,33 +1,55 @@
-<script setup>
+<script>
 import {ref} from 'vue'
-import {useUserStore} from "../stores/LoginStore"
+import {useLoginStore} from "../stores/LoginStore"
 import {useQuasar} from 'quasar'
 import {useRouter} from 'vue-router'
 
-const $q = useQuasar()
-const router = useRouter()
-const userStore = useUserStore()
+export default {
+    setup() {
+        const $q = useQuasar()
+        const router = useRouter()
+        const loginStore = useLoginStore()
 
-const username = ref('')
+        const email = ref('')
 
-function login() {
-    userStore.authenticate(username.value);
-    if (!userStore.authenticated) {
-        router.push('/password')
-    } else {
-        $q.notify({
-            type: 'negative',
-            message: 'Login Fehlgeschlagen',
-            caption: 'Diese Email-Adresse ist noch nicht registriert'
-        })
+        async function login() {
+            if ((email.value).includes("@")) {
+                $q.notify({
+                    type: 'negative',
+                    message: 'Mistake',
+                    caption: 'This seems not to be a valid email!'
+                });
+            } else {
+                try {
+                    const emailExists = await loginStore.checkEmail(email.value);
+                    if (emailExists) {
+                        router.push('/password');
+                    } else {
+                        $q.notify({
+                            type: 'negative',
+                            message: 'Login failed',
+                            caption: 'Email is not registered'
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error during login:', error);
+                    $q.notify({
+                        type: 'negative',
+                        message: 'Login failed',
+                        caption: 'An unexpected error occurred'
+                    });
+                }
+            }
+        }
+
+        function navigateRegister() {
+            router.push("/register")
+        }
+        return {email, login, navigateRegister}
     }
-}
-function navigateRegister() {
-    router.push("/register")
 }
 // https://www.figma.com/file/KE0rSr4lUzKzWQp7nY2jDZ/M-Maps-Prototyp?type=design&node-id=2-8&mode=design&t=atOavQXYG9PWr9Zr-4
 </script>
-
 <template>
     <div class="full-height-center">
         <div class="content-container">
@@ -49,7 +71,7 @@ function navigateRegister() {
                         </div>
                     </div>
                     <div class="row-auto text-align extra-padding">
-                        <q-input class="email-input extra-padding" v-model="username" label="E-Mail Adresse"/>
+                        <q-input class="email-input extra-padding" v-model="email" label="E-Mail Adresse"/>
                         <div class="text-align extra-padding" @click="navigateRegister">
                             Registrieren
                         </div>

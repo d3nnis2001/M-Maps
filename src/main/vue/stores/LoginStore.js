@@ -1,16 +1,15 @@
 import {defineStore} from 'pinia'
-import {ref} from 'vue'
+import emailChecker from '../api/auth.js';
 
-export const useUserStore = defineStore('users', () => {
-    const authenticated = ref(null)
-
-    function authenticate(username) {
-        authenticated.value = (username === 'admin')
+export const useLoginStore = defineStore('users', {
+    actions: {
+        async checkEmail(email) {
+            try {
+                return await emailChecker(email);
+            } catch (error) {
+                console.error("Error checking email: ", error);
+                return false;
+            }
+        }
     }
-
-    function logout() {
-        authenticated.value = false;
-    }
-
-    return {authenticated, authenticate, logout}
-})
+});

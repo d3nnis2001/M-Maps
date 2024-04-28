@@ -1,26 +1,16 @@
 <script setup>
 import {ref} from 'vue'
-import {useUserStore} from "../stores/LoginStore"
+import {useLoginStore} from "../stores/LoginStore"
 import {useQuasar} from 'quasar'
 import {useRouter} from 'vue-router'
 
 const $q = useQuasar()
 const router = useRouter()
-const userStore = useUserStore()
+const loginStore = useLoginStore()
 
 const username = ref('')
 
 function password() {
-    userStore.authenticate(username.value);
-    if (userStore.authenticated) {
-        router.push('/karte')
-    } else {
-        $q.notify({
-            type: 'negative',
-            message: 'Login Fehlgeschlagen',
-            caption: 'Dieses Password passt nicht mit den tatsächlichen Passwort überein'
-        })
-    }
 }
 function navigateForgotPassword() {
     router.push("forgotPassword")
