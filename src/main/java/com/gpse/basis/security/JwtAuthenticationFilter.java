@@ -25,7 +25,7 @@ public final class JwtAuthenticationFilter extends UsernamePasswordAuthenticatio
 
     private final SecurityConstants securityConstants;
 
-    public JwtAuthenticationFilter(AuthenticationManager authenticationManager, final SecurityConstants securityConstants) { //<2>
+    public JwtAuthenticationFilter(AuthenticationManager authenticationManager, SecurityConstants securityConstants) { //<2>
         this.authenticationManager = authenticationManager;
         this.securityConstants = securityConstants;
         setFilterProcessesUrl(this.securityConstants.getAuthLoginUrl());

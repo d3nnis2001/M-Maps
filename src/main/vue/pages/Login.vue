@@ -13,7 +13,7 @@ export default {
         const email = ref('')
 
         async function login() {
-            if ((email.value).includes("@")) {
+            if (!(email.value).includes("@")) {
                 $q.notify({
                     type: 'negative',
                     message: 'Mistake',
@@ -23,7 +23,7 @@ export default {
                 try {
                     const emailExists = await loginStore.checkEmail(email.value);
                     if (emailExists) {
-                        router.push('/password');
+                        await router.push('/password');
                     } else {
                         $q.notify({
                             type: 'negative',

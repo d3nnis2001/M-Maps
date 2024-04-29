@@ -1,12 +1,12 @@
 <script setup>
-import {ref} from 'vue'
-import {useUserStore} from "../stores/RegistrationStore"
+import {ref, toRaw} from 'vue'
+import {useRegistrationStore} from "../stores/RegistrationStore"
 import {useQuasar} from 'quasar'
 import {useRouter} from 'vue-router'
 
 const $q = useQuasar()
 const router = useRouter()
-const userStore = useUserStore()
+const regStore = useRegistrationStore()
 
 const firstName = ref('')
 const name = ref('')
@@ -37,19 +37,69 @@ const service = ref([
     { label: "DB Systemtechnik", value: "1" },
     { label: "DB Kommunikationstechnik", value: "2" }
 ]);
+function checkInputs() {
+    let errormsg = [];
 
+    if (!firstName.value.trim()) {
+        errormsg.push("Please fill the input for your first name");
+    }
+    if (!name.value.trim()) {
+        errormsg.push("Please fill the input for your last name");
+    }
+    if (!email.value.trim()) {
+        errormsg.push("Please fill the input for your email");
+    }
+    if (!pass.value.trim()) {
+        errormsg.push("Please choose a password");
+    }
+    if (!passAgain.value.trim()) {
+        errormsg.push("Please repeat your password");
+    }
+    if (!model1.value || model1.value.length === 0) {
+        errormsg.push("You have to choose atleast one role");
+    }
+    if (!model2.value) {
+        errormsg.push("Choose your region");
+    }
+    if (!model3.value) {
+        errormsg.push("Choose your service for the Deutsche Bahn");
+    }
+    if (pass.value.trim() && passAgain.value.trim() && pass.value !== passAgain.value) {
+        errormsg.push("The actual password doesn't match the repeated one!");
+    }
+
+    if (errormsg.length > 0) {
+        for (let i = 0; i < errormsg.length; i++) {
+            $q.notify({
+                type: 'negative',
+                message: errormsg[i]
+            })
+        }
+        return false;
+    }
+    return true;
+}
 function register() {
-    if (1 === 1) {
-        router.push('/')
-    } else {
-        $q.notify({
-            type: 'negative',
-            message: 'Login Fehlgeschlagen',
-            caption: 'Diese Email-Adresse ist noch nicht registriert'
-        })
+    if (checkInputs()) {
+        const roles = model1.value.map(role => role.label);
+        const region = model2.value ? [{ label: model2.value.label}] : [];
+        const service = model3.value ? [{ label: model3.value.label}] : [];
+        console.log(roles)
+        if (regStore.registerUser(email.value, pass.value, firstName.value, name.value,region[0].label, service[0].label, roles)) {
+            $q.notify({
+                type: 'positive',
+                message: 'Registration was successful!',
+                caption: 'Your account will be activated once an admin unlocks your account'
+            })
+        } else {
+            $q.notify({
+                type: 'negative',
+                message: 'Login failed',
+                caption: 'This email is already registered!'
+            })
+        }
     }
 }
-// https://www.figma.com/file/KE0rSr4lUzKzWQp7nY2jDZ/M-Maps-Prototyp?type=design&node-id=2-8&mode=design&t=atOavQXYG9PWr9Zr-4
 </script>
 
 <template>
@@ -81,7 +131,7 @@ function register() {
                             <q-select class="input-field extra-padding" multiple use-chips standout v-model="model1" :options="roles" label="Rollen" />
                             <q-select class="input-field extra-padding" standout v-model="model2" :options="region" label="Region" />
                             <q-select class="input-field extra-padding" standout v-model="model3" :options="service" label="Fachdienst" />
-                            <q-btn label="Registrieren" color="primary" class=""></q-btn>
+                            <q-btn label="Registrieren" color="primary" @click=register class=""></q-btn>
                         </div>
                         <div class="bg-grey-4 impressum-padding">
                             <div class="text-black text-align justify-center">Impressum</div>

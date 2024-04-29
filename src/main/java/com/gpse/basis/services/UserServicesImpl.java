@@ -22,8 +22,17 @@ public class UserServicesImpl implements UserServices {
         return userRepo.findById(username)
             .orElseThrow(() -> new UsernameNotFoundException("ExampleUser name " + username + " not found."));
     }
-
+    @Override
     public boolean checkExistanceEmail(String email) {
         return userRepo.existsById(email);
+    }
+    @Override
+    public boolean addUser(UserModel us) {
+        userRepo.save(us);
+        return true;
+    }
+    @Override
+    public boolean deleteUser(String email) {
+        return true;
     }
 }

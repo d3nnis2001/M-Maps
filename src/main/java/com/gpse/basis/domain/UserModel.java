@@ -22,6 +22,8 @@ public class UserModel implements UserDetails {
     private String password;
     private  String firstname;
     private String lastname;
+    private ArrayList<String> region;
+    private String service;
     private static final boolean accountNonExpired = true;
     private static final boolean accountNonLocked = true;
     private static final boolean credentialsNonExpired = true;
@@ -38,6 +40,7 @@ public class UserModel implements UserDetails {
     public void addRole(String role) {
         if (this.roles == null) {
             this.roles = new ArrayList<>();
+            this.roles.add(role);
         } else {
             this.roles.add(role);
         }
@@ -102,5 +105,22 @@ public class UserModel implements UserDetails {
     @Override
     public boolean isEnabled() {
         return this.enabled;
+    }
+
+    public void addRegion(String region) {
+        if (this.region == null) {
+            this.region = new ArrayList<>();
+            this.region.add(region);
+        } else {
+            this.region.add(region);
+        }
+    }
+
+    public String getService() {
+        return service;
+    }
+
+    public void setService(String service) {
+        this.service = service;
     }
 }
