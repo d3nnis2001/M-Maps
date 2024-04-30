@@ -1,62 +1,62 @@
 <template>
-    <div class="q-py-md" style="min-width: 80%">
-        <q-file
-            outlined
-            v-model="selectedFiles"
-            style="max-width: 75%"
-            @update:model-value="onFilesSelected()"
-            multiple
-            append
-        >
-            <template v-slot:prepend>
-                <q-icon name="attach_file" />
-            </template>
-        </q-file>
-
-        <div v-if="selectedFilesWithText.length" style="max-width: 75%">
-            <q-list separator>
-                <q-item v-for="(f, index) in selectedFilesWithText" :key="index">
-                    <q-item-section avatar class="gt-xs">
-                        <q-icon v-if="!f.missingId" name="description" size="xl" />
-                        <q-icon v-else name="error" size="xl" color="red" />
-                    </q-item-section>
-                    <q-item-section>
-                        <q-item-label class="full-width ellipsis">
-                            {{ f.file.name }}
-                        </q-item-label>
-                        <q-item-label v-if="f.missingId" style="color: red">
-                            Strecken-Id fehlt!
-                        </q-item-label>
-                    </q-item-section>
-
-                    <q-item-section middle center>
-                        <q-input
-                            v-model="f.textInput"
-                            filled
-                            label="Strecken-Id"
-                            stack-label
-                            :dense="dense"
-                        />
-                    </q-item-section>
-
-                    <q-item-section top side>
-                        <q-btn
-                            class="gt-xs"
-                            size="12px"
-                            flat
-                            dense
-                            round
-                            icon="delete"
-                            @click="removeFile(index)"
-                        />
-                    </q-item-section>
-                </q-item>
-            </q-list>
+    <div class="q-pa-md">
+        <div>
+            <q-file
+                outlined
+                v-model="selectedFiles"
+                style="width: 80%"
+                @update:model-value="onFilesSelected()"
+                multiple
+                append
+            >
+                <template v-slot:prepend>
+                    <q-icon name="attach_file" />
+                </template>
+            </q-file>
         </div>
-    </div>
-    <div>
-        <q-btn :loading="loading" color="red" text-color="white" @click="handleClick" label="Importieren"></q-btn>
-    </div>
+            <div v-if="selectedFilesWithText.length">
+                <q-list separator>
+                    <q-item v-for="(f, index) in selectedFilesWithText" :key="index" style="width: 100%">
+                        <div class="row" style="width: 100%">
+                            <div class="col-xs-3 col-md-1">
+                                <q-icon v-if="!f.error" name="description" size="xl" />
+                                <q-icon v-else name="error" size="xl" color="red" />
+                            </div>
+                            <div class="col-xs-7 col-md-10">
+                                <div class="row">
+                                    <div class="col-12 col-md-6">
+                                        <div :style="{overflow: 'hidden'}">{{ f.file.name }}</div>
+                                        <div v-if="f.error" style="color: red">
+                                            {{ f.errorMsg }}
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <q-input
+                                            v-model="f.textInput"
+                                            filled
+                                            label="Strecken-Id"
+                                            stack-label
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-2 col-md-1">
+                                <q-btn
+                                    size="l"
+                                    flat
+                                    round
+                                    icon="delete"
+                                    @click="removeFile(index)"
+                                />
+                            </div>
+                        </div>
+                    </q-item>
+                </q-list>
+            </div>
+        <div class="q-pa-md">
+            <q-btn :loading="loading" color="red" text-color="white" @click="handleClick" label="Importieren"></q-btn>
+        </div>
+        </div>
 </template>
 
 <script>
@@ -77,7 +77,8 @@ export default {
                 this.selectedFilesWithText.push({
                     file: f,
                     textInput: "",
-                    missingId: false,
+                    error: false,
+                    errorMsg: ""
                 })
             );
             this.selectedFiles.splice(0);
@@ -120,12 +121,8 @@ export default {
                         );
                         console.log("------ " + index);
                         if (file.accepted === false) {
-                            if(file.reason === "Missing Track_ID") {
-                                this.selectedFilesWithText[index].missingId = true;
-                            }
-                            else {
-                                //todo: Grund überprüfen, wenn strecken id fehlt diese rot markieren in der list
-                            }
+                            this.selectedFilesWithText[index].error = true;
+                            this.selectedFilesWithText[index].errorMsg = file.reason;
                         } else {
                             this.selectedFilesWithText.splice(index, 1);
                         }
@@ -135,9 +132,13 @@ export default {
                 .catch((error) => {
                     console.error("Error uploading files:", error);
                     this.loading = false;
-                    // todo: error bearbeiten
+                    this.$q.notify({
+                        message: error.toString(),
+                        timeout: 5000,
+                    });
                 });
         },
     },
 };
 </script>
+

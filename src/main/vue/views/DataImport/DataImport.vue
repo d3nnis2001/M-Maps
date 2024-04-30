@@ -1,14 +1,13 @@
 <template>
-    <q-page class="window-height window-width row">
-        <div class="col-xs-2">
-            <q-page-sticky position="top-left" :offset="[10, 10]">
+    <q-page>
+            <q-page-sticky position="bottom-left" :offset="[10, 10]">
                 <div class="q-mt-md">
                     <q-fab
                         label="Actions"
                         vertical-actions-align="left"
                         color="red"
-                        icon="keyboard_arrow_down"
-                        direction="down"
+                        icon="keyboard_arrow_up"
+                        direction="up"
                     >
                         <q-fab-action
                             v-model="route"
@@ -32,11 +31,8 @@
                     </q-fab>
                 </div>
             </q-page-sticky>
-        </div>
-        <div class="col">
             <importComponent v-if="route == 0" />
             <deleteComponent v-if="route == 1" />
-        </div>
     </q-page>
 </template>
 

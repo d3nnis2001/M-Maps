@@ -1,12 +1,11 @@
 <template>
-    <div class="q-py-md" style="min-width: 80%">
-        <div class="row  justify-start items-center">
-            <div class="col-10">
+    <div class="q-py-md" style="width: 100%">
+        <div class="row q-pa-sm justify-start items-center">
+            <div class="col-xs-7 col-md-10">
                 <q-input
                     bottom-slots
                     v-model="searchString"
                     label="Datensatz-ID"
-                    :dense="dense"
                 >
                     <template v-slot:prepend>
                         <q-icon name="search" />
@@ -16,34 +15,30 @@
                     </template>
                 </q-input>
             </div>
-            <div class="col q-pl-md">
+            <div class="col-xs-5 col-md-2 q-pl-md">
                 <q-btn label="Suchen" @click="requestDataSets" />
             </div>
         </div>
-        <div class="q-pa-md example-col-gutter-mixed">
+        <div class="q-pa-md">
             <div class="row q-col-gutter-x-xs q-col-gutter-y-lg">
-                <div v-for="(set, index) in datasets" :key="index">
-                    <q-card class="my-content">
-                        <q-card-section horizontal>
-                            <q-card-section avatar>
-                                <q-icon name="description" size="50px" />
-                            </q-card-section>
-                            <q-card-section>
-                                <div class="text-h6">{{ set.id }}</div>
-                                <div class="text-subtitle2">{{ set.streckenid }}</div>
-                                <div class="text-subtitle2">{{ set.fileName }}</div>
-                                <div class="text-subtitle2">{{ set.date }}</div>
-                            </q-card-section>
+                <div class="col-md-4 col-sm-12" v-for="(set, index) in datasets" :key="index">
+                    <q-card style="width: 80%">
+                        <q-card-section horizontal class="justify-around q-px-md">
+                            <q-icon name="description" size="xl" />
+                            <div class="text-bold">{{ set.id }}</div>
+                            <q-checkbox v-model="set.checked" />
                         </q-card-section>
                         <q-separator />
-                        <q-card-actions align="right">
-                            <q-checkbox v-model="set.checked" />
-                        </q-card-actions>
+                        <q-card-section>
+                            <div>{{ set.streckenid }}</div>
+                            <div style="width: 80%; overflow: auto;">{{ set.fileName }}</div>
+                            <div>{{ set.date }}</div>
+                        </q-card-section>
                     </q-card>
                 </div>
             </div>
         </div>
-        <div class="row">
+        <div class="row q-pb-xl q-pl-md">
             <div class="col q-py-md">
                 <q-checkbox
                     v-model="del"
@@ -100,7 +95,10 @@ export default {
                     });
                 })
                 .catch((error) => {
-                    // todo: Fehler bearbeiten!
+                    this.$q.notify({
+                        message: error.toString(),
+                        timeout: 5000,
+                    });
                     console.error("Error:", error);
                 });
         },
@@ -141,7 +139,10 @@ export default {
                     console.log("Response:", response.data);
                 })
                 .catch((error) => {
-                    //todo fehler bearbeiten
+                    this.$q.notify({
+                        message: error.toString(),
+                        timeout: 5000,
+                    });
                     console.error("Error:", error);
                 });
         },
@@ -149,10 +150,3 @@ export default {
 };
 </script>
 
-<style lang="sass">
-.example-col-gutter-mixed
-    .my-content
-        background: rgba(#999,.15)
-        border: 1px solid rgba(#999,.2)
-        width: 100%
-</style>
