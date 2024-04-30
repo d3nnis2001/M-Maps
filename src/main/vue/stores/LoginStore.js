@@ -1,5 +1,5 @@
 import {defineStore} from 'pinia'
-import emailChecker from '../api/auth.js';
+import {emailChecker, checkAccountDetails} from '../api/auth.js';
 
 export const useLoginStore = defineStore('users', {
     actions: {
@@ -8,6 +8,15 @@ export const useLoginStore = defineStore('users', {
                 return await emailChecker(email);
             } catch (error) {
                 console.error("Error checking email: ", error);
+                return false;
+            }
+        },
+        async checkPassword(email, password) {
+            try {
+                const response = await checkAccountDetails(email, password)
+                return response;
+            } catch (error) {
+                console.error("Error when trying to log in: ", error);
                 return false;
             }
         }

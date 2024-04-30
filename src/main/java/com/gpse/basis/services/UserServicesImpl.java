@@ -8,6 +8,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 public class UserServicesImpl implements UserServices {
     private final UserRepository userRepo;
@@ -34,5 +36,15 @@ public class UserServicesImpl implements UserServices {
     @Override
     public boolean deleteUser(String email) {
         return true;
+    }
+
+    public boolean checkCredentials(String email, String password) {
+        Optional<UserModel> userOpt = userRepo.findById(email);
+        if (userOpt.isPresent()) {
+            UserModel user = userOpt.get();
+            boolean equal = password.equals(user.getPassword());
+            return equal;
+        }
+        return false;
     }
 }

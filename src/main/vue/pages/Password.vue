@@ -3,14 +3,29 @@ import {ref} from 'vue'
 import {useLoginStore} from "../stores/LoginStore"
 import {useQuasar} from 'quasar'
 import {useRouter} from 'vue-router'
+import {useRoute} from 'vue-router';
 
 const $q = useQuasar()
 const router = useRouter()
+const route = useRoute();
 const loginStore = useLoginStore()
 
-const username = ref('')
+const passwordVar = ref('')
 
-function password() {
+async function password() {
+    const email = route.query.email;
+    const success = await loginStore.checkPassword(email, passwordVar.value)
+    if (success)
+    {
+        router.push("karte")
+    } else {
+        $q.notify({
+            type: 'negative',
+            message: 'Wrong password',
+            caption: 'Password does not match email'
+        });
+    }
+
 }
 function navigateForgotPassword() {
     router.push("forgotPassword")
@@ -39,7 +54,7 @@ function navigateForgotPassword() {
                             </div>
                         </div>
                         <div class="row-auto text-align extra-padding">
-                            <q-input type="password" class="email-input extra-padding" v-model="username" label="Passwort"/>
+                            <q-input type="password" class="email-input extra-padding" v-model="passwordVar" label="Passwort"/>
                             <div class="text-align extra-padding" @click=navigateForgotPassword()>
                                 Passwort Vergessen
                             </div>

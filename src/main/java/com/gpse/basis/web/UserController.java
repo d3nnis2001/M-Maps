@@ -2,6 +2,7 @@ package com.gpse.basis.web;
 
 import com.gpse.basis.domain.UserModel;
 import com.gpse.basis.services.UserServices;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -50,6 +51,17 @@ public class UserController {
         if (!userService.checkExistanceEmail(request.getParameter("email").trim())) {
             boolean success = userService.addUser(us);
             return ResponseEntity.ok(success);
+        }
+        return ResponseEntity.ok(false);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<Boolean> login(final WebRequest request) {
+        String email = request.getParameter("email");
+        String password = request.getParameter("password");
+        System.out.println(password);
+        if (userService.checkCredentials(email, password)) {
+            return ResponseEntity.ok(true);
         }
         return ResponseEntity.ok(false);
     }

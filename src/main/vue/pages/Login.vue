@@ -23,7 +23,7 @@ export default {
                 try {
                     const emailExists = await loginStore.checkEmail(email.value);
                     if (emailExists) {
-                        await router.push('/password');
+                        await router.push({ path: '/password', query: { email: email.value } });
                     } else {
                         $q.notify({
                             type: 'negative',
