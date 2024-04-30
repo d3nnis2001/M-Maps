@@ -58,6 +58,9 @@ public class FileServiceImpl implements FileService {
                     } catch(IndexOutOfBoundsException e) {
                         rsp.add(new FileUploadResponse(file.getOriginalFilename(), false, "Fehlerhafte Parquet-Format"));
                         continue;
+                    } catch(RuntimeException e) {
+                        rsp.add(new FileUploadResponse(file.getOriginalFilename(), false, "Fehlerhafte Datei!"));
+                        continue;
                     }
                     rsp.add(new FileUploadResponse(file.getOriginalFilename(), true, ""));
                 }
@@ -70,6 +73,9 @@ public class FileServiceImpl implements FileService {
                     continue;
                 } catch (IndexOutOfBoundsException e) {
                     rsp.add(new FileUploadResponse(file.getOriginalFilename(), false, "Fehlerhafte Parquet-Format"));
+                    continue;
+                } catch(RuntimeException e) {
+                    rsp.add(new FileUploadResponse(file.getOriginalFilename(), false, "Fehlerhafte Datei!"));
                     continue;
                 }
                 rsp.add(new FileUploadResponse(file.getOriginalFilename(), true, ""));
@@ -92,7 +98,7 @@ public class FileServiceImpl implements FileService {
         return matcher.find();
     }
 
-    public void saveFile(MultipartFile file, String streckenId) throws IOException,IndexOutOfBoundsException {
+    public void saveFile(MultipartFile file, String streckenId) throws IOException,IndexOutOfBoundsException,RuntimeException {
             Date uploadDate = new Date();
 
             DataSet st = new DataSet();
