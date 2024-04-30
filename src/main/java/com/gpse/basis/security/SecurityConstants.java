@@ -16,7 +16,7 @@ public final class SecurityConstants {
         return authLoginUrl;
     }
 
-    public void setAuthLoginUrl(String authLoginUrl) {
+    public void setAuthLoginUrl(final String authLoginUrl) {
         this.authLoginUrl = authLoginUrl;
     }
 
@@ -24,7 +24,7 @@ public final class SecurityConstants {
         return jwtSecret;
     }
 
-    public void setJwtSecret(String jwtSecret) {
+    public void setJwtSecret(final String jwtSecret) {
         this.jwtSecret = jwtSecret;
     }
 
@@ -32,7 +32,7 @@ public final class SecurityConstants {
         return tokenHeader;
     }
 
-    public void setTokenHeader(String tokenHeader) {
+    public void setTokenHeader(final String tokenHeader) {
         this.tokenHeader = tokenHeader;
     }
 
@@ -40,7 +40,7 @@ public final class SecurityConstants {
         return tokenPrefix;
     }
 
-    public void setTokenPrefix(String tokenPrefix) {
+    public void setTokenPrefix(final String tokenPrefix) {
         this.tokenPrefix = tokenPrefix;
     }
 
@@ -48,7 +48,7 @@ public final class SecurityConstants {
         return tokenType;
     }
 
-    public void setTokenType(String tokenType) {
+    public void setTokenType(final String tokenType) {
         this.tokenType = tokenType;
     }
 
@@ -56,7 +56,7 @@ public final class SecurityConstants {
         return tokenIssuer;
     }
 
-    public void setTokenIssuer(String tokenIssuer) {
+    public void setTokenIssuer(final String tokenIssuer) {
         this.tokenIssuer = tokenIssuer;
     }
 
@@ -64,7 +64,7 @@ public final class SecurityConstants {
         return tokenAudience;
     }
 
-    public void setTokenAudience(String tokenAudience) {
+    public void setTokenAudience(final String tokenAudience) {
         this.tokenAudience = tokenAudience;
     }
 

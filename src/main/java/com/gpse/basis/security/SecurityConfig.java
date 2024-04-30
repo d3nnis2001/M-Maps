@@ -33,14 +33,14 @@ public class SecurityConfig {
     private final AuthenticationConfiguration configuration;
 
     @Autowired
-    public SecurityConfig(final UserDetailsService userDetailsService, final SecurityConstants securityConstants, AuthenticationConfiguration configuration) {
+    public SecurityConfig(final UserDetailsService userDetailsService, final SecurityConstants securityConstants, final AuthenticationConfiguration configuration) {
         super();
         this.userDetailsService = userDetailsService;
         this.securityConstants = securityConstants;
         this.configuration = configuration;
     }
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
 
         return http.csrf(AbstractHttpConfigurer::disable)
             .cors(AbstractHttpConfigurer::disable)

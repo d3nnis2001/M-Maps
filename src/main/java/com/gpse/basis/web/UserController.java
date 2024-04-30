@@ -2,7 +2,6 @@ package com.gpse.basis.web;
 
 import com.gpse.basis.domain.UserModel;
 import com.gpse.basis.services.UserServices;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,9 +10,9 @@ import org.springframework.web.context.request.WebRequest;
 @RestController
 @RequestMapping("/api")
 public class UserController {
-    private UserServices userService;
+    private final UserServices userService;
     @Autowired
-    public UserController(UserServices userService) {
+    public UserController(final UserServices userService) {
         this.userService = userService;
     }
     @GetMapping ("/authenticate")
@@ -59,7 +58,6 @@ public class UserController {
     public ResponseEntity<Boolean> login(final WebRequest request) {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
-        System.out.println(password);
         if (userService.checkCredentials(email, password)) {
             return ResponseEntity.ok(true);
         }
