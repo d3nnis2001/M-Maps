@@ -135,6 +135,9 @@ public class FileServiceImpl implements FileService {
     @Override
     public void deleteDataSetsById(List<String> ids) {
         ids.forEach(datasetRepro::deleteById);
-        // todo: zugehörige Daten löschen
+        List<GleisLageDatenpunkt> gld = new ArrayList<>();
+        glDatenRepro.findAll().forEach(gld::add);
+        gld = gld.stream().filter(gl -> ids.contains(gl.getDataSetid())).collect(Collectors.toList());
+        glDatenRepro.deleteAll(gld);
     }
 }
