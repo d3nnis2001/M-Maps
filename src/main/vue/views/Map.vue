@@ -31,5 +31,5 @@ onMounted(() => {
 </template>
 
 <style>
-#map { height: 560px; width: 720px; margin: 48px }
+#map { height: 720px; width: 95%; margin: 48px }
 </style>
