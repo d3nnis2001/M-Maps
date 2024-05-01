@@ -25,5 +25,20 @@ export const checkAccountDetails = async function (email, password){
         return false;
     }
 }
+export const resetPassword = async function (email) {
+    const cred = new URLSearchParams()
+    cred.append("email", email)
+    console.log(email)
+    const response = await axios.post("/api/user/resetPassword",cred)
+    return response
+}
+export const setPasswordNew = async function (email, password, token){
+    const cred = new URLSearchParams()
+    cred.append("email", email)
+    cred.append("password", password)
+    cred.append("token", token)
+    const response = await axios.post("/api/user/setPassword", cred)
+    return response
+}
 
-export default {emailChecker, checkAccountDetails};
+export default {emailChecker, checkAccountDetails, resetPassword, setPasswordNew};

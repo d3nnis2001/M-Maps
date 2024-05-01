@@ -23,7 +23,7 @@ export default {
                 try {
                     const emailExists = await loginStore.checkEmail(email.value);
                     if (emailExists) {
-                        await router.push({ path: '/password', query: { email: email.value } });
+                        await router.push('password');
                     } else {
                         $q.notify({
                             type: 'negative',
@@ -48,7 +48,7 @@ export default {
         return {email, login, navigateRegister}
     }
 }
-// https://www.figma.com/file/KE0rSr4lUzKzWQp7nY2jDZ/M-Maps-Prototyp?type=design&node-id=2-8&mode=design&t=atOavQXYG9PWr9Zr-4
+
 </script>
 <template>
     <div class="full-height-center">

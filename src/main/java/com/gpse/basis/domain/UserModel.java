@@ -8,7 +8,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serial;
 import java.lang.reflect.Array;
+import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
 
@@ -21,6 +23,7 @@ public class UserModel implements UserDetails {
     @JsonIgnore
     private String password;
     private  String firstname;
+    private String passwordToken;
     private String lastname;
     private ArrayList<String> region;
     private String service;
@@ -115,7 +118,16 @@ public class UserModel implements UserDetails {
             this.region.add(region);
         }
     }
-
+    public String setTokenPassword() {
+        SecureRandom random = new SecureRandom();
+        byte[] token = new byte[24];
+        random.nextBytes(token);
+        passwordToken = Base64  .getUrlEncoder().withoutPadding().encodeToString(token);
+        return passwordToken;
+    }
+    public String getTokenPassword() {
+        return passwordToken;
+    }
     public String getService() {
         return service;
     }

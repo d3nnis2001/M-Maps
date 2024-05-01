@@ -28,7 +28,8 @@ async function password() {
 
 }
 function navigateForgotPassword() {
-    router.push("forgotPassword")
+    const email = route.query.email;
+    router.push({path: "/forgotPassword", query: { email: email }})
 }
 // https://www.figma.com/file/KE0rSr4lUzKzWQp7nY2jDZ/M-Maps-Prototyp?type=design&node-id=2-8&mode=design&t=atOavQXYG9PWr9Zr-4
 </script>

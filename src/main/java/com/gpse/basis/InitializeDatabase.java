@@ -18,7 +18,7 @@ public class InitializeDatabase implements InitializingBean {
     @Override
     public void afterPropertiesSet() {
         usRepo.deleteAll();
-        UserModel user = new UserModel("123@gmail.com", "hello", "Georg", "Bauer");
+        UserModel user = new UserModel("d3nnis.s@web.de", "hello", "Georg", "Bauer");
         user.addRole("Prüfer");
         usRepo.save(user);
     }

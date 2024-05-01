@@ -1,6 +1,7 @@
 package com.gpse.basis.web;
 
 import com.gpse.basis.domain.UserModel;
+import com.gpse.basis.services.EmailServices;
 import com.gpse.basis.services.UserServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -11,9 +12,11 @@ import org.springframework.web.context.request.WebRequest;
 @RequestMapping("/api")
 public class UserController {
     private final UserServices userService;
+    private final EmailServices emailService;
     @Autowired
-    public UserController(final UserServices userService) {
+    public UserController(final UserServices userService, final EmailServices emailService) {
         this.userService = userService;
+        this.emailService = emailService;
     }
     @GetMapping ("/authenticate")
     public ResponseEntity<Boolean> authenticate(@RequestParam String email) {
@@ -62,5 +65,27 @@ public class UserController {
             return ResponseEntity.ok(true);
         }
         return ResponseEntity.ok(false);
+    }
+    @PostMapping("/user/resetPassword")
+    public ResponseEntity<Boolean> changePassword(final WebRequest request) {
+        String email = request.getParameter("email");
+        String token = userService.getToken(email);
+        if (userService.checkExistanceEmail(email)) {
+            emailService.sendEmailwithToken(email, token);
+            return ResponseEntity.ok(true);
+        }
+        return ResponseEntity.ok(false);
+    }
+    @PostMapping("/user/setPassword")
+    public ResponseEntity<Boolean> resetPassword(final WebRequest request) {
+        String password = request.getParameter("password");
+        String token = request.getParameter("token");
+        String email = request.getParameter("email");
+        boolean response = userService.setPasswordNew(email, password, token);
+        if (response) {
+            return ResponseEntity.ok(true);
+        } else {
+            return ResponseEntity.ok(false);
+        }
     }
 }

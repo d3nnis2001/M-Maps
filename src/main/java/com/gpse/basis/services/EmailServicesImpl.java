@@ -1,0 +1,31 @@
+package com.gpse.basis.services;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.stereotype.Service;
+@Service
+public class EmailServicesImpl implements EmailServices {
+    @Autowired
+    private JavaMailSender mailSender;
+
+    public void sendEmail(String to, String subject, String body) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("gpseteam1.2@gmail.com");
+        message.setTo(to);
+        message.setSubject(subject);
+        message.setText(body);
+
+        mailSender.send(message);
+
+        System.out.println("Message was sent with success!");
+    }
+    public void sendEmailwithToken(String receiver, String token) {
+        String link = "http://localhost:8080/reset-password?email=" + receiver + "&token=" + token;
+        String subject = "Password Reset";
+        String body = "Hello,\n\nYou have requested to reset your password. "
+            + "Please click on the link below to reset your password:\n\n"
+            + link + "\n\nIf you did not request a password reset, please ignore this email.";
+        sendEmail(receiver, subject, body);
+    }
+}

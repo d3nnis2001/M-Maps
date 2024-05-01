@@ -4,7 +4,7 @@ import Login from '../pages/Login.vue'
 import Registration from "@/main/vue/pages/Registration.vue";
 import Password from "@/main/vue/pages/Password.vue";
 import ForgotPassword from "@/main/vue/pages/ForgotPassword.vue";
-
+import ResetPassword from "@/main/vue/pages/ResetPassword.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -33,6 +33,11 @@ const router = createRouter({
       path: "/forgotPassword",
       name: "forgotPassword",
       component: ForgotPassword
+    },
+    {
+      path: "/reset-password",
+      name: "setNewPassword",
+      component: ResetPassword
     }
   ]
 })
