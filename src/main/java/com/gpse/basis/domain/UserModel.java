@@ -14,7 +14,7 @@ import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
 
-@Document
+@Document(collection = "userModel")
 public class UserModel implements UserDetails {
     @Serial
     private static final long serialVersionUID = 1L;
