@@ -58,7 +58,7 @@
                         <artifactId>maven-compiler-plugin</artifactId>
                         <configuration>
                             <excludes>
-                                <exclude>**/<interner>/<pfad>/offender.java</exclude>
+                                <exclude>**/com/gpse/basis/InitializeDatabase.java</exclude>
                             </excludes>
                         </configuration>
                     </plugin>
