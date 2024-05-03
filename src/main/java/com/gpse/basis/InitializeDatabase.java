@@ -21,6 +21,9 @@ public class InitializeDatabase implements InitializingBean {
     public void initUsers() {
         UserModel user = new UserModel("d3nnis.s@web.de", "hello", "Georg", "Bauer");
         user.addRole("Prüfer");
+        UserModel user2 = new UserModel("mauricemeise@gmx.net", "asdf", "Jochen", "Spack");
+        user.addRole("Admin");
         usRepo.save(user);
+        usRepo.save(user2);
     }
 }

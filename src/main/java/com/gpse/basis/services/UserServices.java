@@ -5,6 +5,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.context.request.WebRequest;
 
+import java.util.ArrayList;
+
 public interface UserServices extends UserDetailsService {
     boolean checkExistanceEmail(String email);
     boolean addUser(UserModel us);
@@ -12,4 +14,5 @@ public interface UserServices extends UserDetailsService {
     boolean checkCredentials(String email, String password);
     String getToken(String email);
     boolean setPasswordNew(String email, String password, String token);
+    ArrayList<UserModel> getAllUsers();
 }
