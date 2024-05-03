@@ -1,6 +1,7 @@
-package com.gpse.basis.web.DataImport;
+package com.gpse.basis.services;
 
 import com.gpse.basis.domain.DataSet;
+import com.gpse.basis.domain.FileUploadResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;

@@ -1,49 +1,41 @@
 <script>
 import {ref} from 'vue'
 import {useQuasar} from 'quasar'
-import {resetPassword, setPasswordNew} from "@/main/vue/api/auth";
-import {useRoute, useRouter} from "vue-router";
+import {resetPassword} from "@/main/vue/api/auth";
 
 export default {
     methods: {resetPassword},
     setup() {
         const $q = useQuasar()
-        const password = ref('')
-        const route = useRoute()
-        const passAgain = ref('')
-        const router = useRouter()
 
-        async function setNewPassword() {
-            if (password !== null && passAgain !== null &&
-                password.value !== "" && password.value === passAgain.value) {
-                const token = route.query.token;
-                const email = route.query.email;
-                console.log(password.value, token)
-                const response = setPasswordNew(email, password.value, token)
+        const email = ref('')
+
+        async function sendPasswordMail() {
+            if (email.value.includes("@")) {
+                const response = resetPassword(email.value)
                 if (response) {
-                    setTimeout(2000);
-                    await router.push("login")
                     $q.notify({
                         type: 'positive',
-                        message: 'Successfully reseted your password',
-                        caption: 'You can now login with your new password'
+                        message: 'Check your email inbox',
+                        caption: 'An email with the link for the password reset has been sent!'
                     });
                 } else {
                     $q.notify({
                         type: 'negative',
-                        message: 'Something went wrong when reseting your password',
-                        caption: 'We apologize. Contact our support'
+                        message: 'Error',
+                        caption: 'Invalid email!'
                     });
                 }
             } else {
                 $q.notify({
                     type: 'negative',
-                    message: 'Wrong input',
-                    caption: 'You have to fill in both password inputs with the same password'
+                    message: 'Error',
+                    caption: 'Invalid email!'
                 });
             }
         }
-        return {password, passAgain, setNewPassword}
+
+        return {sendPasswordMail, email}
     }
 }
 
@@ -56,23 +48,39 @@ export default {
                 <q-card class="q-pa-md">
                     <q-card-section class="inner-card">
                         <div class="row-auto text-align extra-padding">
-                            <img src="../../resources/db-logo.png" alt="Nicht verfügbar">
+                            <img src="../../../resources/db-logo.png" alt="Nicht verfügbar">
                         </div>
                         <div class="row-auto extra-padding">
-                            <div class="text-h4 text-align ">Passwort Neu setzen</div>
+                            <div class="text-h4 text-align ">Passwort Zurücksetzen</div>
                         </div>
                         <div class="row-auto extra-padding">
                             <div class="rectangle"></div>
                         </div>
                         <div class="row-auto extra-padding">
                             <div class="text-align">
-                                Bitte geben Sie ihr neues Passwort ein!
+                                Bitte geben Sie die E-Mail-Adresse ein, mit der Sie sich registriert haben.
+                                Wir senden Ihnen eine E-Mail mit weiteren Schritten zum Zurücksetzen der Login-Daten.
                             </div>
                         </div>
                         <div class="row-auto text-align extra-padding">
-                            <q-input class="email-input extra-padding" type="password" v-model="password" label="Passwort"/>
-                            <q-input class="email-input extra-padding" type="password" v-model="passAgain" label="Passwort erneut eingeben"/>
-                            <q-btn label="Passwort neu setzen" @click="setNewPassword" color="primary" class=""></q-btn>
+                            <q-input class="email-input extra-padding" v-model="email" label="E-Mail Adresse"/>
+                            <q-btn label="Passwort Zurücksetzen" @click="sendPasswordMail" color="primary" class=""></q-btn>
+                            <q-dialog v-model="alert">
+                                <q-card>
+                                    <q-card-section>
+                                        <div class="text-h6">E-Mail verschickt</div>
+                                    </q-card-section>
+
+                                    <q-card-section class="q-pt-none">
+                                        Bitte überprüfen Sie Ihr E-Mail Postfach, um mit der Zurücksetzung des Passworts
+                                        abzuschließen!
+                                    </q-card-section>
+
+                                    <q-card-actions align="right">
+                                        <q-btn flat label="OK" color="primary" v-close-popup />
+                                    </q-card-actions>
+                                </q-card>
+                            </q-dialog>
                         </div>
                         <div class="bg-grey-4 impressum-padding">
                             <div class="text-black text-align justify-center">Impressum</div>

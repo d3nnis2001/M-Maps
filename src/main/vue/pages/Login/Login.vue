@@ -1,6 +1,6 @@
 <script>
 import {ref} from 'vue'
-import {useLoginStore} from "../stores/LoginStore"
+import {useLoginStore} from "../../stores/LoginStore"
 import {useQuasar} from 'quasar'
 import {useRouter} from 'vue-router'
 
@@ -23,7 +23,7 @@ export default {
                 try {
                     const emailExists = await loginStore.checkEmail(email.value);
                     if (emailExists) {
-                        await router.push('password');
+                        await router.push('password?email='+email.value);
                     } else {
                         $q.notify({
                             type: 'negative',
@@ -57,7 +57,7 @@ export default {
                 <q-card class="q-pa-md">
                     <q-card-section class="inner-card">
                     <div class="row-auto text-align extra-padding">
-                        <img src="../../resources/db-logo.png" alt="Nicht verfügbar">
+                        <img src="../../../resources/db-logo.png" alt="Nicht verfügbar">
                     </div>
                     <div class="row-auto extra-padding">
                         <div class="text-h4 text-align ">Einloggen</div>

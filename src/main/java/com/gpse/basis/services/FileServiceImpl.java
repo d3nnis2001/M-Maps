@@ -1,11 +1,13 @@
-package com.gpse.basis.web.DataImport;
+package com.gpse.basis.services;
 
 import com.exasol.parquetio.data.Row;
 import com.exasol.parquetio.reader.RowParquetReader;
 import com.gpse.basis.domain.DataSet;
-import com.gpse.basis.domain.DataSetRepository;
-import com.gpse.basis.domain.GleisLageDatenRepository;
+import com.gpse.basis.repositories.DataSetRepository;
+import com.gpse.basis.repositories.GleisLageDatenRepository;
 import com.gpse.basis.domain.GleisLageDatenpunkt;
+import com.gpse.basis.services.FileService;
+import com.gpse.basis.domain.FileUploadResponse;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.parquet.hadoop.ParquetReader;

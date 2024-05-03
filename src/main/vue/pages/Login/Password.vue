@@ -1,6 +1,6 @@
 <script setup>
 import {ref} from 'vue'
-import {useLoginStore} from "../stores/LoginStore"
+import {useLoginStore} from "../../stores/LoginStore"
 import {useQuasar} from 'quasar'
 import {useRouter} from 'vue-router'
 import {useRoute} from 'vue-router';
@@ -17,7 +17,7 @@ async function password() {
     const success = await loginStore.checkPassword(email, passwordVar.value)
     if (success)
     {
-        router.push("karte")
+        await router.push("map")
     } else {
         $q.notify({
             type: 'negative',
@@ -41,7 +41,7 @@ function navigateForgotPassword() {
                 <q-card class="q-pa-md">
                     <q-card-section class="inner-card">
                         <div class="row-auto text-align extra-padding">
-                            <img src="../../resources/db-logo.png" alt="Nicht verfügbar">
+                            <img src="../../../resources/db-logo.png" alt="Nicht verfügbar">
                         </div>
                         <div class="row-auto extra-padding">
                             <div class="text-h4 text-align ">Passwort Eingabe</div>

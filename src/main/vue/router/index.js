@@ -2,13 +2,13 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import StartView from '../pages/Start.vue'
 import MapView from '../pages/Map.vue'
-import DataImport from "@/main/vue/pages/DataImport/DataImport.vue";
-import Login from '../pages/Login.vue'
-import Registration from "@/main/vue/pages/Registration.vue";
-import Password from "@/main/vue/pages/Password.vue";
-import ForgotPassword from "@/main/vue/pages/ForgotPassword.vue";
-import ResetPassword from "@/main/vue/pages/ResetPassword.vue";
-import Start from "@/main/vue/pages/Start.vue";
+import DataImport from "../pages/DataImport/DataImport.vue";
+import Login from '../pages/Login/Login.vue'
+import Registration from "../pages/Login/Registration.vue";
+import Password from "../pages/Login/Password.vue";
+import ForgotPassword from "../pages/Login/ForgotPassword.vue";
+import ResetPassword from "../pages/Login/ResetPassword.vue";
+import Start from "../pages/Start.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

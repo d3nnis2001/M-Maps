@@ -1,4 +1,4 @@
-package com.gpse.basis.web.DataImport;
+package com.gpse.basis.domain;
 
 public class FileUploadResponse {
     private String name;

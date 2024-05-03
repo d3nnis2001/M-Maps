@@ -1,6 +1,6 @@
 <script setup>
 import {ref, toRaw} from 'vue'
-import {useRegistrationStore} from "../stores/RegistrationStore"
+import {useRegistrationStore} from "../../stores/RegistrationStore"
 import {useQuasar} from 'quasar'
 import {useRouter} from 'vue-router'
 
@@ -109,7 +109,7 @@ function register() {
                 <q-card class="q-pa-md">
                     <q-card-section class="inner-card">
                         <div class="row-auto text-align extra-padding">
-                            <img src="../../resources/db-logo.png" alt="Nicht verfügbar">
+                            <img src="../../../resources/db-logo.png" alt="Nicht verfügbar">
                         </div>
                         <div class="row-auto extra-padding">
                             <div class="text-h4 text-align ">Registrieren</div>
