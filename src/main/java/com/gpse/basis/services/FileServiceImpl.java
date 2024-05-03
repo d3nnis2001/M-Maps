@@ -2,22 +2,21 @@ package com.gpse.basis.services;
 
 import com.exasol.parquetio.data.Row;
 import com.exasol.parquetio.reader.RowParquetReader;
-import com.gpse.basis.domain.DataSet;
+import com.gpse.basis.domain.*;
 import com.gpse.basis.repositories.DataSetRepository;
+import com.gpse.basis.repositories.GeoTrackData;
 import com.gpse.basis.repositories.GleisLageDatenRepository;
-import com.gpse.basis.domain.GleisLageDatenpunkt;
 import com.gpse.basis.services.FileService;
-import com.gpse.basis.domain.FileUploadResponse;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.parquet.hadoop.ParquetReader;
 import org.apache.parquet.hadoop.util.HadoopInputFile;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,10 +29,13 @@ public class FileServiceImpl implements FileService {
 
     private final GleisLageDatenRepository glDatenRepro;
 
+    private final GeoTrackData geoTrack;
+
     @Autowired
-    FileServiceImpl(DataSetRepository repro, GleisLageDatenRepository rpr) {
+    FileServiceImpl(DataSetRepository repro, GleisLageDatenRepository rpr, GeoTrackData gt) {
         datasetRepro = repro;
         glDatenRepro = rpr;
+        geoTrack = gt;
     }
 
     @Override
@@ -46,6 +48,16 @@ public class FileServiceImpl implements FileService {
         while(itr1.hasNext() && itr2.hasNext()) {
             MultipartFile file = itr1.next();
             String streckenId = itr2.next();
+
+            if(file.getOriginalFilename().endsWith(".LLH.dat")) {
+                try {
+                    saveLHHFile(file);
+                } catch (IndexOutOfBoundsException | IOException e) {
+                    rsp.add(new FileUploadResponse(file.getOriginalFilename(), false, "Fehlerhafte Datei!"));
+                }
+                rsp.add(new FileUploadResponse(file.getOriginalFilename(), true, ""));
+                continue;
+            }
 
             if(!checkFileName(file.getOriginalFilename())) {
                 if(Objects.equals(streckenId, "missing")) {
@@ -100,6 +112,22 @@ public class FileServiceImpl implements FileService {
         return matcher.find();
     }
 
+    public void saveLHHFile(MultipartFile file) throws IOException, IndexOutOfBoundsException {
+        List<GeoData> lst = new ArrayList<>();
+        InputStream stream = file.getInputStream();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+
+        String line;
+        while((line = reader.readLine()) != null) {
+            String[] parts = line.split(" ");
+            lst.add(new GeoData(Integer.parseInt(parts[0]),
+                                Double.parseDouble(parts[1]),
+                                Double.parseDouble(parts[2]),
+                                Integer.parseInt(parts[4])));
+        }
+        geoTrack.saveAll(lst);
+    }
+
     public void saveFile(MultipartFile file, String streckenId) throws IOException,IndexOutOfBoundsException,RuntimeException {
             Date uploadDate = new Date();
 
@@ -109,7 +137,7 @@ public class FileServiceImpl implements FileService {
             st.setUploadDate(uploadDate);
 
             System.out.println(st);
-            st = datasetRepro.save(st);
+
 
             List<GleisLageDatenpunkt> lst = new ArrayList<>();
             File tempFile = File.createTempFile("temporary", ".temp");
@@ -123,8 +151,8 @@ public class FileServiceImpl implements FileService {
                 lst.add(new GleisLageDatenpunkt((Double) values.get(0), (Double) values.get(1), (Double) values.get(2), (Double) values.get(3), (Double) values.get(4), st.getId()));
                 row = reader.read();
             }
-            // todo: effizienz????
             glDatenRepro.saveAll(lst);
+            st = datasetRepro.save(st);
             tempFile.delete();
     }
 
@@ -147,5 +175,17 @@ public class FileServiceImpl implements FileService {
         glDatenRepro.findAll().forEach(gld::add);
         gld = gld.stream().filter(gl -> ids.contains(gl.getDataSetid())).collect(Collectors.toList());
         glDatenRepro.deleteAll(gld);
+    }
+
+    @Override
+    public ArrayList<GeoData> getGeoData() {
+        Iterable<GeoData> iterable = geoTrack.findAll();
+        ArrayList<GeoData> geoArr = new ArrayList<>();
+        Iterator<GeoData> iterator = iterable.iterator();
+        while (iterator.hasNext()) {
+            GeoData geo = iterator.next();
+            geoArr.add(geo);
+        }
+        return geoArr;
     }
 }
