@@ -15,12 +15,12 @@ public class Reparatur {
     private int track;
     private Date from;
     private Date till;
-    private ArrayList<String> checklist;
+    private Checklist checklist;
     private String remarks;
     private String status;
     private String freigabeberechtigter;
 
-    public Reparatur(String id, int track, Date from, Date till, ArrayList<String> checklist, String remarks, String status, String freigabeberechtigter) {
+    public Reparatur(String id, int track, Date from, Date till, Checklist checklist, String remarks, String status, String freigabeberechtigter) {
         this.id = id;
         this.track = track;
         this.from = from;
@@ -55,11 +55,11 @@ public class Reparatur {
         this.till = till;
     }
 
-    public ArrayList<String> getChecklist() {
+    public Checklist getChecklist() {
         return checklist;
     }
 
-    public void setChecklist(ArrayList<String> checklist) {
+    public void setChecklist(Checklist checklist) {
         this.checklist = checklist;
     }
 

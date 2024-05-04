@@ -1,5 +1,6 @@
 package com.gpse.basis;
 
+import com.gpse.basis.domain.Checklist;
 import com.gpse.basis.domain.Reparatur;
 import com.gpse.basis.domain.UserModel;
 import com.gpse.basis.repositories.ReperaturRepository;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -39,7 +41,12 @@ public class InitializeDatabase implements InitializingBean {
         ArrayList<String> checklist = new ArrayList<>();
         checklist.add("ErsteAufgabe");
         checklist.add("ZweiteAufgabe");
-        Reparatur rep = new Reparatur("1", 6200, datefrom, datetill, checklist,
+        ArrayList<String> items = new ArrayList<>();
+        items.add("Checker 1");
+        items.add("Checker 2");
+
+        Checklist check1 = new Checklist("1", "Abarbeitung1", items);
+        Reparatur rep = new Reparatur("1", 6200, datefrom, datetill, check1,
             "Alles gut hier", "storniert", "Müller");
 
         // Reparaturauftrag 2
@@ -48,7 +55,12 @@ public class InitializeDatabase implements InitializingBean {
         ArrayList<String> checklist2 = new ArrayList<>();
         checklist.add("ErsteAufgabeWieder");
         checklist.add("ZweiteAufgabeWieder");
-        Reparatur rep2 = new Reparatur("2", 6300, datefrom2, datetill2, checklist2,
+        ArrayList<String> items2 = new ArrayList<>();
+        items2.add("Checker 1");
+        items2.add("Checker 2");
+
+        Checklist check2 = new Checklist("2", "Abarbeitung2", items);
+        Reparatur rep2 = new Reparatur("2", 6300, datefrom2, datetill2, check2,
             "Auch alles gut hier", "neu beauftragt", "Heinz");
         reRepo.save(rep);
         reRepo.save(rep2);

@@ -1,5 +1,6 @@
 package com.gpse.basis.services;
 
+import com.gpse.basis.domain.Checklist;
 import com.gpse.basis.domain.Reparatur;
 import com.gpse.basis.repositories.ReperaturRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,7 +8,9 @@ import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
+import java.util.Random;
 
 @Service
 
@@ -27,5 +30,22 @@ public class ReparaturServiceImpl implements ReparaturService {
             repArr.add(repSolo);
         }
         return repArr;
+    }
+    public boolean addUser(int track, Date date1,
+                           Date date2, String authorized, Checklist checklist, String remarks) {
+        String uniqueID = generateID();
+        if (rep.findById(uniqueID) == null) {
+            uniqueID = generateID();
+        }
+        Reparatur newRep = new Reparatur(uniqueID, track, date1, date2, checklist, remarks, "beauftragt", authorized);
+        rep.save(newRep);
+        return true;
+    }
+
+    public String generateID() {
+        long timestamp = System.currentTimeMillis();
+        Random random = new Random();
+        int randomValue = random.nextInt(1000);
+        return String.valueOf(timestamp) + String.valueOf(randomValue);
     }
 }

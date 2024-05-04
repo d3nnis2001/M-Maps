@@ -27,16 +27,6 @@ function changeBool() {
         <q-page-container>
             <router-view/>
         </q-page-container>
-
-        <q-footer elevated class="bg-secondary text-white">
-            <q-toolbar>
-                <q-toolbar-title>
-                    <div>This is a footer. Hi!</div>
-                </q-toolbar-title>
-            </q-toolbar>
-        </q-footer>
-
-
     </q-layout>
 </template>
 
