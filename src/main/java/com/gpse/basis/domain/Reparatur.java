@@ -2,6 +2,8 @@ package com.gpse.basis.domain;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
+import org.springframework.validation.beanvalidation.SpringConstraintValidatorFactory;
+import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -15,15 +17,20 @@ public class Reparatur {
     private Date till;
     private ArrayList<String> checklist;
     private String remarks;
+    private String status;
+    private String freigabeberechtigter;
 
-    public Reparatur(String id, int track, Date from, Date till, ArrayList<String> checklist, String remarks) {
+    public Reparatur(String id, int track, Date from, Date till, ArrayList<String> checklist, String remarks, String status, String freigabeberechtigter) {
         this.id = id;
         this.track = track;
         this.from = from;
         this.till = till;
         this.checklist = checklist;
         this.remarks = remarks;
+        this.status = status;
+        this.freigabeberechtigter = freigabeberechtigter;
     }
+
     public int getTrack() {
         return track;
     }
@@ -68,5 +75,20 @@ public class Reparatur {
     }
     public String getId() {
         return id;
+    }
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getFreigabeberechtigter() {
+        return freigabeberechtigter;
+    }
+
+    public void setFreigabeberechtigter(String freigabeberechtigter) {
+        this.freigabeberechtigter = freigabeberechtigter;
     }
 }

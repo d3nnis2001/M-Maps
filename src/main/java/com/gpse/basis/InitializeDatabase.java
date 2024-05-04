@@ -39,7 +39,8 @@ public class InitializeDatabase implements InitializingBean {
         ArrayList<String> checklist = new ArrayList<>();
         checklist.add("ErsteAufgabe");
         checklist.add("ZweiteAufgabe");
-        Reparatur rep = new Reparatur("1", 6200, datefrom, datetill, checklist, "Alles gut hier");
+        Reparatur rep = new Reparatur("1", 6200, datefrom, datetill, checklist,
+            "Alles gut hier", "storniert", "Müller");
 
         // Reparaturauftrag 2
         Date datefrom2 = new Date(2023, 02, 10, 10, 10, 10);
@@ -47,8 +48,8 @@ public class InitializeDatabase implements InitializingBean {
         ArrayList<String> checklist2 = new ArrayList<>();
         checklist.add("ErsteAufgabeWieder");
         checklist.add("ZweiteAufgabeWieder");
-        Reparatur rep2 = new Reparatur("2", 6300, datefrom2, datetill2, checklist2, "Auch alles gut hier");
-
+        Reparatur rep2 = new Reparatur("2", 6300, datefrom2, datetill2, checklist2,
+            "Auch alles gut hier", "neu beauftragt", "Heinz");
         reRepo.save(rep);
         reRepo.save(rep2);
 

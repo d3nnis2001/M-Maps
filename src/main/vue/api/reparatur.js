@@ -4,7 +4,7 @@ const repair = async function getRepairs() {
     try {
         const response = await axios.get("/api/repair/getdata")
         console.log(response.data)
-        return response
+        return response.data
     } catch (error) {
         console.error("Unseen error while registering:", error);
         return false;

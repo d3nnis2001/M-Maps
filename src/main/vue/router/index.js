@@ -10,6 +10,7 @@ import ForgotPassword from "../pages/Login/ForgotPassword.vue";
 import ResetPassword from "../pages/Login/ResetPassword.vue";
 import Start from "../pages/Start.vue";
 import ReparaturOverview from "@/main/vue/pages/ReparaturAufträge/ReparaturOverview.vue";
+import ReparaturCreate from "@/main/vue/pages/ReparaturAufträge/ReparaturCreate.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -63,6 +64,11 @@ const router = createRouter({
             path: "/repair",
             name: "Repair",
             component: ReparaturOverview
+        },
+        {
+            path: "/repair/create",
+            name: "RepairCreate",
+            component: ReparaturCreate
         }
   ]
 })
