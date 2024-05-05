@@ -1,7 +1,9 @@
 <script>
 
 import {ref} from "vue";
-import sendrepair from "@/main/vue/api/reparatur";
+import {sendrepair} from "@/main/vue/api/reparatur";
+import {useQuasar} from "quasar";
+
 
 export default {
     setup () {
@@ -10,6 +12,7 @@ export default {
         const checkliste = ref('')
         const date = ref('2024/01/01')
         const date2 = ref('2024/01/02')
+        const $q = useQuasar()
         const bem = ref('')
         function checkInputs() {
             let errormsg = [];
@@ -43,7 +46,8 @@ export default {
         }
         function sendData() {
             const err = checkInputs()
-            if (!err) {
+            console.log(err)
+            if (err) {
                 return sendrepair(streckenabschnitt.value, date.value, date2.value, freigabe.value, checkliste.value, bem.value)
             }
         }
@@ -65,11 +69,11 @@ export default {
     <div class="basic-center">
         <div class="rec1">
             <div class="align-basic">
-                <h8>Prüfkoordinaten/Streckenabschnitt</h8>
+                <h4>Prüfkoordinaten/Streckenabschnitt</h4>
                     <q-input class="extra-mar" outlined v-model="streckenabschnitt" label="Streckenabschnitt" />
             </div>
             <div class="align-basic">
-                <h8>Zeitraum</h8>
+                <h4>Zeitraum</h4>
                 <div class="align-mult">
                     <q-input filled v-model="date" mask="date" :rules="['date']">
                         <template v-slot:append>
@@ -84,7 +88,7 @@ export default {
                             </q-icon>
                         </template>
                     </q-input>
-                    <h8 class="extra-mar">bis</h8>
+                    <h4 class="extra-mar">bis</h4>
                     <q-input filled v-model="date2" mask="date" :rules="['date']">
                         <template v-slot:append>
                             <q-icon name="event" class="cursor-pointer">
@@ -102,8 +106,8 @@ export default {
             </div>
             <div class="align-basic">
                 <div>
-                    <h8 class="mar-align">Freigabeberechtigter</h8>
-                    <h8>Checkliste</h8>
+                    <h4 class="mar-align">Freigabeberechtigter</h4>
+                    <h4>Checkliste</h4>
                 </div>
                 <div class="align-mult">
                     <q-input class="extra-mar" outlined v-model="freigabe" label="Freigabeberechtigter" />
@@ -111,7 +115,7 @@ export default {
                 </div>
             </div>
             <div class="align-basic">
-                <h8>Bemerkungen</h8>
+                <h4>Bemerkungen</h4>
                 <q-input class="extra-mar input-bem" outlined v-model="bem" label="Bemerkungen" />
             </div>
             <q-btn label="Reparaturauftrag anlegen" color="grey" @click=sendData class=""></q-btn>

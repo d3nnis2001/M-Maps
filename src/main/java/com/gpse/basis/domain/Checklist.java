@@ -1,27 +1,21 @@
 package com.gpse.basis.domain;
 
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.util.ArrayList;
 
 @Document(collection = "Checklist")
 public class Checklist {
-    private String id;
+    @MongoId
     private String name;
     private ArrayList<String> items;
+    private ArrayList<Boolean> selected;
 
-    public Checklist(String id, String name, ArrayList<String> items) {
-        this.id = id;
+    public Checklist(String name, ArrayList<String> items, ArrayList<Boolean> selected) {
         this.name = name;
         this.items = items;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
+        this.selected = selected;
     }
 
     public String getName() {
@@ -41,5 +35,12 @@ public class Checklist {
     }
     public void addItem(String item) {
         items.add(item);
+    }
+
+    public ArrayList<Boolean> getSelected() {
+        return selected;
+    }
+    public void setSelected(ArrayList<Boolean> selected) {
+        this.selected = selected;
     }
 }

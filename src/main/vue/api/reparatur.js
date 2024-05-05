@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const repair = async function getRepairs() {
+export const repair = async function getRepairs() {
     try {
         const response = await axios.get("/api/repair/getdata")
         console.log(response.data)
@@ -10,7 +10,7 @@ const repair = async function getRepairs() {
         return false
     }
 }
-const sendrepair = async function sendRepair(track, from, till, authorized, checklist, remarks) {
+export const sendrepair = async function sendRepair(track, from, till, authorized, checklist, remarks) {
     try {
         const cred = new URLSearchParams()
         cred.append("track", track)

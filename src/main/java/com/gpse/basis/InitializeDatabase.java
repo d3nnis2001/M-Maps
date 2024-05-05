@@ -3,6 +3,7 @@ package com.gpse.basis;
 import com.gpse.basis.domain.Checklist;
 import com.gpse.basis.domain.Reparatur;
 import com.gpse.basis.domain.UserModel;
+import com.gpse.basis.repositories.ChecklistRepository;
 import com.gpse.basis.repositories.ReperaturRepository;
 import com.gpse.basis.repositories.UserRepository;
 import org.springframework.beans.factory.InitializingBean;
@@ -17,11 +18,14 @@ import java.util.Date;
 public class InitializeDatabase implements InitializingBean {
     private final UserRepository usRepo;
     private final ReperaturRepository reRepo;
+    private final ChecklistRepository checkRepo;
 
     @Autowired
-    public InitializeDatabase(final UserRepository usRepo, final ReperaturRepository reRepo) {
+    public InitializeDatabase(final UserRepository usRepo,
+                              final ReperaturRepository reRepo, final ChecklistRepository checkRepo) {
         this.usRepo = usRepo;
         this.reRepo = reRepo;
+        this.checkRepo = checkRepo;
     }
     @Override
     public void afterPropertiesSet() {
@@ -44,8 +48,10 @@ public class InitializeDatabase implements InitializingBean {
         ArrayList<String> items = new ArrayList<>();
         items.add("Checker 1");
         items.add("Checker 2");
-
-        Checklist check1 = new Checklist("1", "Abarbeitung1", items);
+        ArrayList<Boolean> selected = new ArrayList<>();
+        selected.add(true);
+        selected.add(false);
+        Checklist check1 = new Checklist("Abarbeitung1", items, selected);
         Reparatur rep = new Reparatur("1", 6200, datefrom, datetill, check1,
             "Alles gut hier", "storniert", "Müller");
 
@@ -59,13 +65,12 @@ public class InitializeDatabase implements InitializingBean {
         items2.add("Checker 1");
         items2.add("Checker 2");
 
-        Checklist check2 = new Checklist("2", "Abarbeitung2", items);
+        Checklist check2 = new Checklist("Abarbeitung2", items, selected);
+        checkRepo.save(check2);
+        checkRepo.save(check1);
         Reparatur rep2 = new Reparatur("2", 6300, datefrom2, datetill2, check2,
             "Auch alles gut hier", "neu beauftragt", "Heinz");
         reRepo.save(rep);
         reRepo.save(rep2);
-
-
-
     }
 }

@@ -1,6 +1,9 @@
 package com.gpse.basis.web;
 
+import com.gpse.basis.domain.Checklist;
 import com.gpse.basis.domain.Reparatur;
+import com.gpse.basis.domain.Utils;
+import com.gpse.basis.services.ChecklistService;
 import com.gpse.basis.services.ReparaturService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +19,7 @@ import java.util.Date;
 @RequestMapping("/api/repair")
 public class ReparaturController {
     private ReparaturService service;
+    private ChecklistService checkservice;
     @Autowired
     public ReparaturController(ReparaturService service) {
         this.service = service;
@@ -27,12 +31,21 @@ public class ReparaturController {
     }
     @PostMapping("/senddata")
     public boolean sendData(final WebRequest request) {
+        Utils utils = new Utils();
         String track = request.getParameter("track");
         String date1 = request.getParameter("from");
+        assert date1 != null;
+        Date acDate1 = utils.transformString(date1);
         String date2 = request.getParameter("till");
+        assert date2 != null;
+        Date acDate2 = utils.transformString(date2);
         String authorized = request.getParameter("authorized");
         String checklist = request.getParameter("checklist");
+        System.out.println(checklist);
         String remarks = request.getParameter("remarks");
+        System.out.println(remarks);
+        Checklist checker = checkservice.loadChecklistByUsername(checklist);
+        service.addUser(Integer.parseInt(track), acDate1, acDate2, authorized, checker, remarks);
         return true;
     }
 }
