@@ -13,6 +13,7 @@ const router = createRouter({
 })
 
 router.beforeEach((to) => {
+    document.title = to.name;
   // Something which should be executed before each routing
 })
 
