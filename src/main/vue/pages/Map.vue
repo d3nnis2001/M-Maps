@@ -30,6 +30,7 @@ onMounted(async () => {
             maxZoom: 19,
             tileSize: 256
         }).addTo(map.value);
+
     const data = await geoData();
     markers = data.map((m) => L.circle([m.longitude, m.latitude], {color: "black", radius: 50}));
     markers.forEach((m) => {
