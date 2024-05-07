@@ -16,5 +16,7 @@ public interface FileService {
     void deleteDataSetsById(List<String> ids);
     void saveLHHFile(MultipartFile file) throws IOException, IndexOutOfBoundsException;
     ArrayList<GeoData> getGeoData();
+    ArrayList<GeoData> getTrackGeoData(int trackID);
+    ArrayList<GeoData> getPartGeoData(int from, int till);
 
 }

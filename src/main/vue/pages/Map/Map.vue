@@ -2,7 +2,8 @@
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {onMounted, ref} from 'vue';
-import {geoData} from "@/main/vue/api/map";
+import {geoData, getTrack} from "@/main/vue/api/map";
+import {useQuasar} from "quasar";
 
 const map = ref(null);
 var markers = [];
@@ -12,6 +13,13 @@ const date = ref('')
 const alert =  ref(false)
 const alert2 =  ref(false)
 const dialogVisible = ref(false);
+const $q = useQuasar()
+const markerStart = ref('')
+const markerEnd = ref('')
+const kmStart = ref('')
+const kmEnd = ref('')
+const selectedMarker = ref('')
+
 
 onMounted(async () => {
     map.value = L.map('map', {
@@ -31,10 +39,13 @@ onMounted(async () => {
             tileSize: 256
         }).addTo(map.value);
     const data = await geoData();
-    markers = data.map((m) => L.circle([m.longitude, m.latitude], {color: "black", radius: 50}));
+    data.forEach((m) => markers.push({
+        marker : L.circle([m.longitude, m.latitude], {color: "black", radius: 50}),
+        data: m,
+    }));
     markers.forEach((m) => {
-        m.addTo(map.value);
-        m.on('click', onMarkerClicked);
+        m.marker.addTo(map.value);
+        m.marker.on('click', onMarkerClicked);
     });
     map.value.on('locationfound', onLocationFound);
     map.value.locate({setView: false});
@@ -42,8 +53,56 @@ onMounted(async () => {
 
 const onMarkerClicked = (event) => {
     const circle = event.target;
+    const marker = markers.find((m) => {
+            return m.data.longitude === circle.getLatLng().lat && m.data.latitude === circle.getLatLng().lng;
+    });
+    selectedMarker.value = marker
     dialogVisible.value = true;
-    console.log(circle.getLatLng());
+    console.log(marker.data.latitude)
+    console.log(marker.data.longitude)
+};
+
+const deleteStart = () => {
+    markerStart.value = null;
+    kmStart.value = '';
+};
+
+const deleteEnd = () => {
+    markerEnd.value = null;
+    kmEnd.value = '';
+};
+
+const addStart = () => {
+    markerStart.value = selectedMarker;
+    kmStart.value = selectedMarker.value.data.track_km;
+};
+const addEnd = () => {
+    markerEnd.value = selectedMarker;
+    kmEnd.value = selectedMarker.value.data.track_km;
+};
+
+const refreshMarkers = async () => {
+    const data = await getTrack(streckenID.value);
+    console.log(data.length)
+    if (data.length === 0) {
+        $q.notify({
+            type: 'negative',
+            message: "Track ID doesn't exist",
+            caption: 'Please choose a different Track ID'
+        });
+    }
+    markers.forEach((m) => map.value.removeLayer(m.marker));
+    markers = []
+    for (let i = 0;i<data.length;i++) {
+        markers.push({
+            marker : L.circle([data[i].longitude, data[i].latitude], {color: "black", radius: 50}),
+            data: data[i],
+        });
+    }
+    markers.forEach((m) => {
+        m.marker.addTo(map.value);
+        m.marker.on('click', onMarkerClicked);
+    });
 };
 
 const onLocationFound = (e) => {
@@ -67,7 +126,7 @@ const centerToUserLocation = () => {
     <div class="mapSettings">
         <div id="map"></div>
         <div class="flexbox_map">
-            <button @click="centerToUserLocation">Center to User's Location</button>
+            <button class="button_settings" @click="centerToUserLocation">Center to User's Location</button>
             <q-card class="my-card">
                 <q-card-section>
                     <div class="text-h6">Filter</div>
@@ -76,7 +135,7 @@ const centerToUserLocation = () => {
 
                 <q-card-actions vertical>
                     <q-btn @click="alert2 = true" no-caps flat>Zeitraum</q-btn>
-                    <q-btn no-caps flat>ID des Streckenabschnitts</q-btn>
+                    <q-btn @click="alert = true" no-caps flat>ID des Streckenabschnitts</q-btn>
                 </q-card-actions>
                 <q-dialog v-model="alert2">
                     <q-card>
@@ -147,39 +206,64 @@ const centerToUserLocation = () => {
                         </q-card-actions>
                     </q-card>
                 </q-dialog>
-            </q-card>
-            <q-card class="my-card">
-                <q-card-section>
-                    <div class="text-h6">Optionen</div>
-                </q-card-section>
-
-                <q-separator />
-
-                <q-card-actions vertical>
-                    <q-btn no-caps flat>Streckenabschnitt auswählen</q-btn>
-                    <q-btn @click="alert = true" no-caps flat>Strecken-ID auswählen</q-btn>
-                </q-card-actions>
                 <q-dialog v-model="alert">
                     <q-card>
                         <q-card-section>
-                            <div class="text-h6">Wähle eine StreckenID</div>
+                            <div class="text-h6">Wähle eine Strecken-ID</div>
                         </q-card-section>
-
-                        <q-card-section class="q-pt-none">
-                            <q-input label="Strecken-ID Eingabe" name="streckeneingabe" v-model="streckenID">
-                            </q-input>
-                        </q-card-section>
-
+                        <q-input class="" v-model="streckenID" label="Strecken-ID Eingabe"/>
                         <q-card-actions align="center">
-                            <q-btn flat label="Eingabe bestätigen" color="primary" v-close-popup/>
+                            <q-btn @click="refreshMarkers" flat label="Filter anwenden" color="primary" v-close-popup/>
                             <q-btn flat label="Abbrechen" color="primary" v-close-popup />
                         </q-card-actions>
                     </q-card>
                 </q-dialog>
             </q-card>
         </div>
-
     </div>
+    <q-dialog v-model="dialogVisible">
+        <div class="col">
+            <q-card class="row">
+                <q-input class="" v-model="kmStart" label="Kilometer Start" readonly/>
+                <q-card class="row">
+                <q-btn
+                    size="l"
+                    flat
+                    round
+                    icon="delete"
+                    @click="deleteStart"
+                />
+                <q-input class="" v-model="kmEnd" label="Kilometer End" readonly/>
+                <q-btn
+                    size="l"
+                    flat
+                    round
+                    icon="delete"
+                    @click="deleteEnd"
+                />
+                </q-card>
+            </q-card>
+            <q-card>
+                <q-btn
+                    color="red"
+                    @click="addStart"
+                    icon="add"
+                    label="add"
+                />
+                <q-btn
+                    color="red"
+                    @click="addEnd"
+                    icon="add"
+                    label="add"
+                />
+            </q-card>
+            <q-card>
+                <q-card-actions align="center">
+                    <q-btn flat label="Okay" color="primary" v-close-popup />
+                </q-card-actions>
+            </q-card>
+        </div>
+    </q-dialog>
 </template>
 <style>
 .my-card {
@@ -188,12 +272,13 @@ const centerToUserLocation = () => {
     margin-bottom: 20px;
 }
 #map {
-    width: 70vw;
-    height: 85vh;
+    width: 95vw;
+    height: 65vh;
 }
 .mapSettings {
     margin-top: 35px;
     margin-left: 40px;
+    flex-direction: column;
     display: flex;
     justify-content: left;
 }
@@ -202,10 +287,17 @@ const centerToUserLocation = () => {
     display: flex;
     flex-direction: column;
 }
+.button_settings {
+    justify-content: left;
+    width: 300px;
+}
+.input-width {
+    width: 40px;
+    height: 20px;
+}
 </style>
 <script>
 
-import { useQuasar } from 'quasar'
 import { ref } from 'vue'
 
 const columns = [
