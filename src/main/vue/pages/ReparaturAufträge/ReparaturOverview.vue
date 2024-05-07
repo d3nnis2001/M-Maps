@@ -1,57 +1,49 @@
 <script>
-import {onMounted, ref} from 'vue'
-import repair from "@/main/vue/api/reparatur";
+import {onMounted, reactive, ref} from 'vue'
+import {repair} from "@/main/vue/api/reparatur";
 import router from "@/main/vue/router";
-
-const columns = [
-    {
-        name: 'desc',
-        required: true,
-        label: 'Reparaturauftrag',
-        align: 'left',
-        field: row => row.name,
-        format: val => `${val}`,
-        sortable: true
-    },
-    { name: 'Von', align: 'center', label: 'Von', field: 'von', sortable: true },
-    { name: 'Bis', label: 'Bis', field: 'bis', sortable: true },
-    { name: 'Freigabeberechtigter', label: 'Freigabeberechtigter', field: 'freigabe' },
-    { name: 'Strecke', label: 'Strecken', field: 'strecke' },
-    { name: 'Status', label: 'Status', field: 'status' },
-]
-
-const rows = [
-    {
-        name: 'RepAuftrag 1',
-        von: '20.04.2024',
-        bis: '24.04.2024',
-        freigabe: "Herr Müller",
-        strecke: "strecke",
-        status: "storniert"
-    },
-    {
-        name: 'RepAuftrag 1',
-        von: '20.04.2024',
-        bis: '24.04.2024',
-        freigabe: "Herr Müller",
-        strecke: "strecke",
-        status: "storniert"
-    }
-]
 
 export default {
     setup () {
+        const state = reactive({
+            filter: '',
+            columns: [
+                {
+                    name: 'desc',
+                    required: true,
+                    label: 'Reparaturauftrag',
+                    align: 'left',
+                    field: row => row.name,
+                    format: val => `${val}`,
+                    sortable: true
+                },
+                { name: 'Von', align: 'center', label: 'Von', field: 'von', sortable: true },
+                { name: 'Bis', label: 'Bis', field: 'bis', sortable: true },
+                { name: 'Freigabeberechtigter', label: 'Freigabeberechtigter', field: 'freigabe' },
+                { name: 'Strecke', label: 'Strecken', field: 'strecke' },
+                { name: 'Status', label: 'Status', field: 'status' },
+            ],
+            rows: []
+        });
+
         onMounted(async () => {
             const response = await repair()
-            console.log(response)
+            for (let i = 0; i<response.length; i++) {
+                state.rows.push({
+                    name: response[i]["id"],
+                    von: response[i]["from"],
+                    bis: response[i]["till"],
+                    freigabe: response[i]["freigabeberechtigter"],
+                    strecke: response[i]["track"],
+                    status: response[i]["status"]})
+            }
         })
         function goCreate() {
             router.push("repair/create")
         }
         return {
             filter: ref(''),
-            columns,
-            rows,
+            state,
             goCreate
         }
     }
@@ -65,8 +57,8 @@ export default {
             flat bordered
             card-class="bg-blue text-white"
             title="Reparaturaufträge"
-            :rows="rows"
-            :columns="columns"
+            :rows="state.rows"
+            :columns="state.columns"
             row-key="name"
             :filter="filter"
             hide-header>

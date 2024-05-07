@@ -42,30 +42,21 @@ public class InitializeDatabase implements InitializingBean {
         // Reparaturauftrag 1
         Date datefrom = new Date(2024, 02, 10, 10, 10, 10);
         Date datetill = new Date(2024, 03, 10, 10, 10, 10);
-        ArrayList<String> checklist = new ArrayList<>();
-        checklist.add("ErsteAufgabe");
-        checklist.add("ZweiteAufgabe");
         ArrayList<String> items = new ArrayList<>();
         items.add("Checker 1");
         items.add("Checker 2");
-        ArrayList<Boolean> selected = new ArrayList<>();
-        selected.add(true);
-        selected.add(false);
-        Checklist check1 = new Checklist("Abarbeitung1", items, selected);
+        Checklist check1 = new Checklist("Abarbeitung1", items);
         Reparatur rep = new Reparatur("1", 6200, datefrom, datetill, check1,
             "Alles gut hier", "storniert", "Müller");
 
         // Reparaturauftrag 2
         Date datefrom2 = new Date(2023, 02, 10, 10, 10, 10);
         Date datetill2 = new Date(2023, 03, 10, 10, 10, 10);
-        ArrayList<String> checklist2 = new ArrayList<>();
-        checklist.add("ErsteAufgabeWieder");
-        checklist.add("ZweiteAufgabeWieder");
         ArrayList<String> items2 = new ArrayList<>();
         items2.add("Checker 1");
         items2.add("Checker 2");
 
-        Checklist check2 = new Checklist("Abarbeitung2", items, selected);
+        Checklist check2 = new Checklist("Abarbeitung2", items);
         checkRepo.save(check2);
         checkRepo.save(check1);
         Reparatur rep2 = new Reparatur("2", 6300, datefrom2, datetill2, check2,

@@ -19,10 +19,11 @@ import java.util.Date;
 @RequestMapping("/api/repair")
 public class ReparaturController {
     private ReparaturService service;
-    private ChecklistService checkservice;
+    private ChecklistService checkService;
     @Autowired
-    public ReparaturController(ReparaturService service) {
+    public ReparaturController(ReparaturService service, ChecklistService checkService) {
         this.service = service;
+        this.checkService = checkService;
     }
 
     @GetMapping("/getdata")
@@ -33,19 +34,22 @@ public class ReparaturController {
     public boolean sendData(final WebRequest request) {
         Utils utils = new Utils();
         String track = request.getParameter("track");
+        System.out.println(track);
         String date1 = request.getParameter("from");
-        assert date1 != null;
         Date acDate1 = utils.transformString(date1);
         String date2 = request.getParameter("till");
-        assert date2 != null;
         Date acDate2 = utils.transformString(date2);
         String authorized = request.getParameter("authorized");
         String checklist = request.getParameter("checklist");
         System.out.println(checklist);
         String remarks = request.getParameter("remarks");
         System.out.println(remarks);
-        Checklist checker = checkservice.loadChecklistByUsername(checklist);
-        service.addUser(Integer.parseInt(track), acDate1, acDate2, authorized, checker, remarks);
-        return true;
+        Checklist checker = checkService.loadChecklistByUsername(checklist);
+        System.out.println(checker.getName());
+        return service.addUser(Integer.parseInt(track), acDate1, acDate2, authorized, checker, remarks);
+    }
+    @PostMapping("/allchecklists")
+    public ArrayList<String> getChecklists() {
+        return checkService.getAllNames();
     }
 }

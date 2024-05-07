@@ -6,7 +6,6 @@ import com.gpse.basis.repositories.ReperaturRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -37,7 +36,9 @@ public class ReparaturServiceImpl implements ReparaturService {
         if (rep.findById(uniqueID) == null) {
             uniqueID = generateID();
         }
+        System.out.println(uniqueID);
         Reparatur newRep = new Reparatur(uniqueID, track, date1, date2, checklist, remarks, "beauftragt", authorized);
+        System.out.println(newRep);
         rep.save(newRep);
         return true;
     }
