@@ -2,7 +2,7 @@
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {onMounted, ref} from 'vue';
-import {geoData, getTrack} from "@/main/vue/api/map";
+import {geoData, getTrack, getPartOfTrack} from "@/main/vue/api/map";
 import {useQuasar} from "quasar";
 
 const map = ref(null);
@@ -118,6 +118,32 @@ const centerToUserLocation = () => {
     }
     map.value.locate(options).on('locationfound', onLocationFound);
 };
+
+const checkForChanges = async () => {
+    if (kmStart.value !== '' && kmEnd.value !== '') {
+        console.log(kmStart.value)
+        const data = await getPartOfTrack(kmStart.value, kmEnd.value)
+        console.log(data)
+        markers.forEach((m) => map.value.removeLayer(m.marker));
+        markers = []
+        for (let i = 0;i<data.length;i++) {
+            markers.push({
+                marker : L.circle([data[i].longitude, data[i].latitude], {color: "black", radius: 50}),
+                data: data[i],
+            });
+        }
+        markers.forEach((m) => {
+            m.marker.addTo(map.value);
+            m.marker.on('click', onMarkerClicked);
+        });
+    } else {
+        if (streckenID !== '') {
+            refreshMarkers()
+        } else {
+
+        }
+    }
+}
 
 
 </script>
@@ -259,7 +285,7 @@ const centerToUserLocation = () => {
             </q-card>
             <q-card>
                 <q-card-actions align="center">
-                    <q-btn flat label="Okay" color="primary" v-close-popup />
+                    <q-btn flat @click="checkForChanges" label="Okay" color="primary" v-close-popup />
                 </q-card-actions>
             </q-card>
         </div>
