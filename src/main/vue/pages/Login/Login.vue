@@ -3,8 +3,11 @@ import {ref} from 'vue'
 import {useLoginStore} from "../../stores/LoginStore"
 import {useQuasar} from 'quasar'
 import {useRouter} from 'vue-router'
+import Impressum from "@/main/vue/pages/Login/Impressum.vue";
+import Heading from "@/main/vue/pages/Login/Heading.vue";
 
 export default {
+    components: {Heading, Impressum},
     setup() {
         const $q = useQuasar()
         const router = useRouter()
@@ -55,13 +58,7 @@ export default {
     <div class="full-height-center bg-grey-2 padding-xl">
         <q-card class="q-pa-md content-container items-center" flat>
             <q-card-section class="inner-card">
-                <div class="row-auto text-align padding-md">
-                    <img src="../../../resources/db-logo.png" alt="Nicht verfügbar">
-                </div>
-                <h1 class="text-h4 text-align text-bold">Einloggen</h1>
-                <div class="row-auto padding-md">
-                    <div class="rectangle"></div>
-                </div>
+                <Heading>Einloggen</Heading>
                 <div class="row-auto padding-sm">
                     <div class="text-align text-grey-9">
                         Bitte geben Sie Ihre E-Mail-Adresse ein.
@@ -75,15 +72,7 @@ export default {
                     <span class="padding-right"></span>
                     <q-btn label="Anmelden" @click="login()" color="dark" class=""></q-btn>
                 </div>
-                <div class="bg-grey-4">
-                    <div class="pading-all">
-                        <div class="text-black text-align justify-center">Impressum</div>
-                    </div>
-                    <div class="divider bg-grey-6"></div>
-                    <div class="pading-all">
-                        <div class="text-black text-align justify-center">DB Systemtechnik GmbH</div>
-                    </div>
-                </div>
+                <Impressum></Impressum>
             </q-card-section>
         </q-card>
     </div>
@@ -116,17 +105,6 @@ export default {
     padding-right: 8px;
 }
 
-.pading-all {
-    padding: 32px;
-}
-
-.divider {
-    width: calc(100% - 32px);
-    height: 2px;
-    border-radius: 16px;
-    margin: auto;
-}
-
 .content-container {
     width: calc(100% - 48px);
     max-width: 384px;
@@ -142,13 +120,5 @@ export default {
 
 .text-align {
     text-align: center;
-}
-
-.rectangle {
-    width: 72px;
-    height: 8px;
-    background-color: rgba(236, 0, 22, 1);
-    border-radius: 16px;
-    margin: auto;
 }
 </style>
