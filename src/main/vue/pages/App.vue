@@ -1,10 +1,9 @@
 <script setup>
 import {RouterView} from 'vue-router'
-let boolStart = true;
 
 </script>
 <template>
-    <q-layout v-if="$route.name === 'start' || $route.name === 'login'">
+    <q-layout v-if="$route.name === 'start' || $route.name === 'login' || $route.name === 'register'">
         <q-page-container>
             <router-view/>
         </q-page-container>

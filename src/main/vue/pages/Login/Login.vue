@@ -58,14 +58,14 @@ export default {
     <div class="full-height-center bg-grey-2 padding-xl">
         <q-card class="q-pa-md content-container items-center" flat>
             <q-card-section class="inner-card">
-                <Heading>Einloggen</Heading>
+                <Heading>Anmeldung</Heading>
                 <div class="row-auto padding-sm">
                     <div class="text-align text-grey-9">
                         Bitte geben Sie Ihre E-Mail-Adresse ein.
                     </div>
                 </div>
                 <div class="row-auto text-align padding-xl">
-                    <q-input class="email-input padding-md" bg-color="bg-grey-1" filled color="black" v-model="email"
+                    <q-input class="email-input padding-md" bg-color="bg-grey-1" filled color="dark" v-model="email"
                              label="E-Mail Adresse"/>
                     <q-btn label="Registrieren" outline color="dark" @click="navigateRegister">
                     </q-btn>
