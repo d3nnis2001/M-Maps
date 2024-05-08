@@ -19,9 +19,7 @@ export const sendRepair = async function sendRepair(track, from, till, authorize
         cred.append("authorized", authorized)
         cred.append("checklist", checklist)
         cred.append("remarks", remarks)
-        console.log(remarks)
         const response = await axios.post("/api/repair/senddata", cred)
-        console.log(response)
         return response
     } catch (error) {
         console.error("Unseen error while registering:", error);
@@ -31,11 +29,24 @@ export const sendRepair = async function sendRepair(track, from, till, authorize
 export const getChecklists = async function getChecklists() {
     try {
         const response = await axios.post("/api/repair/allchecklists");
-        console.log(response)
         return response.data
 
     } catch (error) {
         console.error("Unseen error while getting checklists:", error);
+        return false
+    }
+}
+
+export const getDetailsByID = async function getDetailsByID(name) {
+    try {
+        const response = await axios.get("/api/repair/getbyid", {
+            params: {
+                id: name
+            }
+        });
+        return response.data
+    } catch (error) {
+        console.error("Unseen error while getting repair order:", error);
         return false
     }
 }

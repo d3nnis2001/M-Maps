@@ -1,6 +1,6 @@
 <script>
 
-import {onMounted, reactive, ref} from "vue";
+import {onMounted, ref} from "vue";
 import {getChecklists, sendRepair} from "@/main/vue/api/reparatur";
 import {useQuasar} from "quasar";
 
@@ -9,7 +9,7 @@ export default {
         const streckenabschnitt = ref('')
         const freigabe = ref('')
         const checkliste = ref('')
-        const checkvals = []
+        const checkvals = ref([])
         const date = ref('2024/01/01')
         const date2 = ref('2024/01/02')
         const $q = useQuasar()
@@ -20,9 +20,9 @@ export default {
             const response = await getChecklists()
             console.log(response.length)
             for (let i = 0; i<response.length; i++) {
-                checkvals.push({label: response[i], value: i})
+                checkvals.value.push({label: response[i], value: i})
             }
-            console.log(checkvals)
+            console.log(checkvals.value[0].label)
         })
 
 
@@ -41,7 +41,7 @@ export default {
             if (!freigabe.value.trim()) {
                 errormsg.push("Please choose an authorized person");
             }
-            if (!checkliste.value.trim()) {
+            if (!checkliste.value) {
                 errormsg.push("Please select a checklist");
             }
 

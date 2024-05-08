@@ -52,4 +52,11 @@ public class ReparaturController {
     public ArrayList<String> getChecklists() {
         return checkService.getAllNames();
     }
+
+    @GetMapping("/getbyid")
+    public Reparatur getRepById(final WebRequest request) {
+        Reparatur newRep = service.loadRepByName(request.getParameter("id"));
+        System.out.println("We made it" + newRep.getId());
+        return newRep;
+    }
 }

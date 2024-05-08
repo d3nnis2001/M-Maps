@@ -2,8 +2,10 @@ package com.gpse.basis.services;
 
 import com.gpse.basis.domain.Checklist;
 import com.gpse.basis.domain.Reparatur;
+import com.gpse.basis.domain.UserModel;
 import com.gpse.basis.repositories.ReperaturRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -48,5 +50,10 @@ public class ReparaturServiceImpl implements ReparaturService {
         Random random = new Random();
         int randomValue = random.nextInt(1000);
         return String.valueOf(timestamp) + String.valueOf(randomValue);
+    }
+    @Override
+    public Reparatur loadRepByName(final String repname) throws UsernameNotFoundException {
+        return rep.findById(repname)
+            .orElseThrow(() -> new UsernameNotFoundException("Reparatur name " + repname + " not found."));
     }
 }

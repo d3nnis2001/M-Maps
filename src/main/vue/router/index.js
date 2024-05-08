@@ -11,6 +11,7 @@ import ResetPassword from "../pages/Login/ResetPassword.vue";
 import Start from "../pages/Start.vue";
 import ReparaturOverview from "@/main/vue/pages/ReparaturAufträge/ReparaturOverview.vue";
 import ReparaturCreate from "@/main/vue/pages/ReparaturAufträge/ReparaturCreate.vue";
+import ReparaturEdit from "@/main/vue/pages/ReparaturAufträge/ReparaturEdit.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -69,6 +70,11 @@ const router = createRouter({
             path: "/repair/create",
             name: "RepairCreate",
             component: ReparaturCreate
+        },
+        {
+            path: "/repair/:name/edit",
+            name: "RepairEdit",
+            component: ReparaturEdit
         }
   ]
 })

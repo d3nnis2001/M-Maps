@@ -34,4 +34,7 @@ public class Checklist {
     public void addItem(String item) {
         items.add(item);
     }
+    public int getItemSize() {
+        return items.size();
+    }
 }
