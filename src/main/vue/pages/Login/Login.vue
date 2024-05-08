@@ -23,7 +23,7 @@ export default {
                 try {
                     const emailExists = await loginStore.checkEmail(email.value);
                     if (emailExists) {
-                        await router.push('password?email='+email.value);
+                        await router.push('password?email=' + email.value);
                     } else {
                         $q.notify({
                             type: 'negative',
@@ -45,45 +45,47 @@ export default {
         function navigateRegister() {
             router.push("/register")
         }
+
         return {email, login, navigateRegister}
     }
 }
 
 </script>
 <template>
-    <div class="full-height-center">
-        <div class="content-container">
-            <div class="items-center">
-                <q-card class="q-pa-md">
-                    <q-card-section class="inner-card">
-                    <div class="row-auto text-align extra-padding">
-                        <img src="../../../resources/db-logo.png" alt="Nicht verfügbar">
+    <div class="full-height-center bg-grey-2 padding-xl">
+        <q-card class="q-pa-md content-container items-center" flat>
+            <q-card-section class="inner-card">
+                <div class="row-auto text-align padding-md">
+                    <img src="../../../resources/db-logo.png" alt="Nicht verfügbar">
+                </div>
+                <h1 class="text-h4 text-align text-bold">Einloggen</h1>
+                <div class="row-auto padding-md">
+                    <div class="rectangle"></div>
+                </div>
+                <div class="row-auto padding-sm">
+                    <div class="text-align text-grey-9">
+                        Bitte geben Sie Ihre E-Mail-Adresse ein.
                     </div>
-                    <div class="row-auto extra-padding">
-                        <div class="text-h4 text-align ">Einloggen</div>
-                    </div>
-                    <div class="row-auto extra-padding">
-                        <div class="rectangle"></div>
-                    </div>
-                    <div class="row-auto extra-padding">
-                        <div class="text-align">
-                            Bitte geben Sie Ihre E-Mail-Adresse ein
-                        </div>
-                    </div>
-                    <div class="row-auto text-align extra-padding">
-                        <q-input class="email-input extra-padding" v-model="email" label="E-Mail Adresse"/>
-                        <div class="text-align extra-padding" @click="navigateRegister">
-                            Registrieren
-                        </div>
-                        <q-btn label="Anmelden" @click="login()" color="primary" class=""></q-btn>
-                    </div>
-                    <div class="bg-grey-4 impressum-padding">
+                </div>
+                <div class="row-auto text-align padding-xl">
+                    <q-input class="email-input padding-md" bg-color="bg-grey-1" filled color="black" v-model="email"
+                             label="E-Mail Adresse"/>
+                    <q-btn label="Registrieren" outline color="dark" @click="navigateRegister">
+                    </q-btn>
+                    <span class="padding-right"></span>
+                    <q-btn label="Anmelden" @click="login()" color="dark" class=""></q-btn>
+                </div>
+                <div class="bg-grey-4">
+                    <div class="pading-all">
                         <div class="text-black text-align justify-center">Impressum</div>
                     </div>
-                    </q-card-section>
-                </q-card>
-            </div>
-        </div>
+                    <div class="divider bg-grey-6"></div>
+                    <div class="pading-all">
+                        <div class="text-black text-align justify-center">DB Systemtechnik GmbH</div>
+                    </div>
+                </div>
+            </q-card-section>
+        </q-card>
     </div>
 </template>
 
@@ -98,25 +100,43 @@ export default {
     width: 100%;
 }
 
-.impressum-padding {
-    padding-bottom: 200px;
+.padding-sm {
+    padding-bottom: 16px;
 }
 
-.extra-padding {
-    padding-bottom: 20px;
+.padding-md {
+    padding-bottom: 32px;
+}
+
+.padding-xl {
+    padding-bottom: 64px;
+}
+
+.padding-right {
+    padding-right: 8px;
+}
+
+.pading-all {
+    padding: 32px;
+}
+
+.divider {
+    width: calc(100% - 32px);
+    height: 2px;
+    border-radius: 16px;
+    margin: auto;
 }
 
 .content-container {
-    width: calc(100% - 40px);
-    max-width: 500px;
-    padding: 20px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.6);
-    background: white;
+    width: calc(100% - 48px);
+    max-width: 384px;
+    padding: 16px;
+    height: 100%
 }
 
 .email-input {
     width: 100%;
-    max-width: 300px;
+    max-width: 288px;
     margin: 0 auto;
 }
 
@@ -126,9 +146,9 @@ export default {
 
 .rectangle {
     width: 72px;
-    height: 7px;
+    height: 8px;
     background-color: rgba(236, 0, 22, 1);
-    border-radius: 20px;
+    border-radius: 16px;
     margin: auto;
 }
 </style>
