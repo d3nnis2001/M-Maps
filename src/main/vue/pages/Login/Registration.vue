@@ -120,8 +120,8 @@ function register() {
                 <StandardInput v-model="email" label="E-Mail"></StandardInput>
             </div>
             <div class="padding-sm">
-                <StandardInput v-model="pass" label="Passwort"></StandardInput>
-                <StandardInput v-model="passAgain" label="Passwort wiederholen"></StandardInput>
+                <StandardInput type="password" v-model="pass" label="Passwort"></StandardInput>
+                <StandardInput type="password" v-model="passAgain" label="Passwort wiederholen"></StandardInput>
             </div>
             <q-select class="input-field padding-sm" multiple use-chips standout v-model="model1"
                       :options="roles" label="Rollen"/>
