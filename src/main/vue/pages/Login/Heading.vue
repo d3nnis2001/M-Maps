@@ -4,7 +4,7 @@
 
 <template>
     <div class="items-center">
-        <div class="row-auto text-align padding-md">
+        <div class="row-auto text-align padding-sm">
             <img src="../../../resources/db-logo.png" alt="Nicht verfügbar">
         </div>
         <h1 class="text-h4 text-align text-bold">

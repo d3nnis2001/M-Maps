@@ -3,7 +3,7 @@ import {RouterView} from 'vue-router'
 
 </script>
 <template>
-    <q-layout v-if="$route.name === 'start' || $route.name === 'login' || $route.name === 'register'">
+    <q-layout v-if="$route.name === 'start' || $route.name === 'login' || $route.name === 'register' || $route.name === 'forgotPassword' || $route.name === 'setNewPassword' || $route.name === 'password'">
         <q-page-container>
             <router-view/>
         </q-page-container>
