@@ -11,7 +11,6 @@ import ResetPassword from "../pages/Login/ResetPassword.vue";
 import Start from "../pages/Start.vue";
 import InspectionOrderOverview from '../pages/Pruefauftraege/InspectionOrderOverview.vue';
 
-
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [

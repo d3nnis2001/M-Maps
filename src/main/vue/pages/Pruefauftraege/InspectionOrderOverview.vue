@@ -4,10 +4,8 @@
 export default {
     setup () {
         return {
-            //filter: ref(''),
             columns,
             rows,
-            //goCreate
         }
     }
 }
@@ -17,7 +15,8 @@ const columns = [
     { name: 'start', label: 'Startort', align: 'left', field: 'start', sortable: true },
     { name: 'destination', label: 'Zielort', align: 'left', field: 'ziel', sortable: true },
     { name: 'timeStart', label: 'bis', align: 'left', field: 'von' },
-    { name: 'timeDestination', label: 'Messdaten', align: 'left', field: 'bis' },
+    { name: 'timeDestination', label: 'bis', align: 'left', field: 'von' },
+    { name: 'data', label: 'Messdaten', align: 'left', field: 'data' },
     { name: 'department', label: 'Fachabteilung', align: 'left', field: 'abteilung' },
     { name: 'status', label: 'Status', align: 'left', field: 'status' },
 ]
@@ -47,30 +46,6 @@ const rows = [
         <q-btn label="Neuen Auftrag erstellen" @click="$router.push('/createInspectionOrder')" color="primary"  class=""></q-btn>
         <q-btn label="Auftrag annehmen" @click="" color="primary" class=""></q-btn>
     </div>
-
-    <!--
-    <div class="q-pa-md">
-        <q-table
-            grid
-            flat bordered
-            card-class="bg-blue text-white"
-            title="Prüfaufträge"
-            :rows="rows"
-            :columns="columns"
-            row-key="name"
-            :filter="filter"
-            hide-header>
-            <template v-slot:top-right>
-                <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">
-                    <template v-slot:append>
-                        <q-icon name="search" />
-                    </template>
-                </q-input>
-            </template>
-        </q-table>
-        <q-btn label="Neu erstellen" @click="goCreate" color="primary" class=""></q-btn>
-    </div>
-    -->
 </template>
 
 <style lang="sass">
