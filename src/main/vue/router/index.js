@@ -10,6 +10,7 @@ import ForgotPassword from "../pages/Login/ForgotPassword.vue";
 import ResetPassword from "../pages/Login/ResetPassword.vue";
 import Start from "../pages/Start.vue";
 import CreateInspectionOrder from "../pages/Pruefauftrag/CreateInspectionOrder.vue";
+import EditInspectionOrder from "../pages/Pruefauftrag/EditInspectionOrder.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -63,6 +64,11 @@ const router = createRouter({
             path: "/createInspectionOrder",
             name: "createInspectionOrder",
             component: CreateInspectionOrder
+        },
+        {
+            path: "/editInspectionOrder",
+            name: "editInspectionOrder",
+            component: EditInspectionOrder
         }
   ]
 })
