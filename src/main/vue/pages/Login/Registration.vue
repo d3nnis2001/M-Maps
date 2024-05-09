@@ -129,7 +129,7 @@ function register() {
                       label="Region"/>
             <q-select class="input-field padding-md" standout v-model="model3" :options="service"
                       label="Fachdienst"/>
-            <q-btn label="Registrieren" color="dark" @click=register class=""></q-btn>
+            <q-btn label="Registrieren" color="primary" @click=register class=""></q-btn>
         </div>
         <Impressum></Impressum>
     </StandardCard>

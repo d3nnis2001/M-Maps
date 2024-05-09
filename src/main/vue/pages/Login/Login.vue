@@ -64,9 +64,9 @@ export default {
         <div class="row-auto text-align padding-xl">
             <StandardInput label="E-Mail Adresse" v-model="email"></StandardInput>
             <span class="padding-right">
-                        <q-btn label="Registrieren" outline color="dark" @click="navigateRegister"></q-btn>
+                        <q-btn label="Registrieren" outline color="primary" @click="navigateRegister"></q-btn>
                     </span>
-            <q-btn label="Anmelden" @click="login()" color="dark" class=""></q-btn>
+            <q-btn label="Anmelden" @click="login()" color="primary" class=""></q-btn>
         </div>
         <Impressum></Impressum>
     </StandardCard>

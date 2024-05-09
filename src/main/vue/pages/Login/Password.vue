@@ -47,11 +47,11 @@ function navigateForgotPassword() {
         <div class="row-auto text-align padding-xl">
             <StandardInput type="password" v-model="passwordVar" label="Passwort"></StandardInput>
             <div class="padding-xs">
-                <q-btn class="text-align" flat color="dark" @click=navigateForgotPassword()>
+                <q-btn class="text-align" flat color="primary" @click=navigateForgotPassword()>
                 Passwort Vergessen?
                 </q-btn>
             </div>
-            <q-btn label="Anmelden" @click="password()" color="dark" class=""></q-btn>
+            <q-btn label="Anmelden" @click="password()" color="primary" class=""></q-btn>
         </div>
         <Impressum></Impressum>
     </StandardCard>

@@ -56,7 +56,7 @@ export default {
         </Description>
         <div class="row-auto text-align padding-xl">
             <StandardInput v-model="email" label="E-Mail Adresse"></StandardInput>
-            <q-btn label="Passwort Zurücksetzen" @click="sendPasswordMail" color="dark" class=""></q-btn>
+            <q-btn label="Passwort Zurücksetzen" @click="sendPasswordMail" color="primary" class=""></q-btn>
             <q-dialog v-model="alert">
                 <q-card>
                     <q-card-section>
@@ -68,7 +68,7 @@ export default {
                     </q-card-section>
 
                     <q-card-actions align="right">
-                        <q-btn flat label="OK" color="dark" v-close-popup/>
+                        <q-btn flat label="OK" color="primary" v-close-popup/>
                     </q-card-actions>
                 </q-card>
             </q-dialog>
