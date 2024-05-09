@@ -5,9 +5,12 @@ import {useQuasar} from 'quasar'
 import {useRouter} from 'vue-router'
 import Impressum from "@/main/vue/pages/Login/Impressum.vue";
 import Heading from "@/main/vue/pages/Login/Heading.vue";
+import Description from "@/main/vue/pages/Login/Description.vue";
+import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";
+import StandardCard from "@/main/vue/pages/Login/StandardCard.vue";
 
 export default {
-    components: {Heading, Impressum},
+    components: {StandardCard, StandardInput, Description, Heading, Impressum},
     setup() {
         const $q = useQuasar()
         const router = useRouter()
@@ -55,47 +58,21 @@ export default {
 
 </script>
 <template>
-    <div class="full-height-center bg-grey-2 padding-xl">
-        <q-card class="q-pa-md content-container items-center" flat>
-            <q-card-section class="inner-card">
-                <Heading>Anmeldung</Heading>
-                <div class="row-auto padding-sm">
-                    <div class="text-align text-grey-9">
-                        Bitte geben Sie Ihre E-Mail-Adresse ein.
-                    </div>
-                </div>
-                <div class="row-auto text-align padding-xl">
-                    <q-input class="email-input padding-md" bg-color="bg-grey-1" filled color="dark" v-model="email"
-                             label="E-Mail Adresse"/>
-                    <q-btn label="Registrieren" outline color="dark" @click="navigateRegister">
-                    </q-btn>
-                    <span class="padding-right"></span>
-                    <q-btn label="Anmelden" @click="login()" color="dark" class=""></q-btn>
-                </div>
-                <Impressum></Impressum>
-            </q-card-section>
-        </q-card>
-    </div>
+    <StandardCard>
+        <Heading>Anmelden</Heading>
+        <Description>Bitte geben Sie Ihre E-Mail Adresse ein.</Description>
+        <div class="row-auto text-align padding-xl">
+            <StandardInput label="E-Mail Adresse" v-model="email"></StandardInput>
+            <span class="padding-right">
+                        <q-btn label="Registrieren" outline color="dark" @click="navigateRegister"></q-btn>
+                    </span>
+            <q-btn label="Anmelden" @click="login()" color="dark" class=""></q-btn>
+        </div>
+        <Impressum></Impressum>
+    </StandardCard>
 </template>
 
 <style scoped>
-
-.full-height-center {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    width: 100%;
-}
-
-.padding-sm {
-    padding-bottom: 16px;
-}
-
-.padding-md {
-    padding-bottom: 32px;
-}
 
 .padding-xl {
     padding-bottom: 64px;
@@ -103,19 +80,6 @@ export default {
 
 .padding-right {
     padding-right: 8px;
-}
-
-.content-container {
-    width: calc(100% - 48px);
-    max-width: 384px;
-    padding: 16px;
-    height: 100%
-}
-
-.email-input {
-    width: 100%;
-    max-width: 288px;
-    margin: 0 auto;
 }
 
 .text-align {

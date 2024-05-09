@@ -5,6 +5,9 @@ import {useQuasar} from 'quasar'
 import {useRouter} from 'vue-router'
 import Impressum from "@/main/vue/pages/Login/Impressum.vue";
 import Heading from "@/main/vue/pages/Login/Heading.vue";
+import Description from "@/main/vue/pages/Login/Description.vue";
+import StandardCard from "@/main/vue/pages/Login/StandardCard.vue";
+import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";
 
 const $q = useQuasar()
 const router = useRouter()
@@ -107,58 +110,39 @@ function register() {
 </script>
 
 <template>
-    <div class="full-height-center bg-grey-2 padding-xl">
-        <q-card class="q-pa-md content-container items-center">
-            <q-card-section class="inner-card">
-                <Heading>Registrierung</Heading>
-                <div class="row-auto padding-md">
-                    <div class="text-align text-grey-9">
-                        Bitte füllen Sie folgende Informationen aus.
-                    </div>
-                </div>
-                <div class="row-auto text-align padding-md">
-                    <q-input class="input-field padding-sm" bg-color="bg-grey-1" filled color="dark" v-model="firstName" label="Vorname"/>
-                    <q-input class="input-field padding-sm" bg-color="bg-grey-1" filled color="dark" v-model="name" label="Nachname"/>
-                    <q-input class="input-field padding-md" bg-color="bg-grey-1" filled color="dark" v-model="email" label="E-Mail"/>
-                    <q-input type="password" class="input-field padding-sm" bg-color="bg-grey-1" filled color="dark" v-model="pass" label="Passwort"/>
-                    <q-input type="password" class="input-field padding-md" bg-color="bg-grey-1" filled color="dark" v-model="passAgain"
-                             label="Passwort erneut angeben"/>
-                    <q-select class="input-field padding-sm" multiple use-chips standout v-model="model1"
-                              :options="roles" label="Rollen"/>
-                    <q-select class="input-field padding-sm" standout v-model="model2" :options="region"
-                              label="Region"/>
-                    <q-select class="input-field padding-md" standout v-model="model3" :options="service"
-                              label="Fachdienst"/>
-                    <q-btn label="Registrieren" color="dark" @click=register class=""></q-btn>
-                </div>
-                <Impressum></Impressum>
-            </q-card-section>
-        </q-card>
-    </div>
+    <StandardCard>
+        <Heading>Registrieren</Heading>
+        <Description>Bitte füllen Sie folgende Informationen aus.</Description>
+        <div class="row-auto text-align padding-md">
+            <div class="padding-sm">
+                <StandardInput v-model="firstName" label="Vorname"></StandardInput>
+                <StandardInput v-model="name" label="Nachname"></StandardInput>
+                <StandardInput v-model="email" label="E-Mail"></StandardInput>
+            </div>
+            <div class="padding-sm">
+                <StandardInput v-model="pass" label="Passwort"></StandardInput>
+                <StandardInput v-model="passAgain" label="Passwort wiederholen"></StandardInput>
+            </div>
+            <q-select class="input-field padding-sm" multiple use-chips standout v-model="model1"
+                      :options="roles" label="Rollen"/>
+            <q-select class="input-field padding-sm" standout v-model="model2" :options="region"
+                      label="Region"/>
+            <q-select class="input-field padding-md" standout v-model="model3" :options="service"
+                      label="Fachdienst"/>
+            <q-btn label="Registrieren" color="dark" @click=register class=""></q-btn>
+        </div>
+        <Impressum></Impressum>
+    </StandardCard>
+
 
 </template>
 
 <style scoped>
 
-.full-height-center {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    width: 100%;
-}
-
 .padding-md {
-    padding-bottom: 20px;
+    padding-bottom: 32px;
 }
 
-.content-container {
-    width: calc(100% - 48px);
-    max-width: 384px;
-    padding: 16px;
-    height: 100%
-}
 
 .input-field {
     width: 100%;
@@ -170,15 +154,6 @@ function register() {
     text-align: center;
 }
 
-.full-height-center {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    width: 100%;
-}
-
 .padding-sm {
     padding-bottom: 16px;
 }
@@ -187,7 +162,4 @@ function register() {
     padding-bottom: 32px;
 }
 
-.padding-xl {
-    padding-bottom: 64px;
-}
 </style>
