@@ -9,6 +9,7 @@ import Password from "../pages/Login/Password.vue";
 import ForgotPassword from "../pages/Login/ForgotPassword.vue";
 import ResetPassword from "../pages/Login/ResetPassword.vue";
 import Start from "../pages/Start.vue";
+import CreateInspectionOrder from "../pages/Pruefauftrag/CreateInspectionOrder.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -57,6 +58,11 @@ const router = createRouter({
             path: "/reset-password",
             name: "setNewPassword",
             component: ResetPassword
+        },
+        {
+            path: "/createInspectionOrder",
+            name: "createInspectionOrder",
+            component: CreateInspectionOrder
         }
   ]
 })
