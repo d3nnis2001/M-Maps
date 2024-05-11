@@ -1,32 +1,29 @@
 <template>
     <q-page>
-            <q-page-sticky position="bottom-left" :offset="[10, 10]">
+            <q-page-sticky position="bottom-left" :offset="[10, 10]" >
                 <div class="q-mt-md">
                     <q-fab
                         label="Actions"
                         vertical-actions-align="left"
                         color="red"
                         icon="keyboard_arrow_up"
-                        direction="up"
+                        direction="right"
                     >
                         <q-fab-action
                             v-model="route"
                             color="red"
                             @click="onClickAdd"
                             icon="add"
-                            label="add"
                         />
                         <q-fab-action
                             color="red"
                             @click="onClickDelete"
                             icon="delete"
-                            label="delete"
                         />
                         <q-fab-action
                             color="red"
                             @click="onClickAnalytics"
                             icon="analytics"
-                            label="configure"
                         />
                     </q-fab>
                 </div>

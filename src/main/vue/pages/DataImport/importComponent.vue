@@ -1,18 +1,23 @@
 <template>
     <div class="q-pa-md">
-        <div>
-            <q-file
-                outlined
-                v-model="selectedFiles"
-                style="width: 80%"
-                @update:model-value="onFilesSelected()"
-                multiple
-                append
-            >
-                <template v-slot:prepend>
-                    <q-icon name="attach_file" />
-                </template>
-            </q-file>
+        <div class="row q-pa-sm justify-start items-center">
+            <div class="col-xs-7 col-md-10">
+                <q-input
+                    bottom-slots
+                    v-model="path"
+                    label="Dateipfad"
+                >
+                    <template v-slot:prepend>
+                        <q-icon name="search" />
+                    </template>
+                    <template v-slot:append>
+                        <q-icon name="close" @click="path = ''" class="cursor-pointer" />
+                    </template>
+                </q-input>
+            </div>
+            <div class="col-xs-5 col-md-2 q-pl-md">
+                <q-btn label="Suchen" @click="onSearch" />
+            </div>
         </div>
             <div v-if="selectedFilesWithText.length">
                 <q-list separator>
@@ -25,9 +30,12 @@
                             <div class="col-xs-7 col-md-10">
                                 <div class="row">
                                     <div class="col-12 col-md-6">
-                                        <div :style="{overflow: 'hidden'}">{{ f.file.name }}</div>
+                                        <div :style="{overflow: 'auto'}">{{ f.name }}</div>
                                         <div v-if="f.error" style="color: red">
                                             {{ f.errorMsg }}
+                                        </div>
+                                        <div v-if="f.imported" style="color: green">
+                                            Datei erfolgreich importiert!
                                         </div>
                                     </div>
                                     <div class="col-12 col-md-6">
@@ -41,7 +49,12 @@
                                 </div>
                             </div>
                             <div class="col-xs-2 col-md-1">
+                                <q-checkbox
+                                    v-if="!f.imported"
+                                    v-model="f.selected"
+                                />
                                 <q-btn
+                                    v-if="f.imported"
                                     size="l"
                                     flat
                                     round
@@ -61,6 +74,7 @@
 
 <script>
 import axios from "axios";
+import {search, importFiles} from "@/main/vue/api/dataimport";
 
 export default {
     name: "importComponent",
@@ -69,27 +83,48 @@ export default {
             selectedFiles: [],
             selectedFilesWithText: [],
             loading: false,
+            path: "",
         };
     },
     methods: {
-        onFilesSelected() {
-            this.selectedFiles.forEach((f) =>
+        async onSearch() {
+            if(this.path === ""){
+                this.$q.notify({
+                    message: "Bitte Dateipfad eingeben!",
+                    timeout: 5000,
+                });
+                return;
+            }
+            this.selectedFilesWithText.splice(0);
+
+            const data = await search(this.path);
+            console.log(data)
+            if(data == null) {
+                this.$q.notify({
+                    message: "Directory existiert nicht oder ist leer!",
+                    timeout: 5000,
+                });
+                return;
+            }
+            data.forEach((d) => {
                 this.selectedFilesWithText.push({
-                    file: f,
-                    textInput: "",
+                    path: d[0],
+                    name: d[1],
                     error: false,
-                    errorMsg: ""
+                    errorMsg: "",
+                    textInput: "",
+                    imported: false,
+                    selected: false,
                 })
-            );
-            this.selectedFiles.splice(0);
-            console.log(this.selectedFilesWithText[0].file.name);
+            });
         },
         removeFile(index) {
             this.selectedFiles.splice(index, 1);
             this.selectedFilesWithText.splice(index, 1);
         },
-        handleClick() {
-            if (this.selectedFilesWithText.length === 0) {
+        async handleClick() {
+            const selectedIndex = this.selectedFilesWithText.map((f, index) => f.selected ? index : -1).filter(index => index !== -1);
+            if (selectedIndex.length === 0) {
                 this.$q.notify({
                     message: "Bitte Dateien zum Importieren auswählen!",
                     timeout: 5000,
@@ -97,46 +132,29 @@ export default {
                 return;
             }
             this.loading = true;
-            const formData = new FormData();
-
-            this.selectedFilesWithText.forEach((f) => {
-                formData.append("files[]", f.file);
-                formData.append("additionalData[]", f.textInput === "" ? "missing" : f.textInput);
-            });
-
-            axios
-                .post("http://localhost:8088/api/files/uploadFiles", formData, {
-                    headers: {
-                        "Content-Type": "multipart/form-data",
-                    },
-                })
-                .then((response) => {
-                    const  files  = response.data;
-                    console.log("Response:", files);
-
-                    files.forEach((file) => {
-                        console.log(`File: ${file.name}, Accepted: ${file.accepted}, Reason: ${file.reason}`);
-                        const index = this.selectedFilesWithText.findIndex(
-                            (f) => f.file.name === file.name
-                        );
-                        console.log("------ " + index);
-                        if (file.accepted === false) {
-                            this.selectedFilesWithText[index].error = true;
-                            this.selectedFilesWithText[index].errorMsg = file.reason;
-                        } else {
-                            this.selectedFilesWithText.splice(index, 1);
-                        }
-                    });
-                    this.loading = false;
-                })
-                .catch((error) => {
-                    console.error("Error uploading files:", error);
-                    this.loading = false;
-                    this.$q.notify({
-                        message: error.toString(),
-                        timeout: 5000,
-                    });
+            const selectedPaths = [];
+            const streckenIds = [];
+            selectedIndex.forEach(i => selectedPaths.push(this.selectedFilesWithText[i].path));
+            selectedIndex.forEach(i => streckenIds.push(this.selectedFilesWithText[i].textInput === "" ? "missing" : this.selectedFilesWithText[i].textInput));
+            const response = await importFiles(selectedPaths, streckenIds);
+            if(response == null) {
+                this.$q.notify({
+                    message: "Server Error",
+                    timeout: 5000,
                 });
+                return;
+            }
+            this.loading = false;
+
+            response.forEach((r, index) => {
+                if(r.accepted) {
+                    this.selectedFilesWithText[selectedIndex[index]].imported = true;
+                }
+                else {
+                    this.selectedFilesWithText[selectedIndex[index]].error = true;
+                    this.selectedFilesWithText[selectedIndex[index]].errorMsg = r.reason;
+                }
+            });
         },
     },
 };

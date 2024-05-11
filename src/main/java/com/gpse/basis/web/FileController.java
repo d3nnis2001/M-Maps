@@ -1,13 +1,15 @@
 package com.gpse.basis.web;
 
+import com.fasterxml.jackson.core.util.RequestPayload;
 import com.gpse.basis.domain.DataSet;
 import com.gpse.basis.services.FileService;
 import com.gpse.basis.domain.FileUploadResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -24,9 +26,10 @@ public class FileController {
     }
 
     @PostMapping("/uploadFiles")
-    public ResponseEntity<List<FileUploadResponse>> importFiles(@RequestPart("files[]") List<MultipartFile> files,
-                                                                @RequestParam("additionalData[]") List<String> streckenId) {
-        return ResponseEntity.ok(service.handleImport(files, streckenId));
+    public ResponseEntity<List<FileUploadResponse>> importFiles(@RequestParam("paths") List<String> pt,
+                                                                @RequestParam("ids") List<String> ids) {
+
+        return ResponseEntity.ok(service.handleImport(pt, ids));
     }
 
     @GetMapping("/getFiles")
@@ -39,4 +42,14 @@ public class FileController {
             service.deleteDataSetsById(ids);
     }
 
+    @GetMapping("/getFolder")
+    public  ResponseEntity<List<List<String>>> getFolder(@RequestParam("p") String pt) {
+        System.out.println(pt);
+        try {
+             return ResponseEntity.ok(service.readFoler(pt));
+        } catch (NullPointerException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ArrayList<>());
+        }
+    }
 }
