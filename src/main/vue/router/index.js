@@ -9,6 +9,7 @@ import Password from "../pages/Login/Password.vue";
 import ForgotPassword from "../pages/Login/ForgotPassword.vue";
 import ResetPassword from "../pages/Login/ResetPassword.vue";
 import Start from "../pages/Start.vue";
+import Archiv from "@/main/vue/pages/archiv/Archiv.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -28,6 +29,11 @@ const router = createRouter({
             name: 'dataimport',
             component: DataImport
         },
+      {
+          path: '/archiv',
+          name: 'archiv',
+          component: Archiv
+      },
         {
             path: "/",
             name: "home",
