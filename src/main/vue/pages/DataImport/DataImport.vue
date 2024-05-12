@@ -2,14 +2,14 @@
     <q-page>
         <importComponent v-if="route === 0" />
         <deleteComponent v-if="route === 1" />
-            <q-page-sticky position="bottom-left" :offset="[10, 10]" >
-                <div class="q-mt-md">
+            <q-page-sticky position="bottom-right" :offset="[10, 10]" >
+                <div class="q-mt-lg">
                     <q-fab
                         label="Actions"
                         vertical-actions-align="left"
                         color="red"
-                        icon="keyboard_arrow_right"
-                        direction="right"
+                        icon="keyboard_arrow_left"
+                        direction="left"
                     >
                         <q-fab-action
                             v-model="route"

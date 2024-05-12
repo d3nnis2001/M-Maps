@@ -6,6 +6,7 @@ import com.gpse.basis.domain.*;
 import com.gpse.basis.repositories.DataSetRepository;
 import com.gpse.basis.repositories.GeoTrackData;
 import com.gpse.basis.repositories.GleisLageDatenRepository;
+import com.gpse.basis.repositories.GleisVDataRepository;
 import com.gpse.basis.services.FileService;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.InsertOneModel;
@@ -39,15 +40,18 @@ public class FileServiceImpl implements FileService {
 
     private final GeoTrackData geoTrack;
 
+    private final GleisVDataRepository gleisV;
+
     private MongoTemplate template;
 
     Lock lock = new ReentrantLock();
     @Autowired
-    FileServiceImpl(DataSetRepository repro, GleisLageDatenRepository rpr, GeoTrackData gt, MongoTemplate tmp) {
+    FileServiceImpl(DataSetRepository repro, GleisLageDatenRepository rpr, GeoTrackData gt, MongoTemplate tmp, GleisVDataRepository rprr) {
         datasetRepro = repro;
         glDatenRepro = rpr;
         geoTrack = gt;
         template = tmp;
+        gleisV = rprr;
     }
 
     @Override
@@ -67,6 +71,17 @@ public class FileServiceImpl implements FileService {
                 try {
                     saveLHHFile(file);
                 } catch (IndexOutOfBoundsException | IOException e) {
+                    rsp.add(new FileUploadResponse(file.getName(), false, "Fehlerhafte Datei!"));
+                }
+                rsp.add(new FileUploadResponse(file.getName(), true, ""));
+                continue;
+            }
+
+            if(file.getName().endsWith(".csv")) {
+                try {
+                    saveCsvFile(file);
+                } catch(Exception e) {
+                    System.out.println(e.getMessage());
                     rsp.add(new FileUploadResponse(file.getName(), false, "Fehlerhafte Datei!"));
                 }
                 rsp.add(new FileUploadResponse(file.getName(), true, ""));
@@ -114,6 +129,41 @@ public class FileServiceImpl implements FileService {
             }
         }
         return rsp;
+    }
+
+    private void saveCsvFile(File file) throws Exception {
+        List<GleisVData> lst = new ArrayList<>();
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+        //read header and skip
+        String line = reader.readLine();
+        while((line = reader.readLine()) != null){
+            String[] columns = line.split(";");
+            String[] von = columns[2].split("\\+");
+            von[0] = von[0].trim();
+            von[1] = von[1].trim();
+            String[] bis = columns[3].split("\\+");
+            bis[0] = bis[0].trim();
+            bis[1] = bis[1].trim();
+            lst.add(new GleisVData(
+                Integer.parseInt(columns[0]),
+                Integer.parseInt(columns[1]),
+                Double.parseDouble(von[0].replace(",",".")),
+                Double.parseDouble((von[1].replace(",", "."))),
+                Double.parseDouble((bis[0].replace(",", "."))),
+                Double.parseDouble((bis[1].replace("," , "."))),
+                Integer.parseInt(columns[4]),
+                Integer.parseInt(columns[5]),
+                columns[6]
+            ));
+        }
+        gleisV.saveAll(lst);
+        Date uploadDate = new Date();
+
+        DataSet st = new DataSet();
+        st.setFileName(file.getName());
+        st.setStreckenId(Integer.toString(lst.getFirst().getStr_Nr()));
+        st.setUploadDate(uploadDate);
+        datasetRepro.save(st);
     }
 
     private String extractStreckeId(String fileName){
