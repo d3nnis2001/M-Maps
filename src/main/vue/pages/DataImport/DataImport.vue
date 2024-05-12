@@ -1,12 +1,14 @@
 <template>
     <q-page>
+        <importComponent v-if="route === 0" />
+        <deleteComponent v-if="route === 1" />
             <q-page-sticky position="bottom-left" :offset="[10, 10]" >
                 <div class="q-mt-md">
                     <q-fab
                         label="Actions"
                         vertical-actions-align="left"
                         color="red"
-                        icon="keyboard_arrow_up"
+                        icon="keyboard_arrow_right"
                         direction="right"
                     >
                         <q-fab-action
@@ -28,8 +30,6 @@
                     </q-fab>
                 </div>
             </q-page-sticky>
-            <importComponent v-if="route == 0" />
-            <deleteComponent v-if="route == 1" />
     </q-page>
 </template>
 
