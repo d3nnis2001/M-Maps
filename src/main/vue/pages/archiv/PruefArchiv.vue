@@ -1,14 +1,16 @@
 <script setup>
 
 import {onMounted, onUnmounted, ref} from "vue";
+import {getArchivedPruef, undoPruef} from "@/main/vue/api/archiv";
 
 const smallScreen = ref(false)
 const largeScreen = ref(false)
 const showDialog = ref(false)
 var selectedRow = null
+const rows = ref("")
 
-onMounted(() => {
-    //todo
+onMounted(async () => {
+    rows.value = await getArchivedPruef();
     checkScreenSize();
     window.addEventListener('resize', checkScreenSize);
 })
@@ -33,8 +35,9 @@ const showColumn = (columnName) => {
     return this.visibleColumns.includes(columnName);
 }
 
-const undo = () => {
-    //todo
+const undo = async () => {
+    await undoPruef(selectedRow.name)
+    rows.value = await getArchivedPruef();
 }
 
 const visibleColumns = ["id", "start", "destination"]
@@ -49,11 +52,13 @@ const columns = [
     { name: 'department', label: 'Fachabteilung', align: 'left', field: 'abteilung' },
     { name: 'status', label: 'Status', align: 'left', field: 'status' },
 ]
+/*
 const rows = [
     { name: 'Prüfauftrag 1', start: 'Bielefeld', ziel: 'Hannover', von: '07-04-2024', bis: '08-04-2024', abteilung: ' ', status: "storniert" },
     { name: 'Prüfauftrag 2', start: 'Bielefeld', ziel: 'Berlin', von: '10-05-2023', bis: '12-05-2023', abteilung: ' ', status: "storniert"  },
     { name: 'Prüfauftrag 3', start: 'Bielefeld', ziel: 'Berlin', von: '10-05-2023', bis: '12-05-2023', abteilung: ' ', status: "storniert"  },
 ]
+*/
 </script>
 
 <template>
@@ -84,7 +89,7 @@ const rows = [
             class="my-sticky-header-table"
             flat bordered
             title="Prüfaufträge"
-            :rows="rows"
+            :rows="rows.value"
             :columns="columns"
             row-key="id"
         >
@@ -124,7 +129,7 @@ const rows = [
             grid
             grid-header
             title="Prüfaufträge"
-            :rows="rows"
+            :rows="rows.value"
             :columns="columns"
             row-key="id"
             hide-header

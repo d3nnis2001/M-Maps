@@ -1,13 +1,15 @@
 <script setup>
 import {onMounted, onUnmounted, ref} from "vue";
+import {getArchivedRep, undoRep} from "@/main/vue/api/archiv";
 
 const smallScreen = ref(false)
 const largeScreen = ref(false)
 const showDialog = ref(false)
 var selectedRow = null
+const rows = ref("")
 
-onMounted(() => {
-    //todo
+onMounted(async () => {
+    rows.value = await getArchivedRep()
     checkScreenSize();
     window.addEventListener('resize', checkScreenSize);
 })
@@ -32,8 +34,9 @@ const showColumn = (columnName) => {
     return this.visibleColumns.includes(columnName);
 }
 
-const undo = () => {
-    //todo
+const undo = async () => {
+    await undoRep(selectedRow.name);
+    rows.value = await getArchivedRep()
 }
 
 const visibleColumns = ["ID", "Von", "Bis"]
@@ -54,13 +57,14 @@ const columns =  [
     { name: 'Strecke', label: 'Strecken', field: 'strecke' },
     { name: 'Status', label: 'Status', field: 'status' },
 ]
-
+/*
 const rows = [
     { name: 'Reparaturauftrag 1', von: '07-04-2024', bis: '08-04-2024', freigabe: "Klaus Peter", strecke:"6100", status:"done" },
     { name: 'Reparaturauftrag 2', von: '07-04-2024', bis: '08-04-2024', freigabe: "Klaus Peter", strecke:"6100", status:"done" },
     { name: 'Reparaturauftrag 3', von: '07-04-2024', bis: '08-04-2024', freigabe: "Klaus Peter", strecke:"6100", status:"done" },
     { name: 'Reparaturauftrag 4', von: '07-04-2024', bis: '08-04-2024', freigabe: "Klaus Peter", strecke:"6100", status:"done" },
 ]
+*/
 </script>
 
 <template>
@@ -91,7 +95,7 @@ const rows = [
             class="my-sticky-header-table"
             flat bordered
             title="Reparaturaufträge"
-            :rows="rows"
+            :rows="rows.value"
             :columns="columns"
             row-key="ID"
         >
@@ -126,7 +130,7 @@ const rows = [
             grid
             grid-header
             title="Reparaturaufträge"
-            :rows="rows"
+            :rows="rows.value"
             :columns="columns"
             row-key="ID"
             hide-header
