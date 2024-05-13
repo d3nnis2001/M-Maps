@@ -19,14 +19,15 @@ export default {
             }
         });
 
-        function doNothing() {
+        function saveData() {
             console.log(ticked.value)
+            const response = updateValuesById()
         }
         return {
             repairDetails,
             ticked,
             options,
-            doNothing
+            saveData
         };
     }
 }
@@ -52,7 +53,7 @@ export default {
                     />
                 </div>
             </div>
-            <q-btn label="Speichern" color="grey" @click="doNothing" class=""></q-btn>
+            <q-btn label="Speichern" color="grey" @click="saveData" class=""></q-btn>
         </div>
     </div>
 </template>

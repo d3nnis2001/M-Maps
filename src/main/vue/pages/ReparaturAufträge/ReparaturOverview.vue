@@ -46,12 +46,12 @@ export default {
             showDialog.value = true;
         };
         function goCreate() {
-            router.push("repair/create")
+            router.push("/repair/create")
         }
 
         function editOrder() {
             const name = currentRow.value.name
-            router.push(`repair/${name}/edit`)
+            router.push(`/repair/${name}/edit`)
         }
         return {
             filter: ref(''),

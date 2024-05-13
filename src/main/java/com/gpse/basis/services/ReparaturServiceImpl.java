@@ -56,4 +56,8 @@ public class ReparaturServiceImpl implements ReparaturService {
         return rep.findById(repname)
             .orElseThrow(() -> new UsernameNotFoundException("Reparatur name " + repname + " not found."));
     }
+    @Override
+    public Reparatur changeChecklistwithId(final String id, String checklist) {
+        return null;
+    }
 }

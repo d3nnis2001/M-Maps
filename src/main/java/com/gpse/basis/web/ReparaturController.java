@@ -59,4 +59,10 @@ public class ReparaturController {
         System.out.println("We made it" + newRep.getId());
         return newRep;
     }
+    @PostMapping("/changebyid")
+    public Reparatur changeRepById(final WebRequest request) {
+        String id = request.getParameter("id");
+        String values = request.getParameter("checkVals");
+        return null;
+    }
 }

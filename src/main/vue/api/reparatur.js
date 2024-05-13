@@ -50,3 +50,16 @@ export const getDetailsByID = async function getDetailsByID(name) {
         return false
     }
 }
+
+export const updateValuesById = async function updateValuesById(values, id) {
+    try {
+        const cred = new URLSearchParams()
+        cred.append("checkVals", values)
+        cred.append("id", id)
+        const response = await axios.post("/api/repair/changebyid", cred)
+        return response.data
+    } catch (error) {
+        console.error("Unseen error while trying to update Checklist in Backend:", error);
+        return false
+    }
+}
