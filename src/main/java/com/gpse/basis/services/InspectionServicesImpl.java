@@ -2,9 +2,11 @@ package com.gpse.basis.services;
 
 import com.gpse.basis.domain.InspectionOrder;
 import com.gpse.basis.repositories.InspectionOrderRepository;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Random;
 
 public class InspectionServicesImpl implements InspectionServices {
 
@@ -15,25 +17,28 @@ public class InspectionServicesImpl implements InspectionServices {
     }
 
     @Override
-    public void createInspectionOrder(String streckenId, String userId, String start, String end, String startTime, String endTime,
-                                      String fachabteilung, String messdaten, String status, String bemerkungen,
-                                      boolean archiviert) {
+    public void createInspectionOrder(InspectionOrder inspectionOrder) {
         String defaultStatus = "unbearbeitet";
-        InspectionOrder newInspec = new InspectionOrder(streckenId," ", start, end, startTime, endTime, fachabteilung,
-            messdaten, defaultStatus, bemerkungen, false);
-        inspec.save(newInspec);
+        String defaultUserId = " ";
+        boolean defaultArchiviert = false;
+        inspectionOrder.setInspectionOrderId(generateId());
+        inspec.save(inspectionOrder);
+    }
+    public String generateId() {
+        long timestamp = System.currentTimeMillis();
+        Random random = new Random();
+        int randomValue = random.nextInt(1000);
+        return String.valueOf(timestamp + randomValue);
     }
 
     @Override
-    public void editInspectionOrder(String streckenId, String userId, String start, String end, String startTime, String endTime,
-                                    String fachabteilung, String messdaten, String status, String bemerkungen,
-                                    boolean archiviert) {
+    public void editInspectionOrder(InspectionOrder inspectionOrder) {
 
 
     }
 
     @Override
-    public void acceptInspectionOrder(String streckenId, String userId, String status) {
+    public void acceptInspectionOrder(InspectionOrder inspectionOrder) {
 
     }
 
@@ -47,5 +52,11 @@ public class InspectionServicesImpl implements InspectionServices {
             inspecArray.add(inspec);
         }
         return inspecArray;
+    }
+
+    @Override
+    public InspectionOrder loadInspecById(String streckenId) throws UsernameNotFoundException {
+        return inspec.findById(streckenId).orElseThrow(()
+            -> new UsernameNotFoundException("Inspection Id " + streckenId + " not found."));
     }
 }

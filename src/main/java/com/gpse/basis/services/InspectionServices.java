@@ -2,17 +2,19 @@ package com.gpse.basis.services;
 
 import com.gpse.basis.domain.InspectionOrder;
 import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.ArrayList;
 
 public interface InspectionServices {
 
-    void createInspectionOrder(String streckenId, String userId, String start, String end, String startTime, String endTime, String fachabteilung, String messdaten, String status, String bemerkungen, boolean archiviert);
+    void createInspectionOrder(InspectionOrder inspectionOrder);
 
-    void editInspectionOrder(String streckenId, String userId, String start, String end, String startTime, String endTime, String fachabteilung, String messdaten, String status, String bemerkungen, boolean archiviert);
+    void editInspectionOrder(InspectionOrder inspectionOrder);
 
-    void acceptInspectionOrder(String streckenId, String userId, String status);
+    void acceptInspectionOrder(InspectionOrder inspectionOrder);
 
     ArrayList<InspectionOrder> getInspecData();
+    InspectionOrder loadInspecById(String streckenId) throws UsernameNotFoundException;
 
 }

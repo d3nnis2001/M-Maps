@@ -1,8 +1,12 @@
 package com.gpse.basis.domain;
 
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.MongoId;
 
+@Document
 public class InspectionOrder {
-
+    @MongoId
+    private String inspectionOrderId;
     private String streckenId;
     private String userId;
     private String startOrt;
@@ -29,21 +33,32 @@ public class InspectionOrder {
         this.status = status;
         this.bemerkungen = bemerkungen;
         this.archiviert = archiviert;
-
     }
 
     public InspectionOrder() {
 
     }
+    public String getInspectionOrderId() {
+        return inspectionOrderId;
+    }
 
-    public String getId() {
+    public void setInspectionOrderId(String inspectionOrderId) {
+        this.inspectionOrderId = inspectionOrderId;
+    }
+    public String getStreckenId() {
         return streckenId;
     }
 
-    public void setId(String id) {
+    public void setStreckenId(String id) {
         this.streckenId = id;
     }
+    public String getUserId() {
+        return userId;
+    }
 
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
     public String getStartOrt() {
         return startOrt;
     }
