@@ -45,7 +45,7 @@ public class InitializeDatabase implements InitializingBean {
         ArrayList<String> items = new ArrayList<>();
         items.add("Checker 1");
         items.add("Checker 2");
-        Checklist check1 = new Checklist("Abarbeitung1", items);
+        Checklist check1 = new Checklist("Abarbeitung1", items, false);
         Reparatur rep = new Reparatur("1", 6200, datefrom, datetill, check1,
             "Alles gut hier", "storniert", "Müller");
 
@@ -56,7 +56,8 @@ public class InitializeDatabase implements InitializingBean {
         items2.add("Checker 1");
         items2.add("Checker 2");
 
-        Checklist check2 = new Checklist("Abarbeitung2", items);
+        Checklist check2 = new Checklist("Abarbeitung2", items, false);
+        Checklist material1 = new Checklist("Material1", items, true);
         checkRepo.save(check2);
         checkRepo.save(check1);
         Reparatur rep2 = new Reparatur("2", 6300, datefrom2, datetill2, check2,

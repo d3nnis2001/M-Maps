@@ -10,10 +10,12 @@ public class Checklist {
     @MongoId
     private String name;
     private ArrayList<String> items;
+    private boolean isMaterialList;
 
-    public Checklist(String name, ArrayList<String> items) {
+    public Checklist(String name, ArrayList<String> items, boolean isMaterialList) {
         this.name = name;
         this.items = items;
+        this.isMaterialList = isMaterialList;
     }
 
     public String getName() {
@@ -36,5 +38,13 @@ public class Checklist {
     }
     public int getItemSize() {
         return items.size();
+    }
+
+    public boolean isMaterialList() {
+        return isMaterialList;
+    }
+
+    public void setMaterialList(boolean materialList) {
+        isMaterialList = materialList;
     }
 }
