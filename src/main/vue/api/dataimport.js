@@ -42,3 +42,19 @@ export const deleteDataSets = async(formData) => {
             console.error("Error:", error);
         });
 }
+
+export const getGleisLageRange = async() => {
+    try {
+        const response = await axios.get("http://localhost:8088/api/range/getGleisLage")
+        const r = response.data.map(s => [s])
+        console.log(r)
+        return r
+    } catch (error) {
+
+    }
+}
+
+export const postGleisLageRange = async (r) => {
+    const lst = r.map(s => Object.assign({}, s[0]));
+    await axios.post("http://localhost:8088/api/range/postGleisLage", lst);
+}

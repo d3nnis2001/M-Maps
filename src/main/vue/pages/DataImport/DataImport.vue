@@ -2,6 +2,7 @@
     <q-page>
         <importComponent v-if="route === 0" />
         <deleteComponent v-if="route === 1" />
+        <configureComponent v-if="route === 2"/>
             <q-page-sticky position="bottom-right" :offset="[10, 10]" >
                 <div class="q-mt-lg">
                     <q-fab
@@ -24,7 +25,7 @@
                         />
                         <q-fab-action
                             color="red"
-                            @click="onClickAnalytics"
+                            @click="onClickConfigure"
                             icon="analytics"
                         />
                     </q-fab>
@@ -36,6 +37,7 @@
 <script>
 import importComponent from "./importComponent.vue";
 import deleteComponent from "./deleteComponent.vue";
+import ConfigureComponent from "@/main/vue/pages/DataImport/ConfigureComponent.vue";
 
 export default {
     name: "DataImport",
@@ -51,8 +53,11 @@ export default {
         onClickDelete() {
             this.route = 1;
         },
+        onClickConfigure() {
+            this.route = 2;
+        }
     },
-    components: { deleteComponent, importComponent },
+    components: {ConfigureComponent, deleteComponent, importComponent },
     setup() {},
 };
 </script>
