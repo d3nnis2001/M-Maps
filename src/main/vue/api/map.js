@@ -31,4 +31,16 @@ export const getPartOfTrack = async function getPartOfTrack(from, till) {
     }
 }
 
+export const getPartOfGleislage = async function getPartOfGleislage(id) {
+    try {
+        const cred = new URLSearchParams()
+        cred.append("id", id)
+        const response = await axios.post("/api/map/fromcolours", cred)
+        return response.data
+    } catch (error) {
+        console.log("Something went wrong when getting the Gleislagedaten!")
+    }
+}
+
+
 export default {geoData, getTrack};

@@ -2,7 +2,7 @@
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {onMounted, ref} from 'vue';
-import {geoData, getTrack, getPartOfTrack} from "@/main/vue/api/map";
+import {geoData, getTrack, getPartOfTrack, getPartOfGleislage} from "@/main/vue/api/map";
 import {useQuasar} from "quasar";
 
 const map = ref(null);
@@ -30,6 +30,11 @@ onMounted(async () => {
             [47.2701, 15.0419]
         ]
     });
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map.value);
 
     new L.TileLayer('http://{s}.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png',
         {
@@ -82,45 +87,57 @@ const addEnd = () => {
 };
 
 const refreshMarkers = async () => {
-    const data = await getTrack(streckenID.value);
-    console.log(data.length)
-    if (data.length === 0) {
+    if (streckenID.value === "") {
         $q.notify({
             type: 'negative',
-            message: "Track ID doesn't exist",
-            caption: 'Please choose a different Track ID'
+            message: "Please enter a Track ID",
+            caption: 'Choose please'
         });
-    }
-    markers.forEach((m) => map.value.removeLayer(m.marker));
-    markers = []
-    for (let i = 0;i<data.length;i++) {
-        markers.push({
-            marker : L.circle([data[i].longitude, data[i].latitude], {color: "black", radius: 50}),
-            data: data[i],
+    } else {
+        const data = await getTrack(streckenID.value);
+        console.log(data.length)
+        if (data.length === 0) {
+            $q.notify({
+                type: 'negative',
+                message: "Track ID doesn't exist",
+                caption: 'Please choose a different Track ID'
+            });
+        }
+        markers.forEach((m) => map.value.removeLayer(m.marker));
+        markers = []
+        for (let i = 0;i<data.length;i++) {
+            markers.push({
+                marker : L.circle([data[i].longitude, data[i].latitude], {color: "black", radius: 50}),
+                data: data[i],
+            });
+        }
+        markers.forEach((m) => {
+            m.marker.addTo(map.value);
+            m.marker.on('click', onMarkerClicked);
         });
+        checkForChanges()
     }
-    markers.forEach((m) => {
-        m.marker.addTo(map.value);
-        m.marker.on('click', onMarkerClicked);
-    });
 };
+
 
 const onLocationFound = (e) => {
     const radius = e.accuracy;
     const userLocation = e.latlng;
     L.circle(userLocation, { color: 'blue', radius: 200}).addTo(map.value);
 }
-const centerToUserLocation = () => {
+const centerToUserLocation = async () => {
     const options = {
         setView: true,
         maxZoom: 12,
         animate: true
     }
     map.value.locate(options).on('locationfound', onLocationFound);
+    const gleis = await getPartOfGleislage(streckenID.value)
+    console.log(gleis)
 };
 
 const checkForChanges = async () => {
-    if (kmStart.value !== '' && kmEnd.value !== '') {
+    if (kmStart.value !== '' && kmEnd.value !== '' && streckenID.value !== "") {
         console.log(kmStart.value)
         const data = await getPartOfTrack(kmStart.value, kmEnd.value)
         console.log(data)
@@ -137,11 +154,6 @@ const checkForChanges = async () => {
             m.marker.on('click', onMarkerClicked);
         });
     } else {
-        if (streckenID !== '') {
-            refreshMarkers()
-        } else {
-
-        }
     }
 }
 

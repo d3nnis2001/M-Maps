@@ -10,6 +10,8 @@ public class GeoData {
     @MongoId
     private double latitude;
     private int track_km;
+
+    private int colour;
     public GeoData(int strecken_id, double longitude, double latitude, int track_km) {
         this.strecken_id = strecken_id;
         this.longitude = longitude;
@@ -48,4 +50,11 @@ public class GeoData {
         this.track_km = track_km;
     }
 
+    public int getColour() {
+        return colour;
+    }
+
+    public void setColour(int colour) {
+        this.colour = colour;
+    }
 }

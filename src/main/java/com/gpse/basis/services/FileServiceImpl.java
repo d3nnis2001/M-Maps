@@ -217,11 +217,11 @@ public class FileServiceImpl implements FileService {
             GeoData geo = iterator.next();
             int currKm = geo.getTrack_km();
             if (isright) {
-                if (currKm > from && currKm < till) {
+                if (currKm >= from && currKm <= till) {
                     geoArr.add(geo);
                 }
             } else {
-                if (currKm < from && currKm > till) {
+                if (currKm <= from && currKm >= till) {
                     geoArr.add(geo);
                 }
             }
