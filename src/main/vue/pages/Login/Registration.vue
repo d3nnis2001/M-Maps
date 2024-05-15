@@ -8,6 +8,7 @@ import Heading from "@/main/vue/pages/Login/Heading.vue";
 import Description from "@/main/vue/pages/Login/Description.vue";
 import StandardCard from "@/main/vue/pages/Login/StandardCard.vue";
 import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";
+import registerUs from "@/main/vue/api/register";
 
 const $q = useQuasar()
 const router = useRouter()
@@ -92,7 +93,7 @@ function register() {
         const region = model2.value ? [{label: model2.value.label}] : [];
         const service = model3.value ? [{label: model3.value.label}] : [];
         console.log(roles)
-        if (regStore.registerUser(email.value, pass.value, firstName.value, name.value, region[0].label, service[0].label, roles)) {
+        if (registerUs(email.value, pass.value, firstName.value, name.value, region[0].label, service[0].label, roles)) {
             $q.notify({
                 type: 'positive',
                 message: 'Registration was successful!',
