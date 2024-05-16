@@ -3,8 +3,14 @@ import {ref} from 'vue'
 import {useQuasar} from 'quasar'
 import {resetPassword, setPasswordNew} from "@/main/vue/api/auth";
 import {useRoute, useRouter} from "vue-router";
+import StandardCard from "@/main/vue/pages/Login/StandardCard.vue";
+import Impressum from "@/main/vue/pages/Login/Impressum.vue";
+import Description from "@/main/vue/pages/Login/Description.vue";
+import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";
+import Heading from "@/main/vue/pages/Login/Heading.vue";
 
 export default {
+    components: {Heading, StandardInput, Description, Impressum, StandardCard},
     methods: {resetPassword},
     setup() {
         const $q = useQuasar()
@@ -50,82 +56,30 @@ export default {
 </script>
 
 <template>
-    <div class="full-height-center">
-        <div class="content-container">
-            <div class="items-center">
-                <q-card class="q-pa-md">
-                    <q-card-section class="inner-card">
-                        <div class="row-auto text-align extra-padding">
-                            <img src="../../../resources/db-logo.png" alt="Nicht verfügbar">
-                        </div>
-                        <div class="row-auto extra-padding">
-                            <div class="text-h4 text-align ">Passwort Neu setzen</div>
-                        </div>
-                        <div class="row-auto extra-padding">
-                            <div class="rectangle"></div>
-                        </div>
-                        <div class="row-auto extra-padding">
-                            <div class="text-align">
-                                Bitte geben Sie ihr neues Passwort ein!
-                            </div>
-                        </div>
-                        <div class="row-auto text-align extra-padding">
-                            <q-input class="email-input extra-padding" type="password" v-model="password" label="Passwort"/>
-                            <q-input class="email-input extra-padding" type="password" v-model="passAgain" label="Passwort erneut eingeben"/>
-                            <q-btn label="Passwort neu setzen" @click="setNewPassword" color="primary" class=""></q-btn>
-                        </div>
-                        <div class="bg-grey-4 impressum-padding">
-                            <div class="text-black text-align justify-center">Impressum</div>
-                        </div>
-                    </q-card-section>
-                </q-card>
+    <StandardCard>
+        <Heading>Passwort neu setzen</Heading>
+        <Description>Bitte geben Sie Ihr neues Passwort ein.</Description>
+        <div class="row-auto text-align padding-md">
+            <StandardInput type="password" v-model="password" label="Passwort"></StandardInput>
+            <StandardInput type="password" v-model="passAgain" label="Passwort wiederholen"></StandardInput>
+            <div class="padding-top">
+                <q-btn label="Passwort neu setzen" @click="setNewPassword" color="primary" class=""></q-btn>
             </div>
         </div>
-    </div>
+        <Impressum></Impressum>
+    </StandardCard>
 </template>
 
 <style scoped>
-
-.full-height-center {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    width: 100%;
+.padding-top {
+    padding-top: 16px;
 }
 
-.impressum-padding {
-    padding-bottom: 200px;
-}
-
-.extra-padding {
-    padding-bottom: 20px;
-}
-
-.content-container {
-    width: calc(100% - 40px);
-    max-width: 500px;
-    padding: 20px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.6);
-    background: white;
-}
-
-.email-input {
-    width: 100%;
-    max-width: 300px;
-    margin: 0 auto;
+.padding-md {
+    padding-bottom: 32px;
 }
 
 .text-align {
     text-align: center;
-}
-
-.rectangle {
-    width: 72px;
-    height: 7px;
-    background-color: rgba(236, 0, 22, 1);
-    border-radius: 20px;
-    margin: auto;
 }
 </style>

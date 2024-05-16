@@ -1,8 +1,13 @@
 <script setup>
-import {ref, toRaw} from 'vue'
+import {ref} from 'vue'
 import {useRegistrationStore} from "../../stores/RegistrationStore"
 import {useQuasar} from 'quasar'
 import {useRouter} from 'vue-router'
+import Impressum from "@/main/vue/pages/Login/Impressum.vue";
+import Heading from "@/main/vue/pages/Login/Heading.vue";
+import Description from "@/main/vue/pages/Login/Description.vue";
+import StandardCard from "@/main/vue/pages/Login/StandardCard.vue";
+import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";
 
 const $q = useQuasar()
 const router = useRouter()
@@ -17,26 +22,27 @@ const model1 = ref(null)
 const model2 = ref(null)
 const model3 = ref(null)
 const roles = ref([
-    { label: "Prüfer", value: "1" },
-    { label: "Bearbeiter", value: "2" },
-    { label: "Datenverwalter", value: "3" },
-    { label: "Administrator", value: "4" }
+    {label: "Prüfer", value: "1"},
+    {label: "Bearbeiter", value: "2"},
+    {label: "Datenverwalter", value: "3"},
+    {label: "Administrator", value: "4"}
 ]);
 
 const region = ref([
-    { label: "BY", value: "1" },
-    { label: "BW", value: "2" },
-    { label: "MI", value: "3" },
-    { label: "NW", value: "4" },
-    { label: "SO", value: "5" },
-    { label: "N", value: "6" },
-    { label: "NO", value: "7" }
+    {label: "BY", value: "1"},
+    {label: "BW", value: "2"},
+    {label: "MI", value: "3"},
+    {label: "NW", value: "4"},
+    {label: "SO", value: "5"},
+    {label: "N", value: "6"},
+    {label: "NO", value: "7"}
 ]);
 
 const service = ref([
-    { label: "DB Systemtechnik", value: "1" },
-    { label: "DB Kommunikationstechnik", value: "2" }
+    {label: "DB Systemtechnik", value: "1"},
+    {label: "DB Kommunikationstechnik", value: "2"}
 ]);
+
 function checkInputs() {
     let errormsg = [];
 
@@ -79,13 +85,14 @@ function checkInputs() {
     }
     return true;
 }
+
 function register() {
     if (checkInputs()) {
         const roles = model1.value.map(role => role.label);
-        const region = model2.value ? [{ label: model2.value.label}] : [];
-        const service = model3.value ? [{ label: model3.value.label}] : [];
+        const region = model2.value ? [{label: model2.value.label}] : [];
+        const service = model3.value ? [{label: model3.value.label}] : [];
         console.log(roles)
-        if (regStore.registerUser(email.value, pass.value, firstName.value, name.value,region[0].label, service[0].label, roles)) {
+        if (regStore.registerUser(email.value, pass.value, firstName.value, name.value, region[0].label, service[0].label, roles)) {
             $q.notify({
                 type: 'positive',
                 message: 'Registration was successful!',
@@ -103,76 +110,43 @@ function register() {
 </script>
 
 <template>
-    <div class="full-height-center">
-        <div class="content-container">
-            <div class="items-center">
-                <q-card class="q-pa-md">
-                    <q-card-section class="inner-card">
-                        <div class="row-auto text-align extra-padding">
-                            <img src="../../../resources/db-logo.png" alt="Nicht verfügbar">
-                        </div>
-                        <div class="row-auto extra-padding">
-                            <div class="text-h4 text-align ">Registrieren</div>
-                        </div>
-                        <div class="row-auto extra-padding">
-                            <div class="rectangle"></div>
-                        </div>
-                        <div class="row-auto extra-padding">
-                            <div class="text-align">
-                                Bitte füllen Sie folgende Informationen aus
-                            </div>
-                        </div>
-                        <div class="row-auto text-align extra-padding">
-                            <q-input class="input-field extra-padding" v-model="firstName" label="Vorname"/>
-                            <q-input class="input-field extra-padding" v-model="name" label="Nachname"/>
-                            <q-input class="input-field extra-padding" v-model="email" label="E-Mail"/>
-                            <q-input type="password" class="input-field extra-padding" v-model="pass" label="Passwort"/>
-                            <q-input type="password" class="input-field extra-padding" v-model="passAgain" label="Passwort erneut angeben"/>
-                            <q-select class="input-field extra-padding" multiple use-chips standout v-model="model1" :options="roles" label="Rollen" />
-                            <q-select class="input-field extra-padding" standout v-model="model2" :options="region" label="Region" />
-                            <q-select class="input-field extra-padding" standout v-model="model3" :options="service" label="Fachdienst" />
-                            <q-btn label="Registrieren" color="primary" @click=register class=""></q-btn>
-                        </div>
-                        <div class="bg-grey-4 impressum-padding">
-                            <div class="text-black text-align justify-center">Impressum</div>
-                        </div>
-                    </q-card-section>
-                </q-card>
+    <StandardCard>
+        <Heading>Registrieren</Heading>
+        <Description>Bitte füllen Sie folgende Informationen aus.</Description>
+        <div class="row-auto text-align padding-md">
+            <div class="padding-sm">
+                <StandardInput v-model="firstName" label="Vorname"></StandardInput>
+                <StandardInput v-model="name" label="Nachname"></StandardInput>
+                <StandardInput v-model="email" label="E-Mail"></StandardInput>
             </div>
+            <div class="padding-sm">
+                <StandardInput type="password" v-model="pass" label="Passwort"></StandardInput>
+                <StandardInput type="password" v-model="passAgain" label="Passwort wiederholen"></StandardInput>
+            </div>
+            <q-select class="input-field padding-sm" multiple use-chips standout v-model="model1"
+                      :options="roles" label="Rollen"/>
+            <q-select class="input-field padding-sm" standout v-model="model2" :options="region"
+                      label="Region"/>
+            <q-select class="input-field padding-md" standout v-model="model3" :options="service"
+                      label="Fachdienst"/>
+            <q-btn label="Registrieren" color="primary" @click=register class=""></q-btn>
         </div>
-    </div>
+        <Impressum></Impressum>
+    </StandardCard>
+
+
 </template>
 
 <style scoped>
 
-.full-height-center {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    width: 100%;
+.padding-md {
+    padding-bottom: 32px;
 }
 
-.impressum-padding {
-    padding-bottom: 200px;
-}
-
-.extra-padding {
-    padding-bottom: 20px;
-}
-
-.content-container {
-    width: calc(100% - 40px);
-    max-width: 500px;
-    padding: 20px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.6);
-    background: white;
-}
 
 .input-field {
     width: 100%;
-    max-width: 300px;
+    max-width: 288px;
     margin: 0 auto;
 }
 
@@ -180,11 +154,12 @@ function register() {
     text-align: center;
 }
 
-.rectangle {
-    width: 72px;
-    height: 7px;
-    background-color: rgba(236, 0, 22, 1);
-    border-radius: 20px;
-    margin: auto;
+.padding-sm {
+    padding-bottom: 16px;
 }
+
+.padding-md {
+    padding-bottom: 32px;
+}
+
 </style>
