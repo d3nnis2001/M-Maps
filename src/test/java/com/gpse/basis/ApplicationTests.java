@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Profile;
 
 @Profile("Name1")
 @SpringBootTest
-class TemplateApplicationTests {
+class ApplicationTests {
 
 	@Test
 	void contextLoads() {

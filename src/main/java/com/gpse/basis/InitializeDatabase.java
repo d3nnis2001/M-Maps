@@ -4,13 +4,13 @@ import com.gpse.basis.domain.Checklist;
 import com.gpse.basis.domain.Reparatur;
 import com.gpse.basis.domain.UserModel;
 import com.gpse.basis.repositories.ChecklistRepository;
+import com.gpse.basis.repositories.ChecklistTemplateRepository;
 import com.gpse.basis.repositories.ReperaturRepository;
 import com.gpse.basis.repositories.UserRepository;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -18,14 +18,17 @@ import java.util.Date;
 public class InitializeDatabase implements InitializingBean {
     private final UserRepository usRepo;
     private final ReperaturRepository reRepo;
-    private final ChecklistRepository checkRepo;
+    private final ChecklistTemplateRepository checklistTemplateRepository;
+    private final ChecklistRepository checklistRepository;
 
     @Autowired
     public InitializeDatabase(final UserRepository usRepo,
-                              final ReperaturRepository reRepo, final ChecklistRepository checkRepo) {
+                              final ReperaturRepository reRepo, final ChecklistTemplateRepository checkRepo,
+                              final ChecklistRepository checklistRepository) {
         this.usRepo = usRepo;
         this.reRepo = reRepo;
-        this.checkRepo = checkRepo;
+        this.checklistTemplateRepository = checkRepo;
+        this.checklistRepository = checklistRepository;
     }
     @Override
     public void afterPropertiesSet() {
@@ -45,7 +48,7 @@ public class InitializeDatabase implements InitializingBean {
         ArrayList<String> items = new ArrayList<>();
         items.add("Checker 1");
         items.add("Checker 2");
-        Checklist check1 = new Checklist("Abarbeitung1", items, false);
+        Checklist check1 = new Checklist("Abarbeitung1", items, items);
         Reparatur rep = new Reparatur("1", 6200, datefrom, datetill, check1,
             "Alles gut hier", "storniert", "Müller");
 
@@ -56,10 +59,9 @@ public class InitializeDatabase implements InitializingBean {
         items2.add("Checker 1");
         items2.add("Checker 2");
 
-        Checklist check2 = new Checklist("Abarbeitung2", items, false);
-        Checklist material1 = new Checklist("Material1", items, true);
-        checkRepo.save(check2);
-        checkRepo.save(check1);
+        Checklist check2 = new Checklist("Abarbeitung2", items, items2);
+        checklistRepository.save(check2);
+        checklistRepository.save(check1);
         Reparatur rep2 = new Reparatur("2", 6300, datefrom2, datetill2, check2,
             "Auch alles gut hier", "neu beauftragt", "Heinz");
         reRepo.save(rep);

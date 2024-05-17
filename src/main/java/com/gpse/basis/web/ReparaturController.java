@@ -48,6 +48,8 @@ public class ReparaturController {
         System.out.println(checker.getName());
         return service.addUser(Integer.parseInt(track), acDate1, acDate2, authorized, checker, remarks);
     }
+
+    //TODO: Schnittstelle anpassen nach Änderungen
     @PostMapping("/allchecklists")
     public ArrayList<String> getChecklists() {
         return checkService.getAllNames();

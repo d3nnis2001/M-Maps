@@ -1,6 +1,5 @@
 <script setup>
 import {ref} from 'vue'
-import {useRegistrationStore} from "../../stores/RegistrationStore"
 import {useQuasar} from 'quasar'
 import {useRouter} from 'vue-router'
 import Impressum from "@/main/vue/pages/Login/Impressum.vue";
@@ -12,7 +11,6 @@ import registerUs from "@/main/vue/api/register";
 
 const $q = useQuasar()
 const router = useRouter()
-const regStore = useRegistrationStore()
 
 const firstName = ref('')
 const name = ref('')

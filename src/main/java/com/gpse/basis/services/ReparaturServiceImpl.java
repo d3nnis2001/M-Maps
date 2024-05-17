@@ -2,7 +2,6 @@ package com.gpse.basis.services;
 
 import com.gpse.basis.domain.Checklist;
 import com.gpse.basis.domain.Reparatur;
-import com.gpse.basis.domain.UserModel;
 import com.gpse.basis.repositories.ReperaturRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

@@ -12,10 +12,12 @@ import Start from "../pages/Start.vue";
 import ReparaturOverview from "@/main/vue/pages/ReparaturAufträge/ReparaturOverview.vue";
 import ReparaturCreate from "@/main/vue/pages/ReparaturAufträge/ReparaturCreate.vue";
 import ReparaturEdit from "@/main/vue/pages/ReparaturAufträge/ReparaturEdit.vue";
+import checklistOverview from "@/main/vue/pages/checklists/ChecklistOverview.vue";
+import checklistCreate from "@/main/vue/pages/checklists/ChecklistCreate.vue";
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
+    history: createWebHistory(import.meta.env.BASE_URL),
+    routes: [
         {
             path: '/',
             name: 'start',
@@ -75,12 +77,22 @@ const router = createRouter({
             path: "/repair/:name/edit",
             name: "RepairEdit",
             component: ReparaturEdit
-        }
-  ]
+        },
+        {
+            path: "/checklists",
+            name: "checklistOverview",
+            component: checklistOverview,
+        },
+        {
+            path: "/checklists/create",
+            name: "checklistCreate",
+            component: checklistCreate,
+        },
+    ]
 })
 
 router.beforeEach((to) => {
-  // Something which should be executed before each routing
+    // Something which should be executed before each routing
 })
 
 export default router

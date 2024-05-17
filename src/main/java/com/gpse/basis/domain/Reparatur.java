@@ -2,10 +2,7 @@ package com.gpse.basis.domain;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
-import org.springframework.validation.beanvalidation.SpringConstraintValidatorFactory;
-import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 
-import java.util.ArrayList;
 import java.util.Date;
 
 @Document(collection = "Reparaturauftrag")
