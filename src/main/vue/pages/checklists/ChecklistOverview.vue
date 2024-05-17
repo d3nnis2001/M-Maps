@@ -1,17 +1,19 @@
 <script setup>
-import {getChecklists} from "@/main/vue/api/reparatur";
+import {useChecklistTemplateStore} from "@/main/vue/stores/checklistTemplateStore";
 import {onMounted, ref} from "vue";
 import router from "@/main/vue/router";
 
-let checklists = ref([])
+const checklistTemplateStore = useChecklistTemplateStore()
+
+let checklistNames = ref([])
 
 onMounted(async () => {
-    checklists = await getChecklists()
+    checklistNames = await checklistTemplateStore.getAllChecklistTemplateNames()
 })
 </script>
 
 <template>
-<li v-for="checklist in checklists">
+<li v-for="checklist in checklistNames">
     <div class="text-black padding">
         {{ checklist }}
     </div>

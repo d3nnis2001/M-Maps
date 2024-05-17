@@ -1,6 +1,7 @@
 package com.gpse.basis;
 
 import com.gpse.basis.domain.Checklist;
+import com.gpse.basis.domain.ChecklistTemplate;
 import com.gpse.basis.domain.Reparatur;
 import com.gpse.basis.domain.UserModel;
 import com.gpse.basis.repositories.ChecklistRepository;
@@ -11,8 +12,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
+import java.util.*;
 
 @Service
 public class InitializeDatabase implements InitializingBean {
@@ -34,6 +34,8 @@ public class InitializeDatabase implements InitializingBean {
     public void afterPropertiesSet() {
         initUsers();
         initRepair();
+        initChecklistTemplates();
+        initRepair();
     }
     public void initUsers() {
         // Test User 1
@@ -41,6 +43,14 @@ public class InitializeDatabase implements InitializingBean {
         user.addRole("Prüfer");
         usRepo.save(user);
     }
+    public void initChecklistTemplates() {
+        // Test Checklist Template 1
+        LinkedList<String> tasks = new LinkedList<>(Arrays.asList("Punkt 1", "Punkt 2", "Punkt 3"));
+        LinkedList<String> material = new LinkedList<>(Arrays.asList("Material 1", "Material 2", "Material 3"));
+        ChecklistTemplate example = new ChecklistTemplate("Template 1", tasks, material);
+        checklistTemplateRepository.save(example);
+    }
+
     public void initRepair() {
         // Reparaturauftrag 1
         Date datefrom = new Date(2024, 02, 10, 10, 10, 10);
