@@ -1,7 +1,7 @@
 <script setup>
 import {useChecklistTemplateStore} from "@/main/vue/stores/checklistTemplateStore";
 import {onMounted, ref} from "vue";
-import router from "@/main/vue/router";
+import {RouterLink} from 'vue-router';
 
 const checklistTemplateStore = useChecklistTemplateStore()
 
@@ -18,7 +18,9 @@ onMounted(async () => {
         {{ checklist }}
     </div>
 </li>
-    <q-btn label="neue Checkliste erstellen" @click="router.push({name: 'checklistsCreate'})"></q-btn>
+    <router-link to="/checklists/create">
+        <q-btn label="neue Checkliste erstellen"></q-btn>
+    </router-link>
 </template>
 
 <style scoped>

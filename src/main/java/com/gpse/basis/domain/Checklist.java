@@ -1,33 +1,20 @@
 package com.gpse.basis.domain;
 
-import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Document(collection = "Checklist")
 public class Checklist {
-    @MongoId
-    private String id;
     private String name;
     private List<CheckPoint>  tasks;
     private List<CheckPoint> material;
 
     public Checklist(String name, List<String> tasks, List<String> material) {
-        this.id = new ObjectId().toString();
         this.name = name;
         this.tasks = createCheckPoints(tasks);
         this.material = createCheckPoints(material);
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public String getName() {

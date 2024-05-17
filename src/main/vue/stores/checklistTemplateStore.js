@@ -18,6 +18,18 @@ export const useChecklistTemplateStore = defineStore('checklistTemplates', () =>
         })
     }
 
-    return {getAllChecklistTemplateNames}
+    function addChecklist(name) {
+        return new Promise((resolve, reject) => {
+            api.checklistTemplate.addChecklist(name)
+                .then(() => {
+                    resolve()
+                })
+                .catch(() => {
+                    reject()
+                })
+        })
+    }
+
+    return {getAllChecklistTemplateNames, addChecklist}
 
 })
