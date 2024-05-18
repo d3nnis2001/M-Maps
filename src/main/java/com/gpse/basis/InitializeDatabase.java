@@ -30,6 +30,7 @@ public class InitializeDatabase implements InitializingBean {
         this.checklistTemplateRepository = checkRepo;
         this.checklistRepository = checklistRepository;
     }
+
     @Override
     public void afterPropertiesSet() {
         initUsers();
@@ -37,11 +38,15 @@ public class InitializeDatabase implements InitializingBean {
         initChecklistTemplates();
         initRepair();
     }
+
     public void initUsers() {
         // Test User 1
         UserModel user = new UserModel("d3nnis.s@web.de", "hello", "Georg", "Bauer");
         user.addRole("Prüfer");
+        UserModel user2 = new UserModel("mauricemeise@gmx.net", "asdf", "Jochen", "Bauer");
+        user.addRole("Admin");
         usRepo.save(user);
+        usRepo.save(user2);
     }
     public void initChecklistTemplates() {
         // Test Checklist Template 1

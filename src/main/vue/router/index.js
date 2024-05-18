@@ -9,6 +9,7 @@ import Password from "../pages/Login/Password.vue";
 import ForgotPassword from "../pages/Login/ForgotPassword.vue";
 import ResetPassword from "../pages/Login/ResetPassword.vue";
 import Start from "../pages/Start.vue";
+import AdminMain from "@/main/vue/pages/Nutzerverwaltung/AdminMain.vue";
 import ReparaturOverview from "@/main/vue/pages/ReparaturAufträge/ReparaturOverview.vue";
 import ReparaturCreate from "@/main/vue/pages/ReparaturAufträge/ReparaturCreate.vue";
 import ReparaturEdit from "@/main/vue/pages/ReparaturAufträge/ReparaturEdit.vue";
@@ -62,6 +63,13 @@ const router = createRouter({
             path: "/reset-password",
             name: "setNewPassword",
             component: ResetPassword
+        },
+        {
+            path: "/admin",
+            name: "adminmain",
+            component: AdminMain
+        }
+  ]
         },
         {
             path: "/repair",
