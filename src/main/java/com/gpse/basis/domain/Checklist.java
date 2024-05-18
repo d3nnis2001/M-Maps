@@ -17,6 +17,12 @@ public class Checklist {
         this.material = createCheckPoints(material);
     }
 
+    public Checklist(ChecklistTemplate template) {
+        this.name = template.getName();
+        this.tasks = createCheckPoints(template.getTasks());
+        this.material = createCheckPoints(template.getMaterial());
+    }
+
     public String getName() {
         return name;
     }

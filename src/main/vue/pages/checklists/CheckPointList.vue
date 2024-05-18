@@ -9,17 +9,19 @@ const pattern = /^.*\S.*/
 
 const newItem = ref("")
 const items = ref([])
+const finalItems = ref([])
 const checked = ref(false)
 
 function addItem() {
     if (pattern.test(newItem.value)) {
-        items.value.push(newItem.value)
+        items.value.push({id: items.value.length + 1, text: newItem.value})
+        finalItems.value.push(newItem.value)
         newItem.value = ""
     } else {
         $q.notify({
-            type: 'mistake',
+            type: 'warning',
             message: 'falsche Eingabe',
-            content: 'Die Eingabe für dieses Textfeld ist ungültig'
+            caption: 'Die Eingabe für dieses Textfeld ist ungültig'
         })
     }
 }
@@ -32,8 +34,8 @@ function addItem() {
         </StandardInput>
         <q-btn label="hinzufügen" @click="addItem" color="primary"></q-btn>
     </span>
-    <div v-for="item in items">
-        <q-checkbox  v-model="checked" :label="item" disabled="true"></q-checkbox>
+    <div v-for="item in items" :key="item.id">
+        <q-checkbox  v-model="checked" :label="item.text" disable></q-checkbox>
     </div>
 </template>
 

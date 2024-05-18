@@ -8,5 +8,5 @@ public interface ChecklistTemplateService {
     List<String> getAllChecklistNames();
     List<ChecklistTemplate> getALlTemplates();
 
-    boolean addChecklist(String name);
+    boolean addChecklist(String name, List<String> tasks, List<String> material);
 }

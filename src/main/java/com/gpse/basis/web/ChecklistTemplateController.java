@@ -26,9 +26,8 @@ public class ChecklistTemplateController {
         return checklistTemplateService.getALlTemplates();
     }
 
-    @PostMapping("/create/{name}")
-    public boolean addChecklist(@PathVariable("name") final String name) {
-        return checklistTemplateService.addChecklist(name);
-
+    @PostMapping("/create")
+    public boolean addChecklist(@RequestBody ChecklistTemplate template) {
+        return checklistTemplateService.addChecklist(template.getName(), template.getTasks(), template.getMaterial());
     }
 }

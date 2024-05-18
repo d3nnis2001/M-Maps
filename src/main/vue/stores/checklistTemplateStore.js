@@ -5,9 +5,9 @@ import api from '../api';
 export const useChecklistTemplateStore = defineStore('checklistTemplates', () => {
     const checklistNames = ref([])
     const templates = ref([])
-    const error = ref("")
-    const validInput = ref(true)
+    const invalidInput = ref(false)
     const templateAdded = ref(true)
+    const listsEmpty = ref(false)
 
     function getAllChecklistTemplateNames() {
         return new Promise((resolve, reject) => {
@@ -35,21 +35,34 @@ export const useChecklistTemplateStore = defineStore('checklistTemplates', () =>
         })
     }
 
-    function isNameAllowed(name)  {
+    function nameNotAllowed(name)  {
         const pattern = /^.*\S.*/;
         if (!pattern.test(name)) {
-            validInput.value = false
-            return false
+            invalidInput.value = true
+            return true
         }
-        validInput.value = true
-        return true
+        invalidInput.value = false
+        return false
     }
 
-    function addChecklist(name) {
-        error.value = ""
-        if (isNameAllowed(name)) {
+    function checkListsEmpty(list1, list2) {
+        if (list1.length + list2.length === 0) {
+            listsEmpty.value = true
+            return true
+        } else {
+            listsEmpty.value = false
+            return false
+        }
+    }
+
+    function addChecklist(name, tasks, material) {
+        if (nameNotAllowed(name)) {
+
+        } else if (checkListsEmpty(tasks, material)) {
+
+        } else {
             return new Promise((resolve, reject) => {
-                api.checklistTemplate.addChecklist(name)
+                api.checklistTemplate.addChecklist(name, tasks, material)
                     .then(res => {
                         templateAdded.value = res.data
                         resolve()
@@ -65,8 +78,9 @@ export const useChecklistTemplateStore = defineStore('checklistTemplates', () =>
     return {
         checklistNames,
         templates,
-        validInput,
+        invalidInput,
         templateAdded,
+        listsEmpty,
         getAllChecklistTemplateNames,
         getAllTemplates,
         addChecklist,
