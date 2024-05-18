@@ -68,8 +68,6 @@ const router = createRouter({
             path: "/admin",
             name: "adminmain",
             component: AdminMain
-        }
-  ]
         },
         {
             path: "/repair",
@@ -95,7 +93,7 @@ const router = createRouter({
             path: "/checklists/create",
             name: "checklistCreate",
             component: checklistCreate,
-        },
+        }
     ]
 })
 
