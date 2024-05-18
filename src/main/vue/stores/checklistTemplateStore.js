@@ -3,13 +3,27 @@ import {ref} from 'vue';
 import api from '../api';
 
 export const useChecklistTemplateStore = defineStore('checklistTemplates', () => {
-    let checklistNames = ref([])
+    const checklistNames = ref([])
+    const templates = ref([])
 
     function getAllChecklistTemplateNames() {
         return new Promise((resolve, reject) => {
             api.checklistTemplate.getAllChecklistNames()
                 .then(res => {
-                    checklistNames = res.data
+                    checklistNames.value = res.data
+                    resolve()
+                })
+                .catch(() => {
+                    reject()
+                })
+        })
+    }
+
+    function getAllTemplates() {
+        return new Promise((resolve, reject) => {
+            api.checklistTemplate.getAllTemplates()
+                .then(res => {
+                    templates.value = res.data
                     resolve()
                 })
                 .catch(() => {
@@ -30,6 +44,12 @@ export const useChecklistTemplateStore = defineStore('checklistTemplates', () =>
         })
     }
 
-    return {getAllChecklistTemplateNames, addChecklist}
+    return {
+        checklistNames,
+        templates,
+        getAllChecklistTemplateNames,
+        getAllTemplates,
+        addChecklist
+    }
 
 })

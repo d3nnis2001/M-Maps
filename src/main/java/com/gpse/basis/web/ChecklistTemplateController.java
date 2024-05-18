@@ -1,5 +1,6 @@
 package com.gpse.basis.web;
 
+import com.gpse.basis.domain.ChecklistTemplate;
 import com.gpse.basis.services.ChecklistTemplateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -15,9 +16,14 @@ public class ChecklistTemplateController {
     public ChecklistTemplateController(ChecklistTemplateService checklistTemplateService) {
         this.checklistTemplateService = checklistTemplateService;
     }
-    @GetMapping("/all")
+    @GetMapping("/all/names")
     public List<String> getAllChecklistNames() {
         return checklistTemplateService.getAllChecklistNames();
+    }
+
+    @GetMapping("/all")
+    public List<ChecklistTemplate> getAllTemplates() {
+        return checklistTemplateService.getALlTemplates();
     }
 
     @PostMapping("/create/{name}")

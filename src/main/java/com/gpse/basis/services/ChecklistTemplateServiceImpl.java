@@ -17,11 +17,14 @@ public class ChecklistTemplateServiceImpl implements ChecklistTemplateService {
     @Override
     public List<String> getAllChecklistNames() {
         List<String> result = new LinkedList<>();
-        Iterable<ChecklistTemplate> it = checklistTemplateRepository.findAll();
-        for (ChecklistTemplate names : it) {
-            result.add(names.getName());
-        }
-        System.out.println(result);
+        checklistTemplateRepository.findAll().forEach(item -> result.add(item.getName()));
+        return result;
+    }
+
+    @Override
+    public List<ChecklistTemplate> getALlTemplates() {
+        List<ChecklistTemplate> result = new LinkedList<>();
+        checklistTemplateRepository.findAll().forEach(result::add);
         return result;
     }
 

@@ -1,30 +1,27 @@
 <script setup>
 import {useChecklistTemplateStore} from "@/main/vue/stores/checklistTemplateStore";
-import {onMounted, ref} from "vue";
+import {onMounted} from "vue";
 import {RouterLink} from 'vue-router';
+import {storeToRefs} from "pinia";
 
 const checklistTemplateStore = useChecklistTemplateStore()
 
-let checklistNames = ref([])
+const { checklistNames } = storeToRefs(checklistTemplateStore)
 
 onMounted(async () => {
-    checklistNames = await checklistTemplateStore.getAllChecklistTemplateNames()
+    await checklistTemplateStore.getAllChecklistTemplateNames()
 })
 </script>
 
 <template>
-<li v-for="checklist in checklistNames">
-    <div class="text-black padding">
-        {{ checklist }}
-    </div>
-</li>
+    <li v-for="name in checklistNames">
+        {{ name }}
+    </li>
     <router-link to="/checklists/create">
         <q-btn label="neue Checkliste erstellen"></q-btn>
     </router-link>
 </template>
 
 <style scoped>
-.padding {
-    padding: 8px;
-}
+
 </style>
