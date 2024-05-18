@@ -18,7 +18,7 @@ onMounted(async () => {
         {{ name }}
     </li>
     <router-link to="/checklists/create">
-        <q-btn label="neue Checkliste erstellen"></q-btn>
+        <q-btn label="neue Checkliste erstellen" color="primary"></q-btn>
     </router-link>
 </template>
 

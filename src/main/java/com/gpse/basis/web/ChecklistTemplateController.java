@@ -29,5 +29,6 @@ public class ChecklistTemplateController {
     @PostMapping("/create/{name}")
     public boolean addChecklist(@PathVariable("name") final String name) {
         return checklistTemplateService.addChecklist(name);
+
     }
 }

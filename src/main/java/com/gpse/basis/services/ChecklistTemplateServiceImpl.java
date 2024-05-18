@@ -30,6 +30,9 @@ public class ChecklistTemplateServiceImpl implements ChecklistTemplateService {
 
     @Override
     public boolean addChecklist(String name) {
+        if (checklistTemplateRepository.findById(name).isPresent()) {
+            return false;
+        }
         //TODO: add tasks and material to method signature
         LinkedList<String> tasks = new LinkedList<>(Arrays.asList("Punkt 1", "Punkt 2", "Punkt 3"));
         LinkedList<String> material = new LinkedList<>(Arrays.asList("Material 1", "Material 2", "Material 3"));
