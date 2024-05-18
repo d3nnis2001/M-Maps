@@ -1,10 +1,10 @@
 <script>
-import {onMounted, reactive, ref} from 'vue'
-import {repair} from "@/main/vue/api/reparatur";
+import { onMounted, reactive, ref } from 'vue';
+import { deleteRepairOrder, repair, updateStatus } from "@/main/vue/api/reparatur";
 import router from "@/main/vue/router";
 
 export default {
-    setup () {
+    setup() {
         const state = reactive({
             filter: '',
             columns: [
@@ -27,32 +27,89 @@ export default {
         });
 
         onMounted(async () => {
-            const response = await repair()
-            for (let i = 0; i<response.length; i++) {
+            const response = await repair();
+            for (let i = 0; i < response.length; i++) {
                 state.rows.push({
                     name: response[i]["id"],
                     von: response[i]["from"],
                     bis: response[i]["till"],
                     freigabe: response[i]["freigabeberechtigter"],
                     strecke: response[i]["track"],
-                    status: response[i]["status"]})
+                    status: response[i]["status"]
+                });
             }
-        })
-        const showDialog = ref(false);
-        const currentRow = ref({});
+        });
 
-        const rowClick = async (evt, rowData) => {
-            currentRow.value = rowData;
+        const showDialog = ref(false);
+        const showConfirmDialog = ref(false);
+        const currentRow = reactive({});
+        const rowToDelete = ref(null);
+
+        const rowClick = (evt, rowData) => {
+            Object.assign(currentRow, rowData);
             showDialog.value = true;
         };
+
         function goCreate() {
-            router.push("repair/create")
+            router.push(`/repair/${name}/edit`);
         }
 
-        function editOrder() {
-            const name = currentRow.value.name
-            router.push(`repair/${name}/edit`)
+        async function editOrder() {
+            const name = currentRow.name;
+            router.push(`/repair/${name}/edit`);
         }
+
+        async function cancelOrder() {
+            const name = currentRow.name;
+            await updateStatus(name, "storniert");
+            currentRow.status = "storniert";
+            updateRowStatus(name, "storniert");
+            showDialog.value = false;
+        }
+
+        async function archiveOrder() {
+            const name = currentRow.name;
+            await updateStatus(name, "archiviert");
+            currentRow.status = "archiviert";
+            updateRowStatus(name, "archiviert");
+            showDialog.value = false;
+        }
+
+        async function reapplyOrder() {
+            const name = currentRow.name;
+            await updateStatus(name, "neu beauftragt");
+            currentRow.status = "neu beauftragt";
+            updateRowStatus(name, "neu beauftragt");
+            showDialog.value = false;
+        }
+
+        function confirmDeleteOrder(row) {
+            rowToDelete.value = row;
+            showConfirmDialog.value = true;
+        }
+
+        async function deleteOrder() {
+            const name = rowToDelete.value.name;
+            await deleteRepairOrder(name);
+            removeRow(name);
+            showConfirmDialog.value = false;
+            showDialog.value = false;
+        }
+
+        function updateRowStatus(name, status) {
+            const row = state.rows.find(row => row.name === name);
+            if (row) {
+                row.status = status;
+            }
+        }
+
+        function removeRow(name) {
+            const index = state.rows.findIndex(row => row.name === name);
+            if (index !== -1) {
+                state.rows.splice(index, 1);
+            }
+        }
+
         return {
             filter: ref(''),
             state,
@@ -60,8 +117,14 @@ export default {
             rowClick,
             currentRow,
             showDialog,
-            editOrder
-        }
+            showConfirmDialog,
+            confirmDeleteOrder,
+            deleteOrder,
+            editOrder,
+            cancelOrder,
+            archiveOrder,
+            reapplyOrder
+        };
     }
 }
 </script>
@@ -92,17 +155,31 @@ export default {
             <q-card>
                 <q-card-section>
                     <div class="option-button" @click="editOrder">Bearbeiten</div>
-                    <q-separator />
-                    <div class="option-button" @click="deleteOrder">Löschen</div>
-                    <q-separator />
-                    <div class="option-button" @click="archiveOrder">Archivieren</div>
-                    <q-separator />
-                    <div class="option-button" @click="cancelOrder">Stornieren</div>
-                    <q-separator />
-                    <div class="option-button" @click="reapplyOrder">Neu beantragen</div>
+                    <q-separator v-if="currentRow.status !== 'abgeschlossen'" />
+                    <div class="option-button" v-if="currentRow.status === 'storniert'" @click="confirmDeleteOrder(currentRow)">Löschen</div>
+                    <q-separator v-if="currentRow.status === 'storniert'" />
+                    <div class="option-button" v-if="currentRow.status === 'storniert'" @click="archiveOrder">Archivieren</div>
+                    <q-separator v-if="currentRow.status !== 'abgeschlossen'" />
+                    <div class="option-button" v-if="currentRow.status !== 'storniert'" @click="cancelOrder">Stornieren</div>
+                    <q-separator v-if="currentRow.status === 'abgeschlossen'" />
+                    <div class="option-button" v-if="currentRow.status === 'storniert'" @click="reapplyOrder">Neu beantragen</div>
                 </q-card-section>
                 <q-card-section>
                     <q-btn flat label="Schließen" color="primary" @click="showDialog = false"></q-btn>
+                </q-card-section>
+            </q-card>
+        </q-dialog>
+        <q-dialog v-model="showConfirmDialog">
+            <q-card>
+                <q-card-section>
+                    <div class="text-h6">Bestätigung</div>
+                </q-card-section>
+                <q-card-section>
+                    Sind Sie sich sicher, dass sie diesen Reparaturauftrag löschen wollen?
+                </q-card-section>
+                <q-card-section>
+                    <q-btn flat label="Abbrechen" color="positive" @click="showConfirmDialog = false"></q-btn>
+                    <q-btn flat label="Löschen" color="negative" @click="deleteOrder"></q-btn>
                 </q-card-section>
             </q-card>
         </q-dialog>
@@ -110,7 +187,6 @@ export default {
 </template>
 
 <style scoped>
-
 .option-button {
     cursor: pointer;
     padding: 8px;
@@ -120,5 +196,4 @@ export default {
 .option-button:hover {
     text-decoration: underline;
 }
-
 </style>

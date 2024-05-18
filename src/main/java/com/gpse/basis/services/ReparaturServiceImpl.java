@@ -1,13 +1,13 @@
 package com.gpse.basis.services;
 
-import com.gpse.basis.domain.Checklist;
-import com.gpse.basis.domain.Reparatur;
-import com.gpse.basis.domain.UserModel;
+import com.gpse.basis.domain.*;
+import com.gpse.basis.repositories.RepChecklistRepository;
 import com.gpse.basis.repositories.ReperaturRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -17,9 +17,11 @@ import java.util.Random;
 
 public class ReparaturServiceImpl implements ReparaturService {
     private ReperaturRepository rep;
+    private RepChecklistRepository checkRepo;
     @Autowired
-    public ReparaturServiceImpl(ReperaturRepository rep) {
+    public ReparaturServiceImpl(ReperaturRepository rep, RepChecklistRepository checkRepo) {
         this.rep = rep;
+        this.checkRepo = checkRepo;
     }
 
     public ArrayList<Reparatur> getRepData() {
@@ -32,28 +34,38 @@ public class ReparaturServiceImpl implements ReparaturService {
         }
         return repArr;
     }
-    public boolean addUser(int track, Date date1,
+    public boolean addRepairOrder(int track, Date date1,
                            Date date2, String authorized, Checklist checklist, String remarks) {
-        String uniqueID = generateID();
-        if (rep.findById(uniqueID) == null) {
-            uniqueID = generateID();
-        }
-        System.out.println(uniqueID);
-        Reparatur newRep = new Reparatur(uniqueID, track, date1, date2, checklist, remarks, "beauftragt", authorized);
-        System.out.println(newRep);
+        Utils util = new Utils();
+        String uniqueID = util.generateID();
+        ArrayList<String> selected = new ArrayList<>();
+        ReparaturChecklist check = new ReparaturChecklist(uniqueID, checklist, selected);
+        Reparatur newRep = new Reparatur(uniqueID, track, date1, date2, check, remarks, "beauftragt", authorized);
         rep.save(newRep);
+        checkRepo.save(check);
         return true;
     }
 
-    public String generateID() {
-        long timestamp = System.currentTimeMillis();
-        Random random = new Random();
-        int randomValue = random.nextInt(1000);
-        return String.valueOf(timestamp) + String.valueOf(randomValue);
-    }
     @Override
     public Reparatur loadRepByName(final String repname) throws UsernameNotFoundException {
         return rep.findById(repname)
             .orElseThrow(() -> new UsernameNotFoundException("Reparatur name " + repname + " not found."));
+    }
+
+    public Boolean changeStatus(String name, String newStatus) {
+        Reparatur repa = loadRepByName(name);
+        repa.setStatus(newStatus);
+        rep.save(repa);
+        return true;
+    }
+
+    public Boolean deleteOrder(String name) {
+        try {
+            Reparatur repa = loadRepByName(name);
+            rep.delete(repa);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

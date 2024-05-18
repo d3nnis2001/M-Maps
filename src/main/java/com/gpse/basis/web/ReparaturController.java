@@ -5,11 +5,10 @@ import com.gpse.basis.domain.Reparatur;
 import com.gpse.basis.domain.Utils;
 import com.gpse.basis.services.ChecklistService;
 import com.gpse.basis.services.ReparaturService;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
 import java.util.ArrayList;
@@ -20,6 +19,7 @@ import java.util.Date;
 public class ReparaturController {
     private ReparaturService service;
     private ChecklistService checkService;
+    Utils utils = new Utils();
     @Autowired
     public ReparaturController(ReparaturService service, ChecklistService checkService) {
         this.service = service;
@@ -31,8 +31,7 @@ public class ReparaturController {
         return service.getRepData();
     }
     @PostMapping("/senddata")
-    public boolean sendData(final WebRequest request) {
-        Utils utils = new Utils();
+    public ResponseEntity<Boolean> sendData(final WebRequest request) {
         String track = request.getParameter("track");
         System.out.println(track);
         String date1 = request.getParameter("from");
@@ -44,9 +43,9 @@ public class ReparaturController {
         System.out.println(checklist);
         String remarks = request.getParameter("remarks");
         System.out.println(remarks);
-        Checklist checker = checkService.loadChecklistByUsername(checklist);
+        Checklist checker = checkService.loadChecklistByName(checklist);
         System.out.println(checker.getName());
-        return service.addUser(Integer.parseInt(track), acDate1, acDate2, authorized, checker, remarks);
+        return ResponseEntity.ok(service.addRepairOrder(Integer.parseInt(track), acDate1, acDate2, authorized, checker, remarks));
     }
     @PostMapping("/allchecklists")
     public ArrayList<String> getChecklists() {
@@ -56,7 +55,41 @@ public class ReparaturController {
     @GetMapping("/getbyid")
     public Reparatur getRepById(final WebRequest request) {
         Reparatur newRep = service.loadRepByName(request.getParameter("id"));
-        System.out.println("We made it" + newRep.getId());
         return newRep;
+    }
+
+    @PostMapping("/changeById")
+    public ResponseEntity<Boolean> changeRepChecklist(final WebRequest request) {
+        String tickedString = request.getParameter("ticked");
+        String[] tickedIndices = tickedString.split(",");
+        String id = request.getParameter("id");
+        checkService.changeRepChecklist(id, tickedIndices);
+        return ResponseEntity.ok(true);
+    }
+
+    @PostMapping("/changestatus")
+    public ResponseEntity<Boolean> changeStatus(final WebRequest request) {
+        String newStatus = request.getParameter("status");
+        String name = request.getParameter("name");
+        return ResponseEntity.ok(service.changeStatus(name, newStatus));
+    }
+
+    @PostMapping("/deleterepairorder")
+    public ResponseEntity<Boolean> deleteRepairOrder(final WebRequest request) {
+        String name = request.getParameter("name");
+        return ResponseEntity.ok(service.deleteOrder(name));
+    }
+
+    @PostMapping("/getticked")
+    public ResponseEntity<ArrayList<String>> getTickedList(final WebRequest request) {
+        String id = request.getParameter("id");
+        return ResponseEntity.ok(checkService.getTickedwithId(id));
+    }
+
+    @PostMapping("/setterminated")
+    public ResponseEntity<Boolean> setTerminated(final WebRequest request) {
+        String id = request.getParameter("id");
+        Date date1 = utils.transformString(request.getParameter("date"));
+        return ResponseEntity.ok(checkService.setTerminatedDate(id, date1));
     }
 }

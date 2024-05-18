@@ -9,6 +9,9 @@ import java.util.Date;
 
 public interface ReparaturService {
     ArrayList<Reparatur> getRepData();
-    boolean addUser(int track, Date date1, Date date2, String authorized, Checklist checklist, String remarks);
+    boolean addRepairOrder(int track, Date date1, Date date2, String authorized, Checklist checklist, String remarks);
     Reparatur loadRepByName(final String repname) throws UsernameNotFoundException;
+    Boolean changeStatus(String name, String newStatus);
+
+    Boolean deleteOrder(String name);
 }
