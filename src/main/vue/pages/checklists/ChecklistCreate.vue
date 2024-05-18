@@ -4,6 +4,7 @@ import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";
 import {ref} from "vue";
 import {storeToRefs} from "pinia";
 import {useQuasar} from "quasar";
+import CheckPointList from "@/main/vue/pages/checklists/CheckPointList.vue";
 
 const checklistTemplateStore = useChecklistTemplateStore()
 const $q = useQuasar()
@@ -37,6 +38,8 @@ async function addChecklist() {
 
 <template>
     <StandardInput v-model="name">Name der Checkliste</StandardInput>
+    <CheckPointList>neue Aufgabe</CheckPointList>
+    <CheckPointList>neues Material</CheckPointList>
     <span>
         <router-link to="/checklists">
             <q-btn label="Abbrechen" flat color="primary"></q-btn>
