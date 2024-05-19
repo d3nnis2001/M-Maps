@@ -29,7 +29,7 @@ public class ChecklistTemplateServiceImpl implements ChecklistTemplateService {
 
     @Override
     public boolean addChecklist(String name, List<String> tasks, List<String> material) {
-        if (checklistTemplateRepository.findById(name).isPresent()) {
+        if (checklistTemplateRepository.existsById(name)) {
             return false;
         }
         ChecklistTemplate newChecklist = new ChecklistTemplate(name, tasks, material);

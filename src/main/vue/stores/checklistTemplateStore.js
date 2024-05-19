@@ -62,7 +62,12 @@ export const useChecklistTemplateStore = defineStore('checklistTemplates', () =>
 
         } else {
             return new Promise((resolve, reject) => {
-                api.checklistTemplate.addChecklist(name, tasks, material)
+                const checklist = {
+                    name: name,
+                    tasks: tasks,
+                    material: material
+                }
+                api.checklistTemplate.addChecklist(checklist)
                     .then(res => {
                         templateAdded.value = res.data
                         resolve()

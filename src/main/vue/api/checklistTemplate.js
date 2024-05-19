@@ -7,12 +7,7 @@ export default {
     getAllTemplates() {
         return axios.get('/api/templates/all')
     },
-    addChecklist(name, tasks, material) {
-        const checklist = {
-            name: name,
-            tasks: tasks,
-            material: material
-        }
+    addChecklist(checklist) {
         return axios.post('/api/templates/create', checklist)
     }
 }

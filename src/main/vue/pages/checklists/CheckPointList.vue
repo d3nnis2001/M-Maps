@@ -25,6 +25,11 @@ function addItem() {
         })
     }
 }
+
+function removeItem(id) {
+    items.value.splice(id-1, 1)
+    finalItems.value.splice(id-1, 1)
+}
 </script>
 
 <template>
@@ -35,8 +40,12 @@ function addItem() {
         <q-btn label="hinzufügen" @click="addItem" color="primary"></q-btn>
     </span>
     <div v-for="item in items" :key="item.id">
-        <q-checkbox  v-model="checked" :label="item.text" disable></q-checkbox>
+        <span>
+            <q-checkbox  v-model="checked" :label="item.text" disable></q-checkbox>
+            <q-btn @click="removeItem(item.id)" label="entfernen" outline color="primary"></q-btn>
+        </span>
     </div>
+    {{finalItems}}
 </template>
 
 <style scoped>
