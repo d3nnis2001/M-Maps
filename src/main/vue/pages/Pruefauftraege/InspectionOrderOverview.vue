@@ -1,51 +1,124 @@
 
 <script>
+import {onMounted, reactive, ref} from "vue";
+import router from "@/main/vue/router";
+//import {inspection} from "@/main/vue/api/inspection";
+
 
 export default {
     setup () {
-        return {
-            columns,
-            rows,
+        const state = reactive ({
+            filter: '',
+            columns: [
+                { name: 'courseId', required: true, label: 'ID', align: 'left', field: row => row.name, format: val => `${val}`, sortable: true },
+                { name: 'startLocation', label: 'Startort', align: 'left', field: 'start', sortable: true },
+                { name: 'endLocation', label: 'Zielort', align: 'left', field: 'ziel', sortable: true },
+                { name: 'startTime', label: 'von', align: 'left', field: 'von' },
+                { name: 'endTime', label: 'bis', align: 'left', field: 'von' },
+                { name: 'data', label: 'Messdaten', align: 'left', field: 'data' },
+                { name: 'department', label: 'Fachabteilung', align: 'left', field: 'abteilung' },
+                { name: 'status', label: 'Status', align: 'left', field: 'status' },
+            ],
+            rows: []
+
+        });
+        onMounted(async () => {
+            const response = await inspection()
+            for (let i = 0; i < response.length; i++) {
+                state.rows.push( {
+                    name: response[i]["courseId"],
+                    start: response[i]["startLocation"],
+                    destination: response[i]["endLocation"],
+                    timeStart: response[i]["startTime"],
+                    timeDestination: response[i]["endTime"],
+                    data: response[i]["data"],
+                    department: response[i]["department"],
+                    status: response[i]["status"]
+                })
+            }
+        })
+
+        const showDialog = ref(false);
+        const currentRow = ref({});
+
+        const rowClick = async (evt, rowData) => {
+            currentRow.value = rowData;
+            showDialog.value = true;
+        };
+
+        function createInspectionOrder() {
+            router.push("/createInspectionOrder");
         }
+
+        function editInspectionOrder() {
+            const name = currentRow.value.name
+            router.push(`/${name}/edit`)
+        }
+
+        function acceptInspectionOrder() {
+
+        }
+        return {
+            filter: ref(''),
+            state,
+            createInspectionOrder,
+            editInspectionOrder,
+            acceptInspectionOrder,
+            rowClick,
+            currentRow,
+            showDialog
+        }
+
     }
 }
-
-const columns = [
-    { name: 'id', required: true, label: 'ID', align: 'left', field: row => row.name, format: val => `${val}`, sortable: true },
-    { name: 'start', label: 'Startort', align: 'left', field: 'start', sortable: true },
-    { name: 'destination', label: 'Zielort', align: 'left', field: 'ziel', sortable: true },
-    { name: 'timeStart', label: 'bis', align: 'left', field: 'von' },
-    { name: 'timeDestination', label: 'bis', align: 'left', field: 'von' },
-    { name: 'data', label: 'Messdaten', align: 'left', field: 'data' },
-    { name: 'department', label: 'Fachabteilung', align: 'left', field: 'abteilung' },
-    { name: 'status', label: 'Status', align: 'left', field: 'status' },
-]
-
-const rows = [
-    { name: 'Prüfauftrag 1', start: 'Bielefeld', ziel: 'Hannover', von: '07-04-2024', bis: '08-04-2024', abteilung: ' ', status: "storniert" },
-    { name: 'Prüfauftrag 2', start: 'Bielefeld', ziel: 'Berlin', von: '10-05-2023', bis: '12-05-2023', abteilung: ' ', status: "storniert"  },
-    { name: 'Prüfauftrag 3', start: 'Bielefeld', ziel: 'Berlin', von: '10-05-2023', bis: '12-05-2023', abteilung: ' ', status: "storniert"  },
-]
-
-
 
 </script>
 
 <template>
     <div class="q-pa-md">
-        <q-table
+        <q-table>
             class="my-sticky-header-table"
             flat bordered
             title="Prüfaufträge"
-            :rows="rows"
-            :columns="columns"
+            :rows="state.rows"
+            :columns="state.columns"
             row-key="id"
-        />
+            :filter = "filter"
+            hide-header
+            @row-click="rowClick">
+            <template v-slot:top-right>
+                <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">
+                    <template v-slot:append>
+                        <q-icon name="search" />
+                    </template>
+                </q-input>
+            </template>
+        </q-table>
     </div>
     <div class="q-pa-md">
-        <q-btn label="Neuen Auftrag erstellen" @click="$router.push('/createInspectionOrder')" color="primary"  class=""></q-btn>
-        <q-btn label="Auftrag annehmen" @click="" color="primary" class=""></q-btn>
+        <q-btn label="Neuen Auftrag erstellen" @click="createInspectionOrder" color="primary"  class=""></q-btn>
+        <q-btn label="Auftrag annehmen" @click="acceptInspectionOrder" color="primary" class=""></q-btn>
+
+        <q-dialog v-model="showDialog">
+            <q-card>
+                <q-card-section>
+                    <div class="option-button" @click="editOrder">Bearbeiten</div>
+                    <q-separator />
+                    <div class="option-button" @click="deleteOrder">Löschen</div>
+                    <q-separator />
+                    <div class="option-button" @click="archiveOrder">Archivieren</div>
+                    <q-separator />
+                    <div class="option-button" @click="cancelOrder">Stornieren</div>
+                    <q-separator />
+                    <div class="option-button" @click="reapplyOrder">Neu beantragen</div>
+                </q-card-section>
+                <q-card-section>
+                    <q-btn flat label="Schließen" color="primary" @click="showDialog = false"></q-btn>
+                </q-card-section>
+            </q-card>
+        </q-dialog>
     </div>
+
 </template>
 
 <style lang="sass">

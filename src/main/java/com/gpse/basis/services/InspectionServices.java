@@ -1,7 +1,6 @@
 package com.gpse.basis.services;
 
 import com.gpse.basis.domain.InspectionOrder;
-import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.ArrayList;

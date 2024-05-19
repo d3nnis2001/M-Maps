@@ -7,37 +7,34 @@ import org.springframework.data.mongodb.core.mapping.MongoId;
 public class InspectionOrder {
     @MongoId
     private String inspectionOrderId;
-    private String streckenId;
+    private String courseId;
     private String userId;
-    private String startOrt;
-    private String endOrt;
-    private String startZeit;
-    private String endZeit;
-    private String fachabteilung;
-    private String messdaten;
+    private String startLocation;
+    private String endLocation;
+    private String startTime;
+    private String endTime;
+    private String department;
+    private String data;
     private String status;
-    private String bemerkungen;
-    private boolean archiviert;
+    private String remarks;
+    private boolean archived;
 
-    public InspectionOrder(String streckenId, String userId, String start, String end, String startTime, String endTime,
-                           String fachabteilung, String messdaten, String status, String bemerkungen,
-                           boolean archiviert) {
-        this.streckenId = streckenId;
+    public InspectionOrder(String courseId, String userId, String start, String end, String startTime, String endTime,
+                           String department, String data, String status, String remarks,
+                           boolean archived) {
+        this.courseId = courseId;
         this.userId = userId;
-        this.startOrt = start;
-        this.endOrt = end;
-        this.startZeit = startTime;
-        this.endZeit = endTime;
-        this.fachabteilung = fachabteilung;
-        this.messdaten = messdaten;
+        this.startLocation = start;
+        this.endLocation = end;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.department = department;
+        this.data = data;
         this.status = status;
-        this.bemerkungen = bemerkungen;
-        this.archiviert = archiviert;
+        this.remarks = remarks;
+        this.archived = archived;
     }
 
-    public InspectionOrder() {
-
-    }
     public String getInspectionOrderId() {
         return inspectionOrderId;
     }
@@ -45,12 +42,12 @@ public class InspectionOrder {
     public void setInspectionOrderId(String inspectionOrderId) {
         this.inspectionOrderId = inspectionOrderId;
     }
-    public String getStreckenId() {
-        return streckenId;
+    public String getCourseId() {
+        return courseId;
     }
 
-    public void setStreckenId(String id) {
-        this.streckenId = id;
+    public void setCourseId(String id) {
+        this.courseId = id;
     }
     public String getUserId() {
         return userId;
@@ -59,52 +56,52 @@ public class InspectionOrder {
     public void setUserId(String userId) {
         this.userId = userId;
     }
-    public String getStartOrt() {
-        return startOrt;
+    public String getStartLocation() {
+        return startLocation;
     }
 
-    public void setStartOrt(String startOrt) {
-        this.startOrt = startOrt;
+    public void setStartLocation(String startLocation) {
+        this.startLocation = startLocation;
     }
 
-    public String getEndOrt() {
-        return endOrt;
+    public String getEndLocation() {
+        return endLocation;
     }
 
-    public void setEndOrt(String endOrt) {
-        this.endOrt = endOrt;
+    public void setEndLocation(String endLocation) {
+        this.endLocation = endLocation;
     }
 
-    public String getStartZeit() {
-        return startZeit;
+    public String getStartTime() {
+        return startTime;
     }
 
-    public void setStartZeit(String startZeit) {
-        this.startZeit = startZeit;
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
     }
 
-    public String getEndZeit() {
-        return endZeit;
+    public String getEndTime() {
+        return endTime;
     }
 
-    public void setEndZeit(String endZeit) {
-        this.endZeit = endZeit;
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
     }
 
-    public String getFachabteilung() {
-        return fachabteilung;
+    public String getDepartment() {
+        return department;
     }
 
-    public void setFachabteilung(String fachabteilung) {
-        this.fachabteilung = fachabteilung;
+    public void setDepartment(String department) {
+        this.department = department;
     }
 
-    public String getMessdaten() {
-        return messdaten;
+    public String getData() {
+        return data;
     }
 
-    public void setMessdaten(String messdaten) {
-        this.messdaten = messdaten;
+    public void setData(String data) {
+        this.data = data;
     }
 
     public String getStatus() {
@@ -115,19 +112,19 @@ public class InspectionOrder {
         this.status = status;
     }
 
-    public String getBemerkungen() {
-        return bemerkungen;
+    public String getRemarks() {
+        return remarks;
     }
 
-    public void setBemerkungen(String bemerkungen) {
-        this.bemerkungen = bemerkungen;
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
     }
 
-    public boolean isArchiviert() {
-        return archiviert;
+    public boolean isArchived() {
+        return archived;
     }
 
-    public void setArchiviert(boolean archiviert) {
-        this.archiviert = archiviert;
+    public void setArchived(boolean archived) {
+        this.archived = archived;
     }
 }
