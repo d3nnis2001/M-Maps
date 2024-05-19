@@ -1,12 +1,15 @@
 package com.gpse.basis.domain;
 
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Document(collection = "Checklist")
 public class Checklist {
+    @MongoId
+    private String id;
     private String name;
     private List<CheckPoint>  tasks;
     private List<CheckPoint> material;
@@ -21,6 +24,14 @@ public class Checklist {
         this.name = template.getName();
         this.tasks = createCheckPoints(template.getTasks());
         this.material = createCheckPoints(template.getMaterial());
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {

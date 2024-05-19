@@ -1,7 +1,7 @@
 <script setup>
 import {useChecklistTemplateStore} from "@/main/vue/stores/checklistTemplateStore";
 import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";
-import {computed, ref} from "vue";
+import {ref} from "vue";
 import {storeToRefs} from "pinia";
 import {useQuasar} from "quasar";
 
