@@ -48,20 +48,31 @@ async function addChecklist() {
 </script>
 
 <template>
-    <div>
-
+    <h3 class="text-align items-center">neue Checkliste erstellen</h3>
+    <div class="text-align items-center">
+        <StandardInput v-model="name" label="Name der Checkliste" class="padding-md"/>
+        <CheckPointList :list="taskList" label="neue Aufgabe">Aufgabenliste</CheckPointList>
+        <CheckPointList :list="materialList" label="neues Material">Materialliste</CheckPointList>
+        <span>
+            <router-link to="/checklists">
+                <q-btn label="Abbrechen" flat color="primary"></q-btn>
+            </router-link>
+            <q-btn label="Checkliste erstellen" @click="addChecklist" color="primary"></q-btn>
+        </span>
     </div>
-    <StandardInput v-model="name">Name der Checkliste</StandardInput>
-    <CheckPointList :list="taskList" label="neue Aufgabe" />
-    <CheckPointList :list="materialList" label="neues Material" />
-    <span>
-        <router-link to="/checklists">
-            <q-btn label="Abbrechen" flat color="primary"></q-btn>
-        </router-link>
-        <q-btn label="Checkliste erstellen" @click="addChecklist" color="primary"></q-btn>
-    </span>
 </template>
 
 <style scoped>
+.text-align {
+    text-align: center;
+}
+
+.padding-sm {
+    padding-bottom: 16px;
+}
+
+.padding-md {
+    padding-bottom: 32px;
+}
 
 </style>
