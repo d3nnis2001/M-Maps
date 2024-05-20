@@ -8,18 +8,17 @@ const $q = useQuasar()
 const pattern = /^.*\S.*/
 
 const newItem = ref("")
-const items = ref([])
-const finalItems = ref([])
 const checked = ref(false)
+
+const {list, label} = defineProps(["list","label"])
 
 function addItem() {
     if (pattern.test(newItem.value)) {
-        items.value.push({id: items.value.length + 1, text: newItem.value})
-        finalItems.value.push(newItem.value)
+        list.push({id: list.length, text: newItem.value})
         newItem.value = ""
     } else {
         $q.notify({
-            type: 'warning',
+            type: 'negative',
             message: 'falsche Eingabe',
             caption: 'Die Eingabe für dieses Textfeld ist ungültig'
         })
@@ -27,25 +26,23 @@ function addItem() {
 }
 
 function removeItem(id) {
-    items.value.splice(id-1, 1)
-    finalItems.value.splice(id-1, 1)
+    list.splice(id, 1)
+    let newId = 0
+    list.map(entry => entry.id = newId++)
 }
 </script>
 
 <template>
     <span>
-        <StandardInput v-model="newItem">
-            <slot></slot>
-        </StandardInput>
-        <q-btn label="hinzufügen" @click="addItem" color="primary"></q-btn>
+        <StandardInput v-model="newItem" :label="label" />
+        <q-btn label="hinzufügen" @click="addItem" color="primary"/>
     </span>
-    <div v-for="item in items" :key="item.id">
+    <div v-for="item in list" :key="item.id">
         <span>
-            <q-checkbox  v-model="checked" :label="item.text" disable></q-checkbox>
-            <q-btn @click="removeItem(item.id)" label="entfernen" outline color="primary"></q-btn>
+            <q-checkbox  v-model="checked" :label="item.text" disable/>
+            <q-btn @click="removeItem(item.id)" label="entfernen" outline color="primary"/>
         </span>
     </div>
-    {{finalItems}}
 </template>
 
 <style scoped>

@@ -21,9 +21,12 @@ public class Checklist {
     }
 
     public Checklist(ChecklistTemplate template) {
+        List<CheckPoint> taskCheckPoints = createCheckPoints(template.getTasks());
+        List<CheckPoint> materialCheckPoints = createCheckPoints(template.getMaterial());
+
         this.name = template.getName();
-        this.tasks = createCheckPoints(template.getTasks());
-        this.material = createCheckPoints(template.getMaterial());
+        this.tasks = taskCheckPoints;
+        this.material = materialCheckPoints;
     }
 
     public String getId() {
@@ -46,16 +49,16 @@ public class Checklist {
         return tasks;
     }
 
-    public void setTasks(List<CheckPoint> tasks) {
-        this.tasks = tasks;
+    public void setTasks(List<String> tasks) {
+        this.tasks = createCheckPoints(tasks);
     }
 
     public List<CheckPoint> getMaterial() {
         return material;
     }
 
-    public void setMaterial(List<CheckPoint> material) {
-        this.material = material;
+    public void setMaterial(List<String> material) {
+        this.material = createCheckPoints(material);
     }
 
     public List<CheckPoint> createCheckPoints(List<String> points) {

@@ -4,65 +4,20 @@ import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";
 import {ref} from "vue";
 import {storeToRefs} from "pinia";
 import {useQuasar} from "quasar";
+import CheckPointList from "@/main/vue/pages/checklists/CheckPointList.vue";
 
 const checklistTemplateStore = useChecklistTemplateStore()
 const $q = useQuasar()
 
 const name = ref('')
-const tasks = ref([])
-const material = ref([])
-const tasksOnly = ref([])
-const materialOnly = ref([])
+const taskList = ref([])
+const materialList = ref([])
 
 const {invalidInput, templateAdded, listsEmpty} = storeToRefs(checklistTemplateStore)
 
-const pattern = /^.*\S.*/
-
-const newTask = ref("")
-const newMaterial = ref("")
-const checked = ref(false)
-
-function addTask() {
-    if (pattern.test(newTask.value)) {
-        tasks.value.push({id: tasks.value.length, text: newTask.value})
-        newTask.value = ""
-    } else {
-        $q.notify({
-            type: 'warning',
-            message: 'falsche Eingabe',
-            caption: 'Die Eingabe für dieses Textfeld ist ungültig'
-        })
-    }
-}
-
-function addMaterial() {
-    if (pattern.test(newMaterial.value)) {
-        material.value.push({id: material.value.length, text: newMaterial.value})
-        newMaterial.value = ""
-    } else {
-        $q.notify({
-            type: 'warning',
-            message: 'falsche Eingabe',
-            caption: 'Die Eingabe für dieses Textfeld ist ungültig'
-        })
-    }
-}
-
-function removeTask(id) {
-    tasks.value.splice(id, 1)
-    let newId = 0
-    tasks.value.map(entry => entry.id = newId++)
-}
-
-function removeMaterial(id) {
-    material.value.splice(id, 1)
-    let newId = 0
-    material.value.map(entry => entry.id = newId++)
-}
-
 async function addChecklist() {
-    tasksOnly.value = tasks.value.map(entry => entry.text);
-    materialOnly.value = material.value.map(entry => entry.text)
+    const tasksOnly = taskList.value.map(entry => entry.text);
+    const materialOnly = materialList.value.map(entry => entry.text)
     await checklistTemplateStore.addChecklist(name.value, tasksOnly, materialOnly)
     if (invalidInput.value) {
         $q.notify({
@@ -94,38 +49,14 @@ async function addChecklist() {
 
 <template>
     <StandardInput v-model="name">Name der Checkliste</StandardInput>
-    <div>
-        <span>
-            <StandardInput v-model="newTask" label="neue Aufgabe"> </StandardInput>
-            <q-btn label="hinzufügen" @click="addTask" color="primary"></q-btn>
-        </span>
-        <div v-for="task in tasks" :key="task.id">
-            <span>
-                <q-checkbox v-model="checked" :label="task.text" disable></q-checkbox>
-                <q-btn @click="removeTask(task.id)" outline color="primary" label="entfernen"></q-btn>
-            </span>
-        </div>
-    </div>
-    <div>
-        <span>
-            <StandardInput v-model="newMaterial" label="neues Material"> </StandardInput>
-            <q-btn label="hinzufügen" @click="addMaterial" color="primary"></q-btn>
-        </span>
-        <div v-for="item in material" :key="item.id">
-            <span>
-                <q-checkbox v-model="checked" :label="item.text" disable></q-checkbox>
-                <q-btn @click="removeMaterial(item.id)" outline color="primary" label="entfernen"></q-btn>
-            </span>
-        </div>
-    </div>
+    <CheckPointList :list="taskList" label="neue Aufgabe" />
+    <CheckPointList :list="materialList" label="neues Material" />
     <span>
         <router-link to="/checklists">
             <q-btn label="Abbrechen" flat color="primary"></q-btn>
         </router-link>
         <q-btn label="Checkliste erstellen" @click="addChecklist" color="primary"></q-btn>
     </span>
-    {{tasksOnly}}
-    {{materialOnly}}
 </template>
 
 <style scoped>
