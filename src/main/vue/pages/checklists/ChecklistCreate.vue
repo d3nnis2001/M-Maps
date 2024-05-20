@@ -48,6 +48,9 @@ async function addChecklist() {
 </script>
 
 <template>
+    <div>
+
+    </div>
     <StandardInput v-model="name">Name der Checkliste</StandardInput>
     <CheckPointList :list="taskList" label="neue Aufgabe" />
     <CheckPointList :list="materialList" label="neues Material" />
