@@ -1,8 +1,8 @@
 package com.gpse.basis;
 
-import com.gpse.basis.domain.*;
-import com.gpse.basis.repositories.ChecklistRepository;
-import com.gpse.basis.repositories.ReperaturRepository;
+import com.gpse.basis.domain.GleisLageRange;
+import com.gpse.basis.domain.UserModel;
+import com.gpse.basis.repositories.GleisLageRangeRepository;
 import com.gpse.basis.repositories.UserRepository;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,18 +16,23 @@ public class InitializeDatabase implements InitializingBean {
     private final UserRepository usRepo;
     private final ReperaturRepository reRepo;
     private final ChecklistRepository checkRepo;
+
+    private final GleisLageRangeRepository glrRepo;
+
     @Autowired
     public InitializeDatabase(final UserRepository usRepo,
-                              final ReperaturRepository reRepo, final ChecklistRepository checkRepo) {
+                              final ReperaturRepository reRepo, final ChecklistRepository checkRepo, final GleisLageRangeRepository r) {
         this.usRepo = usRepo;
         this.reRepo = reRepo;
         this.checkRepo = checkRepo;
+        this.glrRepo = r;
     }
 
     @Override
     public void afterPropertiesSet() {
         initUsers();
         initChecklists();
+        initRanges();
     }
 
     public void initUsers() {
@@ -57,5 +62,15 @@ public class InitializeDatabase implements InitializingBean {
 
         checkRepo.save(check2);
         checkRepo.save(check1);
+    }
+
+    public void initRanges() {
+        glrRepo.deleteAll();
+        GleisLageRange range1 = new GleisLageRange(GleisLageRange.Level.SRA, 12, 10, 8, 6, 5);
+        GleisLageRange range2 = new GleisLageRange(GleisLageRange.Level.SR100, 15, 13, 11, 9, 7);
+        GleisLageRange range3 = new GleisLageRange(GleisLageRange.Level.SRLIM, 21, 17, 14, 11, 9);
+        glrRepo.save(range1);
+        glrRepo.save(range2);
+        glrRepo.save(range3);
     }
 }
