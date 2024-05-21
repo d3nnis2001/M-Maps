@@ -7,6 +7,7 @@ import com.gpse.basis.repositories.DataSetRepository;
 import com.gpse.basis.repositories.GeoTrackData;
 import com.gpse.basis.repositories.GleisLageDatenRepository;
 import com.gpse.basis.repositories.GleisVDataRepository;
+import org.apache.avro.util.MapEntry;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.parquet.hadoop.ParquetReader;
@@ -20,6 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 
 import java.io.*;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -380,7 +383,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public ArrayList<GeoData> getPartGeoData(int from, int till) {
+    public List<Map.Entry<DataService.Colors, String>> getPartGeoData(int from, int till) {
         Iterable<GeoData> iterable = geoTrack.findAll();
         boolean isright = true;
         if (from > till) {
@@ -402,7 +405,8 @@ public class FileServiceImpl implements FileService {
             }
         }
         System.out.println(geoArr.size());
-        return geoArr;
+        List<Map.Entry<DataService.Colors, String>> ltg = dService.getNewestColorsforGeoData(geoArr);
+        return ltg;
     }
 
 
@@ -430,5 +434,16 @@ public class FileServiceImpl implements FileService {
         dService.getGeoDatabyTrackId(6100);
 
         return lst;
+    }
+
+    //return null, if from > till
+    public List<Map.Entry<DataService.Colors, String>> getPartHeatmap(int strecke, Date from, Date till) {
+        boolean isright = true;
+        if (from.after(till)) {
+            isright = false;
+            return null;
+        }
+         return dService.getGeoDataByDate(strecke, LocalDateTime.ofInstant(from.toInstant(), ZoneId.systemDefault()), LocalDateTime.ofInstant(till.toInstant(), ZoneId.systemDefault()));
+
     }
 }

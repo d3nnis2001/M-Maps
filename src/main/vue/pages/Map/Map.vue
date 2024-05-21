@@ -2,7 +2,7 @@
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {onMounted, ref} from 'vue';
-import {geoData, getTrack, getPartOfTrack, getPartOfGleislage} from "@/main/vue/api/map";
+import {geoData, getTrack, getPartOfTrack, getTimeFromHeatmap} from "@/main/vue/api/map";
 import {useQuasar} from "quasar";
 
 const map = ref(null);
@@ -157,6 +157,19 @@ const checkForChanges = async () => {
     }
 }
 
+async function getTimeRangeData() {
+    if (date !== '' && date2 !== '') {
+        const response = await getTimeFromHeatmap(streckenID.value, date.value, date2.value)
+        console.log(response)
+    } else {
+        $q.notify({
+            type: 'negative',
+            message: "Please choose a valid time range",
+            caption: 'You have to fill in both values'
+        });
+    }
+}
+
 
 </script>
 
@@ -266,7 +279,7 @@ const checkForChanges = async () => {
                     </q-card-section>
 
                     <q-card-actions align="center">
-                        <q-btn flat label="Filter anwenden" color="primary" v-close-popup/>
+                        <q-btn flat @click="getTimeRangeData" label="Filter anwenden" color="primary" v-close-popup/>
                         <q-btn flat label="Abbrechen" color="primary" v-close-popup />
                     </q-card-actions>
                 </q-card>

@@ -49,11 +49,36 @@ public class DataServiceImpl implements DataService{
         List<Thread> workers = new ArrayList<>(no_threads);
         int index = 0;
         for(int i = 0; i < no_threads - 1; ++i) {
-            workers.add(i, new Thread(new Worker(lst.subList(index, index + sts), l)));
+            workers.add(i, new Thread(new Worker(lst.subList(index, index + sts), l, null, null)));
             index += sts;
             workers.get(i).start();
         }
-        workers.add(no_threads-1, new Thread(new Worker(lst.subList(index, lst.size()), l)));
+        workers.add(no_threads-1, new Thread(new Worker(lst.subList(index, lst.size()), l, null, null)));
+        workers.getLast().start();
+
+        workers.forEach(w -> {
+            try {
+                w.join();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        return l;
+    }
+
+    private List<Map.Entry<Colors, String>> getColorForDateRange(List<GeoData> lst, LocalDateTime from, LocalDateTime till) {
+        List<Map.Entry<Colors, String>> l = new ArrayList<>();
+        int no_threads = 30;
+        int sts = lst.size() / no_threads;
+        List<Thread> workers = new ArrayList<>(no_threads);
+        int index = 0;
+        for(int i = 0; i < no_threads - 1; ++i) {
+            workers.add(i, new Thread(new Worker(lst.subList(index, index + sts), l, from, till)));
+            index += sts;
+            workers.get(i).start();
+        }
+        workers.add(no_threads-1, new Thread(new Worker(lst.subList(index, lst.size()), l, from, till)));
         workers.getLast().start();
 
         workers.forEach(w -> {
@@ -71,11 +96,16 @@ public class DataServiceImpl implements DataService{
         List<Map.Entry<Colors, String>> l;
         private List<GeoData> lst;
 
+        private LocalDateTime from = null;
+        private LocalDateTime till = null;
+
         private final MongoTemplate tmpl = new MongoTemplate(new SimpleMongoClientDatabaseFactory("mongodb://localhost:27017/project_12"));
 
-        Worker(List<GeoData> lst, List<Map.Entry<Colors, String>> l) {
+        Worker(List<GeoData> lst, List<Map.Entry<Colors, String>> l, LocalDateTime from, LocalDateTime till) {
             this.lst = lst;
             this.l = l;
+            this.from = from;
+            this.till = till;
         }
 
         @Override
@@ -91,15 +121,24 @@ public class DataServiceImpl implements DataService{
             lst.forEach(geoDat -> {
                 var res = results.parallelStream().filter(w -> Objects.equals(w.getLocation(), geoDat.getId())).toList();
                 if(!res.isEmpty()) {
-                    double newestTime = res.parallelStream().mapToDouble(GleisLageDatenpunkt::getTime_unix).max().getAsDouble();
-                    LocalDateTime maxDate = Instant.ofEpochSecond((long) newestTime).atZone(ZoneId.systemDefault()).toLocalDate().atStartOfDay();
-                    var v_res = res.parallelStream().filter(obj -> {
-                        LocalDateTime time = Instant.ofEpochSecond((long) obj.getTime_unix()).atZone(ZoneId.systemDefault()).toLocalDate().atStartOfDay();
-                        return time.isEqual(maxDate);
-                    }).toList();
-
+                    List<GleisLageDatenpunkt> v_res = null;
+                    if(from != null && till != null) {
+                        v_res = res.parallelStream().filter(obj -> {
+                            LocalDateTime time = Instant.ofEpochSecond((long) obj.getTime_unix()).atZone(ZoneId.systemDefault()).toLocalDate().atStartOfDay();
+                            return time.isAfter(from) && time.isBefore(till);
+                        }).toList();
+                        if(v_res.isEmpty())
+                            return;
+                    }
+                    else {
+                        double newestTime = res.parallelStream().mapToDouble(GleisLageDatenpunkt::getTime_unix).max().getAsDouble();
+                        LocalDateTime maxDate = Instant.ofEpochSecond((long) newestTime).atZone(ZoneId.systemDefault()).toLocalDate().atStartOfDay();
+                        v_res = res.parallelStream().filter(obj -> {
+                            LocalDateTime time = Instant.ofEpochSecond((long) obj.getTime_unix()).atZone(ZoneId.systemDefault()).toLocalDate().atStartOfDay();
+                            return time.isEqual(maxDate);
+                        }).toList();
+                    }
                     System.out.println("Debug Size v_res: " + v_res.size());
-
                     mySubWorkers.add(new Thread(new SubWorker(v_res, geoDat, l)));
                     mySubWorkers.getLast().start();
                 }
@@ -124,6 +163,7 @@ public class DataServiceImpl implements DataService{
         private List<Map.Entry<Colors, String>> l;
 
         private GeoData g;
+
 
         SubWorker(List<GleisLageDatenpunkt> l, GeoData g, List<Map.Entry<Colors, String>> col) {
             this.k = l;
@@ -209,6 +249,19 @@ public class DataServiceImpl implements DataService{
         System.out.println("Debug Start: ");
         System.out.println(gd.getFirst().getId());
         List<Map.Entry<Colors, String>> col = getNewestColorsforGeoData(gd);
+        System.out.println("Debug Size of geodata with color: " + col.size());
+        return col;
+    }
+
+    public List<Map.Entry<Colors, String>> getGeoDataByDate(int track_id, LocalDateTime from, LocalDateTime till){
+        Query query = new Query();
+        query.addCriteria(Criteria.where("strecken_id").is(track_id));
+        List<GeoData> gd = template.find(query, GeoData.class);
+        if(gd.isEmpty())
+            return null;
+        System.out.println("Debug Start: ");
+        System.out.println(gd.getFirst().getId());
+        List<Map.Entry<Colors, String>> col = getColorForDateRange(gd, from, till);
         System.out.println("Debug Size of geodata with color: " + col.size());
         return col;
     }
