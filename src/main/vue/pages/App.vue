@@ -1,9 +1,14 @@
 <script setup>
 import {RouterView} from 'vue-router'
+let boolStart = true;
+
+function changeBool() {
+    boolStart=false;
+}
 
 </script>
 <template>
-    <q-layout v-if="$route.name === 'start' || $route.name === 'login' || $route.name === 'register' || $route.name === 'forgotPassword' || $route.name === 'setNewPassword' || $route.name === 'password'">
+    <q-layout v-if="$route.name === 'start'">
         <q-page-container>
             <router-view/>
         </q-page-container>
@@ -22,9 +27,6 @@ import {RouterView} from 'vue-router'
         <q-page-container>
             <router-view/>
         </q-page-container>
-
-
-
     </q-layout>
 </template>
 

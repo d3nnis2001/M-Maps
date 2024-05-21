@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const register = async function registerUser(email, password, firstName, lastName, region, service, roles) {
+const registerUs = async function registerUser(email, password, firstName, lastName, region, service, roles) {
     try {
         const cred = new URLSearchParams()
         cred.append("email", email)
@@ -17,4 +17,4 @@ const register = async function registerUser(email, password, firstName, lastNam
     }
 }
 
-export default register;
+export default registerUs;
