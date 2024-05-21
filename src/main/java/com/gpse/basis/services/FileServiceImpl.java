@@ -187,4 +187,45 @@ public class FileServiceImpl implements FileService {
         }
         return geoArr;
     }
+
+    @Override
+    public ArrayList<GeoData> getTrackGeoData(int trackID) {
+        Iterable<GeoData> iterable = geoTrack.findAll();
+        ArrayList<GeoData> geoArr = new ArrayList<>();
+        Iterator<GeoData> iterator = iterable.iterator();
+        while (iterator.hasNext()) {
+            GeoData geo = iterator.next();
+            if (geo.getStrecken_id() == trackID) {
+                geoArr.add(geo);
+            }
+        }
+        System.out.println(geoArr.size());
+        return geoArr;
+    }
+
+    @Override
+    public ArrayList<GeoData> getPartGeoData(int from, int till) {
+        Iterable<GeoData> iterable = geoTrack.findAll();
+        boolean isright = true;
+        if (from > till) {
+            isright = false;
+        }
+        ArrayList<GeoData> geoArr = new ArrayList<>();
+        Iterator<GeoData> iterator = iterable.iterator();
+        while (iterator.hasNext()) {
+            GeoData geo = iterator.next();
+            int currKm = geo.getTrack_km();
+            if (isright) {
+                if (currKm >= from && currKm <= till) {
+                    geoArr.add(geo);
+                }
+            } else {
+                if (currKm <= from && currKm >= till) {
+                    geoArr.add(geo);
+                }
+            }
+        }
+        System.out.println(geoArr.size());
+        return geoArr;
+    }
 }

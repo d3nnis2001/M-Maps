@@ -4,6 +4,7 @@ import 'leaflet/dist/leaflet.css';
 import {onMounted, ref} from 'vue';
 import {geoData, getTrack, getPartOfTrack, getPartOfGleislage} from "@/main/vue/api/map";
 import {useQuasar} from "quasar";
+
 const map = ref(null);
 var markers = [];
 const streckenID = ref('')
@@ -18,6 +19,8 @@ const markerEnd = ref('')
 const kmStart = ref('')
 const kmEnd = ref('')
 const selectedMarker = ref('')
+
+
 onMounted(async () => {
     map.value = L.map('map', {
         center: [51.1657, 10.4515],
@@ -27,10 +30,12 @@ onMounted(async () => {
             [47.2701, 15.0419]
         ]
     });
+
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(map.value);
+
     new L.TileLayer('http://{s}.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png',
         {
             attribution: '<a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors</a>, Style: <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA 2.0</a> <a href="http://www.openrailwaymap.org/">OpenRailwayMap</a> and OpenStreetMap',
@@ -50,24 +55,28 @@ onMounted(async () => {
     map.value.on('locationfound', onLocationFound);
     map.value.locate({setView: false});
 });
+
 const onMarkerClicked = (event) => {
     const circle = event.target;
     const marker = markers.find((m) => {
-        return m.data.longitude === circle.getLatLng().lat && m.data.latitude === circle.getLatLng().lng;
+            return m.data.longitude === circle.getLatLng().lat && m.data.latitude === circle.getLatLng().lng;
     });
     selectedMarker.value = marker
     dialogVisible.value = true;
     console.log(marker.data.latitude)
     console.log(marker.data.longitude)
 };
+
 const deleteStart = () => {
     markerStart.value = null;
     kmStart.value = '';
 };
+
 const deleteEnd = () => {
     markerEnd.value = null;
     kmEnd.value = '';
 };
+
 const addStart = () => {
     markerStart.value = selectedMarker;
     kmStart.value = selectedMarker.value.data.track_km;
@@ -76,6 +85,7 @@ const addEnd = () => {
     markerEnd.value = selectedMarker;
     kmEnd.value = selectedMarker.value.data.track_km;
 };
+
 const refreshMarkers = async () => {
     if (streckenID.value === "") {
         $q.notify({
@@ -108,6 +118,8 @@ const refreshMarkers = async () => {
         checkForChanges()
     }
 };
+
+
 const onLocationFound = (e) => {
     const radius = e.accuracy;
     const userLocation = e.latlng;
@@ -123,6 +135,7 @@ const centerToUserLocation = async () => {
     const gleis = await getPartOfGleislage(streckenID.value)
     console.log(gleis)
 };
+
 const checkForChanges = async () => {
     if (kmStart.value !== '' && kmEnd.value !== '' && streckenID.value !== "") {
         console.log(kmStart.value)
@@ -143,7 +156,10 @@ const checkForChanges = async () => {
     } else {
     }
 }
+
+
 </script>
+
 <template>
     <div class="mapSettings">
         <div class="row putStart">
@@ -191,6 +207,7 @@ const checkForChanges = async () => {
                     <q-card-section>
                         <div class="text-h6">Wähle einen Zeitraum</div>
                     </q-card-section>
+
                     <q-card-section class="q-pt-none">
                         <div class="q-pa-md" style="max-width: 300px">
                             <q-input filled v-model="date">
@@ -205,6 +222,7 @@ const checkForChanges = async () => {
                                         </q-popup-proxy>
                                     </q-icon>
                                 </template>
+
                                 <template v-slot:append>
                                     <q-icon name="access_time" class="cursor-pointer">
                                         <q-popup-proxy cover transition-show="scale" transition-hide="scale">
@@ -231,6 +249,7 @@ const checkForChanges = async () => {
                                         </q-popup-proxy>
                                     </q-icon>
                                 </template>
+
                                 <template v-slot:append>
                                     <q-icon name="access_time" class="cursor-pointer">
                                         <q-popup-proxy cover transition-show="scale" transition-hide="scale">
@@ -245,6 +264,7 @@ const checkForChanges = async () => {
                             </q-input>
                         </div>
                     </q-card-section>
+
                     <q-card-actions align="center">
                         <q-btn flat label="Filter anwenden" color="primary" v-close-popup/>
                         <q-btn flat label="Abbrechen" color="primary" v-close-popup />
@@ -317,44 +337,53 @@ const checkForChanges = async () => {
         </div>
     </q-dialog>
 </template>
+
 <style>
 .full-width {
     flex: 1;
     margin: 0;
     width: 100%;
 }
+
 .borderFirst {
     border-right: 1px solid black;
     border-bottom: 2px solid black;
 }
+
 .borderSecond {
     border-left: 1px solid black;
     border-bottom: 2px solid black;
 }
+
 .expansion_settings {
     background-color: #e0e0e0;
     border-radius: 8px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
 }
+
 .margin-right-con {
     display: flex;
     flex-direction: row;
     justify-content: end;
 }
+
 .expan_items {
     font-weight: bold;
 }
+
 #map {
     width: 95vw;
     height: 80vh;
     border: 3px solid black;
 }
+
 .mapSettings {
     flex-direction: column;
     align-items: center;
     display: flex;
     justify-content: center;
 }
+
 .putStart {
     display: flex;
     width: 100%;
@@ -362,16 +391,22 @@ const checkForChanges = async () => {
     margin-left: 5vw;
     margin-top: 20px;
 }
+
 .flexbox_map {
     margin: 20px;
     display: flex;
     flex-direction: column;
 }
+
 .button_settings {
 }
+
 </style>
+
 <script>
+
 import { ref } from 'vue'
+
 const columns = [
     {
         name: 'desc',
@@ -390,9 +425,10 @@ const rows = [
         streckenid: '6061'
     }
 ]
-const options = [
+const options =  [
     "Zeitraum",
     "ID des Streckenabschnitts",
     "Abschnitt der Karte"
 ]
+
 </script>
