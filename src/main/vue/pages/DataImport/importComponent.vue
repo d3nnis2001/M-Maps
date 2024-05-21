@@ -149,6 +149,8 @@ export default {
             response.forEach((r, index) => {
                 if(r.accepted) {
                     this.selectedFilesWithText[selectedIndex[index]].imported = true;
+                    this.selectedFilesWithText[selectedIndex[index]].error = false;
+                    this.selectedFilesWithText[selectedIndex[index]].errorMsg = "";
                 }
                 else {
                     this.selectedFilesWithText[selectedIndex[index]].error = true;

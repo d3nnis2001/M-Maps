@@ -7,21 +7,17 @@ import com.gpse.basis.repositories.DataSetRepository;
 import com.gpse.basis.repositories.GeoTrackData;
 import com.gpse.basis.repositories.GleisLageDatenRepository;
 import com.gpse.basis.repositories.GleisVDataRepository;
-import com.gpse.basis.services.FileService;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.InsertOneModel;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.parquet.hadoop.ParquetReader;
 import org.apache.parquet.hadoop.util.HadoopInputFile;
-import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.index.Index;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-import com.mongodb.client.model.WriteModel;
+import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 
 import java.io.*;
 import java.util.*;
@@ -29,7 +25,9 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
+
 
 @Service
 public class FileServiceImpl implements FileService {
@@ -44,14 +42,17 @@ public class FileServiceImpl implements FileService {
 
     private MongoTemplate template;
 
+    private final DataService dService;
+
     Lock lock = new ReentrantLock();
     @Autowired
-    FileServiceImpl(DataSetRepository repro, GleisLageDatenRepository rpr, GeoTrackData gt, MongoTemplate tmp, GleisVDataRepository rprr) {
+    FileServiceImpl(DataSetRepository repro, GleisLageDatenRepository rpr, GeoTrackData gt, MongoTemplate tmp, GleisVDataRepository rprr, DataService dstr) {
         datasetRepro = repro;
         glDatenRepro = rpr;
         geoTrack = gt;
         template = tmp;
         gleisV = rprr;
+        dService = dstr;
     }
 
     @Override
@@ -94,15 +95,17 @@ public class FileServiceImpl implements FileService {
                 }
                 else {
                     try {
-                        saveFile(file, streckenId);
-                    } catch (IOException e) {
-                        System.out.println(e.getMessage());
-                        rsp.add(new FileUploadResponse(file.getName(), false, "Fehlerhafte Datei!"));
-                        continue;
+                        String str = saveFile(file, Integer.parseInt(streckenId));
+                        if(str != null){
+                            rsp.add(new FileUploadResponse(file.getName(), false, str));
+                            continue;
+                        }
+
                     } catch(IndexOutOfBoundsException e) {
+                        System.out.println(e.getMessage());
                         rsp.add(new FileUploadResponse(file.getName(), false, "Fehlerhafte Parquet-Format"));
                         continue;
-                    } catch(RuntimeException e) {
+                    } catch (IOException | RuntimeException e) {
                         System.out.println(e.getMessage());
                         rsp.add(new FileUploadResponse(file.getName(), false, "Fehlerhafte Datei!"));
                         continue;
@@ -112,15 +115,15 @@ public class FileServiceImpl implements FileService {
             }
             else {
                 try {
-                    saveFile(file, Objects.equals(streckenId, "missing") ? extractStreckeId(file.getName()) : streckenId);
-                } catch (IOException e) {
-                    System.out.println(e.getMessage());
-                    rsp.add(new FileUploadResponse(file.getName(), false, "Fehlerhafte Datei!"));
-                    continue;
+                    String str = saveFile(file, Objects.equals(streckenId, "missing") ? extractStreckeId(file.getName()) : Integer.parseInt(streckenId));
+                    if(str != null) {
+                        rsp.add(new FileUploadResponse(file.getName(), false, str));
+                        continue;
+                    }
                 } catch (IndexOutOfBoundsException e) {
                     rsp.add(new FileUploadResponse(file.getName(), false, "Fehlerhafte Parquet-Format"));
                     continue;
-                } catch(RuntimeException e) {
+                } catch (IOException | RuntimeException e) {
                     System.out.println(e.getMessage());
                     rsp.add(new FileUploadResponse(file.getName(), false, "Fehlerhafte Datei!"));
                     continue;
@@ -161,16 +164,16 @@ public class FileServiceImpl implements FileService {
 
         DataSet st = new DataSet();
         st.setFileName(file.getName());
-        st.setStreckenId(Integer.toString(lst.getFirst().getStr_Nr()));
+        st.setStreckenId(lst.getFirst().getStr_Nr());
         st.setUploadDate(uploadDate);
         datasetRepro.save(st);
     }
 
-    private String extractStreckeId(String fileName){
+    private int extractStreckeId(String fileName){
         Pattern pattern = Pattern.compile("Str_\\d+");
         Matcher matcher = pattern.matcher(fileName);
         matcher.find();
-        return matcher.group(0);
+        return Integer.parseInt(matcher.group(0).substring(4));
     }
 
     //Prüft ob Strecken ID im Dateinamen enthalten ist
@@ -189,19 +192,19 @@ public class FileServiceImpl implements FileService {
             lst.add(new GeoData(Integer.parseInt(parts[0]),
                                 Double.parseDouble(parts[1]),
                                 Double.parseDouble(parts[2]),
-                                Integer.parseInt(parts[4])));
+                                Integer.parseInt(parts[4]) / 1000.00));
         }
         geoTrack.saveAll(lst);
         Date uploadDate = new Date();
 
         DataSet st = new DataSet();
         st.setFileName(file.getName());
-        st.setStreckenId(Integer.toString(lst.get(0).getStrecken_id()));
+        st.setStreckenId(lst.get(0).getStrecken_id());
         st.setUploadDate(uploadDate);
         datasetRepro.save(st);
     }
 
-    public void saveFile(File file, String streckenId) throws IOException,IndexOutOfBoundsException,RuntimeException {
+    public String saveFile(File file, int streckenId) throws IOException,IndexOutOfBoundsException,RuntimeException {
             Date uploadDate = new Date();
 
             DataSet st = new DataSet();
@@ -219,13 +222,13 @@ public class FileServiceImpl implements FileService {
             Row row = reader.read();
             while (row != null) {
                 List<Object> values = row.getValues();
-                lst.add(new GleisLageDatenpunkt((Double) values.get(0), (Double) values.get(1), (Double) values.get(2), (Double) values.get(3), (Double) values.get(4), st.getId()));
+                lst.add(new GleisLageDatenpunkt((Double) values.get(0), (Double) values.get(1), (Double) values.get(2), (Double) values.get(3), (Double) values.get(4), st.getId(), null, -1));
                 row = reader.read();
             }
             //glDatenRepro.saveAll(lst);
             System.out.println(lst.size());
-            int no_threads = 8;
-            int sts = lst.size() / 8;
+            int no_threads = 30;
+            int sts = lst.size() / no_threads;
             int currentMax = sts;
             int count = 0;
             List<List<GleisLageDatenpunkt>> l = new ArrayList<>();
@@ -241,39 +244,90 @@ public class FileServiceImpl implements FileService {
                 }
             }
             List<Thread> threads = new ArrayList<>();
+            Query query = new Query();
+            query.addCriteria(Criteria.where("strecken_id").is(st.getStreckenId()));
+            List<GeoData> k = template.find(query, GeoData.class);
+            if(k.isEmpty())
+                return "Geo-Daten (LLH) fehlen!";
+            Query query2 = new Query();
+            query2.addCriteria(Criteria.where("Str_Nr").is(st.getStreckenId()));
+            List<GleisVData> kk = template.find(query2, GleisVData.class);
+            if(kk.isEmpty())
+                return "v-zul fehlen!";
             for(int i = 0; i < no_threads; i++){
-                threads.add(new Thread(new Thr(l.get(i))));
-                threads.get(i).run();
-                try {
+                threads.add(new Thread(new Thr(l.get(i), k, kk)));
+                threads.get(i).start();
+            }
+
+
+            try {
+                for (int i = 0; i < no_threads; i++)
                     threads.get(i).join();
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
 
             st = datasetRepro.save(st);
+            return null;
     }
 
     private class Thr implements Runnable {
         int batchSize = 40000;
-        private List<GleisLageDatenpunkt> lst;
-        private  BulkOperations bulkInsertion = template.bulkOps(BulkOperations.BulkMode.UNORDERED, GleisLageDatenpunkt.class);
-        Thr(List<GleisLageDatenpunkt> lt) {lst = lt;}
+
+        private final List<GleisLageDatenpunkt> lst;
+
+        private final MongoTemplate tmpl1 = new MongoTemplate(new SimpleMongoClientDatabaseFactory("mongodb://localhost:27017/project_12"));
+
+
+        private BulkOperations bulkInsertion = tmpl1.bulkOps(BulkOperations.BulkMode.UNORDERED, GleisLageDatenpunkt.class);
+
+       private final List<GeoData> l;
+
+       private final List<GleisVData> lst3;
+
+        Thr(List<GleisLageDatenpunkt> lt, List<GeoData> k, List<GleisVData> trk) {
+            lst = lt;
+            l = k;
+            lst3 = trk;
+        }
+
         @Override
         public void run() {
+            findGeoDataIfExistent();
+            save();
+        }
+
+        private void save() {
             int idx = 0;
-            while(idx < lst.size()) {
+            while (idx < lst.size()) {
                 bulkInsertion.insert(lst.get(idx++));
-                if(idx % batchSize == 0) {
+                if (idx % batchSize == 0) {
                     bulkInsertion.execute();
-                    lock.lock();
-                    bulkInsertion = template.bulkOps(BulkOperations.BulkMode.UNORDERED, GleisLageDatenpunkt.class);
-                    lock.unlock();
+                    bulkInsertion = tmpl1.bulkOps(BulkOperations.BulkMode.UNORDERED, GleisLageDatenpunkt.class);
                 }
             }
             bulkInsertion.execute();
         }
+        private void findGeoDataIfExistent() {
+            lst.parallelStream()
+                .forEach(gld -> {
+                    GeoData closestElements = l.parallelStream()
+                        .min((geo1, geo2) -> {
+                            double distance1 = Math.abs(geo1.getTrack_km() - gld.getStr_km());
+                            double distance2 = Math.abs(geo2.getTrack_km() - gld.getStr_km());
+                            return Double.compare(distance1, distance2);
+                        })
+                        .orElse(null);
+                    gld.setLocation(closestElements.getId());
+                    Optional<GleisVData> result = lst3.stream()
+                        .filter(obj -> obj.getVon_km() <= gld.getStr_km() && gld.getStr_km() <= obj.getBis_km())
+                        .findFirst();
+                    gld.setV_zul(result.get().getV_zul());
+                });
+        }
+
     }
+
 
     @Override
     public List<DataSet> getDataSets(String searchString) {
@@ -283,17 +337,19 @@ public class FileServiceImpl implements FileService {
             return s;
         }
         else{
-            return s.stream().filter(xt -> xt.getId().contains(searchString)).collect(Collectors.toList());
+            return s.stream().filter(xt -> xt.getId().contains(searchString)).collect(toList());
         }
     }
 
     @Override
     public void deleteDataSetsById(List<String> ids) {
-        ids.forEach(datasetRepro::deleteById);
-        List<GleisLageDatenpunkt> gld = new ArrayList<>();
-        glDatenRepro.findAll().forEach(gld::add);
-        gld = gld.stream().filter(gl -> ids.contains(gl.getDataSetid())).collect(Collectors.toList());
-        glDatenRepro.deleteAll(gld);
+        Query query = new Query();
+        query.addCriteria(Criteria.where("_id").in(ids));
+        template.remove(query, "dataSets");
+
+        query = new Query();
+        query.addCriteria(Criteria.where("dataSetid").in(ids));
+        template.remove(query, "GleisLageDaten");
     }
 
     @Override
@@ -328,6 +384,10 @@ public class FileServiceImpl implements FileService {
         List<List<String>> lst = new ArrayList<>();
         List<File> files = getAllFiles(folder);
         files.forEach(f -> lst.add(new ArrayList<String>() {{add(f.getPath()); add(f.getName());}}));
+
+        //todo: löschen
+        dService.getGeoDatabyTrackId(6100);
+
         return lst;
     }
 }

@@ -85,4 +85,17 @@ public class GleisLageRange {
     public void set_greater230_(double _greater230_) {
         this._greater230_ = _greater230_;
     }
+
+    public double getValueToVelocity(int vel) {
+        if(vel <= 80)
+            return _smaller80_;
+        else if(vel >= 80 && vel <= 120)
+            return _80to120_;
+        else if(vel >= 120 && vel <= 160)
+            return _120to160_;
+        else if(vel >= 160 && vel <= 230)
+            return _160to230_;
+        else
+            return _greater230_;
+    }
 }
