@@ -3,7 +3,7 @@ import { createPinia } from 'pinia'
 import { Quasar } from 'quasar'
 import quasarUserOptions from './quasar-user-options'
 
-import App from './App.vue'
+import App from './pages/App.vue'
 import router from './router'
 
 // import store from "./stores";
