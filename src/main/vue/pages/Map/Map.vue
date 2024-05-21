@@ -162,178 +162,247 @@ const checkForChanges = async () => {
 
 <template>
     <div class="mapSettings">
+        <div class="row putStart">
+            <div class="">
+                <q-expansion-item
+                    icon="settings"
+                    label="Optionen"
+                    expand-icon="arrow_drop_down"
+                    dense
+                    class="expansion_settings"
+                >
+                    <q-list>
+                        <q-item clickable v-ripple>
+                            <q-item-section>
+                                <div class="expan_items" @click="alert2=true">
+                                    Zeitraum
+                                </div>
+                            </q-item-section>
+                        </q-item>
+                        <q-item clickable v-ripple>
+                            <q-item-section>
+                                <div class="expan_items" @click="alert=true">
+                                    Strecken-ID auswählen
+                                </div>
+                            </q-item-section>
+                        </q-item>
+                    </q-list>
+                </q-expansion-item>
+            </div>
+            <div class="    ">
+                <q-btn
+                    class="button_settings"
+                    icon="my_location"
+                    round
+                    flat
+                    @click="centerToUserLocation"
+                    aria-label="Center to User's Location"
+                />
+            </div>
+        </div>
         <div id="map"></div>
         <div class="flexbox_map">
-            <button class="button_settings" @click="centerToUserLocation">Center to User's Location</button>
-            <q-card class="my-card">
-                <q-card-section>
-                    <div class="text-h6">Filter</div>
-                </q-card-section>
-                <q-separator />
+            <q-dialog v-model="alert2">
+                <q-card>
+                    <q-card-section>
+                        <div class="text-h6">Wähle einen Zeitraum</div>
+                    </q-card-section>
 
-                <q-card-actions vertical>
-                    <q-btn @click="alert2 = true" no-caps flat>Zeitraum</q-btn>
-                    <q-btn @click="alert = true" no-caps flat>ID des Streckenabschnitts</q-btn>
-                </q-card-actions>
-                <q-dialog v-model="alert2">
-                    <q-card>
-                        <q-card-section>
-                            <div class="text-h6">Wähle einen Zeitraum</div>
-                        </q-card-section>
+                    <q-card-section class="q-pt-none">
+                        <div class="q-pa-md" style="max-width: 300px">
+                            <q-input filled v-model="date">
+                                <template v-slot:prepend>
+                                    <q-icon name="event" class="cursor-pointer">
+                                        <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                                            <q-date v-model="date" mask="YYYY-MM-DD HH:mm">
+                                                <div class="row items-center justify-end">
+                                                    <q-btn v-close-popup label="Close" color="primary" flat />
+                                                </div>
+                                            </q-date>
+                                        </q-popup-proxy>
+                                    </q-icon>
+                                </template>
 
-                        <q-card-section class="q-pt-none">
-                            <div class="q-pa-md" style="max-width: 300px">
-                                <q-input filled v-model="date">
-                                    <template v-slot:prepend>
-                                        <q-icon name="event" class="cursor-pointer">
-                                            <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                                                <q-date v-model="date" mask="YYYY-MM-DD HH:mm">
-                                                    <div class="row items-center justify-end">
-                                                        <q-btn v-close-popup label="Close" color="primary" flat />
-                                                    </div>
-                                                </q-date>
-                                            </q-popup-proxy>
-                                        </q-icon>
-                                    </template>
+                                <template v-slot:append>
+                                    <q-icon name="access_time" class="cursor-pointer">
+                                        <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                                            <q-time v-model="date" mask="YYYY-MM-DD HH:mm" format24h>
+                                                <div class="row items-center justify-end">
+                                                    <q-btn v-close-popup label="Close" color="primary" flat />
+                                                </div>
+                                            </q-time>
+                                        </q-popup-proxy>
+                                    </q-icon>
+                                </template>
+                            </q-input>
+                        </div>
+                        <div class="q-pa-md" style="max-width: 300px">
+                            <q-input filled v-model="date2">
+                                <template v-slot:prepend>
+                                    <q-icon name="event" class="cursor-pointer">
+                                        <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                                            <q-date v-model="date2" mask="YYYY-MM-DD HH:mm">
+                                                <div class="row items-center justify-end">
+                                                    <q-btn v-close-popup label="Close" color="primary" flat />
+                                                </div>
+                                            </q-date>
+                                        </q-popup-proxy>
+                                    </q-icon>
+                                </template>
 
-                                    <template v-slot:append>
-                                        <q-icon name="access_time" class="cursor-pointer">
-                                            <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                                                <q-time v-model="date" mask="YYYY-MM-DD HH:mm" format24h>
-                                                    <div class="row items-center justify-end">
-                                                        <q-btn v-close-popup label="Close" color="primary" flat />
-                                                    </div>
-                                                </q-time>
-                                            </q-popup-proxy>
-                                        </q-icon>
-                                    </template>
-                                </q-input>
-                            </div>
-                            <div class="q-pa-md" style="max-width: 300px">
-                                <q-input filled v-model="date2">
-                                    <template v-slot:prepend>
-                                        <q-icon name="event" class="cursor-pointer">
-                                            <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                                                <q-date v-model="date2" mask="YYYY-MM-DD HH:mm">
-                                                    <div class="row items-center justify-end">
-                                                        <q-btn v-close-popup label="Close" color="primary" flat />
-                                                    </div>
-                                                </q-date>
-                                            </q-popup-proxy>
-                                        </q-icon>
-                                    </template>
+                                <template v-slot:append>
+                                    <q-icon name="access_time" class="cursor-pointer">
+                                        <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                                            <q-time v-model="date2" mask="YYYY-MM-DD HH:mm" format24h>
+                                                <div class="row items-center justify-end">
+                                                    <q-btn v-close-popup label="Close" color="primary" flat />
+                                                </div>
+                                            </q-time>
+                                        </q-popup-proxy>
+                                    </q-icon>
+                                </template>
+                            </q-input>
+                        </div>
+                    </q-card-section>
 
-                                    <template v-slot:append>
-                                        <q-icon name="access_time" class="cursor-pointer">
-                                            <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                                                <q-time v-model="date2" mask="YYYY-MM-DD HH:mm" format24h>
-                                                    <div class="row items-center justify-end">
-                                                        <q-btn v-close-popup label="Close" color="primary" flat />
-                                                    </div>
-                                                </q-time>
-                                            </q-popup-proxy>
-                                        </q-icon>
-                                    </template>
-                                </q-input>
-                            </div>
-                        </q-card-section>
-
-                        <q-card-actions align="center">
-                            <q-btn flat label="Filter anwenden" color="primary" v-close-popup/>
-                            <q-btn flat label="Abbrechen" color="primary" v-close-popup />
-                        </q-card-actions>
-                    </q-card>
-                </q-dialog>
-                <q-dialog v-model="alert">
-                    <q-card>
-                        <q-card-section>
-                            <div class="text-h6">Wähle eine Strecken-ID</div>
-                        </q-card-section>
-                        <q-input class="" v-model="streckenID" label="Strecken-ID Eingabe"/>
-                        <q-card-actions align="center">
-                            <q-btn @click="refreshMarkers" flat label="Filter anwenden" color="primary" v-close-popup/>
-                            <q-btn flat label="Abbrechen" color="primary" v-close-popup />
-                        </q-card-actions>
-                    </q-card>
-                </q-dialog>
-            </q-card>
+                    <q-card-actions align="center">
+                        <q-btn flat label="Filter anwenden" color="primary" v-close-popup/>
+                        <q-btn flat label="Abbrechen" color="primary" v-close-popup />
+                    </q-card-actions>
+                </q-card>
+            </q-dialog>
+            <q-dialog v-model="alert">
+                <q-card>
+                    <q-card-section>
+                        <div class="text-h6">Wähle eine Strecken-ID</div>
+                    </q-card-section>
+                    <q-input class="" v-model="streckenID" label="Strecken-ID Eingabe"/>
+                    <q-card-actions align="center">
+                        <q-btn @click="refreshMarkers" flat label="Filter anwenden" color="primary" v-close-popup/>
+                        <q-btn flat label="Abbrechen" color="primary" v-close-popup />
+                    </q-card-actions>
+                </q-card>
+            </q-dialog>
         </div>
     </div>
-    <q-dialog v-model="dialogVisible">
-        <div class="col">
-            <q-card class="row">
-                <q-input class="" v-model="kmStart" label="Kilometer Start" readonly/>
-                <q-card class="row">
-                <q-btn
-                    size="l"
-                    flat
-                    round
-                    icon="delete"
-                    @click="deleteStart"
-                />
-                <q-input class="" v-model="kmEnd" label="Kilometer End" readonly/>
-                <q-btn
-                    size="l"
-                    flat
-                    round
-                    icon="delete"
-                    @click="deleteEnd"
-                />
+    <q-dialog class="dialog_map" v-model="dialogVisible">
+        <div class="">
+            <div class="col">
+                <div class="row">
+                    <q-card flat square class="col borderFirst">
+                        <div class="row">
+                            <q-input class="full-width" v-model="kmStart" label="Kilometer Start" readonly/>
+                            <q-btn
+                                size="l"
+                                flat
+                                round
+                                icon="add"
+                                @click="addStart"
+                            />
+                            <q-btn
+                                size="l"
+                                flat
+                                round
+                                icon="delete"
+                                @click="deleteStart"
+                            />
+                        </div>
+                    </q-card>
+                    <q-card flat square class="col borderSecond">
+                        <div class="row">
+                            <q-input class="full-width" v-model="kmEnd" label="Kilometer End" readonly/>
+                            <q-btn
+                                size="l"
+                                flat
+                                round
+                                icon="add"
+                                @click="addEnd"
+                            />
+                            <q-btn
+                                size="l"
+                                flat
+                                round
+                                icon="delete"
+                                @click="deleteEnd"
+                            />
+                        </div>
+                    </q-card>
+                </div>
+                <q-card flat square bordered>
+                    <q-card-actions align="center">
+                        <q-btn flat @click="checkForChanges" label="Speichern" color="primary" v-close-popup />
+                    </q-card-actions>
                 </q-card>
-            </q-card>
-            <q-card>
-                <q-btn
-                    color="red"
-                    @click="addStart"
-                    icon="add"
-                    label="add"
-                />
-                <q-btn
-                    color="red"
-                    @click="addEnd"
-                    icon="add"
-                    label="add"
-                />
-            </q-card>
-            <q-card>
-                <q-card-actions align="center">
-                    <q-btn flat @click="checkForChanges" label="Okay" color="primary" v-close-popup />
-                </q-card-actions>
-            </q-card>
+            </div>
         </div>
     </q-dialog>
 </template>
+
 <style>
-.my-card {
+.full-width {
+    flex: 1;
+    margin: 0;
     width: 100%;
-    max-width: 250px;
-    margin-bottom: 20px;
 }
+
+.borderFirst {
+    border-right: 1px solid black;
+    border-bottom: 2px solid black;
+}
+
+.borderSecond {
+    border-left: 1px solid black;
+    border-bottom: 2px solid black;
+}
+
+.expansion_settings {
+    background-color: #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+}
+
+.margin-right-con {
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+}
+
+.expan_items {
+    font-weight: bold;
+}
+
 #map {
     width: 95vw;
-    height: 65vh;
+    height: 80vh;
+    border: 3px solid black;
 }
+
 .mapSettings {
-    margin-top: 35px;
-    margin-left: 40px;
     flex-direction: column;
+    align-items: center;
     display: flex;
-    justify-content: left;
+    justify-content: center;
 }
+
+.putStart {
+    display: flex;
+    width: 100%;
+    justify-content: start;
+    margin-left: 5vw;
+    margin-top: 20px;
+}
+
 .flexbox_map {
     margin: 20px;
     display: flex;
     flex-direction: column;
 }
+
 .button_settings {
-    justify-content: left;
-    width: 300px;
 }
-.input-width {
-    width: 40px;
-    height: 20px;
-}
+
 </style>
+
 <script>
 
 import { ref } from 'vue'
