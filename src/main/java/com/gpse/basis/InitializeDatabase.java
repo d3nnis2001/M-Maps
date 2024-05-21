@@ -1,8 +1,11 @@
 package com.gpse.basis;
 
+import com.gpse.basis.domain.Checklist;
 import com.gpse.basis.domain.GleisLageRange;
 import com.gpse.basis.domain.UserModel;
+import com.gpse.basis.repositories.ChecklistRepository;
 import com.gpse.basis.repositories.GleisLageRangeRepository;
+import com.gpse.basis.repositories.ReperaturRepository;
 import com.gpse.basis.repositories.UserRepository;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;

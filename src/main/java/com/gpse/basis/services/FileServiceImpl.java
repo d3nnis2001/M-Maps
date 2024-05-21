@@ -390,7 +390,7 @@ public class FileServiceImpl implements FileService {
         Iterator<GeoData> iterator = iterable.iterator();
         while (iterator.hasNext()) {
             GeoData geo = iterator.next();
-            int currKm = geo.getTrack_km();
+            double currKm = geo.getTrack_km();
             if (isright) {
                 if (currKm >= from && currKm <= till) {
                     geoArr.add(geo);
