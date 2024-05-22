@@ -24,18 +24,20 @@ export default {
         });
         onMounted(async () => {
             const response = await getInspectionOrder()
+            console.log("API Response:", response);
             for (let i = 0; i < response.length; i++) {
-                state.rows.push( {
-                    name: response[i]["inspectionOrderId"],
-                    start: response[i]["startLocation"],
-                    destination: response[i]["endLocation"],
-                    timeStart: response[i]["startTime"],
-                    timeDestination: response[i]["endTime"],
+                state.rows.push({
+                    inspectionOrderId: response[i]["inspectionOrderId"],
+                    startLocation: response[i]["startLocation"],
+                    endLocation: response[i]["endLocation"],
+                    startTime: response[i]["startTime"],
+                    endTime: response[i]["endTime"],
                     data: response[i]["data"],
                     department: response[i]["department"],
                     status: response[i]["status"]
                 })
             }
+            console.log("State Rows:", state.rows);
         })
 
         const showDialog = ref(false);
@@ -76,28 +78,19 @@ export default {
 
 <template>
     <div class="q-pa-md">
-        <q-table>
+        <q-table
             class="my-sticky-header-table"
             flat bordered
             title="Prüfaufträge"
             :rows="state.rows"
             :columns="state.columns"
-            row-key="id"
+            row-key="inspectionOrderId"
             :filter = "filter"
-            hide-header
-            @row-click="rowClick">
-            <template v-slot:top-right>
-                <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">
-                    <template v-slot:append>
-                        <q-icon name="search" />
-                    </template>
-                </q-input>
-            </template>
-        </q-table>
+            @row-click="rowClick" />
     </div>
+
     <div class="q-pa-md">
         <q-btn label="Neuen Auftrag erstellen" @click="createInspectionOrder" color="primary"  class=""></q-btn>
-        <q-btn label="Auftrag annehmen" @click="acceptInspectionOrder" color="primary" class=""></q-btn>
 
         <q-dialog v-model="showDialog">
             <q-card>
@@ -108,15 +101,14 @@ export default {
                     <q-separator />
                     <div class="option-button" @click="archiveOrder">Archivieren</div>
                     <q-separator />
-                    <div class="option-button" @click="cancelOrder">Stornieren</div>
-                    <q-separator />
-                    <div class="option-button" @click="reapplyOrder">Neu beantragen</div>
+                    <div class="option-button" @click="acceptInspectionOrder">Auftrag annehmen</div>
                 </q-card-section>
                 <q-card-section>
                     <q-btn flat label="Schließen" color="primary" @click="showDialog = false"></q-btn>
                 </q-card-section>
             </q-card>
         </q-dialog>
+
     </div>
 
 </template>

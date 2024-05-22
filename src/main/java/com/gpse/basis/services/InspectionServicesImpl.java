@@ -53,6 +53,7 @@ public class InspectionServicesImpl implements InspectionServices {
             InspectionOrder inspec = iterator.next();
             inspecArray.add(inspec);
         }
+        System.out.println("TEST-getInspecData");
         return inspecArray;
     }
 

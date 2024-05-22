@@ -25,6 +25,9 @@ public class InspectionController {
         System.out.println("TEST_04");
         return inspec.getInspecData();
     }
+
+
+    // -> CreateInspectionOrder
     @PostMapping("/senddata")
     public void sendData(final WebRequest request) {
         System.out.println("TEST-SENDDATA");
