@@ -2,16 +2,18 @@ package com.gpse.basis.services;
 
 import com.gpse.basis.domain.InspectionOrder;
 import com.gpse.basis.repositories.InspectionOrderRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
-
+@Service
 public class InspectionServicesImpl implements InspectionServices {
 
     private InspectionOrderRepository inspec;
-
+    @Autowired
     public InspectionServicesImpl(InspectionOrderRepository inspec) {
         this.inspec = inspec;
     }

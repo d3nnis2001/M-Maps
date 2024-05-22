@@ -11,6 +11,7 @@ export const getInspectionOrder = async function getInspectionOrder() {
     }
 }
 
+// -> CreateInspectionOrder.vue
 export const sendInspectionOrder = async function sendInspectionOrder(inspectionOrderId, streckenId, userId, start, end, startTime,
                                                                       endTime, fachabteilung, messdaten, status, bemerkungen, archiviert) {
     try {
@@ -35,6 +36,7 @@ export const sendInspectionOrder = async function sendInspectionOrder(inspection
     }
 }
 
+// -> editInspectionOrder.vue
 export const getDataById = async function getDataById(id) {
     try {
         const response = await axios.get("/api/inspection/getById", {

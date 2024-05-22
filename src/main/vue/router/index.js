@@ -61,7 +61,7 @@ const router = createRouter({
         },
         {
             path: "/inspectionOrderOverview",
-            name: "inspctionOrderOverview",
+            name: "inspectionOrderOverview",
             component: InspectionOrderOverview
         }
   ]

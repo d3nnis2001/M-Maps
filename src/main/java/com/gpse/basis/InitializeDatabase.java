@@ -2,6 +2,7 @@ package com.gpse.basis;
 
 import com.gpse.basis.domain.InspectionOrder;
 import com.gpse.basis.domain.UserModel;
+import com.gpse.basis.repositories.InspectionOrderRepository;
 import com.gpse.basis.repositories.UserRepository;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,10 +11,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class InitializeDatabase implements InitializingBean {
     private final UserRepository usRepo;
-
+    private final InspectionOrderRepository ioRepo;
     @Autowired
-    public InitializeDatabase(final UserRepository usRepo) {
+    public InitializeDatabase(final UserRepository usRepo, final InspectionOrderRepository ioRepo) {
         this.usRepo = usRepo;
+        this.ioRepo = ioRepo;
     }
     @Override
     public void afterPropertiesSet() {
@@ -27,9 +29,10 @@ public class InitializeDatabase implements InitializingBean {
     }
 
     public void initInspectionOrder() {
-        InspectionOrder inspec = new InspectionOrder("1234", "1000", "Bielefeld",
+        InspectionOrder inspec = new InspectionOrder("1111","1234", "1000", "Bielefeld",
             "Hannover", "08-05-2024", "09-05-2024",
             " ", " ", "archiviert", "hallo :)", true);
+        ioRepo.save(inspec);
     }
 
 }

@@ -2,31 +2,31 @@
 <script>
 import {onMounted, reactive, ref} from "vue";
 import router from "@/main/vue/router";
-//import {inspection} from "@/main/vue/api/inspection";
+import {getInspectionOrder} from "@/main/vue/api/inspection";
 
 
 export default {
     setup () {
         const state = reactive ({
             filter: '',
-            columns: [
-                { name: 'courseId', required: true, label: 'ID', align: 'left', field: row => row.name, format: val => `${val}`, sortable: true },
-                { name: 'startLocation', label: 'Startort', align: 'left', field: 'start', sortable: true },
-                { name: 'endLocation', label: 'Zielort', align: 'left', field: 'ziel', sortable: true },
-                { name: 'startTime', label: 'von', align: 'left', field: 'von' },
-                { name: 'endTime', label: 'bis', align: 'left', field: 'von' },
+            columns: [   // field: row => row.name
+                { name: 'inspectionOrderId', required: true, label: 'ID', align: 'left', field: 'inspectionOrderId', format: val => `${val}`, sortable: true },
+                { name: 'startLocation', label: 'Startort', align: 'left', field: 'startLocation', sortable: true },
+                { name: 'endLocation', label: 'Zielort', align: 'left', field: 'endLocation', sortable: true },
+                { name: 'startTime', label: 'von', align: 'left', field: 'startTime' },
+                { name: 'endTime', label: 'bis', align: 'left', field: 'endTime' },
                 { name: 'data', label: 'Messdaten', align: 'left', field: 'data' },
-                { name: 'department', label: 'Fachabteilung', align: 'left', field: 'abteilung' },
+                { name: 'department', label: 'Fachabteilung', align: 'left', field: 'department' },
                 { name: 'status', label: 'Status', align: 'left', field: 'status' },
             ],
             rows: []
 
         });
         onMounted(async () => {
-            const response = await inspection()
+            const response = await getInspectionOrder()
             for (let i = 0; i < response.length; i++) {
                 state.rows.push( {
-                    name: response[i]["courseId"],
+                    name: response[i]["inspectionOrderId"],
                     start: response[i]["startLocation"],
                     destination: response[i]["endLocation"],
                     timeStart: response[i]["startTime"],

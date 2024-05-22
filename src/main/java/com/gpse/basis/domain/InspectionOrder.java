@@ -3,7 +3,8 @@ package com.gpse.basis.domain;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
-@Document
+
+@Document(collection = "inspectionOrder")
 public class InspectionOrder {
     @MongoId
     private String inspectionOrderId;
@@ -19,13 +20,13 @@ public class InspectionOrder {
     private String remarks;
     private boolean archived;
 
-    public InspectionOrder(String courseId, String userId, String start, String end, String startTime, String endTime,
-                           String department, String data, String status, String remarks,
-                           boolean archived) {
+    public InspectionOrder(String inspectionOrderId, String courseId, String userId, String startLocation, String endLocation, String startTime, String endTime,
+                           String department, String data, String status, String remarks, boolean archived) {
+        this.inspectionOrderId = inspectionOrderId;
         this.courseId = courseId;
         this.userId = userId;
-        this.startLocation = start;
-        this.endLocation = end;
+        this.startLocation = startLocation;
+        this.endLocation = endLocation;
         this.startTime = startTime;
         this.endTime = endTime;
         this.department = department;
