@@ -6,8 +6,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = Application.class)
-public class ApplicationIT {
+@SpringBootTest(classes = TemplateApplication.class)
+public class TemplateApplicationIT {
 
     @Test
     public void contextLoads() {
