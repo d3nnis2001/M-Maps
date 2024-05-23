@@ -81,6 +81,10 @@ const router = createRouter({
             path: "/admin",
             name: "adminmain",
             component: AdminMain
+        },
+        {
+            path: "/impressum",
+            name: "impressum",
         }
   ]
 })
