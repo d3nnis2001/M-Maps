@@ -19,13 +19,18 @@ public class InspectionServicesImpl implements InspectionServices {
     }
 
     @Override
-    public void createInspectionOrder(InspectionOrder inspectionOrder) {
+    public void createInspectionOrder(ArrayList<String> inspecArray) {
         String defaultStatus = "unbearbeitet";
         String defaultUserId = " ";
-        boolean defaultArchiviert = false;
-        inspectionOrder.setInspectionOrderId(generateId());
+        String inspectionOrderId = generateId();
+        boolean defaultArchived = false;
+
+        InspectionOrder inspectionOrder = new InspectionOrder(inspectionOrderId, inspecArray.get(0), defaultUserId,
+            inspecArray.get(1), inspecArray.get(2), inspecArray.get(3), inspecArray.get(4),
+            inspecArray.get(5), inspecArray.get(6), defaultStatus, inspecArray.get(7), defaultArchived);
         inspec.save(inspectionOrder);
     }
+
     public String generateId() {
         long timestamp = System.currentTimeMillis();
         Random random = new Random();

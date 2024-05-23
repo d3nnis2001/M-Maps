@@ -27,26 +27,19 @@ public class InspectionController {
     }
 
 
-    // -> CreateInspectionOrder
     @PostMapping("/senddata")
     public void sendData(final WebRequest request) {
         System.out.println("TEST-SENDDATA");
-        String inspectionOrderId = request.getParameter("inspectionOrderId");
-        String courseId = request.getParameter("courseId");
-        String userId = request.getParameter("userId");
-        String startLocation = request.getParameter("startLocation");
-        String endLocation = request.getParameter("endLocation");
-        String startTime = request.getParameter("startTime");
-        String endTime = request.getParameter("endTime");
-        String department = request.getParameter("department");
-        String data = request.getParameter("data");
-        String remarks = request.getParameter("remarks");
-        String status = request.getParameter("status");
-        boolean archiviert = Boolean.valueOf(request.getParameter("archiviert"));
-        InspectionOrder inspecOrder = new InspectionOrder(inspectionOrderId, courseId, userId, startLocation, endLocation, startTime, endTime,
-            department, data, status, remarks, archiviert);
-        inspec.createInspectionOrder(inspecOrder);
-
+        ArrayList<String> inspecArray = new ArrayList<>();
+        inspecArray.add(request.getParameter("courseId"));
+        inspecArray.add(request.getParameter("startLocation"));
+        inspecArray.add(request.getParameter("endLocation"));
+        inspecArray.add(request.getParameter("startTime"));
+        inspecArray.add(request.getParameter("endTime"));
+        inspecArray.add(request.getParameter("department"));
+        inspecArray.add(request.getParameter("inspectionData"));
+        inspecArray.add(request.getParameter("remarks"));
+        inspec.createInspectionOrder(inspecArray);
     }
 
     @GetMapping("/getById")

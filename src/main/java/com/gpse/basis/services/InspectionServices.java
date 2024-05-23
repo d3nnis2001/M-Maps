@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public interface InspectionServices {
 
-    void createInspectionOrder(InspectionOrder inspectionOrder);
+    void createInspectionOrder(ArrayList<String> inspecArray);
 
     void editInspectionOrder(InspectionOrder inspectionOrder);
 

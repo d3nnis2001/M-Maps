@@ -11,22 +11,18 @@ export const getInspectionOrder = async function getInspectionOrder() {
     }
 }
 
-// -> CreateInspectionOrder.vue
-export const sendInspectionOrder = async function sendInspectionOrder(inspectionOrderId, streckenId, userId, start, end, startTime,
-                                                                      endTime, fachabteilung, messdaten, status, bemerkungen, archiviert) {
+export const sendInspectionOrder = async function sendInspectionOrder(courseId, startLocation, endLocation, startTime,
+                                                                      endTime, department, dataInspec, remarks) {
     try {
         const derc = new URLSearchParams();
-        derc.append("streckenId", streckenId);
-        derc.append("userId", userId);
-        derc.append("start", start);
-        derc.append("end", end);
+        derc.append("courseId", courseId);
+        derc.append("startLocation", startLocation);
+        derc.append("endLocation", endLocation);
         derc.append("startTime", startTime);
         derc.append("endTime", endTime);
-        derc.append("fachabteilung", fachabteilung);
-        derc.append("messdaten", messdaten);
-        derc.append("status", status);
-        derc.append("bemerkungen", bemerkungen);
-        derc.append("archiviert", archiviert);
+        derc.append("department", department);
+        derc.append("inspectionData", dataInspec);
+        derc.append("remarks", remarks);
         const response = await axios.post("/api/inspection/senddata", derc)
         return response;
 

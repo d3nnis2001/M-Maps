@@ -9,6 +9,7 @@ import Password from "../pages/Login/Password.vue";
 import ForgotPassword from "../pages/Login/ForgotPassword.vue";
 import ResetPassword from "../pages/Login/ResetPassword.vue";
 import Start from "../pages/Start.vue";
+import InspectionOrderOverview from "@/main/vue/pages/Pruefauftrag/InspectionOrderOverview.vue";
 import CreateInspectionOrder from "../pages/Pruefauftrag/CreateInspectionOrder.vue";
 import EditInspectionOrder from "../pages/Pruefauftrag/EditInspectionOrder.vue";
 
@@ -61,12 +62,17 @@ const router = createRouter({
             component: ResetPassword
         },
         {
-            path: "/createInspectionOrder",
+            path: "/inspectionOrder",
+            name: "inspectionOrderOverview",
+            component: InspectionOrderOverview
+        },
+        {
+            path: "/inspectionOrder/create",
             name: "createInspectionOrder",
             component: CreateInspectionOrder
         },
         {
-            path: "/editInspectionOrder",
+            path: "/inspectionOrder/:inspectionOrderId/edit",
             name: "editInspectionOrder",
             component: EditInspectionOrder
         }

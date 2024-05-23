@@ -1,21 +1,19 @@
-
 <script>
 import {onMounted, reactive, ref} from "vue";
 import router from "@/main/vue/router";
 import {getInspectionOrder} from "@/main/vue/api/inspection";
-
 
 export default {
     setup () {
         const state = reactive ({
             filter: '',
             columns: [   // field: row => row.name
-                { name: 'inspectionOrderId', required: true, label: 'ID', align: 'left', field: 'inspectionOrderId', format: val => `${val}`, sortable: true },
+                { name: 'inspectionOrderId', required: true, label: 'ID', align: 'left', field: row => row.inspectionOrderId, format: val => `${val}`, sortable: true },
                 { name: 'startLocation', label: 'Startort', align: 'left', field: 'startLocation', sortable: true },
                 { name: 'endLocation', label: 'Zielort', align: 'left', field: 'endLocation', sortable: true },
                 { name: 'startTime', label: 'von', align: 'left', field: 'startTime' },
                 { name: 'endTime', label: 'bis', align: 'left', field: 'endTime' },
-                { name: 'data', label: 'Messdaten', align: 'left', field: 'data' },
+                { name: 'inspectionData', label: 'Messdaten', align: 'left', field: 'inspectionData' },
                 { name: 'department', label: 'Fachabteilung', align: 'left', field: 'department' },
                 { name: 'status', label: 'Status', align: 'left', field: 'status' },
             ],
@@ -32,7 +30,7 @@ export default {
                     endLocation: response[i]["endLocation"],
                     startTime: response[i]["startTime"],
                     endTime: response[i]["endTime"],
-                    data: response[i]["data"],
+                    inspectionData: response[i]["inspectionData"],
                     department: response[i]["department"],
                     status: response[i]["status"]
                 })
@@ -49,26 +47,26 @@ export default {
         };
 
         function createInspectionOrder() {
-            router.push("/createInspectionOrder");
+            router.push("inspectionOrder/create");
         }
 
         function editInspectionOrder() {
-            const name = currentRow.value.name
-            router.push(`/${name}/edit`)
+            const inspectionOrderId = currentRow.value.name
+            router.push(`inspectionOrder/${inspectionOrderId}/edit`)
         }
 
         function acceptInspectionOrder() {
-
+            // Nächster Sprint - UserID benötigt
         }
         return {
-            filter: ref(''),
             state,
+            filter: ref(''),
             createInspectionOrder,
             editInspectionOrder,
             acceptInspectionOrder,
             rowClick,
             currentRow,
-            showDialog
+            showDialog,
         }
 
     }
@@ -95,7 +93,7 @@ export default {
         <q-dialog v-model="showDialog">
             <q-card>
                 <q-card-section>
-                    <div class="option-button" @click="editOrder">Bearbeiten</div>
+                    <div class="option-button" @click="editInspectionOrder">Bearbeiten</div>
                     <q-separator />
                     <div class="option-button" @click="deleteOrder">Löschen</div>
                     <q-separator />

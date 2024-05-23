@@ -15,13 +15,13 @@ public class InspectionOrder {
     private String startTime;
     private String endTime;
     private String department;
-    private String data;
+    private String inspectionData;
     private String status;
     private String remarks;
     private boolean archived;
 
     public InspectionOrder(String inspectionOrderId, String courseId, String userId, String startLocation, String endLocation, String startTime, String endTime,
-                           String department, String data, String status, String remarks, boolean archived) {
+                           String department, String inspectionData, String status, String remarks, boolean archived) {
         this.inspectionOrderId = inspectionOrderId;
         this.courseId = courseId;
         this.userId = userId;
@@ -30,7 +30,7 @@ public class InspectionOrder {
         this.startTime = startTime;
         this.endTime = endTime;
         this.department = department;
-        this.data = data;
+        this.inspectionData = inspectionData;
         this.status = status;
         this.remarks = remarks;
         this.archived = archived;
@@ -97,12 +97,12 @@ public class InspectionOrder {
         this.department = department;
     }
 
-    public String getData() {
-        return data;
+    public String getInspectionData() {
+        return inspectionData;
     }
 
-    public void setData(String data) {
-        this.data = data;
+    public void setInspectionData(String inspectionData) {
+        this.inspectionData = inspectionData;
     }
 
     public String getStatus() {
