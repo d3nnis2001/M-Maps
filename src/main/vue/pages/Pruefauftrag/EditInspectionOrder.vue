@@ -15,7 +15,8 @@ export default {
         const department = ref('')
         const inspectionData = ref('')
         const remarks = ref('')
-        const dense = ref(false);
+        const dense = ref(false)
+        const showDialog = ref(false);
 
         onMounted(async () => {
 
@@ -118,37 +119,21 @@ export default {
                 autogrow
             />
 
+            <q-btn label="Status" @click="showDialog = true" />
 
-            <q-btn-dropdown color="red" label="Status" dropdown-icon="change_history">
-                <q-list>
-                    <q-item clickable v-close-popup @click="onItemClick">
-                        <q-item-section>
-                            <q-item-label>beauftragt</q-item-label>
-                        </q-item-section>
-                    </q-item>
-
-                    <q-item clickable v-close-popup @click="onItemClick">
-                        <q-item-section>
-                            <q-item-label>in Bearbeitung</q-item-label>
-                        </q-item-section>
-                    </q-item>
-
-                    <q-item clickable v-close-popup @click="onItemClick">
-                        <q-item-section>
-                            <q-item-label>abgeschlossen</q-item-label>
-                        </q-item-section>
-                    </q-item>
-
-                    <q-item clickable v-close-popup @click="onItemClick">
-                        <q-item-section>
-                            <q-item-label>storniert</q-item-label>
-                        </q-item-section>
-                    </q-item>
-                </q-list>
-            </q-btn-dropdown>
+            <q-dialog v-model="showDialog">
+                <q-card>
+                    <q-card-section>
+                        //Optionen implementieren für die Status Änderung
+                    </q-card-section>
+                    <q-card-section>
+                        <q-btn flat label="Schließen" color="primary" @click="showDialog = false"></q-btn>
+                    </q-card-section>
+                </q-card>
+            </q-dialog>
 
 
-            <q-btn label="Speichern" @click="$router.push('/inspectionOrderOverview')" color="primary" class=""></q-btn>
+            <q-btn label="Speichern" @click="$router.push('/inspectionOrder')" color="primary" class=""></q-btn>
         </div>
     </div>
 

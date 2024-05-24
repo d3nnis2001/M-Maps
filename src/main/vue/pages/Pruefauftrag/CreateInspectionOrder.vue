@@ -15,6 +15,7 @@ export default {
         const department = ref('')
         const inspectionData = ref('')
         const remarks = ref('')
+        const dense = ref(false);
 
         onMounted(async () => {
 
@@ -116,7 +117,7 @@ export default {
                 autogrow
             />
             <q-btn label="Erstellen" @click="sendData" color="primary" class=""></q-btn>
-            <q-btn label="Abbrechen" @click="$router.push('/inspectionOrderOverview')" color="primary" class=""></q-btn>
+            <q-btn label="Abbrechen" @click="$router.push('/inspectionOrder')" color="primary" class=""></q-btn>
         </div>
     </div>
 

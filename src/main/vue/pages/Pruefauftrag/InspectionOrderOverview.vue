@@ -49,9 +49,9 @@ export default {
         function createInspectionOrder() {
             router.push("inspectionOrder/create");
         }
-
         function editInspectionOrder() {
-            const inspectionOrderId = currentRow.value.name
+            const inspectionOrderId = currentRow.value["inspectionOrderId"]
+            console.log(currentRow.value["inspectionOrderId"])
             router.push(`inspectionOrder/${inspectionOrderId}/edit`)
         }
 
