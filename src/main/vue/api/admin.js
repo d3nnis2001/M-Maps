@@ -11,14 +11,15 @@ export const getUserData = async function getData() {
         return false
     }
 }
-function transformData(response) {
-    const arr = []
-    for (let i = 0;i<response.length;i++)
-    {
-        const user = response[i]
-        const details = [user["username"], user["firstname"], user["lastname"], user["service"]]
-        arr.push(details)
+
+export async function editUser(selectedUser, router) {
+    if (selectedUser[0] === undefined) {
+        this.$q.notify({
+            message: "Wähle einen Nutzer aus!",
+            timeout: 5000,
+        });
+    } else {
+        await router.push("/admin/editUser")
+        console.log(selectedUser[0].username)
     }
-    return arr
 }
-export default {getUserData}

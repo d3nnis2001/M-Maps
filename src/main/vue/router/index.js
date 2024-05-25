@@ -13,10 +13,11 @@ import ReparaturOverview from "@/main/vue/pages/ReparaturAufträge/ReparaturOver
 import ReparaturCreate from "@/main/vue/pages/ReparaturAufträge/ReparaturCreate.vue";
 import ReparaturEdit from "@/main/vue/pages/ReparaturAufträge/ReparaturEdit.vue";
 import AdminMain from "@/main/vue/pages/Nutzerverwaltung/AdminMain.vue";
+import EditUser from "@/main/vue/pages/Nutzerverwaltung/EditUser.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
+    routes: [
         {
             path: '/',
             name: 'start',
@@ -81,7 +82,12 @@ const router = createRouter({
             path: "/admin",
             name: "adminmain",
             component: AdminMain
-        }
+        },
+        {
+            path: "/admin/editUser",
+            name: "editUser",
+            component: EditUser
+        },
   ]
 })
 
