@@ -1,20 +1,15 @@
 package com.gpse.basis;
 
-import com.gpse.basis.domain.InspectionOrder;
 import com.gpse.basis.domain.Checklist;
 import com.gpse.basis.domain.GleisLageRange;
+import com.gpse.basis.domain.InspectionOrder;
 import com.gpse.basis.domain.UserModel;
-import com.gpse.basis.repositories.InspectionOrderRepository;
-import com.gpse.basis.repositories.ChecklistRepository;
-import com.gpse.basis.repositories.GleisLageRangeRepository;
-import com.gpse.basis.repositories.ReperaturRepository;
-import com.gpse.basis.repositories.UserRepository;
+import com.gpse.basis.repositories.*;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 @Service
 public class InitializeDatabase implements InitializingBean {
@@ -26,9 +21,8 @@ public class InitializeDatabase implements InitializingBean {
     private final GleisLageRangeRepository glrRepo;
 
     @Autowired
-    public InitializeDatabase(final UserRepository usRepo, final InspectionOrderRepository ioRepo) {
-    public InitializeDatabase(final UserRepository usRepo,
-                              final ReperaturRepository reRepo, final ChecklistRepository checkRepo, final GleisLageRangeRepository r) {
+    public InitializeDatabase(final UserRepository usRepo, final InspectionOrderRepository ioRepo, final ReperaturRepository reRepo,
+        final ChecklistRepository checkRepo, final GleisLageRangeRepository r) {
         this.usRepo = usRepo;
         this.ioRepo = ioRepo;
         this.reRepo = reRepo;
