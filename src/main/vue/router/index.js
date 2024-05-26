@@ -13,8 +13,9 @@ import AdminMain from "@/main/vue/pages/Nutzerverwaltung/AdminMain.vue";
 import ReparaturOverview from "@/main/vue/pages/ReparaturAufträge/ReparaturOverview.vue";
 import ReparaturCreate from "@/main/vue/pages/ReparaturAufträge/ReparaturCreate.vue";
 import ReparaturEdit from "@/main/vue/pages/ReparaturAufträge/ReparaturEdit.vue";
-import checklistOverview from "@/main/vue/pages/checklists/ChecklistOverview.vue";
+import checklistOverview from "@/main/vue/pages/checklists/ChecklistList.vue";
 import checklistCreate from "@/main/vue/pages/checklists/ChecklistCreate.vue";
+import checklistSingle from "@/main/vue/pages/checklists/ChecklistSingle.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -93,6 +94,11 @@ const router = createRouter({
             path: "/checklists/create",
             name: "checklistCreate",
             component: checklistCreate,
+        },
+        {
+            path: "/checklists/:name",
+            name: "checklistSingle",
+            component: checklistSingle,
         }
     ]
 })

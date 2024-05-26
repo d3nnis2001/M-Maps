@@ -2,10 +2,12 @@ package com.gpse.basis.services;
 
 import com.gpse.basis.domain.ChecklistTemplate;
 import com.gpse.basis.repositories.ChecklistTemplateRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ChecklistTemplateServiceImpl implements ChecklistTemplateService {
@@ -35,5 +37,11 @@ public class ChecklistTemplateServiceImpl implements ChecklistTemplateService {
         ChecklistTemplate newChecklist = new ChecklistTemplate(name, tasks, material);
         checklistTemplateRepository.save(newChecklist);
         return true;
+    }
+
+    @Override
+    public Optional<ChecklistTemplate> getTemplate(String name) {
+        Optional<ChecklistTemplate> template = checklistTemplateRepository.findById(name);
+        return template;
     }
 }

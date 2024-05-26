@@ -9,5 +9,8 @@ export default {
     },
     addChecklist(checklist) {
         return axios.post('/api/templates/create', checklist)
+    },
+    getTemplate(name) {
+        return axios.get(`/api/templates/${name}`)
     }
 }

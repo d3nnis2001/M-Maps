@@ -18,7 +18,9 @@ onMounted(async () => {
     <div class="items-center text-align">
         <q-list class="items-center text-align" separator padding>
             <q-item v-for="name in checklistNames">
-                <q-btn color="primary" flat :label="name" />
+                <RouterLink :to="`checklists/${name}`">
+                    <q-btn color="primary" flat :label="name" />
+                </RouterLink>
             </q-item>
         </q-list>
         <router-link to="/checklists/create">
