@@ -63,7 +63,7 @@ export default {
             const inputs = checkInputs()
             console.log(inputs)
             if (inputs) {
-                router.push('/inspectionOrderOverview')
+                router.push('/inspectionOrder')
                 return sendInspectionOrder(courseId.value, startLocation.value, endLocation.value, startTime.value,
                     endTime.value, department.value, inspectionData.value, remarks.value)
 

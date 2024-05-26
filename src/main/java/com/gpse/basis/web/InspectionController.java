@@ -44,14 +44,18 @@ public class InspectionController {
 
     @GetMapping("/getById")
     public InspectionOrder getDataById(final WebRequest request) {
-        InspectionOrder inspection = inspec.loadInspecById(request.getParameter("streckenId"));
+        InspectionOrder inspection = inspec.loadInspecById(request.getParameter("inspectionOrderId"));
         return inspection;
-
     }
 
     @PostMapping("/sendById")
-    public InspectionOrder sendDataById() {
-        return null;
+    public void sendDataById(final WebRequest request) {
+        InspectionOrder inspectionOrderNew = new InspectionOrder(request.getParameter("inspectionOrderId"),
+            request.getParameter("courseId"), "", request.getParameter("startLocation"),
+            request.getParameter("endLocation"), request.getParameter("startTime"),
+            request.getParameter("endTime"), request.getParameter("department"),
+            request.getParameter("inspectionData"), "", request.getParameter("remarks"), false);
+        inspec.editInspectionOrder(inspectionOrderNew);
     }
 
 }

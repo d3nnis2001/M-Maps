@@ -39,9 +39,17 @@ public class InspectionServicesImpl implements InspectionServices {
     }
 
     @Override
-    public void editInspectionOrder(InspectionOrder inspectionOrder) {
-
-
+    public void editInspectionOrder(InspectionOrder inspecNew) {
+        InspectionOrder inspecOld = loadInspecById(inspecNew.getInspectionOrderId());
+        inspecOld.setCourseId(inspecNew.getCourseId());
+        inspecOld.setStartLocation(inspecNew.getStartLocation());
+        inspecOld.setEndLocation(inspecNew.getEndLocation());
+        inspecOld.setStartTime(inspecNew.getStartTime());
+        inspecOld.setEndTime(inspecNew.getEndTime());
+        inspecOld.setDepartment(inspecNew.getDepartment());
+        inspecOld.setInspectionData(inspecNew.getInspectionData());
+        inspecOld.setRemarks(inspecNew.getRemarks());
+        inspec.save(inspecOld);
     }
 
     @Override
@@ -58,13 +66,12 @@ public class InspectionServicesImpl implements InspectionServices {
             InspectionOrder inspec = iterator.next();
             inspecArray.add(inspec);
         }
-        System.out.println("TEST-getInspecData");
         return inspecArray;
     }
 
     @Override
-    public InspectionOrder loadInspecById(String streckenId) throws UsernameNotFoundException {
-        return inspec.findById(streckenId).orElseThrow(()
-            -> new UsernameNotFoundException("Inspection Id " + streckenId + " not found."));
+    public InspectionOrder loadInspecById(String inspectionOrderId) throws UsernameNotFoundException {
+        return inspec.findById(inspectionOrderId).orElseThrow(()
+            -> new UsernameNotFoundException("Inspection Order Id " + inspectionOrderId + " not found."));
     }
 }

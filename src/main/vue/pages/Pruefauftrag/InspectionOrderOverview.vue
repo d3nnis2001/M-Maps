@@ -7,7 +7,7 @@ export default {
     setup () {
         const state = reactive ({
             filter: '',
-            columns: [   // field: row => row.name
+            columns: [
                 { name: 'inspectionOrderId', required: true, label: 'ID', align: 'left', field: row => row.inspectionOrderId, format: val => `${val}`, sortable: true },
                 { name: 'startLocation', label: 'Startort', align: 'left', field: 'startLocation', sortable: true },
                 { name: 'endLocation', label: 'Zielort', align: 'left', field: 'endLocation', sortable: true },
@@ -95,10 +95,12 @@ export default {
                 <q-card-section>
                     <div class="option-button" @click="editInspectionOrder">Bearbeiten</div>
                     <q-separator />
+                    <!--
                     <div class="option-button" @click="deleteOrder">Löschen</div>
                     <q-separator />
                     <div class="option-button" @click="archiveOrder">Archivieren</div>
                     <q-separator />
+                    -->
                     <div class="option-button" @click="acceptInspectionOrder">Auftrag annehmen</div>
                 </q-card-section>
                 <q-card-section>
