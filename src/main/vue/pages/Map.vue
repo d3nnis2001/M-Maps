@@ -1,23 +1,398 @@
 <script setup>
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import {onMounted} from 'vue';
-
-onMounted(() => {
-    const map = L.map('map').setView([52.0368609707235, 8.49525289846377], 13);
-
+import {onMounted, ref} from 'vue';
+import {geoData, getTrack, getPartOfTrack, getPartOfGleislage} from "@/main/vue/api/map";
+import {useQuasar} from "quasar";
+const map = ref(null);
+var markers = [];
+const streckenID = ref('')
+const date2 = ref('')
+const date = ref('')
+const alert =  ref(false)
+const alert2 =  ref(false)
+const dialogVisible = ref(false);
+const $q = useQuasar()
+const markerStart = ref('')
+const markerEnd = ref('')
+const kmStart = ref('')
+const kmEnd = ref('')
+const selectedMarker = ref('')
+onMounted(async () => {
+    map.value = L.map('map', {
+        center: [51.1657, 10.4515],
+        zoom: 6,
+        maxBounds: [
+            [55.0583, 5.8662],
+            [47.2701, 15.0419]
+        ]
+    });
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    }).addTo(map);
-})
-
+    }).addTo(map.value);
+    new L.TileLayer('http://{s}.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png',
+        {
+            attribution: '<a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors</a>, Style: <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA 2.0</a> <a href="http://www.openrailwaymap.org/">OpenRailwayMap</a> and OpenStreetMap',
+            minZoom: 6,
+            maxZoom: 19,
+            tileSize: 256
+        }).addTo(map.value);
+    const data = await geoData();
+    data.forEach((m) => markers.push({
+        marker : L.circle([m.longitude, m.latitude], {color: "black", radius: 50}),
+        data: m,
+    }));
+    markers.forEach((m) => {
+        m.marker.addTo(map.value);
+        m.marker.on('click', onMarkerClicked);
+    });
+    map.value.on('locationfound', onLocationFound);
+    map.value.locate({setView: false});
+});
+const onMarkerClicked = (event) => {
+    const circle = event.target;
+    const marker = markers.find((m) => {
+        return m.data.longitude === circle.getLatLng().lat && m.data.latitude === circle.getLatLng().lng;
+    });
+    selectedMarker.value = marker
+    dialogVisible.value = true;
+    console.log(marker.data.latitude)
+    console.log(marker.data.longitude)
+};
+const deleteStart = () => {
+    markerStart.value = null;
+    kmStart.value = '';
+};
+const deleteEnd = () => {
+    markerEnd.value = null;
+    kmEnd.value = '';
+};
+const addStart = () => {
+    markerStart.value = selectedMarker;
+    kmStart.value = selectedMarker.value.data.track_km;
+};
+const addEnd = () => {
+    markerEnd.value = selectedMarker;
+    kmEnd.value = selectedMarker.value.data.track_km;
+};
+const refreshMarkers = async () => {
+    if (streckenID.value === "") {
+        $q.notify({
+            type: 'negative',
+            message: "Please enter a Track ID",
+            caption: 'Choose please'
+        });
+    } else {
+        const data = await getTrack(streckenID.value);
+        console.log(data.length)
+        if (data.length === 0) {
+            $q.notify({
+                type: 'negative',
+                message: "Track ID doesn't exist",
+                caption: 'Please choose a different Track ID'
+            });
+        }
+        markers.forEach((m) => map.value.removeLayer(m.marker));
+        markers = []
+        for (let i = 0;i<data.length;i++) {
+            markers.push({
+                marker : L.circle([data[i].longitude, data[i].latitude], {color: "black", radius: 50}),
+                data: data[i],
+            });
+        }
+        markers.forEach((m) => {
+            m.marker.addTo(map.value);
+            m.marker.on('click', onMarkerClicked);
+        });
+        checkForChanges()
+    }
+};
+const onLocationFound = (e) => {
+    const radius = e.accuracy;
+    const userLocation = e.latlng;
+    L.circle(userLocation, { color: 'blue', radius: 200}).addTo(map.value);
+}
+const centerToUserLocation = async () => {
+    const options = {
+        setView: true,
+        maxZoom: 12,
+        animate: true
+    }
+    map.value.locate(options).on('locationfound', onLocationFound);
+    const gleis = await getPartOfGleislage(streckenID.value)
+    console.log(gleis)
+};
+const checkForChanges = async () => {
+    if (kmStart.value !== '' && kmEnd.value !== '' && streckenID.value !== "") {
+        console.log(kmStart.value)
+        const data = await getPartOfTrack(kmStart.value, kmEnd.value)
+        console.log(data)
+        markers.forEach((m) => map.value.removeLayer(m.marker));
+        markers = []
+        for (let i = 0;i<data.length;i++) {
+            markers.push({
+                marker : L.circle([data[i].longitude, data[i].latitude], {color: "black", radius: 50}),
+                data: data[i],
+            });
+        }
+        markers.forEach((m) => {
+            m.marker.addTo(map.value);
+            m.marker.on('click', onMarkerClicked);
+        });
+    } else {
+    }
+}
 </script>
-
 <template>
-    <div id="map"></div>
+    <div class="mapSettings">
+        <div class="row putStart">
+            <div class="">
+                <q-expansion-item
+                    icon="settings"
+                    label="Optionen"
+                    expand-icon="arrow_drop_down"
+                    dense
+                    class="expansion_settings"
+                >
+                    <q-list>
+                        <q-item clickable v-ripple>
+                            <q-item-section>
+                                <div class="expan_items" @click="alert2=true">
+                                    Zeitraum
+                                </div>
+                            </q-item-section>
+                        </q-item>
+                        <q-item clickable v-ripple>
+                            <q-item-section>
+                                <div class="expan_items" @click="alert=true">
+                                    Strecken-ID auswählen
+                                </div>
+                            </q-item-section>
+                        </q-item>
+                    </q-list>
+                </q-expansion-item>
+            </div>
+            <div class="    ">
+                <q-btn
+                    class="button_settings"
+                    icon="my_location"
+                    round
+                    flat
+                    @click="centerToUserLocation"
+                    aria-label="Center to User's Location"
+                />
+            </div>
+        </div>
+        <div id="map"></div>
+        <div class="flexbox_map">
+            <q-dialog v-model="alert2">
+                <q-card>
+                    <q-card-section>
+                        <div class="text-h6">Wähle einen Zeitraum</div>
+                    </q-card-section>
+                    <q-card-section class="q-pt-none">
+                        <div class="q-pa-md" style="max-width: 300px">
+                            <q-input filled v-model="date">
+                                <template v-slot:prepend>
+                                    <q-icon name="event" class="cursor-pointer">
+                                        <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                                            <q-date v-model="date" mask="YYYY-MM-DD HH:mm">
+                                                <div class="row items-center justify-end">
+                                                    <q-btn v-close-popup label="Close" color="primary" flat />
+                                                </div>
+                                            </q-date>
+                                        </q-popup-proxy>
+                                    </q-icon>
+                                </template>
+                                <template v-slot:append>
+                                    <q-icon name="access_time" class="cursor-pointer">
+                                        <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                                            <q-time v-model="date" mask="YYYY-MM-DD HH:mm" format24h>
+                                                <div class="row items-center justify-end">
+                                                    <q-btn v-close-popup label="Close" color="primary" flat />
+                                                </div>
+                                            </q-time>
+                                        </q-popup-proxy>
+                                    </q-icon>
+                                </template>
+                            </q-input>
+                        </div>
+                        <div class="q-pa-md" style="max-width: 300px">
+                            <q-input filled v-model="date2">
+                                <template v-slot:prepend>
+                                    <q-icon name="event" class="cursor-pointer">
+                                        <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                                            <q-date v-model="date2" mask="YYYY-MM-DD HH:mm">
+                                                <div class="row items-center justify-end">
+                                                    <q-btn v-close-popup label="Close" color="primary" flat />
+                                                </div>
+                                            </q-date>
+                                        </q-popup-proxy>
+                                    </q-icon>
+                                </template>
+                                <template v-slot:append>
+                                    <q-icon name="access_time" class="cursor-pointer">
+                                        <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                                            <q-time v-model="date2" mask="YYYY-MM-DD HH:mm" format24h>
+                                                <div class="row items-center justify-end">
+                                                    <q-btn v-close-popup label="Close" color="primary" flat />
+                                                </div>
+                                            </q-time>
+                                        </q-popup-proxy>
+                                    </q-icon>
+                                </template>
+                            </q-input>
+                        </div>
+                    </q-card-section>
+                    <q-card-actions align="center">
+                        <q-btn flat label="Filter anwenden" color="primary" v-close-popup/>
+                        <q-btn flat label="Abbrechen" color="primary" v-close-popup />
+                    </q-card-actions>
+                </q-card>
+            </q-dialog>
+            <q-dialog v-model="alert">
+                <q-card>
+                    <q-card-section>
+                        <div class="text-h6">Wähle eine Strecken-ID</div>
+                    </q-card-section>
+                    <q-input class="" v-model="streckenID" label="Strecken-ID Eingabe"/>
+                    <q-card-actions align="center">
+                        <q-btn @click="refreshMarkers" flat label="Filter anwenden" color="primary" v-close-popup/>
+                        <q-btn flat label="Abbrechen" color="primary" v-close-popup />
+                    </q-card-actions>
+                </q-card>
+            </q-dialog>
+        </div>
+    </div>
+    <q-dialog class="dialog_map" v-model="dialogVisible">
+        <div class="">
+            <div class="col">
+                <div class="row">
+                    <q-card flat square class="col borderFirst">
+                        <div class="row">
+                            <q-input class="full-width" v-model="kmStart" label="Kilometer Start" readonly/>
+                            <q-btn
+                                size="l"
+                                flat
+                                round
+                                icon="add"
+                                @click="addStart"
+                            />
+                            <q-btn
+                                size="l"
+                                flat
+                                round
+                                icon="delete"
+                                @click="deleteStart"
+                            />
+                        </div>
+                    </q-card>
+                    <q-card flat square class="col borderSecond">
+                        <div class="row">
+                            <q-input class="full-width" v-model="kmEnd" label="Kilometer End" readonly/>
+                            <q-btn
+                                size="l"
+                                flat
+                                round
+                                icon="add"
+                                @click="addEnd"
+                            />
+                            <q-btn
+                                size="l"
+                                flat
+                                round
+                                icon="delete"
+                                @click="deleteEnd"
+                            />
+                        </div>
+                    </q-card>
+                </div>
+                <q-card flat square bordered>
+                    <q-card-actions align="center">
+                        <q-btn flat @click="checkForChanges" label="Speichern" color="primary" v-close-popup />
+                    </q-card-actions>
+                </q-card>
+            </div>
+        </div>
+    </q-dialog>
 </template>
-
 <style>
-#map { height: 720px; width: 95%; margin: 48px }
+.full-width {
+    flex: 1;
+    margin: 0;
+    width: 100%;
+}
+.borderFirst {
+    border-right: 1px solid black;
+    border-bottom: 2px solid black;
+}
+.borderSecond {
+    border-left: 1px solid black;
+    border-bottom: 2px solid black;
+}
+.expansion_settings {
+    background-color: #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+}
+.margin-right-con {
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+}
+.expan_items {
+    font-weight: bold;
+}
+#map {
+    width: 95vw;
+    height: 80vh;
+    border: 3px solid black;
+}
+.mapSettings {
+    flex-direction: column;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+.putStart {
+    display: flex;
+    width: 100%;
+    justify-content: start;
+    margin-left: 5vw;
+    margin-top: 20px;
+}
+.flexbox_map {
+    margin: 20px;
+    display: flex;
+    flex-direction: column;
+}
+.button_settings {
+}
 </style>
+<script>
+import { ref } from 'vue'
+const columns = [
+    {
+        name: 'desc',
+        required: true,
+        align: 'left',
+        field: row => row.name,
+        sortable: true
+    },
+    { name: 'StreckenID', align: 'center', label: 'Strecken-ID', field: 'streckenid', sortable: true }
+]
+const rows = [
+    {
+        streckenid: '6060'
+    },
+    {
+        streckenid: '6061'
+    }
+]
+const options = [
+    "Zeitraum",
+    "ID des Streckenabschnitts",
+    "Abschnitt der Karte"
+]
+</script>

@@ -9,6 +9,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Optional;
 
 @Service
@@ -68,5 +71,17 @@ public class UserServicesImpl implements UserServices {
         us.setPassword(password);
         userRepo.save(us);
         return true;
+    }
+    @Override
+    public ArrayList<UserModel> getAllUsers() {
+        Iterable<UserModel> iterable = userRepo.findAll();
+        ArrayList<UserModel> users = new ArrayList<>();
+        Iterator<UserModel> iterator = iterable.iterator();
+        while (iterator.hasNext()) {
+            UserModel userModel = iterator.next();
+            users.add(userModel);
+            System.out.println(userModel.getLastname());
+        }
+        return users;
     }
 }

@@ -12,6 +12,10 @@ import Start from "../pages/Start.vue";
 import InspectionOrderOverview from "@/main/vue/pages/Pruefauftrag/InspectionOrderOverview.vue";
 import CreateInspectionOrder from "../pages/Pruefauftrag/CreateInspectionOrder.vue";
 import EditInspectionOrder from "../pages/Pruefauftrag/EditInspectionOrder.vue";
+import ReparaturOverview from "@/main/vue/pages/ReparaturAufträge/ReparaturOverview.vue";
+import ReparaturCreate from "@/main/vue/pages/ReparaturAufträge/ReparaturCreate.vue";
+import ReparaturEdit from "@/main/vue/pages/ReparaturAufträge/ReparaturEdit.vue";
+import AdminMain from "@/main/vue/pages/Nutzerverwaltung/AdminMain.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -60,21 +64,6 @@ const router = createRouter({
             path: "/reset-password",
             name: "setNewPassword",
             component: ResetPassword
-        },
-        {
-            path: "/inspectionOrder",
-            name: "inspectionOrderOverview",
-            component: InspectionOrderOverview
-        },
-        {
-            path: "/inspectionOrder/create",
-            name: "createInspectionOrder",
-            component: CreateInspectionOrder
-        },
-        {
-            path: "/inspectionOrder/:inspectionOrderId/edit",
-            name: "editInspectionOrder",
-            component: EditInspectionOrder
         }
   ]
 })

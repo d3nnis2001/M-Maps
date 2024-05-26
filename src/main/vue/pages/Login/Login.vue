@@ -3,8 +3,14 @@ import {ref} from 'vue'
 import {useLoginStore} from "../../stores/LoginStore"
 import {useQuasar} from 'quasar'
 import {useRouter} from 'vue-router'
+import Impressum from "@/main/vue/pages/Login/Impressum.vue";
+import Heading from "@/main/vue/pages/Login/Heading.vue";
+import Description from "@/main/vue/pages/Login/Description.vue";
+import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";
+import StandardCard from "@/main/vue/pages/Login/StandardCard.vue";
 
 export default {
+    components: {StandardCard, StandardInput, Description, Heading, Impressum},
     setup() {
         const $q = useQuasar()
         const router = useRouter()
@@ -23,7 +29,7 @@ export default {
                 try {
                     const emailExists = await loginStore.checkEmail(email.value);
                     if (emailExists) {
-                        await router.push('password?email='+email.value);
+                        await router.push('password?email=' + email.value);
                     } else {
                         $q.notify({
                             type: 'negative',
@@ -45,90 +51,38 @@ export default {
         function navigateRegister() {
             router.push("/register")
         }
+
         return {email, login, navigateRegister}
     }
 }
 
 </script>
 <template>
-    <div class="full-height-center">
-        <div class="content-container">
-            <div class="items-center">
-                <q-card class="q-pa-md">
-                    <q-card-section class="inner-card">
-                    <div class="row-auto text-align extra-padding">
-                        <img src="../../../resources/db-logo.png" alt="Nicht verfügbar">
-                    </div>
-                    <div class="row-auto extra-padding">
-                        <div class="text-h4 text-align ">Einloggen</div>
-                    </div>
-                    <div class="row-auto extra-padding">
-                        <div class="rectangle"></div>
-                    </div>
-                    <div class="row-auto extra-padding">
-                        <div class="text-align">
-                            Bitte geben Sie Ihre E-Mail-Adresse ein
-                        </div>
-                    </div>
-                    <div class="row-auto text-align extra-padding">
-                        <q-input class="email-input extra-padding" v-model="email" label="E-Mail Adresse"/>
-                        <div class="text-align extra-padding" @click="navigateRegister">
-                            Registrieren
-                        </div>
-                        <q-btn label="Anmelden" @click="login()" color="primary" class=""></q-btn>
-                    </div>
-                    <div class="bg-grey-4 impressum-padding">
-                        <div class="text-black text-align justify-center">Impressum</div>
-                    </div>
-                    </q-card-section>
-                </q-card>
-            </div>
+    <StandardCard>
+        <Heading>Anmelden</Heading>
+        <Description>Bitte geben Sie Ihre E-Mail Adresse ein.</Description>
+        <div class="row-auto text-align padding-xl">
+            <StandardInput label="E-Mail Adresse" v-model="email"></StandardInput>
+            <span class="padding-right">
+                        <q-btn label="Registrieren" outline color="primary" @click="navigateRegister"></q-btn>
+                    </span>
+            <q-btn label="Anmelden" @click="login()" color="primary" class=""></q-btn>
         </div>
-    </div>
+        <Impressum></Impressum>
+    </StandardCard>
 </template>
 
 <style scoped>
 
-.full-height-center {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    width: 100%;
+.padding-xl {
+    padding-bottom: 64px;
 }
 
-.impressum-padding {
-    padding-bottom: 200px;
-}
-
-.extra-padding {
-    padding-bottom: 20px;
-}
-
-.content-container {
-    width: calc(100% - 40px);
-    max-width: 500px;
-    padding: 20px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.6);
-    background: white;
-}
-
-.email-input {
-    width: 100%;
-    max-width: 300px;
-    margin: 0 auto;
+.padding-right {
+    padding-right: 8px;
 }
 
 .text-align {
     text-align: center;
-}
-
-.rectangle {
-    width: 72px;
-    height: 7px;
-    background-color: rgba(236, 0, 22, 1);
-    border-radius: 20px;
-    margin: auto;
 }
 </style>

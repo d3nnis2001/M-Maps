@@ -20,7 +20,7 @@ public class UserModel implements UserDetails {
     private String email;
     @JsonIgnore
     private String password;
-    private  String firstname;
+    private String firstname;
     private String passwordToken;
     private String lastname;
     private ArrayList<String> region;
