@@ -13,6 +13,9 @@ import ReparaturOverview from "@/main/vue/pages/ReparaturAufträge/ReparaturOver
 import ReparaturCreate from "@/main/vue/pages/ReparaturAufträge/ReparaturCreate.vue";
 import ReparaturEdit from "@/main/vue/pages/ReparaturAufträge/ReparaturEdit.vue";
 import AdminMain from "@/main/vue/pages/Nutzerverwaltung/AdminMain.vue";
+import Dataviewer from "@/main/vue/pages/Dataviewer/Dataviewer.vue";
+import DataviewerRoute from "@/main/vue/pages/Dataviewer/DataviewerRoute.vue";
+import DataviewerPoint from "@/main/vue/pages/Dataviewer/DataviewerPoint.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -81,6 +84,21 @@ const router = createRouter({
             path: "/admin",
             name: "adminmain",
             component: AdminMain
+        },
+        {
+            path: "/dataviewer",
+            name: "Dataviewer",
+            component: Dataviewer
+        },
+        {
+            path: "/dataviewer/route/:id",
+            name: "DataviewerRoute",
+            component: DataviewerRoute
+        },
+        {
+            path: "/dataviewer/point/:id",
+            name: "DataviewerPoint",
+            component: DataviewerPoint
         }
   ]
 })
