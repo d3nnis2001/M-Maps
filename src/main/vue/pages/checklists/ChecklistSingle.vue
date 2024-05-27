@@ -3,20 +3,40 @@
 import { useChecklistTemplateStore } from "@/main/vue/stores/checklistTemplateStore";
 import { storeToRefs } from "pinia";
 import {onMounted} from "vue";
-import {useRoute} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
+import {useQuasar} from "quasar";
 import CheckPointList from "@/main/vue/pages/checklists/CheckPointList.vue";
 
 const checklistTemplateStore = useChecklistTemplateStore()
-
+const $q = useQuasar()
 const route = useRoute()
+const router = useRouter()
 
 const {name} = route.params
 
-const { template } = storeToRefs(checklistTemplateStore)
+const { template, templateName, templateDeleted} = storeToRefs(checklistTemplateStore)
 
 onMounted(async () => {
     await checklistTemplateStore.getTemplate(name)
 })
+
+function deleteTemplate() {
+    checklistTemplateStore.deleteTemplate(template.name)
+    if (!templateDeleted) {
+        $q.notify({
+            type: 'negative',
+            message: 'Fehler',
+            caption: 'Die Checkliste konnte nicht entfernt werden.'
+        })
+    } else {
+        $q.notify({
+            type: 'positive',
+            message: 'Erfolg',
+            caption: 'Die Checkliste wurde erfolgreich entfernt.'
+        })
+    }
+    router.push("/checklists")
+}
 </script>
 
 <template>
@@ -34,7 +54,7 @@ onMounted(async () => {
         <CheckPointList :list="template.material" />
     </div>
     <span>
-        <q-btn label="Checkliste löschen" outline color="negative"/>
+        <q-btn label="Checkliste löschen" outline color="negative" @click="deleteTemplate"/>
         <q-btn label="Checkliste bearbeiten" color="primary"/>
     </span>
 </template>

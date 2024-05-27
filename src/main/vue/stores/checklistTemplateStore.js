@@ -6,8 +6,10 @@ export const useChecklistTemplateStore = defineStore('checklistTemplates', () =>
     const checklistNames = ref([])
     const templates = ref([])
     const template = ref({name:"", tasks:[], material:[]})
+    const templateName = ref("")
     const invalidInput = ref(false)
     const templateAdded = ref(true)
+    const templateDeleted = ref(true)
     const listsEmpty = ref(false)
 
     function getAllChecklistTemplateNames() {
@@ -93,17 +95,40 @@ export const useChecklistTemplateStore = defineStore('checklistTemplates', () =>
         })
     }
 
+    function deleteTemplate(name) {
+        return new Promise((resolve, reject) => {
+            api.checklistTemplate.deleteTemplate(name)
+                .then(res => {
+                    templateName.value = res.data
+                    const index = templates.value.findIndex(
+                        (item) => item.name === templateName.value)
+                    if (index !== -1) {
+                        templates.value.splice(index, 1)
+                    }
+                    templateDeleted.value = true
+                    resolve()
+                })
+                .catch(() => {
+                    templateDeleted.value = false
+                    reject()
+                })
+        })
+    }
+
     return {
         checklistNames,
         templates,
         template,
+        templateName,
         invalidInput,
         templateAdded,
+        templateDeleted,
         listsEmpty,
         getTemplate,
         getAllChecklistTemplateNames,
         getAllTemplates,
         addChecklist,
+        deleteTemplate
     }
 
 })

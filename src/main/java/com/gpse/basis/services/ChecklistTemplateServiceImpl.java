@@ -2,7 +2,6 @@ package com.gpse.basis.services;
 
 import com.gpse.basis.domain.ChecklistTemplate;
 import com.gpse.basis.repositories.ChecklistTemplateRepository;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
@@ -41,7 +40,11 @@ public class ChecklistTemplateServiceImpl implements ChecklistTemplateService {
 
     @Override
     public Optional<ChecklistTemplate> getTemplate(String name) {
-        Optional<ChecklistTemplate> template = checklistTemplateRepository.findById(name);
-        return template;
+        return checklistTemplateRepository.findById(name);
+    }
+
+    @Override
+    public void deleteTemplate(ChecklistTemplate template) {
+        checklistTemplateRepository.delete(template);
     }
 }

@@ -12,5 +12,8 @@ export default {
     },
     getTemplate(name) {
         return axios.get(`/api/templates/${name}`)
+    },
+    deleteTemplate(name) {
+        return axios.delete(`/api/templates/delete/${name}`)
     }
 }
