@@ -47,4 +47,9 @@ public class ChecklistTemplateController {
         checklistTemplateService.deleteTemplate(templateName);
         return templateName;
     }
+
+    @PostMapping("/duplicate")
+    public String addDuplicate(@RequestBody ChecklistTemplate template) {
+        return checklistTemplateService.duplicateTemplate(template);
+    }
 }

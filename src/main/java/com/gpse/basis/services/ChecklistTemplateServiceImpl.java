@@ -47,4 +47,13 @@ public class ChecklistTemplateServiceImpl implements ChecklistTemplateService {
     public void deleteTemplate(String templateName) {
         checklistTemplateRepository.deleteById(templateName);
     }
+
+    @Override
+    public String duplicateTemplate(ChecklistTemplate template) {
+        String modifiedTemplateName = template.getName() + " Kopie";
+        while (!addChecklist(modifiedTemplateName, template.getTasks(), template.getMaterial())) {
+            modifiedTemplateName += " Kopie";
+        }
+        return modifiedTemplateName;
+    }
 }

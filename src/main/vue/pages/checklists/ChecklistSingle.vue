@@ -14,7 +14,7 @@ const router = useRouter()
 
 const {name} = route.params
 
-const {template, templateName, templateDeleted} = storeToRefs(checklistTemplateStore)
+const {template, templateName, templateDeleted, templateAdded} = storeToRefs(checklistTemplateStore)
 
 onMounted(async () => {
     await checklistTemplateStore.getTemplate(name)
@@ -34,8 +34,26 @@ function deleteTemplate() {
             message: 'Erfolg',
             caption: 'Die Checkliste wurde erfolgreich entfernt.'
         })
+        router.push("/checklists")
     }
-    router.push("/checklists")
+}
+
+function duplicateTemplate() {
+    checklistTemplateStore.duplicateTemplate()
+    if (!templateAdded) {
+        $q.notify({
+            type: 'negative',
+            message: 'Fehler',
+            caption: 'Die Checkliste konnte nicht dupliziert werden.'
+        })
+    } else {
+        $q.notify({
+            type: 'positive',
+            message: 'Erfolg',
+            caption: 'Die Checkliste wurde erfolgreich dupliziert.'
+        })
+        router.push("/checklists")
+    }
 }
 </script>
 
@@ -54,8 +72,9 @@ function deleteTemplate() {
         <CheckPointList :list="template.material" />
     </div>
     <span>
-        <q-btn label="Checkliste löschen" outline color="negative" @click="deleteTemplate"/>
-        <q-btn label="Checkliste bearbeiten" color="primary"/>
+        <q-btn label="löschen" outline color="negative" @click="deleteTemplate"/>
+        <q-btn label="duplizieren" outline color="primary" @click="duplicateTemplate" />
+        <q-btn label="bearbeiten" color="primary"/>
     </span>
 </template>
 

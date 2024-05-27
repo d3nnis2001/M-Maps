@@ -6,7 +6,7 @@ import {storeToRefs} from "pinia";
 
 const checklistTemplateStore = useChecklistTemplateStore()
 
-const { checklistNames } = storeToRefs(checklistTemplateStore)
+const { templateNames } = storeToRefs(checklistTemplateStore)
 
 onMounted(async () => {
     await checklistTemplateStore.getAllChecklistTemplateNames()
@@ -17,7 +17,7 @@ onMounted(async () => {
     <h3 class="items-center text-align">Checklisten</h3>
     <div class="items-center text-align">
         <q-list class="items-center text-align" separator padding>
-            <q-item v-for="name in checklistNames">
+            <q-item v-for="name in templateNames">
                 <RouterLink :to="`checklists/${name}`">
                     <q-btn color="primary" flat :label="name" />
                 </RouterLink>

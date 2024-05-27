@@ -13,4 +13,5 @@ public interface ChecklistTemplateService {
     Optional<ChecklistTemplate> getTemplate(String name);
 
     void deleteTemplate(String templateName);
+    String duplicateTemplate(ChecklistTemplate template);
 }

@@ -3,9 +3,9 @@ import {ref} from 'vue';
 import api from '../api';
 
 export const useChecklistTemplateStore = defineStore('checklistTemplates', () => {
-    const checklistNames = ref([])
+    const templateNames = ref([])
     const templates = ref([])
-    const template = ref({name:"", tasks:[], material:[]})
+    const template = ref({name: "", tasks: [], material: []})
     const templateName = ref("")
     const invalidInput = ref(false)
     const templateAdded = ref(true)
@@ -16,7 +16,7 @@ export const useChecklistTemplateStore = defineStore('checklistTemplates', () =>
         return new Promise((resolve, reject) => {
             api.checklistTemplate.getAllChecklistNames()
                 .then(res => {
-                    checklistNames.value = res.data
+                    templateNames.value = res.data
                     resolve()
                 })
                 .catch(() => {
@@ -38,7 +38,7 @@ export const useChecklistTemplateStore = defineStore('checklistTemplates', () =>
         })
     }
 
-    function nameNotAllowed(name)  {
+    function nameNotAllowed(name) {
         const pattern = /^.*\S.*/;
         if (!pattern.test(name)) {
             invalidInput.value = true
@@ -82,6 +82,7 @@ export const useChecklistTemplateStore = defineStore('checklistTemplates', () =>
             })
         }
     }
+
     function getTemplate(name) {
         return new Promise((resolve, reject) => {
             api.checklistTemplate.getTemplate(name)
@@ -103,7 +104,7 @@ export const useChecklistTemplateStore = defineStore('checklistTemplates', () =>
                     const index = templates.value.findIndex(
                         (item) => item.name === templateName.value)
                     if (index !== -1) {
-                        templates.value.splice(index, 1)
+                        templateNames.value.splice(index, 1)
                     }
                     templateDeleted.value = true
                     resolve()
@@ -115,8 +116,28 @@ export const useChecklistTemplateStore = defineStore('checklistTemplates', () =>
         })
     }
 
+    function duplicateTemplate() {
+        return new Promise((resolve, reject) => {
+            api.checklistTemplate.duplicateTemplate(template.value)
+                .then(res => {
+                    templateAdded.value = true
+                    templateName.value = res.data
+                    const index = templateNames.value.findIndex(
+                        (item) => item.name === template.value.name)
+                    if (index !== -1) {
+                        templateNames.value.splice(index, 0, templateName.value)
+                    }
+                    resolve()
+                })
+                .catch(() => {
+                    templateAdded.value = false
+                    reject()
+                })
+        })
+    }
+
     return {
-        checklistNames,
+        templateNames,
         templates,
         template,
         templateName,
@@ -128,7 +149,8 @@ export const useChecklistTemplateStore = defineStore('checklistTemplates', () =>
         getAllChecklistTemplateNames,
         getAllTemplates,
         addChecklist,
-        deleteTemplate
+        deleteTemplate,
+        duplicateTemplate
     }
 
 })

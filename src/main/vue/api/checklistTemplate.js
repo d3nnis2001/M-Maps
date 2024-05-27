@@ -15,5 +15,8 @@ export default {
     },
     deleteTemplate(name) {
         return axios.delete(`/api/templates/delete/${name}`)
+    },
+    duplicateTemplate(template) {
+        return axios.post(`/api/templates/duplicate`, template)
     }
 }
