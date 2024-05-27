@@ -5,9 +5,11 @@ import {ref} from "vue";
 import {storeToRefs} from "pinia";
 import {useQuasar} from "quasar";
 import CheckPointList from "@/main/vue/pages/checklists/CheckPointEdit.vue";
+import {useRouter} from "vue-router";
 
 const checklistTemplateStore = useChecklistTemplateStore()
 const $q = useQuasar()
+const router = useRouter()
 
 const name = ref('')
 const taskList = ref([])
@@ -43,6 +45,7 @@ async function addChecklist() {
             message: 'Erfolg',
             caption: 'Die Checkliste wurde hinzugefügt.'
         })
+        await router.push("/checklists")
     }
 }
 </script>
@@ -55,9 +58,9 @@ async function addChecklist() {
         <CheckPointList :list="materialList" label="neues Material">Materialliste</CheckPointList>
         <span>
             <router-link to="/checklists">
-                <q-btn label="Abbrechen" flat color="primary"></q-btn>
+                <q-btn label="Abbrechen" flat color="primary"/>
             </router-link>
-            <q-btn label="Checkliste erstellen" @click="addChecklist" color="primary"></q-btn>
+            <q-btn label="Checkliste erstellen" @click="addChecklist" color="primary"/>
         </span>
     </div>
 </template>
@@ -65,10 +68,6 @@ async function addChecklist() {
 <style scoped>
 .text-align {
     text-align: center;
-}
-
-.padding-sm {
-    padding-bottom: 16px;
 }
 
 .padding-md {

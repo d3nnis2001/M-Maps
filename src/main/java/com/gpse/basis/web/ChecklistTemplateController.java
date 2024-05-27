@@ -43,13 +43,8 @@ public class ChecklistTemplateController {
     }
 
     @DeleteMapping("/delete/{name}")
-    public String deleteTemplate(@PathVariable("name") final String name) {
-        Optional<ChecklistTemplate> template = checklistTemplateService.getTemplate(name);
-        if (template.isEmpty()) {
-            throw new NotFoundException();
-        }
-        String templateName = template.get().getName();
-        checklistTemplateService.deleteTemplate(template.get());
+    public String deleteTemplate(@PathVariable("name") String templateName) {
+        checklistTemplateService.deleteTemplate(templateName);
         return templateName;
     }
 }

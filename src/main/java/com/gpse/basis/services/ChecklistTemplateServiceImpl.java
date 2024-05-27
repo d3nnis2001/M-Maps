@@ -44,7 +44,7 @@ public class ChecklistTemplateServiceImpl implements ChecklistTemplateService {
     }
 
     @Override
-    public void deleteTemplate(ChecklistTemplate template) {
-        checklistTemplateRepository.delete(template);
+    public void deleteTemplate(String templateName) {
+        checklistTemplateRepository.deleteById(templateName);
     }
 }

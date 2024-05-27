@@ -95,9 +95,9 @@ export const useChecklistTemplateStore = defineStore('checklistTemplates', () =>
         })
     }
 
-    function deleteTemplate(name) {
+    function deleteTemplate() {
         return new Promise((resolve, reject) => {
-            api.checklistTemplate.deleteTemplate(name)
+            api.checklistTemplate.deleteTemplate(template.value.name)
                 .then(res => {
                     templateName.value = res.data
                     const index = templates.value.findIndex(

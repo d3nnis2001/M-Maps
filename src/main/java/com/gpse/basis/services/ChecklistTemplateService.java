@@ -12,5 +12,5 @@ public interface ChecklistTemplateService {
     boolean addChecklist(String name, List<String> tasks, List<String> material);
     Optional<ChecklistTemplate> getTemplate(String name);
 
-    void deleteTemplate(ChecklistTemplate template);
+    void deleteTemplate(String templateName);
 }

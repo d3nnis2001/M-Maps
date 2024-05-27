@@ -14,14 +14,14 @@ const router = useRouter()
 
 const {name} = route.params
 
-const { template, templateName, templateDeleted} = storeToRefs(checklistTemplateStore)
+const {template, templateName, templateDeleted} = storeToRefs(checklistTemplateStore)
 
 onMounted(async () => {
     await checklistTemplateStore.getTemplate(name)
 })
 
 function deleteTemplate() {
-    checklistTemplateStore.deleteTemplate(template.name)
+    checklistTemplateStore.deleteTemplate()
     if (!templateDeleted) {
         $q.notify({
             type: 'negative',
