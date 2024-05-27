@@ -22,14 +22,12 @@ public class InspectionController {
     }
     @GetMapping("/getdata")
     public ArrayList<InspectionOrder> getData() {
-        System.out.println("TEST_04");
         return inspec.getInspecData();
     }
 
 
     @PostMapping("/senddata")
     public void sendData(final WebRequest request) {
-        System.out.println("TEST-SENDDATA");
         ArrayList<String> inspecArray = new ArrayList<>();
         inspecArray.add(request.getParameter("courseId"));
         inspecArray.add(request.getParameter("startLocation"));

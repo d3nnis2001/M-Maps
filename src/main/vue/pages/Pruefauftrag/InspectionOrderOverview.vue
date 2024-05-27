@@ -9,6 +9,7 @@ export default {
             filter: '',
             columns: [
                 { name: 'inspectionOrderId', required: true, label: 'ID', align: 'left', field: row => row.inspectionOrderId, format: val => `${val}`, sortable: true },
+               // { name: 'courseId', label: 'StreckenId', align: 'left', field: 'courseId', sortable: true },
                 { name: 'startLocation', label: 'Startort', align: 'left', field: 'startLocation', sortable: true },
                 { name: 'endLocation', label: 'Zielort', align: 'left', field: 'endLocation', sortable: true },
                 { name: 'startTime', label: 'von', align: 'left', field: 'startTime' },
@@ -26,6 +27,7 @@ export default {
             for (let i = 0; i < response.length; i++) {
                 state.rows.push({
                     inspectionOrderId: response[i]["inspectionOrderId"],
+                   // courseId: response[i]["courseId"],
                     startLocation: response[i]["startLocation"],
                     endLocation: response[i]["endLocation"],
                     startTime: response[i]["startTime"],

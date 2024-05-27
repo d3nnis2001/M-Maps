@@ -64,7 +64,22 @@ const router = createRouter({
             path: "/reset-password",
             name: "setNewPassword",
             component: ResetPassword
-        }
+        },
+          {
+              path: "/inspectionOrder",
+              name: "inspectionOrderOverview",
+              component: InspectionOrderOverview
+          },
+          {
+              path: "/inspectionOrder/create",
+              name: "createInspectionOrder",
+              component: CreateInspectionOrder
+          },
+          {
+              path: "/inspectionOrder/:inspectionOrderId/edit",
+              name: "editInspectionOrder",
+              component: EditInspectionOrder
+          }
   ]
 })
 
