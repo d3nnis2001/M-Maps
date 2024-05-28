@@ -243,7 +243,7 @@ public class DataServiceImpl implements DataService{
         Query query = new Query();
         query.addCriteria(Criteria.where("strecken_id").is(track_id));
         List<GeoData> gd = template.find(query, GeoData.class);
-
+        System.out.println("WIR haben es ins service geschafft!!!!");
         if(gd.isEmpty())
             return null;
         System.out.println("Debug Start: ");

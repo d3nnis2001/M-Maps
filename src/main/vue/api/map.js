@@ -10,8 +10,8 @@ export const getGeoData = async function getGeoData() {
 export const getTrack = async function getTrack(trackID) {
     try {
         const cred = new URLSearchParams()
-        cred.append("trackid", trackID)
-        const response = await axios.post("/api/map/gettrack", cred)
+        cred.append("id", trackID)
+        const response = await axios.post("/api/map/getmapbyid", cred)
         return response.data
     } catch (error) {
         console.log("Something went wrong when getting the trackID")

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,8 +21,10 @@ public class MapController {
 
     @Autowired
     private FileService file;
-    public MapController(FileService file) {
+    private final DataService dataService;
+    public MapController(FileService file, DataService dataService) {
         this.file = file;
+        this.dataService = dataService;
     }
 
     @GetMapping("/gettracks")
@@ -48,7 +51,7 @@ public class MapController {
         return k;
     }
 
-    @PostMapping("getpartofheatmap")
+    @PostMapping("/getpartofheatmap")
     public List<ResponseColor> getPartOfHeatmap(final WebRequest request) {
         Utils util = new Utils();
         String strecke = request.getParameter("strecke");
@@ -61,6 +64,13 @@ public class MapController {
         for(int i = 0; i < lst.size(); ++i)
             k.add(i, new ResponseColor(lst.get(i).getValue(), lst.get(i).getKey()));
         return k;
+    }
+
+    @PostMapping("/getmapbyid")
+    public List<Map.Entry<DataService.Colors, String>> getMapByID(final WebRequest request) {
+        String id = request.getParameter("id");
+        assert id != null;
+        return dataService.getGeoDatabyTrackId(Integer.parseInt(id));
     }
 
     private class ResponseColor {

@@ -66,8 +66,6 @@ const onMarkerClicked = (event) => {
     });
     selectedMarker.value = marker
     dialogVisible.value = true;
-    console.log(marker.data.latitude)
-    console.log(marker.data.longitude)
 };
 
 const deleteStart = () => {
@@ -98,7 +96,7 @@ const refreshMarkers = async () => {
         });
     } else {
         const data = await getTrack(streckenID.value);
-        console.log(data.length)
+        console.log(data)
         if (data.length === 0) {
             $q.notify({
                 type: 'negative',
@@ -123,7 +121,6 @@ const refreshMarkers = async () => {
 };
 
 const createRepairOrder = async () => {
-    console.log(selectedMarker.value.data)
     const longitude = selectedMarker.value.data.longitude
     const latitude = selectedMarker.value.data.latitude
     const streckenID = selectedMarker.value.data.strecken_id
@@ -151,14 +148,11 @@ const centerToUserLocation = async () => {
     }
     map.value.locate(options).on('locationfound', onLocationFound);
     const gleis = await getPartOfGleislage(streckenID.value)
-    console.log(gleis)
 };
 
 const checkForChanges = async () => {
     if (kmStart.value !== '' && kmEnd.value !== '' && streckenID.value !== "") {
-        console.log(kmStart.value)
         const data = await getPartOfTrack(kmStart.value, kmEnd.value)
-        console.log(data)
         markers.forEach((m) => map.value.removeLayer(m.marker));
         markers = []
         for (let i = 0;i<data.length;i++) {
@@ -178,7 +172,6 @@ const checkForChanges = async () => {
 async function getTimeRangeData() {
     if (date !== '' && date2 !== '') {
         const response = await getTimeFromHeatmap(streckenID.value, date.value, date2.value)
-        console.log(response)
     } else {
         $q.notify({
             type: 'negative',
