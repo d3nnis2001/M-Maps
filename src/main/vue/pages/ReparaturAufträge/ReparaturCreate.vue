@@ -85,14 +85,14 @@ export default {
 
 <template>
     <div class="outline">
-        <div class="align-basic">
-            <p>Prüfkoordinaten/Streckenabschnitt</p>
-            <StandardInput class="extra-mar" v-model="streckenabschnitt" label="Streckenabschnitt"></StandardInput>
-        </div>
-        <div class="align-basic">
-            <p>Zeitraum</p>
-            <div class="align-mult">
-                <q-input filled v-model="date" mask="date" :rules="['date']">
+        <div class="outer-container">
+            <div class="text-with-input">
+                <p>Prüfkoordinaten/Streckenabschnitt</p>
+                <StandardInput class="extra-mar" v-model="streckenabschnitt" label="Streckenabschnitt"></StandardInput>
+            </div>
+            <div class="text-with-input">
+                <p>Zeitraum</p>
+                <q-input class="input-style" filled v-model="date" mask="date" :rules="['date']">
                     <template v-slot:append>
                         <q-icon name="event" class="cursor-pointer">
                             <q-popup-proxy cover transition-show="scale" transition-hide="scale">
@@ -105,59 +105,80 @@ export default {
                         </q-icon>
                     </template>
                 </q-input>
-                <p class="extra-mar">bis</p>
+                    <p class="small_p">bis</p>
+                <q-input  class="input-style" filled v-model="date2" mask="date" :rules="['date']">
+                    <template v-slot:append>
+                        <q-icon name="event" class="cursor-pointer">
+                            <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                                <q-date v-model="date2">
+                                    <div class="row items-center justify-end">
+                                        <q-btn v-close-popup label="Close" color="primary" flat />
+                                    </div>
+                                </q-date>
+                            </q-popup-proxy>
+                        </q-icon>
+                    </template>
+                </q-input>
             </div>
-            <q-input filled v-model="date2" mask="date" :rules="['date']">
-                <template v-slot:append>
-                    <q-icon name="event" class="cursor-pointer">
-                        <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                            <q-date v-model="date2">
-                                <div class="row items-center justify-end">
-                                    <q-btn v-close-popup label="Close" color="primary" flat />
-                                </div>
-                            </q-date>
-                        </q-popup-proxy>
-                    </q-icon>
-                </template>
-            </q-input>
+            <div>
+                <p class="text-with-input">Freigabeberechtigter</p>
+                <StandardInput class="extra-mar" v-model="freigabe" label="Freigabeberechtigter" ></StandardInput>
+            </div>
+            <div>
+                <p>Checkliste</p>
+                <q-select class="checkListInput text-with-input" outlined v-model="checkliste" :options="checkvals" label="Checkliste" />
+            </div>
+            <div>
+                <p>Bemerkungen</p>
+                <q-input class="input-bem text-with-input" outlined color="primary" rounded v-model="bem" label="Bemerkungen" />
+            </div>
+            <q-btn class="button-set" size="16px" no-caps rounded label="Reparaturauftrag anlegen" color="primary" @click=sendData></q-btn>
         </div>
-        <div class="align-basic">
-            <p class="mar-align">Freigabeberechtigter</p>
-            <StandardInput class="extra-mar" v-model="freigabe" label="Freigabeberechtigter" ></StandardInput>
-            <p>Checkliste</p>
-            <q-select class="checkListInput" outlined v-model="checkliste" :options="checkvals" label="Checkliste" />
-            <p>Bemerkungen</p>
-            <q-input class="extra-mar input-bem" outlined v-model="bem" label="Bemerkungen" />
-        </div>
-        <q-btn label="Reparaturauftrag anlegen" color="primary" @click=sendData class="button-set"></q-btn>
     </div>
 </template>
-<style>
+<style lang="scss">
 .outline {
-    border: 1px solid black;
+    border: 2px solid $primary;
     padding: 20px;
-    margin: 20px;
+    margin: 10px;
+    border-radius: 15px;
+    background-color: #F7F7F7;
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
 }
-.align-basic {
+
+p {
+    font-size: 16px;
+    font-weight: bold
+}
+
+.small_p {
+    font-size: 13px;
+    font-weight: normal;
+}
+
+.input-style {
+    width: 100%;
+    max-width: 288px;
+}
+.outer-container {
     display: flex;
     flex-direction: column;
-    align-items: start;
 }
-.align-mult {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    justify-content: flex-start;
-}
+
 .button-set {
     margin-top: 20px;
+    width: 100%;
+    max-width: 288px;
 }
 
 .input-bem {
     width: 100%;
+
 }
 .checkListInput {
-    width: 150px;
+    width: 100%;
+    max-width: 288px;
+    margin-bottom: 20px;
 }
 
 </style>

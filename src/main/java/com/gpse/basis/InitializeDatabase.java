@@ -54,12 +54,6 @@ public class InitializeDatabase implements InitializingBean {
         items.add("Checker 3");
         items.add("Checker 4");
 
-        ArrayList<String> items2 = new ArrayList<>();
-        items2.add("Checker 1");
-        items2.add("Checker 2");
-        items2.add("Checker 3");
-        items2.add("Checker 4");
-
         Checklist check1 = new Checklist("Abarbeitung1", items);
         Checklist check2 = new Checklist("Abarbeitung2", items);
 
