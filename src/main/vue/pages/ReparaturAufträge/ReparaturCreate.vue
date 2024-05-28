@@ -87,11 +87,11 @@ export default {
     <div class="outline">
         <div class="outer-container">
             <div class="text-with-input">
-                <p>Prüfkoordinaten/Streckenabschnitt</p>
+                <p style="font-weight: bold;">Prüfkoordinaten/Streckenabschnitt</p>
                 <StandardInput class="extra-mar" v-model="streckenabschnitt" label="Streckenabschnitt"></StandardInput>
             </div>
             <div class="text-with-input">
-                <p>Zeitraum</p>
+                <p style="font-weight: bold;">Zeitraum</p>
                 <q-input class="input-style" filled v-model="date" mask="date" :rules="['date']">
                     <template v-slot:append>
                         <q-icon name="event" class="cursor-pointer">
@@ -121,15 +121,15 @@ export default {
                 </q-input>
             </div>
             <div>
-                <p class="text-with-input">Freigabeberechtigter</p>
+                <p style="font-weight: bold;">Freigabeberechtigter</p>
                 <StandardInput class="extra-mar" v-model="freigabe" label="Freigabeberechtigter" ></StandardInput>
             </div>
             <div>
-                <p>Checkliste</p>
+                <p style="font-weight: bold;">Checkliste</p>
                 <q-select class="checkListInput text-with-input" outlined v-model="checkliste" :options="checkvals" label="Checkliste" />
             </div>
             <div>
-                <p>Bemerkungen</p>
+                <p style="font-weight: bold;">Bemerkungen</p>
                 <q-input class="input-bem text-with-input" outlined color="primary" rounded v-model="bem" label="Bemerkungen" />
             </div>
             <q-btn class="button-set" size="16px" no-caps rounded label="Reparaturauftrag anlegen" color="primary" @click=sendData></q-btn>
@@ -148,12 +148,12 @@ export default {
 
 p {
     font-size: 16px;
-    font-weight: bold
+    font-weight: bold;
 }
 
 .small_p {
     font-size: 13px;
-    font-weight: normal;
+    font-weight: bold;
 }
 
 .input-style {

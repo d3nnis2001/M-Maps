@@ -211,8 +211,7 @@ const removeRow = (name) => {
                 </div>
             </template>
         </q-table>
-
-        <q-btn class="handleButton" label="Neu erstellen" @click="goCreate" color="primary"></q-btn>
+        <q-btn class="handleButton" style="width: 100%; max-width: 218px" size="16px" no-caps rounded label="Neu Erstellen" color="primary" @click=goCreate></q-btn>
 
         <q-dialog v-model="showDialog">
             <q-card>
