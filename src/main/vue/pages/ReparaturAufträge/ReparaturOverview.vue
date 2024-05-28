@@ -20,9 +20,9 @@ const state = reactive({
         },
         { name: 'von', align: 'center', label: 'Von', field: 'von', sortable: true },
         { name: 'bis', label: 'Bis', field: 'bis', sortable: true },
-        { name: 'freigabe', label: 'Freigabeberechtigter', field: 'freigabe'},
-        { name: 'strecke', label: 'Strecke', field: 'strecke' },
-        { name: 'status', label: 'Status', field: 'status' },
+        { name: 'freigabe', label: 'Freigabeberechtigter', field: 'freigabe', sortable: true},
+        { name: 'strecke', label: 'Strecke', field: 'strecke', sortable: true},
+        { name: 'status', label: 'Status', field: 'status', sortable: true},
     ],
     rows: []
 });

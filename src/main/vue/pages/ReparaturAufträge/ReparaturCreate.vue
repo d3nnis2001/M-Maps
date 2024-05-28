@@ -4,8 +4,10 @@ import {onMounted, ref} from "vue";
 import {getChecklists, sendRepair} from "@/main/vue/api/reparatur";
 import {useQuasar} from "quasar";
 import { useRouter } from "vue-router";
+import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";
 
 export default {
+    components: {StandardInput},
     setup () {
         const streckenabschnitt = ref('')
         const freigabe = ref('')
@@ -85,7 +87,7 @@ export default {
     <div class="outline">
         <div class="align-basic">
             <p>Prüfkoordinaten/Streckenabschnitt</p>
-            <q-input class="extra-mar" outlined v-model="streckenabschnitt" label="Streckenabschnitt" />
+            <StandardInput class="extra-mar" v-model="streckenabschnitt" label="Streckenabschnitt"></StandardInput>
         </div>
         <div class="align-basic">
             <p>Zeitraum</p>
@@ -119,21 +121,15 @@ export default {
                 </template>
             </q-input>
         </div>
-        <div class="align-mult">
-            <div class="align-basic">
-                <p class="mar-align">Freigabeberechtigter</p>
-                <q-input class="extra-mar" outlined v-model="freigabe" label="Freigabeberechtigter" />
-            </div>
-            <div class="align-basic">
-                <p>Checkliste</p>
-                <q-select v-model="checkliste" :options="checkvals" label="Checkliste" />
-            </div>
-        </div>
         <div class="align-basic">
+            <p class="mar-align">Freigabeberechtigter</p>
+            <StandardInput class="extra-mar" v-model="freigabe" label="Freigabeberechtigter" ></StandardInput>
+            <p>Checkliste</p>
+            <q-select class="checkListInput" outlined v-model="checkliste" :options="checkvals" label="Checkliste" />
             <p>Bemerkungen</p>
             <q-input class="extra-mar input-bem" outlined v-model="bem" label="Bemerkungen" />
         </div>
-        <q-btn label="Reparaturauftrag anlegen" color="grey" @click=sendData class=""></q-btn>
+        <q-btn label="Reparaturauftrag anlegen" color="primary" @click=sendData class="button-set"></q-btn>
     </div>
 </template>
 <style>
@@ -146,20 +142,22 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: start;
-    margin-bottom: 30px;
 }
 .align-mult {
     display: flex;
     flex-direction: row;
-    align-items: start;
-    justify-content: start;
+    align-items: flex-start;
+    justify-content: flex-start;
 }
-.extra-mar {
-    margin-top: 10px;
-    margin-right: 20px;
+.button-set {
+    margin-top: 20px;
 }
-.mar-align {
-    margin-right: 110px;
+
+.input-bem {
+    width: 100%;
+}
+.checkListInput {
+    width: 150px;
 }
 
 </style>
