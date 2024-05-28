@@ -1,15 +1,14 @@
 <script>
-
 import {onMounted, ref} from "vue";
 import {getChecklists, sendRepair} from "@/main/vue/api/reparatur";
 import {useQuasar} from "quasar";
-import { useRouter } from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";
 
 export default {
     components: {StandardInput},
     setup () {
-        const streckenabschnitt = ref('')
+        let streckenabschnitt = ref('')
         const freigabe = ref('')
         const checkliste = ref('')
         const checkvals = ref([])
@@ -18,6 +17,10 @@ export default {
         const $q = useQuasar()
         const bem = ref('')
         const router = useRouter()
+        let vorLatitude = ref('')
+        let vorLongitude = ref('')
+
+        const route = useRoute();
 
         onMounted(async () => {
             const response = await getChecklists()
@@ -26,6 +29,13 @@ export default {
                 checkvals.value.push({label: response[i], value: i})
             }
             console.log(checkvals.value[0].label)
+            console.log('Query parameters:', route.query);
+            console.log('streckenID:', route.query.streckenID);
+            if (route.query.streckenID !== undefined) {
+                streckenabschnitt.value = route.query.streckenID
+                vorLatitude.value = route.query.latitude
+                vorLongitude.value = route.query.longitude
+            }
         })
 
 
@@ -63,7 +73,8 @@ export default {
             const err = checkInputs()
             console.log(err)
             if (err) {
-                const response = sendRepair(streckenabschnitt.value, date.value, date2.value, freigabe.value, checkliste.value["label"], bem.value)
+                const response = sendRepair(streckenabschnitt.value, date.value, date2.value,
+                    freigabe.value, checkliste.value["label"], bem.value, vorLongitude.value, vorLatitude.value)
                 router.push({ path: "/repair" });
             }
         }
@@ -76,12 +87,13 @@ export default {
             date2,
             bem,
             sendData,
-            checkvals
+            checkvals,
+            vorLatitude,
+            vorLongitude
         }
     }
 }
 </script>
-
 
 <template>
     <div class="outline">
@@ -89,10 +101,21 @@ export default {
             <div class="text-with-input">
                 <p style="font-weight: bold;">Prüfkoordinaten/Streckenabschnitt</p>
                 <StandardInput class="extra-mar" v-model="streckenabschnitt" label="Streckenabschnitt"></StandardInput>
+                <div class="row">
+                    <div class="text-with-input mar-right">
+                        <p style="font-weight: bold;">Latitude</p>
+                        <StandardInput class="extra-mar" v-model="vorLatitude" label="Latitude" ></StandardInput>
+                    </div>
+                    <div class="text-with-input">
+                        <p style="font-weight: bold;">Longitude</p>
+                        <StandardInput class="extra-mar" v-model="vorLongitude" label="Longitude" ></StandardInput>
+                    </div>
+                </div>
+                <div>
             </div>
-            <div class="text-with-input">
-                <p style="font-weight: bold;">Zeitraum</p>
-                <q-input class="input-style" filled v-model="date" mask="date" :rules="['date']">
+            <p style="font-weight: bold;">Zeitraum (von - bis)</p>
+            <div class="text-with-input row extra-mar">
+                <q-input class="input-style mar-right" filled v-model="date" mask="date" :rules="['date']">
                     <template v-slot:append>
                         <q-icon name="event" class="cursor-pointer">
                             <q-popup-proxy cover transition-show="scale" transition-hide="scale">
@@ -105,7 +128,6 @@ export default {
                         </q-icon>
                     </template>
                 </q-input>
-                    <p class="small_p">bis</p>
                 <q-input  class="input-style" filled v-model="date2" mask="date" :rules="['date']">
                     <template v-slot:append>
                         <q-icon name="event" class="cursor-pointer">
@@ -119,14 +141,17 @@ export default {
                         </q-icon>
                     </template>
                 </q-input>
+                </div>
             </div>
-            <div>
-                <p style="font-weight: bold;">Freigabeberechtigter</p>
-                <StandardInput class="extra-mar" v-model="freigabe" label="Freigabeberechtigter" ></StandardInput>
-            </div>
-            <div>
-                <p style="font-weight: bold;">Checkliste</p>
-                <q-select class="checkListInput text-with-input" outlined v-model="checkliste" :options="checkvals" label="Checkliste" />
+            <div class="row extra-mar">
+                    <div class="mar-right">
+                        <p style="font-weight: bold;">Freigabeberechtigter</p>
+                        <StandardInput class="" v-model="freigabe" label="Freigabeberechtigter" ></StandardInput>
+                    </div>
+                    <div class="checkListInput">
+                        <p style="font-weight: bold;">Checkliste</p>
+                        <q-select class="" outlined v-model="checkliste" :options="checkvals" label="Checkliste" />
+                    </div>
             </div>
             <div>
                 <p style="font-weight: bold;">Bemerkungen</p>
@@ -136,6 +161,7 @@ export default {
         </div>
     </div>
 </template>
+
 <style lang="scss">
 .outline {
     border: 2px solid $primary;
@@ -151,15 +177,16 @@ p {
     font-weight: bold;
 }
 
-.small_p {
-    font-size: 13px;
-    font-weight: bold;
+.mar-right {
+    margin-right: 20px;
 }
+
 
 .input-style {
     width: 100%;
     max-width: 288px;
 }
+
 .outer-container {
     display: flex;
     flex-direction: column;
@@ -173,12 +200,16 @@ p {
 
 .input-bem {
     width: 100%;
-
 }
+
 .checkListInput {
     width: 100%;
     max-width: 288px;
     margin-bottom: 20px;
 }
 
+.extra-mar {
+    margin-bottom: 20px;
+}
 </style>
+

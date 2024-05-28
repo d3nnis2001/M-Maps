@@ -1,6 +1,7 @@
 package com.gpse.basis.web;
 
 import com.gpse.basis.domain.Checklist;
+import com.gpse.basis.domain.GeoCords;
 import com.gpse.basis.domain.Reparatur;
 import com.gpse.basis.domain.Utils;
 import com.gpse.basis.services.ChecklistService;
@@ -13,6 +14,7 @@ import org.springframework.web.context.request.WebRequest;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/repair")
@@ -45,7 +47,14 @@ public class ReparaturController {
         System.out.println(remarks);
         Checklist checker = checkService.loadChecklistByName(checklist);
         System.out.println(checker.getName());
-        return ResponseEntity.ok(service.addRepairOrder(Integer.parseInt(track), acDate1, acDate2, authorized, checker, remarks));
+        String latitude = request.getParameter("latitude");
+        String longitude = request.getParameter("longitude");
+        GeoCords geo = new GeoCords(latitude, longitude);
+        if (latitude.equals("") ) {
+            geo = null;
+        }
+
+        return ResponseEntity.ok(service.addRepairOrder(Integer.parseInt(track), acDate1, acDate2, authorized, checker, remarks, geo));
     }
     @PostMapping("/allchecklists")
     public ArrayList<String> getChecklists() {

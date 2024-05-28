@@ -6,6 +6,7 @@ import {getGeoData, getTrack, getPartOfTrack, getPartOfGleislage} from "@/main/v
 import {useQuasar} from "quasar";
 import DateInput from "@/main/vue/pages/Map/DateInput.vue";
 import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";
+import router from "@/main/vue/router";
 
 const map = ref(null);
 var markers = [];
@@ -120,6 +121,21 @@ const refreshMarkers = async () => {
         checkForChanges()
     }
 };
+
+const createRepairOrder = async () => {
+    console.log(selectedMarker.value.data)
+    const longitude = selectedMarker.value.data.longitude
+    const latitude = selectedMarker.value.data.latitude
+    const streckenID = selectedMarker.value.data.strecken_id
+    await router.push({
+        path: "/repair/create",
+        query: {
+            longitude: longitude,
+            latitude: latitude,
+            streckenID: streckenID
+        }
+    });
+}
 
 
 const onLocationFound = (e) => {
@@ -281,10 +297,33 @@ const checkForChanges = async () => {
                     </q-card>
                 </div>
                 <q-card flat square bordered>
-                    <q-card-actions align="center">
-                        <q-btn flat @click="checkForChanges" label="Speichern" color="primary" v-close-popup />
+                    <q-card-actions>
+                        <q-btn
+                            style="align-items: end; justify-content: end"
+                            flat
+                            no-caps
+                            @click="createRepairOrder"
+                            label="Reparatur anlegen"
+                            color="primary"
+                            v-close-popup
+                        >
+                            <q-icon name="build" style="margin-left: 8px;" />
+                        </q-btn>
                     </q-card-actions>
                 </q-card>
+                <q-card flat square bordered>
+                    <q-card-actions>
+                        <q-btn
+                            flat
+                            no-caps
+                            @click="checkForChanges"
+                            label="Speichern"
+                            color="primary"
+                            v-close-popup
+                        />
+                    </q-card-actions>
+                </q-card>
+
             </div>
         </div>
     </q-dialog>
