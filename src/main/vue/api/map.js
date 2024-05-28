@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const geoData = async function getGeoData() {
+export const getGeoData = async function getGeoData() {
     try {
         const response = await axios.get("/api/map/gettracks")
         return response.data;
@@ -25,7 +25,6 @@ export const getPartOfTrack = async function getPartOfTrack(from, till) {
         cred.append("from", from)
         cred.append("till", till)
         const response = await axios.post("/api/map/getparttrack", cred)
-        console.log(response.data)
         return response.data
     } catch (error) {
         console.log("Something went wront when getting a track part!")
@@ -45,4 +44,5 @@ export const getTimeFromHeatmap = async function getTimeFromHeatmap(strecke, fro
     }
 }
 
-export default {geoData, getTrack};
+
+export default {getGeoData, getTrack};

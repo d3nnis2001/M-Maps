@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = TemplateApplication.class)
+@SpringBootTest(classes = RunApplication.class)
 public class ExampleApplicationIT {
 
     @Test

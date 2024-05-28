@@ -2,8 +2,11 @@
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {onMounted, ref} from 'vue';
-import {geoData, getTrack, getPartOfTrack, getTimeFromHeatmap} from "@/main/vue/api/map";
+import {getGeoData, getTrack, getPartOfTrack, getTimeFromHeatmap} from "@/main/vue/api/map";
 import {useQuasar} from "quasar";
+import DateInput from "@/main/vue/pages/Map/DateInput.vue";
+import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";
+import router from "@/main/vue/router";
 
 const map = ref(null);
 var markers = [];
@@ -43,7 +46,7 @@ onMounted(async () => {
             maxZoom: 19,
             tileSize: 256
         }).addTo(map.value);
-    const data = await geoData();
+    const data = await getGeoData();
     data.forEach((m) => markers.push({
         marker : L.circle([m.longitude, m.latitude], {color: "black", radius: 50}),
         data: m,
@@ -119,6 +122,21 @@ const refreshMarkers = async () => {
     }
 };
 
+const createRepairOrder = async () => {
+    console.log(selectedMarker.value.data)
+    const longitude = selectedMarker.value.data.longitude
+    const latitude = selectedMarker.value.data.latitude
+    const streckenID = selectedMarker.value.data.strecken_id
+    await router.push({
+        path: "/repair/create",
+        query: {
+            longitude: longitude,
+            latitude: latitude,
+            streckenID: streckenID
+        }
+    });
+}
+
 
 const onLocationFound = (e) => {
     const radius = e.accuracy;
@@ -176,33 +194,31 @@ async function getTimeRangeData() {
 <template>
     <div class="mapSettings">
         <div class="row putStart">
-            <div class="">
-                <q-expansion-item
-                    icon="settings"
-                    label="Optionen"
-                    expand-icon="arrow_drop_down"
-                    dense
-                    class="expansion_settings"
-                >
-                    <q-list>
-                        <q-item clickable v-ripple>
-                            <q-item-section>
-                                <div class="expan_items" @click="alert2=true">
-                                    Zeitraum
-                                </div>
-                            </q-item-section>
-                        </q-item>
-                        <q-item clickable v-ripple>
-                            <q-item-section>
-                                <div class="expan_items" @click="alert=true">
-                                    Strecken-ID auswählen
-                                </div>
-                            </q-item-section>
-                        </q-item>
-                    </q-list>
-                </q-expansion-item>
-            </div>
-            <div class="    ">
+            <q-expansion-item
+                icon="settings"
+                label="Verfügbare Filter"
+                expand-icon="arrow_drop_down"
+                dense
+                class="expansion_settings"
+            >
+                <q-list>
+                    <q-item clickable v-ripple>
+                        <q-item-section>
+                            <div class="expan_items" @click="alert2=true">
+                                Zeitraum
+                            </div>
+                        </q-item-section>
+                    </q-item>
+                    <q-item clickable v-ripple>
+                        <q-item-section>
+                            <div class="expan_items" @click="alert=true">
+                                Strecken-ID auswählen
+                            </div>
+                        </q-item-section>
+                    </q-item>
+                </q-list>
+            </q-expansion-item>
+            <div class="location_button">
                 <q-btn
                     class="button_settings"
                     icon="my_location"
@@ -223,58 +239,10 @@ async function getTimeRangeData() {
 
                     <q-card-section class="q-pt-none">
                         <div class="q-pa-md" style="max-width: 300px">
-                            <q-input filled v-model="date">
-                                <template v-slot:prepend>
-                                    <q-icon name="event" class="cursor-pointer">
-                                        <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                                            <q-date v-model="date" mask="YYYY-MM-DD HH:mm">
-                                                <div class="row items-center justify-end">
-                                                    <q-btn v-close-popup label="Close" color="primary" flat />
-                                                </div>
-                                            </q-date>
-                                        </q-popup-proxy>
-                                    </q-icon>
-                                </template>
-
-                                <template v-slot:append>
-                                    <q-icon name="access_time" class="cursor-pointer">
-                                        <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                                            <q-time v-model="date" mask="YYYY-MM-DD HH:mm" format24h>
-                                                <div class="row items-center justify-end">
-                                                    <q-btn v-close-popup label="Close" color="primary" flat />
-                                                </div>
-                                            </q-time>
-                                        </q-popup-proxy>
-                                    </q-icon>
-                                </template>
-                            </q-input>
+                            <DateInput v-model="date"></DateInput>
                         </div>
                         <div class="q-pa-md" style="max-width: 300px">
-                            <q-input filled v-model="date2">
-                                <template v-slot:prepend>
-                                    <q-icon name="event" class="cursor-pointer">
-                                        <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                                            <q-date v-model="date2" mask="YYYY-MM-DD HH:mm">
-                                                <div class="row items-center justify-end">
-                                                    <q-btn v-close-popup label="Close" color="primary" flat />
-                                                </div>
-                                            </q-date>
-                                        </q-popup-proxy>
-                                    </q-icon>
-                                </template>
-
-                                <template v-slot:append>
-                                    <q-icon name="access_time" class="cursor-pointer">
-                                        <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                                            <q-time v-model="date2" mask="YYYY-MM-DD HH:mm" format24h>
-                                                <div class="row items-center justify-end">
-                                                    <q-btn v-close-popup label="Close" color="primary" flat />
-                                                </div>
-                                            </q-time>
-                                        </q-popup-proxy>
-                                    </q-icon>
-                                </template>
-                            </q-input>
+                            <DateInput v-model="date2"></DateInput>
                         </div>
                     </q-card-section>
 
@@ -289,7 +257,7 @@ async function getTimeRangeData() {
                     <q-card-section>
                         <div class="text-h6">Wähle eine Strecken-ID</div>
                     </q-card-section>
-                    <q-input class="" v-model="streckenID" label="Strecken-ID Eingabe"/>
+                    <StandardInput v-model="streckenID" label="Strecken-ID Eingabe"></StandardInput>
                     <q-card-actions align="center">
                         <q-btn @click="refreshMarkers" flat label="Filter anwenden" color="primary" v-close-popup/>
                         <q-btn flat label="Abbrechen" color="primary" v-close-popup />
@@ -342,16 +310,40 @@ async function getTimeRangeData() {
                     </q-card>
                 </div>
                 <q-card flat square bordered>
-                    <q-card-actions align="center">
-                        <q-btn flat @click="checkForChanges" label="Speichern" color="primary" v-close-popup />
+                    <q-card-actions>
+                        <q-btn
+                            style="align-items: end; justify-content: end"
+                            flat
+                            no-caps
+                            @click="createRepairOrder"
+                            label="Reparatur anlegen"
+                            color="primary"
+                            v-close-popup
+                        >
+                            <q-icon name="build" style="margin-left: 8px;" />
+                        </q-btn>
                     </q-card-actions>
                 </q-card>
+                <q-card flat square bordered>
+                    <q-card-actions>
+                        <q-btn
+                            flat
+                            no-caps
+                            @click="checkForChanges"
+                            label="Speichern"
+                            color="primary"
+                            v-close-popup
+                        />
+                    </q-card-actions>
+                </q-card>
+
             </div>
         </div>
     </q-dialog>
 </template>
 
-<style>
+<style lang="scss">
+
 .full-width {
     flex: 1;
     margin: 0;
@@ -387,7 +379,8 @@ async function getTimeRangeData() {
 #map {
     width: 95vw;
     height: 80vh;
-    border: 3px solid black;
+    border: 3px solid $primary;
+    border-radius: 15px;
 }
 
 .mapSettings {
@@ -411,7 +404,18 @@ async function getTimeRangeData() {
     flex-direction: column;
 }
 
-.button_settings {
+.expansion_settings {
+    position: absolute;
+    z-index: 2000;
+}
+
+.location_button {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    width: 100%;
+    margin-right: 5vw;
 }
 
 </style>
