@@ -2,30 +2,29 @@ package com.gpse.basis;
 
 import com.gpse.basis.domain.Checklist;
 import com.gpse.basis.domain.GleisLageRange;
+import com.gpse.basis.domain.InspectionOrder;
 import com.gpse.basis.domain.UserModel;
-import com.gpse.basis.repositories.ChecklistRepository;
-import com.gpse.basis.repositories.GleisLageRangeRepository;
-import com.gpse.basis.repositories.ReperaturRepository;
-import com.gpse.basis.repositories.UserRepository;
+import com.gpse.basis.repositories.*;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 @Service
 public class InitializeDatabase implements InitializingBean {
     private final UserRepository usRepo;
+    private final InspectionOrderRepository ioRepo;
     private final ReperaturRepository reRepo;
     private final ChecklistRepository checkRepo;
 
     private final GleisLageRangeRepository glrRepo;
 
     @Autowired
-    public InitializeDatabase(final UserRepository usRepo,
-                              final ReperaturRepository reRepo, final ChecklistRepository checkRepo, final GleisLageRangeRepository r) {
+    public InitializeDatabase(final UserRepository usRepo, final InspectionOrderRepository ioRepo, final ReperaturRepository reRepo,
+        final ChecklistRepository checkRepo, final GleisLageRangeRepository r) {
         this.usRepo = usRepo;
+        this.ioRepo = ioRepo;
         this.reRepo = reRepo;
         this.checkRepo = checkRepo;
         this.glrRepo = r;
@@ -34,10 +33,10 @@ public class InitializeDatabase implements InitializingBean {
     @Override
     public void afterPropertiesSet() {
         initUsers();
+        initInspectionOrder();
         initChecklists();
         initRanges();
     }
-
     public void initUsers() {
         // Test User 1
         UserModel user = new UserModel("d3nnis.s@web.de", "hello", "Georg", "Bauer");
@@ -56,12 +55,12 @@ public class InitializeDatabase implements InitializingBean {
         items.add("Checker 2");
         items.add("Checker 3");
         items.add("Checker 4");
-
-        ArrayList<String> items2 = new ArrayList<>();
-        items2.add("Checker 1");
-        items2.add("Checker 2");
-        items2.add("Checker 3");
-        items2.add("Checker 4");
+        items.add("Checker 5");
+        items.add("Checker 6");
+        items.add("Checker 7");
+        items.add("Checker 8");
+        items.add("Checker 9");
+        items.add("Checker 10");
 
         Checklist check1 = new Checklist("Abarbeitung1", items);
         Checklist check2 = new Checklist("Abarbeitung2", items);
@@ -79,4 +78,12 @@ public class InitializeDatabase implements InitializingBean {
         glrRepo.save(range2);
         glrRepo.save(range3);
     }
+
+    public void initInspectionOrder() {
+        InspectionOrder inspec = new InspectionOrder("1111","1234", "1000", "Bielefeld",
+            "Hannover", "08-05-2024", "09-05-2024",
+            " ", " ", "archiviert", "hallo :)", true);
+        ioRepo.save(inspec);
+    }
+
 }

@@ -1,8 +1,9 @@
 import axios from 'axios';
 
-export const geoData = async function getGeoData() {
+export const getGeoData = async function getGeoData() {
     try {
         const response = await axios.get("/api/map/gettracks")
+        console.log(response)
         return response.data;
     } catch (error) {
     }
@@ -43,4 +44,4 @@ export const getPartOfGleislage = async function getPartOfGleislage(id) {
 }
 
 
-export default {geoData, getTrack};
+export default {getGeoData, getTrack};
