@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 import StartView from '../pages/Start.vue'
-import MapView from '../pages/Map/Map.vue'
+import MapView from '../pages/Map.vue'
 import DataImport from "../pages/DataImport/DataImport.vue";
 import Login from '../pages/Login/Login.vue'
 import Registration from "../pages/Login/Registration.vue";
@@ -9,6 +9,9 @@ import Password from "../pages/Login/Password.vue";
 import ForgotPassword from "../pages/Login/ForgotPassword.vue";
 import ResetPassword from "../pages/Login/ResetPassword.vue";
 import Start from "../pages/Start.vue";
+import InspectionOrderOverview from "@/main/vue/pages/Pruefauftrag/InspectionOrderOverview.vue";
+import CreateInspectionOrder from "../pages/Pruefauftrag/CreateInspectionOrder.vue";
+import EditInspectionOrder from "../pages/Pruefauftrag/EditInspectionOrder.vue";
 import ReparaturOverview from "@/main/vue/pages/ReparaturAufträge/ReparaturOverview.vue";
 import ReparaturCreate from "@/main/vue/pages/ReparaturAufträge/ReparaturCreate.vue";
 import ReparaturEdit from "@/main/vue/pages/ReparaturAufträge/ReparaturEdit.vue";
@@ -62,26 +65,21 @@ const router = createRouter({
             name: "setNewPassword",
             component: ResetPassword
         },
-        {
-            path: "/repair",
-            name: "Repair",
-            component: ReparaturOverview
-        },
-        {
-            path: "/repair/create",
-            name: "RepairCreate",
-            component: ReparaturCreate
-        },
-        {
-            path: "/repair/:name/edit",
-            name: "RepairEdit",
-            component: ReparaturEdit
-        },
-        {
-            path: "/admin",
-            name: "adminmain",
-            component: AdminMain
-        }
+          {
+              path: "/inspectionOrder",
+              name: "inspectionOrderOverview",
+              component: InspectionOrderOverview
+          },
+          {
+              path: "/inspectionOrder/create",
+              name: "createInspectionOrder",
+              component: CreateInspectionOrder
+          },
+          {
+              path: "/inspectionOrder/:inspectionOrderId/edit",
+              name: "editInspectionOrder",
+              component: EditInspectionOrder
+          }
   ]
 })
 
