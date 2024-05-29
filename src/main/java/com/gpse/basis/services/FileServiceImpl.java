@@ -354,7 +354,9 @@ public class FileServiceImpl implements FileService {
         query.addCriteria(Criteria.where("dataSetid").in(ids));
         template.remove(query, "GleisLageDaten");
     }
-
+    /**
+     * Returns the all available Geodata
+     **/
     @Override
     public ArrayList<GeoData> getGeoData() {
         Iterable<GeoData> iterable = geoTrack.findAll();
@@ -367,6 +369,9 @@ public class FileServiceImpl implements FileService {
         return geoArr;
     }
 
+    /**
+     * Returns the all available Geodata from a track
+     **/
     @Override
     public ArrayList<GeoData> getTrackGeoData(int trackID) {
         Iterable<GeoData> iterable = geoTrack.findAll();
@@ -410,7 +415,6 @@ public class FileServiceImpl implements FileService {
     }
 
 
-
     private List<File> getAllFiles(File folder) {
         File[] files = folder.listFiles();
         List<File> fileList = new ArrayList<>();
@@ -438,9 +442,7 @@ public class FileServiceImpl implements FileService {
 
     //return null, if from > till
     public List<Map.Entry<DataService.Colors, String>> getPartHeatmap(int strecke, Date from, Date till) {
-        boolean isright = true;
         if (from.after(till)) {
-            isright = false;
             return null;
         }
          return dService.getGeoDataByDate(strecke, LocalDateTime.ofInstant(from.toInstant(), ZoneId.systemDefault()), LocalDateTime.ofInstant(till.toInstant(), ZoneId.systemDefault()));

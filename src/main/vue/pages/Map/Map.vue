@@ -10,6 +10,7 @@ import router from "@/main/vue/router";
 
 const map = ref(null);
 var markers = [];
+let data = ref([])
 const streckenID = ref('')
 const date2 = ref('')
 const date = ref('')
@@ -46,7 +47,7 @@ onMounted(async () => {
             maxZoom: 19,
             tileSize: 256
         }).addTo(map.value);
-    const data = await getGeoData();
+    data = await getGeoData();
     data.forEach((m) => markers.push({
         marker : L.circle([m.longitude, m.latitude], {color: "black", radius: 50}),
         data: m,
@@ -87,6 +88,15 @@ const addEnd = () => {
     kmEnd.value = selectedMarker.value.data.track_km;
 };
 
+const findKeyById = (id, data) => {
+    for (const key in data) {
+        if (data[key] === id) {
+            return key;
+        }
+    }
+    return null;
+};
+
 const refreshMarkers = async () => {
     if (streckenID.value === "") {
         $q.notify({
@@ -95,8 +105,8 @@ const refreshMarkers = async () => {
             caption: 'Choose please'
         });
     } else {
-        const data = await getTrack(streckenID.value);
-        console.log(data)
+        const heatmap = await getTrack(streckenID.value);
+        console.log(heatmap[0])
         if (data.length === 0) {
             $q.notify({
                 type: 'negative',
@@ -107,10 +117,13 @@ const refreshMarkers = async () => {
         markers.forEach((m) => map.value.removeLayer(m.marker));
         markers = []
         for (let i = 0;i<data.length;i++) {
-            markers.push({
-                marker : L.circle([data[i].longitude, data[i].latitude], {color: "black", radius: 50}),
-                data: data[i],
-            });
+            const key = findKeyById(data[i].id, heatmap);
+            if (key) {
+                markers.push({
+                    marker : L.circle([data[i].longitude, data[i].latitude], {color: "black", radius: 50}),
+                    data: data[i],
+                });
+            }
         }
         markers.forEach((m) => {
             m.marker.addTo(map.value);

@@ -13,7 +13,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
@@ -239,30 +238,32 @@ public class DataServiceImpl implements DataService{
         }
     }
 
+    /**
+     * Gets the Colours and ids for each existing GeoPoint
+     **/
+
     public List<Map.Entry<Colors, String>> getGeoDatabyTrackId(int track_id) {
         Query query = new Query();
         query.addCriteria(Criteria.where("strecken_id").is(track_id));
         List<GeoData> gd = template.find(query, GeoData.class);
-        System.out.println("WIR haben es ins service geschafft!!!!");
         if(gd.isEmpty())
             return null;
-        System.out.println("Debug Start: ");
-        System.out.println(gd.getFirst().getId());
         List<Map.Entry<Colors, String>> col = getNewestColorsforGeoData(gd);
-        System.out.println("Debug Size of geodata with color: " + col.size());
         return col;
     }
 
+    /**
+     * Gets the Colours and ids for each existing GeoPoint in a
+     * timeframe.
+     **/
     public List<Map.Entry<Colors, String>> getGeoDataByDate(int track_id, LocalDateTime from, LocalDateTime till){
         Query query = new Query();
         query.addCriteria(Criteria.where("strecken_id").is(track_id));
         List<GeoData> gd = template.find(query, GeoData.class);
         if(gd.isEmpty())
             return null;
-        System.out.println("Debug Start: ");
         System.out.println(gd.getFirst().getId());
         List<Map.Entry<Colors, String>> col = getColorForDateRange(gd, from, till);
-        System.out.println("Debug Size of geodata with color: " + col.size());
         return col;
     }
 }
