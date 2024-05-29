@@ -35,12 +35,12 @@ public class ReparaturServiceImpl implements ReparaturService {
         return repArr;
     }
     public boolean addRepairOrder(int track, Date date1,
-                           Date date2, String authorized, Checklist checklist, String remarks) {
+                           Date date2, String authorized, Checklist checklist, String remarks, GeoCords geo) {
         Utils util = new Utils();
         String uniqueID = util.generateID();
         ArrayList<String> selected = new ArrayList<>();
         ReparaturChecklist check = new ReparaturChecklist(uniqueID, checklist, selected);
-        Reparatur newRep = new Reparatur(uniqueID, track, date1, date2, check, remarks, "beauftragt", authorized);
+        Reparatur newRep = new Reparatur(uniqueID, track, date1, date2, check, remarks, "beauftragt", authorized, geo);
         rep.save(newRep);
         checkRepo.save(check);
         return true;
