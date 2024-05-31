@@ -2,7 +2,7 @@
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {onMounted, ref} from 'vue';
-import {getGeoData, getTrack, getPartOfTrack, getTimeFromHeatmap} from "@/main/vue/api/map";
+import {getGeoData, getTrack, getPartOfTrack} from "@/main/vue/api/map";
 import {useQuasar} from "quasar";
 import DateInput from "@/main/vue/pages/Map/DateInput.vue";
 import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";
@@ -22,6 +22,7 @@ const markerEnd = ref('')
 const kmStart = ref('')
 const kmEnd = ref('')
 const selectedMarker = ref('')
+let data = ref([])
 
 
 onMounted(async () => {
@@ -46,7 +47,7 @@ onMounted(async () => {
             maxZoom: 19,
             tileSize: 256
         }).addTo(map.value);
-    const data = await getGeoData();
+    data = await getGeoData();
     data.forEach((m) => markers.push({
         marker : L.circle([m.longitude, m.latitude], {color: "black", radius: 50}),
         data: m,
@@ -62,10 +63,11 @@ onMounted(async () => {
 const onMarkerClicked = (event) => {
     const circle = event.target;
     const marker = markers.find((m) => {
-            return m.data.longitude === circle.getLatLng().lat && m.data.latitude === circle.getLatLng().lng;
+        return m.data.longitude === circle.getLatLng().lat && m.data.latitude === circle.getLatLng().lng;
     });
     selectedMarker.value = marker
     dialogVisible.value = true;
+    console.log(selectedMarker.value)
 };
 
 const deleteStart = () => {
@@ -87,6 +89,30 @@ const addEnd = () => {
     kmEnd.value = selectedMarker.value.data.track_km;
 };
 
+function getLetLng(geopoint) {
+    for (let i = 0;i<data.length;i++) {
+        if (data[i].id === geopoint) {
+            return [data[i].longitude, data[i].latitude]
+        }
+    }
+}
+
+function getAllGeoPointsWithColor(dataPoint) {
+    let output = []
+    for(let i = 0;i < dataPoint.length;i++) {
+        if(dataPoint[i].NORMAL !== undefined) {
+            output.push([getLetLng(dataPoint[i].NORMAL), "black"])
+        } else if (dataPoint[i].LOW !== undefined) {
+            output.push([getLetLng(dataPoint[i].LOW), "green"])
+        } else if (dataPoint[i].MEDIUM !== undefined) {
+            output.push([getLetLng(dataPoint[i].MEDIUM), "orange"])
+        } else if (dataPoint[i].HIGH !== undefined) {
+            output.push([getLetLng(dataPoint[i].HIGH), "red"])
+        }
+    }
+    return output
+}
+
 const refreshMarkers = async () => {
     if (streckenID.value === "") {
         $q.notify({
@@ -96,7 +122,7 @@ const refreshMarkers = async () => {
         });
     } else {
         const data = await getTrack(streckenID.value);
-        console.log(data)
+        const newData = getAllGeoPointsWithColor(data)
         if (data.length === 0) {
             $q.notify({
                 type: 'negative',
@@ -106,9 +132,10 @@ const refreshMarkers = async () => {
         }
         markers.forEach((m) => map.value.removeLayer(m.marker));
         markers = []
-        for (let i = 0;i<data.length;i++) {
+        for (let i = 0; i < newData.length; i++) {
+            console.log(newData[i])
             markers.push({
-                marker : L.circle([data[i].longitude, data[i].latitude], {color: "black", radius: 50}),
+                marker: L.circle([newData[i][0][0], newData[i][0][1]], {color: newData[i][1], radius: 50}),
                 data: data[i],
             });
         }
@@ -121,6 +148,7 @@ const refreshMarkers = async () => {
 };
 
 const createRepairOrder = async () => {
+    console.log(selectedMarker.value.data)
     const longitude = selectedMarker.value.data.longitude
     const latitude = selectedMarker.value.data.latitude
     const streckenID = selectedMarker.value.data.strecken_id
@@ -138,7 +166,7 @@ const createRepairOrder = async () => {
 const onLocationFound = (e) => {
     const radius = e.accuracy;
     const userLocation = e.latlng;
-    L.circle(userLocation, { color: 'blue', radius: 200}).addTo(map.value);
+    L.circle(userLocation, {color: 'blue', radius: 200}).addTo(map.value);
 }
 const centerToUserLocation = async () => {
     const options = {
@@ -148,16 +176,19 @@ const centerToUserLocation = async () => {
     }
     map.value.locate(options).on('locationfound', onLocationFound);
     const gleis = await getPartOfGleislage(streckenID.value)
+    console.log(gleis)
 };
 
 const checkForChanges = async () => {
     if (kmStart.value !== '' && kmEnd.value !== '' && streckenID.value !== "") {
+        console.log(kmStart.value)
         const data = await getPartOfTrack(kmStart.value, kmEnd.value)
+        console.log(data)
         markers.forEach((m) => map.value.removeLayer(m.marker));
         markers = []
-        for (let i = 0;i<data.length;i++) {
+        for (let i = 0; i < data.length; i++) {
             markers.push({
-                marker : L.circle([data[i].longitude, data[i].latitude], {color: "black", radius: 50}),
+                marker: L.circle([data[i].longitude, data[i].latitude], {color: "black", radius: 50}),
                 data: data[i],
             });
         }
@@ -166,18 +197,6 @@ const checkForChanges = async () => {
             m.marker.on('click', onMarkerClicked);
         });
     } else {
-    }
-}
-
-async function getTimeRangeData() {
-    if (date !== '' && date2 !== '') {
-        const response = await getTimeFromHeatmap(streckenID.value, date.value, date2.value)
-    } else {
-        $q.notify({
-            type: 'negative',
-            message: "Please choose a valid time range",
-            caption: 'You have to fill in both values'
-        });
     }
 }
 
@@ -240,8 +259,8 @@ async function getTimeRangeData() {
                     </q-card-section>
 
                     <q-card-actions align="center">
-                        <q-btn flat @click="getTimeRangeData" label="Filter anwenden" color="primary" v-close-popup/>
-                        <q-btn flat label="Abbrechen" color="primary" v-close-popup />
+                        <q-btn flat label="Filter anwenden" color="primary" v-close-popup/>
+                        <q-btn flat label="Abbrechen" color="primary" v-close-popup/>
                     </q-card-actions>
                 </q-card>
             </q-dialog>
@@ -253,7 +272,7 @@ async function getTimeRangeData() {
                     <StandardInput v-model="streckenID" label="Strecken-ID Eingabe"></StandardInput>
                     <q-card-actions align="center">
                         <q-btn @click="refreshMarkers" flat label="Filter anwenden" color="primary" v-close-popup/>
-                        <q-btn flat label="Abbrechen" color="primary" v-close-popup />
+                        <q-btn flat label="Abbrechen" color="primary" v-close-popup/>
                     </q-card-actions>
                 </q-card>
             </q-dialog>
@@ -313,7 +332,7 @@ async function getTimeRangeData() {
                             color="primary"
                             v-close-popup
                         >
-                            <q-icon name="build" style="margin-left: 8px;" />
+                            <q-icon name="build" style="margin-left: 8px;"/>
                         </q-btn>
                     </q-card-actions>
                 </q-card>
@@ -374,6 +393,7 @@ async function getTimeRangeData() {
     height: 80vh;
     border: 3px solid $primary;
     border-radius: 15px;
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
 }
 
 .mapSettings {
@@ -415,7 +435,7 @@ async function getTimeRangeData() {
 
 <script>
 
-import { ref } from 'vue'
+import {ref} from 'vue'
 
 const columns = [
     {
@@ -425,7 +445,7 @@ const columns = [
         field: row => row.name,
         sortable: true
     },
-    { name: 'StreckenID', align: 'center', label: 'Strecken-ID', field: 'streckenid', sortable: true }
+    {name: 'StreckenID', align: 'center', label: 'Strecken-ID', field: 'streckenid', sortable: true}
 ]
 const rows = [
     {
@@ -435,7 +455,7 @@ const rows = [
         streckenid: '6061'
     }
 ]
-const options =  [
+const options = [
     "Zeitraum",
     "ID des Streckenabschnitts",
     "Abschnitt der Karte"
