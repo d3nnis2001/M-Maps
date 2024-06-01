@@ -4,8 +4,10 @@ import {useQuasar} from "quasar";
 import { useRoute } from 'vue-router';
 import {getDataById, sendDataById, sendInspectionOrder} from "@/main/vue/api/inspection";
 import router from "@/main/vue/router";
+import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";
 
 export default {
+    components: {StandardInput},
     setup () {
         const $q = useQuasar()
         const courseId = ref('')
@@ -100,6 +102,83 @@ export default {
 </script>
 
 <template>
+    <div class="outline">
+        <div class="outer-layer">
+            <div>
+                <div class="row">
+                    <p style="margin-right: 5px">PrüfauftragsId: </p>
+                    <p style="font-weight: bold">{{ currentInspectionOrderId }}</p>
+                </div>
+            </div>
+            <q-separator size="2px" color="primary" style="margin-top: 20px "></q-separator>
+
+            <p style="font-weight: bold; margin-top: 20px">StreckenId</p>
+            <StandardInput class="extra-mar" v-model="courseId" label="StreckenId" ></StandardInput>
+            <div class="row">
+                <div class="text-with-input mar-right">
+                    <p style="font-weight: bold;">Startort</p>
+                    <StandardInput class="extra-mar" v-model="startLocation" label="Startort" ></StandardInput>
+                </div>
+                <div class="text-with-input">
+                    <p style="font-weight: bold;">Zielort</p>
+                    <StandardInput class="extra-mar" v-model="endLocation" label="Zielort" ></StandardInput>
+                </div>
+            </div>
+            <p style="font-weight: bold;">Zeitraum (von - bis)</p>
+            <div class="text-with-input row extra-mar">
+                <q-input class="input-style mar-right" filled v-model="startTime" mask="date" :rules="['date']">
+                    <template v-slot:append>
+                        <q-icon name="event" class="cursor-pointer">
+                            <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                                <q-date v-model="startTime">
+                                    <div class="row items-center justify-end">
+                                        <q-btn v-close-popup label="Close" color="primary" flat />
+                                    </div>
+                                </q-date>
+                            </q-popup-proxy>
+                        </q-icon>
+                    </template>
+                </q-input>
+                <q-input  class="input-style" filled v-model="endTime" mask="date" :rules="['date']">
+                    <template v-slot:append>
+                        <q-icon name="event" class="cursor-pointer">
+                            <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                                <q-date v-model="endTime">
+                                    <div class="row items-center justify-end">
+                                        <q-btn v-close-popup label="Close" color="primary" flat />
+                                    </div>
+                                </q-date>
+                            </q-popup-proxy>
+                        </q-icon>
+                    </template>
+                </q-input>
+            </div>
+
+        <div class="row extra-mar">
+            <div class="mar-right">
+                <p style="font-weight: bold;">Fachabteilung</p>
+                <StandardInput class="" v-model="department" label="Fachabteilung" ></StandardInput>
+            </div>
+            <div class="row extra-mar">
+                <p style="font-weight: bold;">Messdaten</p>
+                <StandardInput class="" v-model="inspectionData" label="Messdaten"></StandardInput>
+            </div>
+        </div>
+        <div>
+            <p style="font-weight: bold;">Bemerkungen</p>
+            <q-input class="input-bem text-with-input" outlined color="primary" rounded v-model="remarks" label="Bemerkungen" />
+        </div>
+            <q-btn style="width: 100%; max-width: 218px; margin-top: 20px" size="16px" no-caps rounded label="Speichern" color="primary" @click=sendData></q-btn>
+
+        </div>
+    </div>
+
+
+
+
+
+
+    <!-- ###########################################################################
     <div class="q-pa-md">
         <div class="q-gutter-y-md column" style="max-width: 300px">
 
@@ -134,11 +213,52 @@ export default {
             <q-btn label="Speichern" @click="sendData" color="primary" class=""></q-btn>
         </div>
     </div>
+    -->
 
 </template>
 
 
-<style scoped>
+<style lang="scss">
+.outline {
+    border: 2px solid $primary;
+    padding: 20px;
+    margin: 10px;
+    border-radius: 15px;
+    background-color: #F7F7F7;
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
+}
 
+p {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.mar-right {
+    margin-right: 20px;
+}
+
+
+.input-style {
+    width: 100%;
+    max-width: 288px;
+}
+
+.outer-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.button-set {
+    margin-top: 20px;
+    width: 100%;
+    max-width: 288px;
+}
+
+.input-bem {
+    width: 100%;
+}
+
+.extra-mar {
+    margin-bottom: 20px;
+}
 </style>
-

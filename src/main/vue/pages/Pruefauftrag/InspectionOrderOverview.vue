@@ -77,7 +77,12 @@ export default {
 </script>
 
 <template>
-    <div class="q-pa-md">
+    <div class="q-pa-md extra-margin">
+        <q-input borderless dense debounce="300" v-model="state.filter" placeholder="Search">
+            <template v-slot:append>
+                <q-icon name="search" />
+            </template>
+        </q-input>
         <q-table
             class="my-sticky-header-table"
             flat bordered
@@ -90,7 +95,7 @@ export default {
     </div>
 
     <div class="q-pa-md">
-        <q-btn label="Neuen Auftrag erstellen" @click="createInspectionOrder" color="primary"  class=""></q-btn>
+        <q-btn class="handleButton" style="width: 100%; max-width: 218px" size="16px" no-caps rounded label="Auftrag erstellen" @click="createInspectionOrder" color="primary"></q-btn>
 
         <q-dialog v-model="showDialog">
             <q-card>

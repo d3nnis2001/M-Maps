@@ -1,9 +1,6 @@
 package com.gpse.basis;
 
-import com.gpse.basis.domain.Checklist;
-import com.gpse.basis.domain.GleisLageRange;
-import com.gpse.basis.domain.InspectionOrder;
-import com.gpse.basis.domain.UserModel;
+import com.gpse.basis.domain.*;
 import com.gpse.basis.repositories.*;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,5 +79,6 @@ public class InitializeDatabase implements InitializingBean {
             " ", " ", "archiviert", "hallo :)", true);
         ioRepo.save(inspec);
     }
+
 
 }
