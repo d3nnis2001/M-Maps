@@ -18,15 +18,17 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
-
 import java.io.*;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static java.util.stream.Collectors.toList;
+
+
 
 
 @Service
@@ -44,15 +46,18 @@ public class FileServiceImpl implements FileService {
 
     private final DataService dService;
 
+    private final RosBagService rosService;
+
     Lock lock = new ReentrantLock();
     @Autowired
-    FileServiceImpl(DataSetRepository repro, GleisLageDatenRepository rpr, GeoTrackData gt, MongoTemplate tmp, GleisVDataRepository rprr, DataService dstr) {
+    FileServiceImpl(DataSetRepository repro, GleisLageDatenRepository rpr, GeoTrackData gt, MongoTemplate tmp, GleisVDataRepository rprr, DataService dstr, RosBagService ros) {
         datasetRepro = repro;
         glDatenRepro = rpr;
         geoTrack = gt;
         template = tmp;
         gleisV = rprr;
         dService = dstr;
+        rosService = ros;
     }
 
     @Override
@@ -78,10 +83,31 @@ public class FileServiceImpl implements FileService {
                 continue;
             }
 
+            if(file.getName().endsWith(".bag")) {
+
+                    if(Objects.equals(streckenId, "missing")) {
+                        rsp.add(new FileUploadResponse(file.getName(), false, "Missing Track_ID"));
+                    }
+                    else {
+                        if(file.getName().contains("camera")) {
+                            rosService.saveCameraImagesForTrack(Integer.parseInt(streckenId), file.getAbsolutePath());
+                        }
+                        Date uploadDate = new Date();
+                        DataSet st = new DataSet();
+                        st.setFileName(file.getAbsolutePath());
+                        st.setStreckenId(Integer.parseInt(streckenId));
+                        st.setUploadDate(uploadDate);
+                        datasetRepro.save(st);
+                        rsp.add(new FileUploadResponse(file.getName(), true, ""));
+                    }
+
+                continue;
+            }
+
             if(file.getName().endsWith(".csv")) {
                 try {
                     saveCsvFile(file);
-                } catch(Exception e) {
+                } catch(IOException e) {
                     System.out.println(e.getMessage());
                     rsp.add(new FileUploadResponse(file.getName(), false, "Fehlerhafte Datei!"));
                 }
@@ -134,7 +160,10 @@ public class FileServiceImpl implements FileService {
         return rsp;
     }
 
-    private void saveCsvFile(File file) throws Exception {
+
+
+
+    private void saveCsvFile(File file) throws IOException {
         List<GleisVData> lst = new ArrayList<>();
         BufferedReader reader = new BufferedReader(new FileReader(file));
         //read header and skip
@@ -425,9 +454,6 @@ public class FileServiceImpl implements FileService {
         List<List<String>> lst = new ArrayList<>();
         List<File> files = getAllFiles(folder);
         files.forEach(f -> lst.add(new ArrayList<String>() {{add(f.getPath()); add(f.getName());}}));
-
-        //todo: löschen
-        dService.getGeoDatabyTrackId(6100);
 
         return lst;
     }

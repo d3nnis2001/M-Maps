@@ -1,15 +1,13 @@
 package com.gpse.basis;
 
-import com.gpse.basis.domain.Checklist;
-import com.gpse.basis.domain.GleisLageRange;
-import com.gpse.basis.domain.InspectionOrder;
-import com.gpse.basis.domain.UserModel;
+import com.gpse.basis.domain.*;
 import com.gpse.basis.repositories.*;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
 public class InitializeDatabase implements InitializingBean {
@@ -20,14 +18,17 @@ public class InitializeDatabase implements InitializingBean {
 
     private final GleisLageRangeRepository glrRepo;
 
+    private final GeoTrackData geoTrackRepository;
+
     @Autowired
     public InitializeDatabase(final UserRepository usRepo, final InspectionOrderRepository ioRepo, final ReperaturRepository reRepo,
-        final ChecklistRepository checkRepo, final GleisLageRangeRepository r) {
+        final ChecklistRepository checkRepo, final GleisLageRangeRepository r, final GeoTrackData gTD) {
         this.usRepo = usRepo;
         this.ioRepo = ioRepo;
         this.reRepo = reRepo;
         this.checkRepo = checkRepo;
         this.glrRepo = r;
+        this.geoTrackRepository = gTD;
     }
 
     @Override
@@ -36,6 +37,7 @@ public class InitializeDatabase implements InitializingBean {
         initInspectionOrder();
         initChecklists();
         initRanges();
+        initGeoTrack();
     }
     public void initUsers() {
         // Test User 1
@@ -81,6 +83,18 @@ public class InitializeDatabase implements InitializingBean {
             "Hannover", "08-05-2024", "09-05-2024",
             " ", " ", "archiviert", "hallo :)", true);
         ioRepo.save(inspec);
+    }
+
+    public void initGeoTrack() {
+        Iterable<GeoData> lst = geoTrackRepository.findAll();
+        AtomicBoolean found = new AtomicBoolean(false);
+        lst.forEach(w -> {
+            if(w.getStrecken_id() == 1) {
+                found.set(true);
+            }
+        });
+        if(!found.get())
+            geoTrackRepository.save(new GeoData(1, 52.17027,  9.08446,0));
     }
 
 }

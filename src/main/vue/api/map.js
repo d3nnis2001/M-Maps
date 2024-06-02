@@ -43,5 +43,17 @@ export const getPartOfGleislage = async function getPartOfGleislage(id) {
     }
 }
 
+export const getImagesForTrackId = async(trackId) => {
+    try {
+        const cred = new URLSearchParams()
+        cred.append("trackid", trackId)
+        const response = await axios.post("/api/map/getCameraImageforTrack", cred)
+        console.log(response.data)
+        return response.data
+    }catch (error) {
+        console.log("Something went wrong, when getting the pictures!")
+    }
+}
+
 
 export default {getGeoData, getTrack};

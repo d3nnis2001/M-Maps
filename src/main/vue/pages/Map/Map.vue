@@ -2,7 +2,7 @@
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {onMounted, ref} from 'vue';
-import {getGeoData, getTrack, getPartOfTrack, getPartOfGleislage} from "@/main/vue/api/map";
+import {getGeoData, getTrack, getPartOfTrack, getPartOfGleislage, getImagesForTrackId} from "@/main/vue/api/map";
 import {useQuasar} from "quasar";
 import DateInput from "@/main/vue/pages/Map/DateInput.vue";
 import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";
@@ -22,6 +22,9 @@ const markerEnd = ref('')
 const kmStart = ref('')
 const kmEnd = ref('')
 const selectedMarker = ref('')
+const dialogMarkerOne = ref(false)
+const slide = ref(0)
+const cameraimages = ref([])
 
 
 onMounted(async () => {
@@ -59,11 +62,18 @@ onMounted(async () => {
     map.value.locate({setView: false});
 });
 
-const onMarkerClicked = (event) => {
+const onMarkerClicked = async (event) => {
     const circle = event.target;
     const marker = markers.find((m) => {
             return m.data.longitude === circle.getLatLng().lat && m.data.latitude === circle.getLatLng().lng;
     });
+    if(marker.data.strecken_id === 1) {
+        //todo: hardcoded
+        dialogMarkerOne.value = true
+        cameraimages.value = await getImagesForTrackId(1)
+        return
+    }
+
     selectedMarker.value = marker
     dialogVisible.value = true;
     console.log(marker.data.latitude)
@@ -325,6 +335,13 @@ const checkForChanges = async () => {
                 </q-card>
 
             </div>
+        </div>
+    </q-dialog>
+    <q-dialog v-model="dialogMarkerOne">
+        <div class="q-pa-md">
+                <div v-for="(img,index) in cameraimages" >
+                    <img :src="img" alt="Example Image">
+                </div>
         </div>
     </q-dialog>
 </template>
