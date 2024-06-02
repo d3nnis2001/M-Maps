@@ -13,7 +13,8 @@ public interface InspectionServices {
 
     void acceptInspectionOrder(InspectionOrder inspectionOrder);
 
+    Boolean deleteInspectionOrder(String id);
     ArrayList<InspectionOrder> getInspecData();
-    InspectionOrder loadInspecById(String streckenId) throws UsernameNotFoundException;
+    InspectionOrder loadInspecById(String inspectionOrderId) throws UsernameNotFoundException;
 
 }

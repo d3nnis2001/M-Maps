@@ -1,6 +1,7 @@
 package com.gpse.basis.services;
 
 import com.gpse.basis.domain.InspectionOrder;
+import com.gpse.basis.domain.Reparatur;
 import com.gpse.basis.repositories.InspectionOrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -54,6 +55,20 @@ public class InspectionServicesImpl implements InspectionServices {
 
     @Override
     public void acceptInspectionOrder(InspectionOrder inspectionOrder) {
+
+    }
+
+    @Override
+    public Boolean deleteInspectionOrder(String inspectionOrderId) {
+        try {
+            System.out.println("TEST: Impl Datei");
+            InspectionOrder inspectionOrder = loadInspecById(inspectionOrderId);
+            System.out.println("TEST: " + inspectionOrder.getInspectionOrderId());
+            inspec.delete(inspectionOrder);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
 
     }
 

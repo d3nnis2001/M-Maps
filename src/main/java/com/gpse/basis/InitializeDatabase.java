@@ -74,9 +74,9 @@ public class InitializeDatabase implements InitializingBean {
     }
 
     public void initInspectionOrder() {
-        InspectionOrder inspec = new InspectionOrder("1111","1234", "1000", "Bielefeld",
-            "Hannover", "08-05-2024", "09-05-2024",
-            " ", " ", "archiviert", "hallo :)", true);
+        InspectionOrder inspec = new InspectionOrder("1716728251294","1234", "1000", "Bielefeld",
+            "Hannover", "2024/01/01", "2024/01/02",
+            " ", " ", "archiviert", "", true);
         ioRepo.save(inspec);
     }
 

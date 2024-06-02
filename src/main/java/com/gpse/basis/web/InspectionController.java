@@ -56,4 +56,11 @@ public class InspectionController {
         inspec.editInspectionOrder(inspectionOrderNew);
     }
 
+    @PostMapping("/deleteInspectionOrder")
+    public void deleteInspectionOrder(final WebRequest request) {
+        String id = request.getParameter("inspectionOrderId");
+        System.out.println("TEST: " +  id);
+        inspec.deleteInspectionOrder(id);
+    }
+
 }
