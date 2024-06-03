@@ -4,11 +4,13 @@ import com.gpse.basis.domain.*;
 import com.gpse.basis.repositories.*;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 
 @Service
+@Profile("Application")
 public class InitializeDatabase implements InitializingBean {
     private final UserRepository usRepo;
     private final InspectionOrderRepository ioRepo;
