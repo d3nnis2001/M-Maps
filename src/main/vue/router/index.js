@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 import StartView from '../pages/Start.vue'
-import MapView from '../pages/Map/Map.vue'
 import DataImport from "../pages/DataImport/DataImport.vue";
 import Login from '../pages/Login/Login.vue'
 import Registration from "../pages/Login/Registration.vue";
@@ -16,6 +15,7 @@ import ReparaturOverview from "@/main/vue/pages/ReparaturAufträge/ReparaturOver
 import ReparaturCreate from "@/main/vue/pages/ReparaturAufträge/ReparaturCreate.vue";
 import ReparaturEdit from "@/main/vue/pages/ReparaturAufträge/ReparaturEdit.vue";
 import AdminMain from "@/main/vue/pages/Nutzerverwaltung/AdminMain.vue";
+import MapView from "../pages/Map/Map.vue"
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
