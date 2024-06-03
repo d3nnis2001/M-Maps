@@ -16,7 +16,6 @@ public class InitializeDatabase implements InitializingBean {
     private final InspectionOrderRepository ioRepo;
     private final ReperaturRepository reRepo;
     private final ChecklistRepository checkRepo;
-
     private final GleisLageRangeRepository glrRepo;
 
     @Autowired
