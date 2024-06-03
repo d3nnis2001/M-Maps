@@ -6,6 +6,7 @@ export const useChecklistTemplateStore = defineStore('checklistTemplates', () =>
     const templateNames = ref([])
     const templates = ref([])
     const template = ref({name: "", tasks: [], material: []})
+    const templateEdit = ref({name: "", tasks: [], material: []})
     const templateName = ref("")
     const invalidInput = ref(false)
     const templateAdded = ref(true)
@@ -122,11 +123,7 @@ export const useChecklistTemplateStore = defineStore('checklistTemplates', () =>
                 .then(res => {
                     templateAdded.value = true
                     templateName.value = res.data
-                    const index = templateNames.value.findIndex(
-                        (item) => item.name === template.value.name)
-                    if (index !== -1) {
-                        templateNames.value.splice(index, 0, templateName.value)
-                    }
+                    templateNames.value.push(templateName.value)
                     resolve()
                 })
                 .catch(() => {
@@ -136,10 +133,32 @@ export const useChecklistTemplateStore = defineStore('checklistTemplates', () =>
         })
     }
 
+    function editChecklist() {
+        if (nameNotAllowed(templateEdit.value.name)) {
+
+        } else if (checkListsEmpty(templateEdit.value.tasks, templateEdit.value.material)) {
+
+        } else {
+            return new Promise((resolve, reject) => {
+                api.checklistTemplate.editTemplate(template, templateEdit)
+                    .then(res => {
+                        templateAdded.value = res.data
+                        template.value = templateEdit.value
+                        resolve()
+                    })
+                    .catch(res => {
+                        templateAdded.value = res.data
+                        reject()
+                    })
+            })
+        }
+    }
+
     return {
         templateNames,
         templates,
         template,
+        templateEdit,
         templateName,
         invalidInput,
         templateAdded,
@@ -150,7 +169,8 @@ export const useChecklistTemplateStore = defineStore('checklistTemplates', () =>
         getAllTemplates,
         addChecklist,
         deleteTemplate,
-        duplicateTemplate
+        duplicateTemplate,
+        editChecklist
     }
 
 })

@@ -74,7 +74,9 @@ function duplicateTemplate() {
     <span>
         <q-btn label="löschen" outline color="negative" @click="deleteTemplate"/>
         <q-btn label="duplizieren" outline color="primary" @click="duplicateTemplate" />
-        <q-btn label="bearbeiten" color="primary"/>
+        <RouterLink :to="`/checklists/edit/${template.name}`">
+            <q-btn label="bearbeiten" color="primary"/>
+        </RouterLink>
     </span>
 </template>
 

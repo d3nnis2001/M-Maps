@@ -52,4 +52,9 @@ public class ChecklistTemplateController {
     public String addDuplicate(@RequestBody ChecklistTemplate template) {
         return checklistTemplateService.duplicateTemplate(template);
     }
+
+    @PostMapping("/edit")
+    public boolean editChecklist(@RequestBody ChecklistTemplate oldTemplate, @RequestBody ChecklistTemplate newTemplate) {
+        return checklistTemplateService.editChecklist(oldTemplate, newTemplate);
+    }
 }

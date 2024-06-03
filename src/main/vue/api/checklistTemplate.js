@@ -18,5 +18,8 @@ export default {
     },
     duplicateTemplate(template) {
         return axios.post(`/api/templates/duplicate`, template)
+    },
+    editTemplate(template, newTemplate) {
+        return axios.post(`/api/templates/edit`, oldTemplate, newTemplate)
     }
 }
