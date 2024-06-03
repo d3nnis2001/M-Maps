@@ -4,6 +4,7 @@ import {useUserStore} from "@/main/vue/stores/UserStore";
 export const getUserData = async function getData() {
     try {
         const response = await axios.get("/api/admin/getuserdata")
+        console.log(response.data)
         //return transformData(response.data)
         return response.data
     } catch (error) {

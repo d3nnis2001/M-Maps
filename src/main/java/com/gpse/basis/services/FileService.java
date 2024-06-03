@@ -3,6 +3,7 @@ package com.gpse.basis.services;
 import com.gpse.basis.domain.DataSet;
 import com.gpse.basis.domain.FileUploadResponse;
 import com.gpse.basis.domain.GeoData;
+import com.gpse.basis.domain.GleisLageDatenpunkt;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -21,5 +22,9 @@ public interface FileService {
     ArrayList<GeoData> getPartGeoData(int from, int till);
 
     List<List<String>> readFoler(String path);
+
+    ArrayList<GleisLageDatenpunkt> getAllTrackData();
+    ArrayList<GleisLageDatenpunkt> getTrackData(int trackId);
+    ArrayList<String> getDataforId(int trackId);
 
 }

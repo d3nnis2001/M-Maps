@@ -406,7 +406,6 @@ public class FileServiceImpl implements FileService {
     }
 
 
-
     private List<File> getAllFiles(File folder) {
         File[] files = folder.listFiles();
         List<File> fileList = new ArrayList<>();
@@ -430,5 +429,48 @@ public class FileServiceImpl implements FileService {
         dService.getGeoDatabyTrackId(6100);
 
         return lst;
+    }
+
+    public ArrayList<String> getDataforId(int trackId) {
+        List<DataSet> sets = getDataSets("all");
+        ArrayList<String> dataIds = new ArrayList<>();
+        for (DataSet set : sets) {
+            if (set.getStreckenId() == trackId) {
+                dataIds.add(set.getId());
+            }
+        }
+        return dataIds;
+    }
+
+    public ArrayList<GleisLageDatenpunkt> getTrackData(int trackId) {
+        ArrayList<GleisLageDatenpunkt> dataPoints = new ArrayList<>();
+        ArrayList<String> dataIds = getDataforId(trackId);
+        Iterable<GleisLageDatenpunkt> iterable = glDatenRepro.findAll();
+        Iterator<GleisLageDatenpunkt> iterator = iterable.iterator();
+        while (iterator.hasNext()) {
+            GleisLageDatenpunkt dataPoint = iterator.next();
+            if (dataPoint.getStr_km() > 70 && dataPoint.getStr_km() < 100) {
+                dataPoints.add(dataPoint);
+            }
+        }
+        /*
+        while (iterator.hasNext()) {
+            GleisLageDatenpunkt gld = iterator.next();
+            if (dataIds.contains(gld.getId())) {
+                dataPoints.add(gld);
+            }
+        }*/
+        return dataPoints;
+    }
+
+    public ArrayList<GleisLageDatenpunkt> getAllTrackData() {
+        Iterable<GleisLageDatenpunkt> iterable = glDatenRepro.findAll();
+        ArrayList<GleisLageDatenpunkt> dataPoints = new ArrayList<>();
+        Iterator<GleisLageDatenpunkt> iterator = iterable.iterator();
+        while (iterator.hasNext()) {
+            GleisLageDatenpunkt gld = iterator.next();
+            dataPoints.add(gld);
+        }
+        return dataPoints;
     }
 }
