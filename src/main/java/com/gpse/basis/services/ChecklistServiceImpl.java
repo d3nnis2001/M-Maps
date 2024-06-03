@@ -6,9 +6,12 @@ import com.gpse.basis.repositories.ChecklistRepository;
 import com.gpse.basis.repositories.RepChecklistRepository;
 import org.apache.kerby.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -54,7 +57,7 @@ public class ChecklistServiceImpl implements ChecklistService {
         return repCheck.getCheckSel();
     }
 
-    public Boolean setTerminatedDate(String id, Date term) {
+    public Boolean setTerminatedDate(String id, LocalDate term) {
         try {
             ReparaturChecklist r1 = loadRepCheckById(id);
             r1.setTerminiert(term);

@@ -7,11 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
-import java.util.Random;
 
 @Service
 
@@ -34,8 +33,8 @@ public class ReparaturServiceImpl implements ReparaturService {
         }
         return repArr;
     }
-    public boolean addRepairOrder(int track, Date date1,
-                           Date date2, String authorized, Checklist checklist, String remarks, GeoCords geo) {
+    public boolean addRepairOrder(int track, LocalDate date1,
+                           LocalDate date2, String authorized, Checklist checklist, String remarks, GeoCords geo) {
         Utils util = new Utils();
         String uniqueID = util.generateID();
         ArrayList<String> selected = new ArrayList<>();

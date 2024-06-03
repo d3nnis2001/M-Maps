@@ -441,11 +441,10 @@ public class FileServiceImpl implements FileService {
     }
 
     //return null, if from > till
-    public List<Map.Entry<DataService.Colors, String>> getPartHeatmap(int strecke, Date from, Date till) {
-        if (from.after(till)) {
+    public List<Map.Entry<DataService.Colors, String>> getPartHeatmap(int strecke, LocalDateTime from, LocalDateTime till) {
+        if (from.isAfter(till)) {
             return null;
         }
-         return dService.getGeoDataByDate(strecke, LocalDateTime.ofInstant(from.toInstant(), ZoneId.systemDefault()), LocalDateTime.ofInstant(till.toInstant(), ZoneId.systemDefault()));
-
+         return dService.getGeoDataByDate(strecke, from, till);
     }
 }

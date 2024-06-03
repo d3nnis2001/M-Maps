@@ -2,7 +2,7 @@
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {onMounted, ref} from 'vue';
-import {getGeoData, getTrack, getPartOfTrack} from "@/main/vue/api/map";
+import {getGeoData, getTrack, getPartOfTrack, getTimeFromHeatmap} from "@/main/vue/api/map";
 import {useQuasar} from "quasar";
 import DateInput from "@/main/vue/pages/Map/DateInput.vue";
 import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";
@@ -67,7 +67,7 @@ const onMarkerClicked = (event) => {
     });
     selectedMarker.value = marker
     dialogVisible.value = true;
-    console.log(selectedMarker.value)
+    console.log(selectedMarker.value.data)
 };
 
 const deleteStart = () => {
@@ -82,6 +82,7 @@ const deleteEnd = () => {
 
 const addStart = () => {
     markerStart.value = selectedMarker;
+
     kmStart.value = selectedMarker.value.data.track_km;
 };
 const addEnd = () => {
@@ -131,12 +132,10 @@ const refreshMarkers = async () => {
             });
         }
         markers.forEach((m) => map.value.removeLayer(m.marker));
-        markers = []
         for (let i = 0; i < newData.length; i++) {
-            console.log(newData[i])
             markers.push({
                 marker: L.circle([newData[i][0][0], newData[i][0][1]], {color: newData[i][1], radius: 50}),
-                data: data[i],
+                data: newData[i],
             });
         }
         markers.forEach((m) => {
@@ -148,7 +147,7 @@ const refreshMarkers = async () => {
 };
 
 const createRepairOrder = async () => {
-    console.log(selectedMarker.value.data)
+    console.log(selectedMarker.value)
     const longitude = selectedMarker.value.data.longitude
     const latitude = selectedMarker.value.data.latitude
     const streckenID = selectedMarker.value.data.strecken_id
@@ -162,6 +161,10 @@ const createRepairOrder = async () => {
     });
 }
 
+async function getHeatmapWithTime() {
+    const timeData = await getTimeFromHeatmap(streckenID, date._value, date2._value)
+    console.log(timeData)
+}
 
 const onLocationFound = (e) => {
     const radius = e.accuracy;
@@ -259,7 +262,7 @@ const checkForChanges = async () => {
                     </q-card-section>
 
                     <q-card-actions align="center">
-                        <q-btn flat label="Filter anwenden" color="primary" v-close-popup/>
+                        <q-btn flat @click="getHeatmapWithTime" label="Filter anwenden" color="primary" v-close-popup/>
                         <q-btn flat label="Abbrechen" color="primary" v-close-popup/>
                     </q-card-actions>
                 </q-card>

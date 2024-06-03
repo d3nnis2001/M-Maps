@@ -22,9 +22,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
-
-
-
 @Service
 public class DataServiceImpl implements DataService{
     private static final Lock lock = new ReentrantLock();
@@ -256,7 +253,7 @@ public class DataServiceImpl implements DataService{
      * Gets the Colours and ids for each existing GeoPoint in a
      * timeframe.
      **/
-    public List<Map.Entry<Colors, String>> getGeoDataByDate(int track_id, LocalDateTime from, LocalDateTime till){
+    public List<Map.Entry<Colors, String>> getGeoDataByDate(int track_id, LocalDateTime from, LocalDateTime till) {
         Query query = new Query();
         query.addCriteria(Criteria.where("strecken_id").is(track_id));
         List<GeoData> gd = template.find(query, GeoData.class);
@@ -264,6 +261,7 @@ public class DataServiceImpl implements DataService{
             return null;
         System.out.println(gd.getFirst().getId());
         List<Map.Entry<Colors, String>> col = getColorForDateRange(gd, from, till);
+        System.out.println("Wir sind im Dataservice: "+col.size());
         return col;
     }
 }

@@ -4,10 +4,12 @@ import com.gpse.basis.domain.DataSet;
 import com.gpse.basis.domain.FileUploadResponse;
 import com.gpse.basis.domain.GeoData;
 import org.apache.avro.util.MapEntry;
+import org.springframework.cglib.core.Local;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +27,6 @@ public interface FileService {
 
     List<List<String>> readFoler(String path);
 
-    List<Map.Entry<DataService.Colors, String>> getPartHeatmap(int strecke, Date from, Date till);
+    List<Map.Entry<DataService.Colors, String>> getPartHeatmap(int strecke, LocalDateTime from, LocalDateTime till);
 
 }

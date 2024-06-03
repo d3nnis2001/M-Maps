@@ -5,11 +5,13 @@ import com.gpse.basis.domain.Utils;
 import com.gpse.basis.services.DataService;
 import com.gpse.basis.services.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
 import java.awt.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -51,14 +53,15 @@ public class MapController {
         return k;
     }
 
-    @PostMapping("/getpartofheatmap")
+    @PostMapping("/getpartheatmap")
     public List<ResponseColor> getPartOfHeatmap(final WebRequest request) {
-        Utils util = new Utils();
         String strecke = request.getParameter("strecke");
         String from = request.getParameter("from");
         String till = request.getParameter("till");
-        Date fromDate = util.transformString(from);
-        Date tillDate = util.transformString(till);
+        System.out.println(from);
+        LocalDateTime fromDate = LocalDateTime.parse(from);
+        LocalDateTime tillDate = LocalDateTime.parse(till);
+        System.out.println("Datum: "+fromDate);
         List<Map.Entry<DataService.Colors, String>> lst = file.getPartHeatmap(Integer.parseInt(strecke), fromDate, tillDate);
         List<ResponseColor> k = new ArrayList<>(lst.size());
         for(int i = 0; i < lst.size(); ++i)

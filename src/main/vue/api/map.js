@@ -45,4 +45,4 @@ export const getTimeFromHeatmap = async function getTimeFromHeatmap(strecke, fro
 }
 
 
-export default {getGeoData, getTrack};
+export default {getGeoData, getTrack, getTimeFromHeatmap};

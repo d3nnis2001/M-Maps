@@ -15,9 +15,9 @@ public interface DataService {
 
 
     }
-    public List<Map.Entry<Colors, String>> getNewestColorsforGeoData(List<GeoData> lst);
+    List<Map.Entry<Colors, String>> getNewestColorsforGeoData(List<GeoData> lst);
 
-    public List<Map.Entry<Colors, String>> getGeoDatabyTrackId(int track_id);
+    List<Map.Entry<Colors, String>> getGeoDatabyTrackId(int track_id);
 
-    public List<Map.Entry<Colors, String>> getGeoDataByDate(int track_id, LocalDateTime from, LocalDateTime till);
+    List<Map.Entry<Colors, String>> getGeoDataByDate(int track_id, LocalDateTime from, LocalDateTime till);
 }
