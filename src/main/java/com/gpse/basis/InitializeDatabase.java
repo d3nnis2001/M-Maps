@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 
 @Service
-@Profile("Application")
+@Profile("Name1")
 public class InitializeDatabase implements InitializingBean {
     private final UserRepository usRepo;
     private final InspectionOrderRepository ioRepo;
