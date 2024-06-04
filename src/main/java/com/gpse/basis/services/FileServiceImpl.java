@@ -45,17 +45,15 @@ public class FileServiceImpl implements FileService {
 
     private MongoTemplate template;
 
-    private final DataService dService;
 
     Lock lock = new ReentrantLock();
     @Autowired
-    FileServiceImpl(DataSetRepository repro, GleisLageDatenRepository rpr, GeoTrackData gt, MongoTemplate tmp, GleisVDataRepository rprr, DataService dstr) {
+    FileServiceImpl(DataSetRepository repro, GleisLageDatenRepository rpr, GeoTrackData gt, MongoTemplate tmp, GleisVDataRepository rprr) {
         datasetRepro = repro;
         glDatenRepro = rpr;
         geoTrack = gt;
         template = tmp;
         gleisV = rprr;
-        dService = dstr;
     }
 
     @Override
@@ -354,65 +352,6 @@ public class FileServiceImpl implements FileService {
         query.addCriteria(Criteria.where("dataSetid").in(ids));
         template.remove(query, "GleisLageDaten");
     }
-    /**
-     * Returns the all available Geodata
-     **/
-    @Override
-    public ArrayList<GeoData> getGeoData() {
-        Iterable<GeoData> iterable = geoTrack.findAll();
-        ArrayList<GeoData> geoArr = new ArrayList<>();
-        Iterator<GeoData> iterator = iterable.iterator();
-        while (iterator.hasNext()) {
-            GeoData geo = iterator.next();
-            geoArr.add(geo);
-        }
-        return geoArr;
-    }
-
-    /**
-     * Returns the all available Geodata from a track
-     **/
-    @Override
-    public ArrayList<GeoData> getTrackGeoData(int trackID) {
-        Iterable<GeoData> iterable = geoTrack.findAll();
-        ArrayList<GeoData> geoArr = new ArrayList<>();
-        Iterator<GeoData> iterator = iterable.iterator();
-        while (iterator.hasNext()) {
-            GeoData geo = iterator.next();
-            if (geo.getStrecken_id() == trackID) {
-                geoArr.add(geo);
-            }
-        }
-        System.out.println(geoArr.size());
-        return geoArr;
-    }
-
-    @Override
-    public List<Map.Entry<DataService.Colors, String>> getPartGeoData(int from, int till) {
-        Iterable<GeoData> iterable = geoTrack.findAll();
-        boolean isright = true;
-        if (from > till) {
-            isright = false;
-        }
-        ArrayList<GeoData> geoArr = new ArrayList<>();
-        Iterator<GeoData> iterator = iterable.iterator();
-        while (iterator.hasNext()) {
-            GeoData geo = iterator.next();
-            double currKm = geo.getTrack_km();
-            if (isright) {
-                if (currKm >= from && currKm <= till) {
-                    geoArr.add(geo);
-                }
-            } else {
-                if (currKm <= from && currKm >= till) {
-                    geoArr.add(geo);
-                }
-            }
-        }
-        System.out.println(geoArr.size());
-        List<Map.Entry<DataService.Colors, String>> ltg = dService.getNewestColorsforGeoData(geoArr);
-        return ltg;
-    }
 
 
     private List<File> getAllFiles(File folder) {
@@ -433,18 +372,6 @@ public class FileServiceImpl implements FileService {
         List<List<String>> lst = new ArrayList<>();
         List<File> files = getAllFiles(folder);
         files.forEach(f -> lst.add(new ArrayList<String>() {{add(f.getPath()); add(f.getName());}}));
-
-        //todo: löschen
-        dService.getGeoDatabyTrackId(6100);
-
         return lst;
-    }
-
-    //return null, if from > till
-    public List<Map.Entry<DataService.Colors, String>> getPartHeatmap(int strecke, LocalDateTime from, LocalDateTime till) {
-        if (from.isAfter(till)) {
-            return null;
-        }
-         return dService.getGeoDataByDate(strecke, from, till);
     }
 }

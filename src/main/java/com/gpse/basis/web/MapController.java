@@ -22,36 +22,16 @@ import java.util.Date;
 public class MapController {
 
     @Autowired
-    private FileService file;
     private final DataService dataService;
-    public MapController(FileService file, DataService dataService) {
-        this.file = file;
+    public MapController(DataService dataService) {
         this.dataService = dataService;
     }
 
     @GetMapping("/gettracks")
     public ArrayList<GeoData> getAllGeoData() {
-        return file.getGeoData();
+        return dataService.getGeoData();
     }
 
-    @PostMapping("/gettrack")
-    public ArrayList<GeoData> getTrackGeoData(final WebRequest request) {
-        String trackID = request.getParameter("trackid");
-        System.out.println(trackID);
-        assert trackID != null;
-        return file.getTrackGeoData(Integer.parseInt(trackID));
-    }
-
-    @PostMapping("/getparttrack")
-    public List<ResponseColor> getPartTrack(final WebRequest request) {
-        int from = Integer.parseInt(request.getParameter("from"));
-        int till = Integer.parseInt(request.getParameter("till"));
-        List<Map.Entry<DataService.Colors, String>> lst = file.getPartGeoData(from, till);
-        List<ResponseColor> k = new ArrayList<>(lst.size());
-        for(int i = 0; i < lst.size(); ++i)
-            k.add(i, new ResponseColor(lst.get(i).getValue(), lst.get(i).getKey()));
-        return k;
-    }
 
     @PostMapping("/getpartheatmap")
     public List<ResponseColor> getPartOfHeatmap(final WebRequest request) {
@@ -62,18 +42,16 @@ public class MapController {
         LocalDateTime fromDate = LocalDateTime.parse(from);
         LocalDateTime tillDate = LocalDateTime.parse(till);
         System.out.println("Datum: "+fromDate);
-        List<Map.Entry<DataService.Colors, String>> lst = file.getPartHeatmap(Integer.parseInt(strecke), fromDate, tillDate);
+        List<Map.Entry<DataService.Colors, String>> lst = dataService.getGeoDataByDate(Integer.parseInt(strecke), fromDate, tillDate);
         List<ResponseColor> k = new ArrayList<>(lst.size());
         for(int i = 0; i < lst.size(); ++i)
             k.add(i, new ResponseColor(lst.get(i).getValue(), lst.get(i).getKey()));
         return k;
     }
 
-    @PostMapping("/getmapbyid")
-    public List<Map.Entry<DataService.Colors, String>> getMapByID(final WebRequest request) {
-        String id = request.getParameter("id");
-        assert id != null;
-        return dataService.getGeoDatabyTrackId(Integer.parseInt(id));
+    @PostMapping("/getheatmap")
+    public List<Map.Entry<DataService.Colors, String>> getHeatmap() {
+        return dataService.getHeatmap();
     }
 
     private class ResponseColor {

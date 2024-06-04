@@ -2,7 +2,7 @@
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {onMounted, ref} from 'vue';
-import {getGeoData, getTrack, getPartOfTrack, getTimeFromHeatmap} from "@/main/vue/api/map";
+import {getGeoData, getHeatmap, getTimeFromHeatmap} from "@/main/vue/api/map";
 import {useQuasar} from "quasar";
 import DateInput from "@/main/vue/pages/Map/DateInput.vue";
 import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";
@@ -23,12 +23,17 @@ const kmStart = ref('')
 const kmEnd = ref('')
 const selectedMarker = ref('')
 let data = ref([])
+let heatData = ref([])
 
-
+/**
+ * Sets map up and gets all GeoData for standard view
+ **/
 onMounted(async () => {
     map.value = L.map('map', {
         center: [51.1657, 10.4515],
-        zoom: 6,
+        zoom: 7,
+        maxZoom: 15,
+        minZoom: 7,
         maxBounds: [
             [55.0583, 5.8662],
             [47.2701, 15.0419]
@@ -36,18 +41,22 @@ onMounted(async () => {
     });
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(map.value);
 
     new L.TileLayer('http://{s}.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png',
         {
             attribution: '<a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors</a>, Style: <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA 2.0</a> <a href="http://www.openrailwaymap.org/">OpenRailwayMap</a> and OpenStreetMap',
-            minZoom: 6,
-            maxZoom: 19,
             tileSize: 256
         }).addTo(map.value);
     data = await getGeoData();
+    setGeoData()
+});
+
+// --------------------- SET DATA ----------------------
+
+async function setGeoData() {
+    markers.forEach((m) => map.value.removeLayer(m.marker));
     data.forEach((m) => markers.push({
         marker : L.circle([m.longitude, m.latitude], {color: "black", radius: 50}),
         data: m,
@@ -56,9 +65,40 @@ onMounted(async () => {
         m.marker.addTo(map.value);
         m.marker.on('click', onMarkerClicked);
     });
-    map.value.on('locationfound', onLocationFound);
-    map.value.locate({setView: false});
-});
+}
+
+async function setPartGeoData(trackID) {
+    markers.forEach((m) => map.value.removeLayer(m.marker));
+    markers = []
+    data.forEach((m) => {
+        if (String(m.strecken_id) === String(trackID)) {
+            markers.push({marker: L.circle([m.longitude, m.latitude], {color: "black", radius: 50}), data: m})
+        }
+    });
+    markers.forEach((m) => {
+        m.marker.addTo(map.value);
+        m.marker.on('click', onMarkerClicked);
+    });
+}
+
+async function setPartGeoDataKm(km_start, km_end) {
+    markers.forEach((m) => map.value.removeLayer(m.marker));
+    markers = []
+    if (km_start > km_end) {
+        let temp = km_start
+        km_start = km_end
+        km_end = temp
+    }
+    data.forEach((m) => {
+        if (m.track_km >= km_start && m.track_km <= km_end) {
+            markers.push({marker: L.circle([m.longitude, m.latitude], {color: "black", radius: 50}), data: m})
+        }
+    });
+    markers.forEach((m) => {
+        m.marker.addTo(map.value);
+        m.marker.on('click', onMarkerClicked);
+    });
+}
 
 const onMarkerClicked = (event) => {
     const circle = event.target;
@@ -67,8 +107,136 @@ const onMarkerClicked = (event) => {
     });
     selectedMarker.value = marker
     dialogVisible.value = true;
-    console.log(selectedMarker.value.data)
 };
+// ---------------------------- Filter -----------------------------------
+
+// ---------------------------- HEATMAP ----------------------------------
+
+
+function getLatLng(geopoint) {
+    for (let i = 0;i<data.length;i++) {
+        if (data[i].id === geopoint) {
+            return [data[i].longitude, data[i].latitude]
+        }
+    }
+}
+
+
+function getAllGeoPointsWithColor(dataPoint) {
+    let output = []
+    for(let i = 0;i < dataPoint.length;i++) {
+        if(dataPoint[i].NORMAL !== undefined) {
+            output.push([getLatLng(dataPoint[i].NORMAL), "black"])
+        } else if (dataPoint[i].LOW !== undefined) {
+            output.push([getLatLng(dataPoint[i].LOW), "green"])
+        } else if (dataPoint[i].MEDIUM !== undefined) {
+            output.push([getLatLng(dataPoint[i].MEDIUM), "orange"])
+        } else if (dataPoint[i].HIGH !== undefined) {
+            output.push([getLatLng(dataPoint[i].HIGH), "red"])
+        }
+    }
+    return output
+}
+
+
+const setValueStreckenID = async () => {
+    if (streckenID.value === "") {
+        $q.notify({
+            type: 'negative',
+            message: "Please enter a Track ID",
+            caption: 'Choose please'
+        });
+    } else {
+        setPartGeoData(streckenID.value)
+        if (markers.length === 0) {
+            $q.notify({
+                type: 'negative',
+                message: "Track ID doesn't exist",
+                caption: 'Please choose a different Track ID'
+            });
+        }
+    }
+};
+
+async function getAllHeatmapData() {
+    heatData = await getHeatmap()
+    var colors = getAllGeoPointsWithColor(heatData)
+    console.log(colors)
+    if (data.length === 0) {
+        $q.notify({
+            type: 'negative',
+            message: "Track ID doesn't exist",
+            caption: 'Please choose a different Track ID'
+        });
+    }
+    markers.forEach((m) => map.value.removeLayer(m.marker));
+    markers = []
+    for (let i = 0; i < colors.length; i++) {
+        markers.push({
+            marker: L.circleMarker([colors[i][0][0], colors[i][0][1]], {
+                color: colors[i][1],
+                radius: 5,
+                fillColor: colors[i][1],
+                fillOpacity: 1.0
+            }),
+            data: colors[i],
+        });
+    }
+    markers.forEach((m) => {
+        m.marker.addTo(map.value);
+        m.marker.on('click', onMarkerClicked);
+    });
+}
+
+
+async function getHeatmapWithTime() {
+    const timeData = await getTimeFromHeatmap(streckenID, date._value, date2._value)
+    console.log(timeData)
+}
+
+// ------------------------ LOCATION ZOOM ---------------------------
+
+const onLocationFound = (e) => {
+    const userLocation = e.latlng;
+    L.circle(userLocation, {color: 'blue', radius: 100}).addTo(map.value);
+    map.value.setView(userLocation, 12);
+}
+
+const onLocationError = (e) => {
+    $q.notify({
+        type: 'negative',
+        message: `Location error: ${e.message}`,
+        caption: 'Could not determine your location'
+    });
+}
+
+const centerToUserLocation = async () => {
+    map.value.locate().on('locationfound', onLocationFound).on("locationerror", onLocationError)
+};
+
+// -------------------- REPAIR ORDER ------------------------
+
+const createRepairOrder = async () => {
+    const longitude = selectedMarker.value.data.longitude
+    const latitude = selectedMarker.value.data.latitude
+    const streckenID = selectedMarker.value.data.strecken_id
+    await router.push({
+        path: "/repair/create",
+        query: {
+            longitude: longitude,
+            latitude: latitude,
+            streckenID: streckenID
+        }
+    });
+}
+
+// ------------------------- HANDLING FOR PART OF MAP -------------------------
+
+const getPartOfGeoData = async () => {
+    if (kmStart.value !== '' && kmEnd.value !== '') {
+        setPartGeoDataKm(kmStart.value, kmEnd.value)
+    }
+}
 
 const deleteStart = () => {
     markerStart.value = null;
@@ -90,119 +258,7 @@ const addEnd = () => {
     kmEnd.value = selectedMarker.value.data.track_km;
 };
 
-function getLetLng(geopoint) {
-    for (let i = 0;i<data.length;i++) {
-        if (data[i].id === geopoint) {
-            return [data[i].longitude, data[i].latitude]
-        }
-    }
-}
-
-function getAllGeoPointsWithColor(dataPoint) {
-    let output = []
-    for(let i = 0;i < dataPoint.length;i++) {
-        if(dataPoint[i].NORMAL !== undefined) {
-            output.push([getLetLng(dataPoint[i].NORMAL), "black"])
-        } else if (dataPoint[i].LOW !== undefined) {
-            output.push([getLetLng(dataPoint[i].LOW), "green"])
-        } else if (dataPoint[i].MEDIUM !== undefined) {
-            output.push([getLetLng(dataPoint[i].MEDIUM), "orange"])
-        } else if (dataPoint[i].HIGH !== undefined) {
-            output.push([getLetLng(dataPoint[i].HIGH), "red"])
-        }
-    }
-    return output
-}
-
-const refreshMarkers = async () => {
-    if (streckenID.value === "") {
-        $q.notify({
-            type: 'negative',
-            message: "Please enter a Track ID",
-            caption: 'Choose please'
-        });
-    } else {
-        const data = await getTrack(streckenID.value);
-        const newData = getAllGeoPointsWithColor(data)
-        if (data.length === 0) {
-            $q.notify({
-                type: 'negative',
-                message: "Track ID doesn't exist",
-                caption: 'Please choose a different Track ID'
-            });
-        }
-        markers.forEach((m) => map.value.removeLayer(m.marker));
-        for (let i = 0; i < newData.length; i++) {
-            markers.push({
-                marker: L.circle([newData[i][0][0], newData[i][0][1]], {color: newData[i][1], radius: 50}),
-                data: newData[i],
-            });
-        }
-        markers.forEach((m) => {
-            m.marker.addTo(map.value);
-            m.marker.on('click', onMarkerClicked);
-        });
-        checkForChanges()
-    }
-};
-
-const createRepairOrder = async () => {
-    console.log(selectedMarker.value)
-    const longitude = selectedMarker.value.data.longitude
-    const latitude = selectedMarker.value.data.latitude
-    const streckenID = selectedMarker.value.data.strecken_id
-    await router.push({
-        path: "/repair/create",
-        query: {
-            longitude: longitude,
-            latitude: latitude,
-            streckenID: streckenID
-        }
-    });
-}
-
-async function getHeatmapWithTime() {
-    const timeData = await getTimeFromHeatmap(streckenID, date._value, date2._value)
-    console.log(timeData)
-}
-
-const onLocationFound = (e) => {
-    const radius = e.accuracy;
-    const userLocation = e.latlng;
-    L.circle(userLocation, {color: 'blue', radius: 200}).addTo(map.value);
-}
-const centerToUserLocation = async () => {
-    const options = {
-        setView: true,
-        maxZoom: 12,
-        animate: true
-    }
-    map.value.locate(options).on('locationfound', onLocationFound);
-    const gleis = await getPartOfGleislage(streckenID.value)
-    console.log(gleis)
-};
-
-const checkForChanges = async () => {
-    if (kmStart.value !== '' && kmEnd.value !== '' && streckenID.value !== "") {
-        console.log(kmStart.value)
-        const data = await getPartOfTrack(kmStart.value, kmEnd.value)
-        console.log(data)
-        markers.forEach((m) => map.value.removeLayer(m.marker));
-        markers = []
-        for (let i = 0; i < data.length; i++) {
-            markers.push({
-                marker: L.circle([data[i].longitude, data[i].latitude], {color: "black", radius: 50}),
-                data: data[i],
-            });
-        }
-        markers.forEach((m) => {
-            m.marker.addTo(map.value);
-            m.marker.on('click', onMarkerClicked);
-        });
-    } else {
-    }
-}
-
+// ---------------------------------------------------------------------------
 
 </script>
 
@@ -228,6 +284,13 @@ const checkForChanges = async () => {
                         <q-item-section>
                             <div class="expan_items" @click="alert=true">
                                 Strecken-ID auswählen
+                            </div>
+                        </q-item-section>
+                    </q-item>
+                    <q-item clickable v-ripple>
+                        <q-item-section>
+                            <div class="expan_items" @click="getAllHeatmapData">
+                                Heatmap anzeigen
                             </div>
                         </q-item-section>
                     </q-item>
@@ -274,7 +337,7 @@ const checkForChanges = async () => {
                     </q-card-section>
                     <StandardInput v-model="streckenID" label="Strecken-ID Eingabe"></StandardInput>
                     <q-card-actions align="center">
-                        <q-btn @click="refreshMarkers" flat label="Filter anwenden" color="primary" v-close-popup/>
+                        <q-btn @click="setValueStreckenID" flat label="Filter anwenden" color="primary" v-close-popup/>
                         <q-btn flat label="Abbrechen" color="primary" v-close-popup/>
                     </q-card-actions>
                 </q-card>
@@ -344,7 +407,7 @@ const checkForChanges = async () => {
                         <q-btn
                             flat
                             no-caps
-                            @click="checkForChanges"
+                            @click="getPartOfGeoData"
                             label="Speichern"
                             color="primary"
                             v-close-popup

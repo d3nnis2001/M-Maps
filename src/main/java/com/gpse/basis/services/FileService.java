@@ -21,12 +21,7 @@ public interface FileService {
 
     void deleteDataSetsById(List<String> ids);
     void saveLHHFile(File file) throws IOException, IndexOutOfBoundsException;
-    ArrayList<GeoData> getGeoData();
-    ArrayList<GeoData> getTrackGeoData(int trackID);
-    List<Map.Entry<DataService.Colors, String>> getPartGeoData(int from, int till);
-
     List<List<String>> readFoler(String path);
 
-    List<Map.Entry<DataService.Colors, String>> getPartHeatmap(int strecke, LocalDateTime from, LocalDateTime till);
 
 }
