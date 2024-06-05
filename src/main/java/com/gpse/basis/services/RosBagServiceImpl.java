@@ -34,6 +34,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Service
 public class RosBagServiceImpl implements RosBagService{
 
+
     private final MongoTemplate template;
 
     private static final String IMAGE_DIRECTORY = "../gp-se-ss-2024-team1-2/rosbagPictures";
@@ -72,12 +73,12 @@ public class RosBagServiceImpl implements RosBagService{
                                 System.out.println(a.length);
                                 BufferedImage image = demosaic(a, (int) width, (int) height);
                                 long unixTimestamp = Instant.now().getEpochSecond();
-                                String name = "/BagCameraImage" + "-" + +unixTimestamp + xyz + ".png";
+                                String name = "/BagCameraImage" + "-" + unixTimestamp + xyz + ".png";
                                 File outputfile = new File(IMAGE_DIRECTORY + name);
                                 System.out.println(outputfile.getAbsolutePath());
                                 try {
                                     ImageIO.write(image, "png", outputfile);
-                                    template.save(new CameraImage(trackId, "http://localhost:8080" + directory_name + name ), "CameraImages");
+                                    template.save(new CameraImage(trackId, "http://localhost:8080" + directory_name + name , 0), "CameraImages");
                                 } catch (IOException e) {
                                     throw new RuntimeException(e);
                                 }
@@ -87,9 +88,8 @@ public class RosBagServiceImpl implements RosBagService{
                                 throw new RuntimeException(e);
                             }
 
-                            //todo: for debugging
                             xyz.getAndIncrement();
-                            return xyz.get() <= 5;
+                            return true;
                         });
 
                     }
@@ -103,44 +103,43 @@ public class RosBagServiceImpl implements RosBagService{
     }
 
     @Override
-    public List<BufferedImage> getInfraRedImagesForTrack(int trackId) {
-        List<BufferedImage> images = new ArrayList<>();
-        Query q = new Query();
-        q.addCriteria(Criteria.where("streckenId").is(trackId));
-        List<DataSet> data = template.find(q, DataSet.class).stream().filter(dt -> dt.getFileName().contains("camera")).toList();
-        for(var d : data) {
+    public void saveInfraRedImagesForTrack(int trackId, String fileName) {
             try {
-                BagFile f = BagReader.readFile(d.getFileName());
+                BagFile f = BagReader.readFile(fileName);
                 for (TopicInfo topic : f.getTopics()) {
                     if (Objects.equals(topic.getName(), "/IRCam/image_raw")) {
                         AtomicInteger xyz = new AtomicInteger();
                         f.forMessagesOnTopic(topic.getName(), (message, connection) -> {
+                            /*
                             MessageType header = message.getField("header");
                             header.getFieldNames().forEach(System.out::println);
                             System.out.println();
                             message.getFieldNames().forEach(System.out::println);
                             System.out.println();
-                            long width = 0;
+
+                             */
                             try {
-                                width = message.<UInt32Type>getField("width").getValue();
+                                long width = message.<UInt32Type>getField("width").getValue();
                                 long height = message.<UInt32Type>getField("height").getValue();
                                 var lst = message.<ArrayType>getField("data");
                                 System.out.println(width + "   " + height);
                                 var a = lst.getAsBytes();
                                 int index = 0;
-                                BufferedImage rgbImage = new BufferedImage((int) width, (int) height, BufferedImage.TYPE_INT_RGB);
+                                BufferedImage irImage = new BufferedImage((int) width, (int) height, BufferedImage.TYPE_INT_RGB);
                                 for (int i = 0; i < height; ++i) {
                                     for (int j = 0; j < width; ++j) {
                                         int value = ((int) a[index++]) & 0xff;
-                                        rgbImage.setRGB(j, i, new Color(value, value, value).getRGB());
+                                        irImage.setRGB(j, i, new Color(value, value, value).getRGB());
                                     }
                                 }
-                                images.add(rgbImage);
-                                File outputfile = new File("/Users/jt/gpse/data/ctm/Strecke_6100/Str_6100___RKZ_1/" + "Picture_IR" + xyz + ".png");
+                                long unixTimestamp = Instant.now().getEpochSecond();
+                                String name = "/IRCameraImage" + "-" + unixTimestamp + xyz + ".png";
+                                File outputfile = new File(IMAGE_DIRECTORY + name);
+                                System.out.println(outputfile.getAbsolutePath());
                                 xyz.getAndIncrement();
                                 try {
-                                    ImageIO.write(rgbImage, "png", outputfile);
-                                    System.out.println("Bild geschrieben!");
+                                    ImageIO.write(irImage, "png", outputfile);
+                                    template.save(new CameraImage(trackId, "http://localhost:8080" + directory_name + name , 1), "CameraImages");
                                 } catch (IOException e) {
                                     throw new RuntimeException(e);
                                 }
@@ -156,9 +155,6 @@ public class RosBagServiceImpl implements RosBagService{
                 throw new RuntimeException(e);
             }
 
-        }
-        System.out.println("Images length: " + images.size());
-        return images;
     }
 
     @Override
@@ -245,10 +241,23 @@ public class RosBagServiceImpl implements RosBagService{
         List<String> lst = new ArrayList<>();
         Query q = new Query();
         q.addCriteria(Criteria.where("track_id").is(trackId));
+        q.addCriteria(Criteria.where("type").is(0));
         var itr = template.find(q, CameraImage.class);
         itr.forEach(w -> lst.add(w.getPath()));
         return lst;
     }
+
+    @Override
+    public List<String> getIRImagesForTrack(int trackId) {
+        List<String> lst = new ArrayList<>();
+        Query q = new Query();
+        q.addCriteria(Criteria.where("track_id").is(trackId));
+        q.addCriteria(Criteria.where("type").is(1));
+        var itr = template.find(q, CameraImage.class);
+        itr.forEach(w -> lst.add(w.getPath()));
+        return lst;
+    }
+
 
     private boolean inRange(int x, int y) {
         return x >= 0 && x < 3008 && y >= 0 && y < 4112;

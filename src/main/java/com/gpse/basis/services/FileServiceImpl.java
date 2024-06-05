@@ -91,6 +91,7 @@ public class FileServiceImpl implements FileService {
                     else {
                         if(file.getName().contains("camera")) {
                             rosService.saveCameraImagesForTrack(Integer.parseInt(streckenId), file.getAbsolutePath());
+                            rosService.saveInfraRedImagesForTrack(Integer.parseInt(streckenId), file.getAbsolutePath());
                         }
                         Date uploadDate = new Date();
                         DataSet st = new DataSet();

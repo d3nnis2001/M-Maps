@@ -8,10 +8,12 @@ import java.util.List;
 public interface RosBagService {
     void saveCameraImagesForTrack(int trackId, String filename);
 
-    List<BufferedImage> getInfraRedImagesForTrack(int trackId);
+    void saveInfraRedImagesForTrack(int trackId, String filename);
 
     List<List<VelodynePoint>> getVelodynePointsForTrack(int trackId);
 
     List<String> getImagesForTrack(int trackId);
+
+    List<String> getIRImagesForTrack(int trackId);
 
 }

@@ -2,7 +2,14 @@
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {onMounted, ref} from 'vue';
-import {getGeoData, getTrack, getPartOfTrack, getPartOfGleislage, getImagesForTrackId} from "@/main/vue/api/map";
+import {
+    getGeoData,
+    getTrack,
+    getPartOfTrack,
+    getPartOfGleislage,
+    getImagesForTrackId,
+    getIRImagesForTrackId
+} from "@/main/vue/api/map";
 import {useQuasar} from "quasar";
 import DateInput from "@/main/vue/pages/Map/DateInput.vue";
 import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";
@@ -23,7 +30,7 @@ const kmStart = ref('')
 const kmEnd = ref('')
 const selectedMarker = ref('')
 const dialogMarkerOne = ref(false)
-const slide = ref(0)
+const slide = ref(1)
 const cameraimages = ref([])
 
 
@@ -67,18 +74,27 @@ const onMarkerClicked = async (event) => {
     const marker = markers.find((m) => {
             return m.data.longitude === circle.getLatLng().lat && m.data.latitude === circle.getLatLng().lng;
     });
-    if(marker.data.strecken_id === 1) {
-        //todo: hardcoded
-        dialogMarkerOne.value = true
-        cameraimages.value = await getImagesForTrackId(1)
-        return
-    }
 
     selectedMarker.value = marker
     dialogVisible.value = true;
     console.log(marker.data.latitude)
     console.log(marker.data.longitude)
 };
+
+const loadCameraPictures = async () => {
+    cameraimages.value = await getImagesForTrackId(selectedMarker.value.data.strecken_id)
+    if(cameraimages.value.length !== 0) {
+        dialogMarkerOne.value = true
+    }
+};
+
+const loadIRCameraPictures = async () => {
+    console.log(selectedMarker.value.data.strecken_id)
+    cameraimages.value = await getIRImagesForTrackId(selectedMarker.value.data.strecken_id)
+    if(cameraimages.value.length !== 0) {
+        dialogMarkerOne.value = true
+    }
+}
 
 const deleteStart = () => {
     markerStart.value = null;
@@ -333,14 +349,71 @@ const checkForChanges = async () => {
                         />
                     </q-card-actions>
                 </q-card>
+                <q-card flat square bordered>
+                    <div class="row">
+                        <div class="col-4">
+                            <q-btn
+                                style="align-items: end; justify-content: end"
+                                flat
+                                no-caps
+                                @click="loadCameraPictures"
+                                label="Bilder"
+                                color="primary"
+                                v-close-popup
+                            >
+                                <q-icon name="photo_camera" style="margin-left: 8px;" />
+                            </q-btn>
+                        </div>
+                        <div class="col-4">
+                            <q-btn
+                                style="align-items: end; justify-content: end"
+                                flat
+                                no-caps
+                                @click="loadIRCameraPictures"
+                                label="IR-Bilder"
+                                color="primary"
+                                v-close-popup
+                            >
+                                <q-icon name="sensors" style="margin-left: 8px;" />
+                            </q-btn>
+                        </div>
+                        <div class="col-4">
+                            <q-btn
+                                style="align-items: end; justify-content: end"
+                                flat
+                                no-caps
+                                @click="loadLidarData"
+                                label="LIDAR-Daten"
+                                color="primary"
+                                v-close-popup
+                            >
+                                <q-icon name="flare" style="margin-left: 8px;" />
+                            </q-btn>
+                        </div>
+                    </div>
 
+
+                </q-card>
             </div>
         </div>
     </q-dialog>
-    <q-dialog v-model="dialogMarkerOne">
+    <q-dialog v-model="dialogMarkerOne" full-width>
         <div class="q-pa-md">
-            <img src="http://localhost:8080/rosbagPictures/BagCameraImage-17176066001.png" alt="Image" width="500" height="600">
-        </div>
+                <q-carousel
+                    v-model="slide"
+                    swipeable
+                    animated
+                    arrows
+                >
+                    <q-carousel-slide
+                        v-for="(img, id) in cameraimages"
+                        :key="id"
+                        :name="id+1"
+                        :img-src="img"
+                    />
+                </q-carousel>
+            </div>
+
     </q-dialog>
 </template>
 

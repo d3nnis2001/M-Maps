@@ -48,4 +48,11 @@ public class MapController {
         int trackId = Integer.parseInt(request.getParameter("trackid"));
         return rosBag.getImagesForTrack(trackId);
     }
+
+    @PostMapping("/getIRCameraImageforTrack")
+    public List<String> getIRCameraImageforTrack(final WebRequest request) {
+        int trackId = Integer.parseInt(request.getParameter("trackid"));
+        return rosBag.getIRImagesForTrack(trackId);
+    }
+
 }

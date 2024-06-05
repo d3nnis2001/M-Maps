@@ -55,5 +55,17 @@ export const getImagesForTrackId = async(trackId) => {
     }
 }
 
+export const getIRImagesForTrackId = async(trackId) => {
+    try {
+        const cred = new URLSearchParams()
+        cred.append("trackid", trackId)
+        const response = await axios.post("/api/map/getIRCameraImageforTrack", cred)
+        console.log(response.data)
+        return response.data
+    }catch (error) {
+        console.log("Something went wrong, when getting the IR pictures!")
+    }
+}
+
 
 export default {getGeoData, getTrack};
