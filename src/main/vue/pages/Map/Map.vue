@@ -339,9 +339,7 @@ const checkForChanges = async () => {
     </q-dialog>
     <q-dialog v-model="dialogMarkerOne">
         <div class="q-pa-md">
-                <div v-for="(img,index) in cameraimages" >
-                    <img :src="img" alt="Example Image">
-                </div>
+            <img src="http://localhost:8080/rosbagPictures/BagCameraImage-17176066001.png" alt="Image" width="500" height="600">
         </div>
     </q-dialog>
 </template>

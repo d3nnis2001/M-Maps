@@ -22,6 +22,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -32,7 +36,9 @@ public class RosBagServiceImpl implements RosBagService{
 
     private final MongoTemplate template;
 
-    private static final String IMAGE_DIRECTORY = "src/main/resources/public/static/";
+    private static final String IMAGE_DIRECTORY = "../gp-se-ss-2024-team1-2/rosbagPictures";
+
+    private static final String directory_name = "/rosbagPictures";
 
 
 
@@ -65,12 +71,13 @@ public class RosBagServiceImpl implements RosBagService{
                                 var a = lst.getAsBytes();
                                 System.out.println(a.length);
                                 BufferedImage image = demosaic(a, (int) width, (int) height);
-                                String name = "BagCameraImage" + "-" + xyz + ".png";
+                                long unixTimestamp = Instant.now().getEpochSecond();
+                                String name = "/BagCameraImage" + "-" + +unixTimestamp + xyz + ".png";
                                 File outputfile = new File(IMAGE_DIRECTORY + name);
-                                System.out.println(outputfile.getPath());
+                                System.out.println(outputfile.getAbsolutePath());
                                 try {
                                     ImageIO.write(image, "png", outputfile);
-                                    template.save(new CameraImage(trackId, "http://localhost:8080/" + outputfile.getPath()), "CameraImages");
+                                    template.save(new CameraImage(trackId, "http://localhost:8080" + directory_name + name ), "CameraImages");
                                 } catch (IOException e) {
                                     throw new RuntimeException(e);
                                 }
@@ -200,7 +207,6 @@ public class RosBagServiceImpl implements RosBagService{
                                 }
                                 var lst = message.<ArrayType>getField("data");
                                 byte[] a = lst.getAsBytes();
-                                String csvFilePath = "/Users/jt/gpse/data/ctm/Strecke_6100/Str_6100___RKZ_1/points.csv";
                                 int size = 0;
                                     for(int i = 0; i < a.length; i+=22){
                                         byte[] x_value = new byte[] {a[i+offset_x], a[i+offset_x+1], a[i+offset_x+2], a[i+offset_x+3]};
