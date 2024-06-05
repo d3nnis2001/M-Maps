@@ -1,7 +1,6 @@
 package com.gpse.basis.services;
 
 import com.gpse.basis.domain.InspectionOrder;
-import com.gpse.basis.domain.Reparatur;
 import com.gpse.basis.repositories.InspectionOrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -21,7 +20,7 @@ public class InspectionServicesImpl implements InspectionServices {
 
     @Override
     public void createInspectionOrder(ArrayList<String> inspecArray) {
-        String defaultStatus = "unbearbeitet";
+        String defaultStatus = "beauftragt";
         String defaultUserId = " ";
         String inspectionOrderId = generateId();
         boolean defaultArchived = false;

@@ -17,6 +17,7 @@ export default {
         const endTime = ref('')
         const department = ref('')
         const inspectionData = ref('')
+        const inspectionDataValues = ref([])
         const remarks = ref('')
         const dense = ref(false)
         const route = useRoute();
@@ -32,6 +33,9 @@ export default {
             department.value = inspectionOrder.department;
             inspectionData.value = inspectionOrder.inspectionData;
             remarks.value = inspectionOrder.remarks;
+
+            inspectionDataValues.value.push("Gleislagedaten")
+            inspectionDataValues.value.push("Sonstige Daten")
 
         });
 
@@ -93,6 +97,7 @@ export default {
             endTime,
             department,
             inspectionData,
+            inspectionDataValues,
             remarks,
             sendData,
             dense
@@ -159,9 +164,9 @@ export default {
                 <p style="font-weight: bold;">Fachabteilung</p>
                 <StandardInput class="" v-model="department" label="Fachabteilung" ></StandardInput>
             </div>
-            <div class="row extra-mar">
+            <div class="checkListInput">
                 <p style="font-weight: bold;">Messdaten</p>
-                <StandardInput class="" v-model="inspectionData" label="Messdaten"></StandardInput>
+                <q-select class="" outlined v-model="inspectionData" :options="inspectionDataValues" label="Messdaten"></q-select>
             </div>
         </div>
         <div>

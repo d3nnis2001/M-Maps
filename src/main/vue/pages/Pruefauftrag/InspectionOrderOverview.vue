@@ -1,8 +1,8 @@
 <script>
-import {onMounted, reactive, ref} from "vue";
+import {onMounted, onUnmounted, reactive, ref} from "vue";
 import router from "@/main/vue/router";
 import {deleteInspectionOrder, getInspectionOrder} from "@/main/vue/api/inspection";
-import {deleteRepairOrder} from "@/main/vue/api/reparatur";
+import {deleteRepairOrder, repair} from "@/main/vue/api/reparatur";
 
 export default {
     setup () {
@@ -22,7 +22,29 @@ export default {
             rows: []
 
         });
+
+        const smallScreen = ref(false);
+        const largeScreen = ref(true);
+
         onMounted(async () => {
+            checkScreenSize();
+            window.addEventListener('resize', checkScreenSize);
+            await fetchData();
+
+        })
+
+        onUnmounted(() => {
+            window.removeEventListener('resize', checkScreenSize);
+        });
+
+        const showDialog = ref(false);
+        const showConfirmDialog = ref(false);
+        const showPictureUploadDialog = ref(false);
+        const currentRow = ref({});
+        const rowToDelete = ref(null);
+
+
+        const fetchData = async () => {
             const response = await getInspectionOrder()
             console.log("API Response:", response);
             for (let i = 0; i < response.length; i++) {
@@ -39,12 +61,13 @@ export default {
                 })
             }
             console.log("State Rows:", state.rows);
-        })
+        };
+        const checkScreenSize = () => {
+            const screenSize = window.innerWidth;
+            smallScreen.value = screenSize <= 500;
+            largeScreen.value = screenSize > 500;
+        };
 
-        const showDialog = ref(false);
-        const showConfirmDialog = ref(false);
-        const currentRow = ref({});
-        const rowToDelete = ref(null);
 
         const rowClick = async (evt, rowData) => {
             currentRow.value = rowData;
@@ -61,11 +84,28 @@ export default {
         }
 
         function acceptInspectionOrder() {
-            // Nächster Sprint - UserID benötigt
+            // UserId Änderung!!!!
+
+            // Statusänderung auf 'in Bearbeeitung'
         }
 
-        function archiveOrder() {
-            // archivieren
+        function markArchived() {
+            // Statusänderung auf 'archiviert'
+        }
+
+        function markFinished() {
+            // Bild speichern
+
+            // Statusänderung auf 'abgeschlossen'
+
+        }
+
+        function markCancelled() {
+            // Statusänderung auf 'storniert'
+        }
+
+        function markOrdered() {
+            // Statusänderung auf 'beauftragt'
         }
 
         const confirmDeleteOrder = (row) => {
@@ -87,6 +127,8 @@ export default {
                 state.rows.splice(index, 1);
             }
         };
+
+
         return {
             state,
             filter: ref(''),
@@ -94,12 +136,18 @@ export default {
             editInspectionOrder,
             acceptInspectionOrder,
             deleteOrder,
-            archiveOrder,
+            archiveOrder: markArchived,
             rowClick,
             currentRow,
             showDialog,
             showConfirmDialog,
-            confirmDeleteOrder
+            confirmDeleteOrder,
+            markFinished,
+            markCancelled,
+            markOrdered,
+            smallScreen,
+            largeScreen,
+            showPictureUploadDialog
         }
 
     }
@@ -114,7 +162,9 @@ export default {
                 <q-icon name="search" />
             </template>
         </q-input>
+
         <q-table
+            v-show="!smallScreen && largeScreen"
             class="my-sticky-header-table"
             flat bordered
             title="Prüfaufträge"
@@ -123,7 +173,21 @@ export default {
             row-key="inspectionOrderId"
             :filter = "filter"
             @row-click="rowClick" />
+
+        <q-table
+            v-show="!largeScreen && smallScreen"
+            class="my-sticky-header-table2"
+            flat bordered
+            grid
+            title="Prüfaufträge"
+            :rows="state.rows"
+            :columns="state.columns"
+            row-key="inspectionOrderId"
+            :filter = "filter"
+            hide-header
+            @row-click="rowClick" />
     </div>
+
 
     <div class="q-pa-md">
         <q-btn class="handleButton" style="width: 100%; max-width: 218px" size="16px" no-caps rounded label="Auftrag erstellen" @click="createInspectionOrder" color="primary"></q-btn>
@@ -132,12 +196,18 @@ export default {
             <q-card>
                 <q-card-section>
                     <div class="option-button" @click="editInspectionOrder">Bearbeiten</div>
-                    <q-separator v-if="currentRow.status !== 'abgeschlossen' " />
-                    <div class="option-button" @click="confirmDeleteOrder(currentRow)">Löschen</div>
+                    <q-separator  />
+                    <div class="option-button" v-if="currentRow.status === 'storniert'" @click="confirmDeleteOrder(currentRow)">Löschen</div>
                     <q-separator />
-                    <q-separator v-if="currentRow.status === 'storniert'" />
-                    <div class="option-button" v-if="currentRow.status === 'storniert'" @click="archiveOrder">Archivieren</div>
-                    <div class="option-button" @click="acceptInspectionOrder">Auftrag annehmen</div>
+                    <div class="option-button" v-if="currentRow.status === 'abgeschlossen'" @click="archiveOrder">Archivieren</div>
+                    <q-separator />
+                    <div class="option-button" @click="showPictureUploadDialog = true">Auftrag abschließen</div>
+                    <q-separator />
+                    <div class="option-button" @click="acceptInspectionOrder">Auftrag annehmen </div>
+                    <q-separator />
+                    <div class="option-button" v-if="currentRow.status === 'beauftragt'" @click="markCancelled">Stornieren</div>
+                    <q-separator />
+                    <div class="option-button" v-if="currentRow.status === 'storniert'" @click="markOrdered">Beauftragen</div>
                 </q-card-section>
                 <q-card-section>
                     <q-btn flat label="Schließen" color="primary" @click="showDialog = false"></q-btn>
@@ -155,6 +225,29 @@ export default {
                 <q-card-section>
                     <q-btn flat label="Abbrechen" color="positive" @click="showConfirmDialog = false"></q-btn>
                     <q-btn flat label="Löschen" color="negative" @click="deleteOrder"></q-btn>
+                </q-card-section>
+            </q-card>
+        </q-dialog>
+        <q-dialog v-model="showPictureUploadDialog">
+            <q-card>
+                <q-card-section>
+                    <div class="text-h6">Bestätigung</div>
+                </q-card-section>
+                <q-card-section>
+                    Wollen Sie noch Fotos für die Dokumentation hochladen?
+                </q-card-section>
+                <q-card-section>
+                    <q-uploader
+                        url="http://localhost:8080/upload"
+                        label="Fotos hochladen"
+                        color=$blue-grey-5
+                        square
+                        flat
+                        bordered
+                        style="max-width: 300px"
+                    />
+                    <q-btn flat label="Abbrechen" color="negative" @click="showPictureUploadDialog = false"></q-btn>
+                    <q-btn flat label="Prüfauftrag abschließen" color="positive" @click="markFinished"></q-btn>
                 </q-card-section>
             </q-card>
         </q-dialog>
@@ -179,14 +272,14 @@ export default {
         z-index: 1
     thead tr:first-child th
         top: 0
-
-    /* this is when the loading indicator appears */
     &.q-table--loading thead tr:last-child th
-        /* height of all previous header rows */
         top: 48px
-
-    /* prevent scrolling behind sticky top row on focus */
     tbody
-        /* height of all previous header rows */
         scroll-margin-top: 48px
+
+.my-sticky-header-table2
+    .q-table__top,
+    .q-table__bottom,
+    thead tr:first-child th
+        background-color: $blue-grey-5
 </style>
