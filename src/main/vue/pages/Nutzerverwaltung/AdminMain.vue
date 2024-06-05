@@ -1,12 +1,11 @@
 <script>
-import {onUnmounted, ref} from "vue";
+import {onMounted, onUnmounted, ref} from "vue";
 import axios, {all} from "axios";
 import EditUser from "@/main/vue/pages/Nutzerverwaltung/EditUser.vue";
 import {useQuasar} from "quasar";
 import {useRouter} from "vue-router";
 import {useLoginStore} from "@/main/vue/stores/LoginStore";
-import {getUserData} from "@/main/vue/api/admin";
-import {editUser} from "@/main/vue/api/admin";
+import {getUserData, deleteUser} from "@/main/vue/api/admin";
 
 
 const columns = [
@@ -29,17 +28,17 @@ const selected = ref([])
 
 export default {
     computed: {
-        editUser() {
-            return editUser
-        }
+
     },
     components: {EditUser},
     setup() {
         const $q = useQuasar()
         const router = useRouter()
         const loginStore = useLoginStore()
+        const smallScreen = ref(false);
+        const largeScreen = ref(true);
 
-        function getData() {
+        async function getData() {
             const data = getUserData()
             console.log(data)
             data.then(allUsers => {
@@ -55,21 +54,37 @@ export default {
             })
         }
 
-        getData();
-        return {columns, rows, selected, router}
+        const checkScreenSize = () => {
+            const screenSize = window.innerWidth;
+            smallScreen.value = screenSize <= 500;
+            largeScreen.value = screenSize > 500;
+        };
+
+        onMounted(async () => {
+            checkScreenSize();
+            window.addEventListener('resize', checkScreenSize);
+            await getData();
+        });
+
+        onUnmounted(() => {
+            window.removeEventListener('resize', checkScreenSize);
+        });
+
+        return {columns, rows, selected, router, smallScreen, largeScreen}
     },
     data() {
 
     },
     methods: {
-        deleteUser(selectedUser) {
-
+        async deleteUsername(selectedUser) {
             if (selectedUser[0] === undefined) {
                 this.$q.notify({
                     message: "Wähle einen Nutzer aus!",
                     timeout: 5000,
                 });
             } else {
+                deleteUser(selectedUser);
+                deleteRow(selectedUser);
                 console.log(selectedUser[0].username)
             }
         },
@@ -84,7 +99,17 @@ export default {
                     message: `Nutzer mit der ID: '${selectedUser[0].username}' wurde freigeschaltet!`,
                     timeout: 5000,
                 });
-                console.log(selectedUser[0].username)
+            }
+        },
+        async editUser(selectedUser, router) {
+            if (selectedUser[0] === undefined) {
+                this.$q.notify({
+                    message: "Wähle einen Nutzer aus!",
+                    timeout: 5000,
+                });
+            } else {
+                const username = selectedUser[0].username;
+                await router.push(`/admin/${username}/editUser`)
             }
         }
     }
@@ -95,7 +120,7 @@ export default {
     <div class="q-pa-md">
         <q-btn label="Freischalten" color="primary" @click=unlockUser(selected) class=""></q-btn>
         <q-btn label="Editieren" color="primary" @click=editUser(selected,router) class=""></q-btn>
-        <q-btn label="Löschen" color="primary" @click="deleteUser(selected)" class=""></q-btn>
+        <q-btn label="Löschen" color="primary" @click="deleteUsername(selected)" class=""></q-btn>
         <q-table
             title="User Data"
             :rows="rows"
@@ -104,11 +129,6 @@ export default {
             selection="single"
             v-model:selected="selected"
         />
-        <!--
-        <div class="q-mt-md">
-            Selected: {{ JSON.stringify(selected) }}
-        </div>
-        -->
     </div>
 </template>
 <style scoped>
