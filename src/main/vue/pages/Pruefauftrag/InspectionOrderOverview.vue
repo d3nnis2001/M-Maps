@@ -1,7 +1,7 @@
 <script>
 import {onMounted, onUnmounted, reactive, ref} from "vue";
 import router from "@/main/vue/router";
-import {deleteInspectionOrder, getInspectionOrder} from "@/main/vue/api/inspection";
+import {deleteInspectionOrder, getInspectionOrder, sendNewStatus} from "@/main/vue/api/inspection";
 import {deleteRepairOrder, repair} from "@/main/vue/api/reparatur";
 
 export default {
@@ -85,26 +85,40 @@ export default {
 
         function acceptInspectionOrder() {
             // UserId Änderung!!!!
-
-            // Statusänderung auf 'in Bearbeeitung'
+            showDialog.value = false;
+            const id = currentRow.value.inspectionOrderId;
+            sendNewStatus(id, "in Bearbeitung");
+            // Statusänderung auf 'in Bearbeitung'
         }
 
         function markArchived() {
+            showDialog.value = false;
+            const id = currentRow.value.inspectionOrderId;
+            sendNewStatus(id, "archiviert");
             // Statusänderung auf 'archiviert'
         }
 
         function markFinished() {
             // Bild speichern
-
+            showPictureUploadDialog.value = false;
+            showDialog.value = false;
+            const id = currentRow.value.inspectionOrderId;
+            sendNewStatus(id, "abgeschlossen");
             // Statusänderung auf 'abgeschlossen'
 
         }
 
         function markCancelled() {
+            showDialog.value = false;
+            const id = currentRow.value.inspectionOrderId;
+            sendNewStatus(id, "storniert");
             // Statusänderung auf 'storniert'
         }
 
         function markOrdered() {
+            showDialog.value = false;
+            const id = currentRow.value.inspectionOrderId;
+            sendNewStatus(id, "beauftragt");
             // Statusänderung auf 'beauftragt'
         }
 
@@ -149,7 +163,6 @@ export default {
             largeScreen,
             showPictureUploadDialog
         }
-
     }
 }
 
@@ -187,7 +200,6 @@ export default {
             hide-header
             @row-click="rowClick" />
     </div>
-
 
     <div class="q-pa-md">
         <q-btn class="handleButton" style="width: 100%; max-width: 218px" size="16px" no-caps rounded label="Auftrag erstellen" @click="createInspectionOrder" color="primary"></q-btn>

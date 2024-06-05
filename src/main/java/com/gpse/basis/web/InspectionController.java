@@ -59,8 +59,13 @@ public class InspectionController {
     @PostMapping("/deleteInspectionOrder")
     public void deleteInspectionOrder(final WebRequest request) {
         String id = request.getParameter("inspectionOrderId");
-        System.out.println("TEST: " +  id);
         inspec.deleteInspectionOrder(id);
+    }
+    @PostMapping("/sendNewStatus")
+    public void sendNewStatus(final WebRequest request) {
+        String inspectionOrderId = request.getParameter("inspectionOrderId");
+        String status = request.getParameter("status");
+        inspec.editStatus(inspectionOrderId, status);
     }
 
 }

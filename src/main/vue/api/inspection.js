@@ -81,4 +81,18 @@ export const deleteInspectionOrder = async function deleteInspectionOrder(inspec
     }
 }
 
+export const sendNewStatus = async function sendNewStatus(inspectionOrderId, status) {
+    try {
+        const derc = new URLSearchParams();
+        derc.append("inspectionOrderId", inspectionOrderId);
+        derc.append("status", status);
+        const response = await axios.post("/api/inspection/sendNewStatus", derc)
+        return response;
+
+    } catch (error) {
+        console.error("Unseen error: ", error);
+        return false;
+    }
+}
+
 

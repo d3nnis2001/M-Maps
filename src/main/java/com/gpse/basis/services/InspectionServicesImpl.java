@@ -60,15 +60,22 @@ public class InspectionServicesImpl implements InspectionServices {
     @Override
     public Boolean deleteInspectionOrder(String inspectionOrderId) {
         try {
-            System.out.println("TEST: Impl Datei");
             InspectionOrder inspectionOrder = loadInspecById(inspectionOrderId);
-            System.out.println("TEST: " + inspectionOrder.getInspectionOrderId());
             inspec.delete(inspectionOrder);
             return true;
         } catch (Exception e) {
             return false;
         }
+    }
 
+    @Override
+    public void editStatus(String inspectionOrderId, String status) {
+        InspectionOrder inspectionOrder = loadInspecById(inspectionOrderId);
+        if (status.equals("archiviert")) {
+            inspectionOrder.setArchived(true);
+        }
+        inspectionOrder.setStatus(status);
+        inspec.save(inspectionOrder);
     }
 
     @Override
