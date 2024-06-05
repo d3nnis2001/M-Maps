@@ -2,10 +2,12 @@
 import {onMounted, onUnmounted, reactive, ref} from "vue";
 import router from "@/main/vue/router";
 import {deleteInspectionOrder, getInspectionOrder, sendNewStatus} from "@/main/vue/api/inspection";
-import {deleteRepairOrder, repair} from "@/main/vue/api/reparatur";
+import {useQuasar} from "quasar";
+import axios from 'axios';
 
 export default {
     setup () {
+        const $q = useQuasar();
         const state = reactive ({
             filter: '',
             columns: [
@@ -98,8 +100,9 @@ export default {
             // Statusänderung auf 'archiviert'
         }
 
-        function markFinished() {
+        async function markFinished() {
             // Bild speichern
+
             showPictureUploadDialog.value = false;
             showDialog.value = false;
             const id = currentRow.value.inspectionOrderId;
@@ -142,6 +145,23 @@ export default {
             }
         };
 
+        function onRejected (rejectedEntries) {
+            $q.notify({
+                type: 'negative',
+                message: `${rejectedEntries.length} file(s) did not pass validation constraints`
+            })
+        }
+
+        async function modifyFileName (file) {
+            const id = currentRow.inspectionOrderId;
+            console.log("ID: ", id.value);
+            const newFileName = `${id}-${file.name}`;
+            console.log("newFileName: ", newFileName.value);
+            const newFile = new File([file], newFileName, { type: file.type });
+            return newFile;
+
+        }
+
 
         return {
             state,
@@ -161,7 +181,9 @@ export default {
             markOrdered,
             smallScreen,
             largeScreen,
-            showPictureUploadDialog
+            showPictureUploadDialog,
+            onRejected,
+            modifyFileName
         }
     }
 }
@@ -211,15 +233,15 @@ export default {
                     <q-separator  />
                     <div class="option-button" v-if="currentRow.status === 'storniert'" @click="confirmDeleteOrder(currentRow)">Löschen</div>
                     <q-separator />
-                    <div class="option-button" v-if="currentRow.status === 'abgeschlossen'" @click="archiveOrder">Archivieren</div>
+                    <div class="option-button" v-if="currentRow.status === 'abgeschlossen' && currentRow.status !== 'archiviert'" @click="archiveOrder">Archivieren</div>
                     <q-separator />
-                    <div class="option-button" @click="showPictureUploadDialog = true">Auftrag abschließen</div>
+                    <div class="option-button" v-if="currentRow.status !== 'abgeschlossen'" @click="showPictureUploadDialog = true">Auftrag abschließen</div>
                     <q-separator />
-                    <div class="option-button" @click="acceptInspectionOrder">Auftrag annehmen </div>
+                    <div class="option-button"  @click="acceptInspectionOrder">Auftrag annehmen </div>
                     <q-separator />
-                    <div class="option-button" v-if="currentRow.status === 'beauftragt'" @click="markCancelled">Stornieren</div>
+                    <div class="option-button" v-if="currentRow.status === 'beauftragt' && currentRow.status !== 'storniert'" @click="markCancelled">Stornieren</div>
                     <q-separator />
-                    <div class="option-button" v-if="currentRow.status === 'storniert'" @click="markOrdered">Beauftragen</div>
+                    <div class="option-button" v-if="currentRow.status === 'storniert' && currentRow.status !== 'beauftragt'" @click="markOrdered">Beauftragen</div>
                 </q-card-section>
                 <q-card-section>
                     <q-btn flat label="Schließen" color="primary" @click="showDialog = false"></q-btn>
@@ -250,13 +272,15 @@ export default {
                 </q-card-section>
                 <q-card-section>
                     <q-uploader
-                        url="http://localhost:8080/upload"
-                        label="Fotos hochladen"
-                        color=$blue-grey-5
-                        square
-                        flat
-                        bordered
+                        field-name="file"
                         style="max-width: 300px"
+                        url="/api/inspection/upload"
+                        label="Restricted to images"
+                        multiple
+                        accept=".jpg, image/*"
+                        @rejected="onRejected"
+                        :factory="modifyFileName"
+                        with-credentials
                     />
                     <q-btn flat label="Abbrechen" color="negative" @click="showPictureUploadDialog = false"></q-btn>
                     <q-btn flat label="Prüfauftrag abschließen" color="positive" @click="markFinished"></q-btn>

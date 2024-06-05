@@ -3,12 +3,14 @@ package com.gpse.basis.web;
 import com.gpse.basis.domain.InspectionOrder;
 import com.gpse.basis.services.InspectionServices;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 @RestController
@@ -66,6 +68,17 @@ public class InspectionController {
         String inspectionOrderId = request.getParameter("inspectionOrderId");
         String status = request.getParameter("status");
         inspec.editStatus(inspectionOrderId, status);
+    }
+
+    @PostMapping("/upload")
+    public void handleFileUpload(@RequestPart(value = "file") final MultipartFile uploadfile) throws IOException {
+        saveUploadedFiles(uploadfile);
+    }
+
+    private void saveUploadedFiles(final MultipartFile file) throws IOException {
+        final byte[] bytes = file.getBytes();
+        final Path path = Paths.get("src/main/resources/Bestaetigungsfotos_Pruefauftraege/" +  "/" + file.getOriginalFilename());
+        Files.write(path, bytes);
     }
 
 }
