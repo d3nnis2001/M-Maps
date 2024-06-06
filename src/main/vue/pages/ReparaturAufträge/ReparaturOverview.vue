@@ -98,6 +98,11 @@ const reapplyOrder = async () => {
     showDialog.value = false;
 };
 
+const sendToTrackBuilder = async () => {
+    const name = currentRow.name;
+    router.push(`/repair/${name}/trackBuilder`);
+};
+
 const confirmDeleteOrder = (row) => {
     rowToDelete.value = row;
     showConfirmDialog.value = true;
@@ -225,6 +230,8 @@ const removeRow = (name) => {
                     <div class="option-button" v-if="currentRow.status !== 'storniert'" @click="cancelOrder">Stornieren</div>
                     <q-separator v-if="currentRow.status === 'abgeschlossen'" />
                     <div class="option-button" v-if="currentRow.status === 'storniert'" @click="reapplyOrder">Neu beantragen</div>
+                    <q-separator v-if="currentRow.status === 'terminiert'" />
+                    <div class="option-button" v-if="currentRow.status === 'terminiert'" @click="sendToTrackBuilder">Link an Gleisbauer</div>
                 </q-card-section>
                 <q-card-section>
                     <q-btn flat label="Schließen" color="primary" @click="showDialog = false"></q-btn>

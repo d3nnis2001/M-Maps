@@ -12,7 +12,12 @@ import org.springframework.cglib.core.Local;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -101,5 +106,15 @@ public class ReparaturController {
         String id = request.getParameter("id");
         LocalDate date1 = LocalDate.parse(request.getParameter("date").replace("/", "-"), formatter);
         return ResponseEntity.ok(checkService.setTerminatedDate(id, date1));
+    }
+    @PostMapping("/upload")
+    public void handleFileUpload(@RequestPart(value = "file") final MultipartFile uploadfile) throws IOException {
+        saveUploadedFiles(uploadfile);
+    }
+
+    private void saveUploadedFiles(final MultipartFile file) throws IOException {
+        final byte[] bytes = file.getBytes();
+        final Path path = Paths.get("src/main/resources/imagesRepair/" + file.getOriginalFilename());
+        Files.write(path, bytes);
     }
 }

@@ -81,7 +81,7 @@ export default {
                 </div>
                 <div class="row">
                     <p style="margin-right: 5px">Zeitraum: </p>
-                    <p style="font-weight: bold">{{ repairDetails.from }}</p>
+                    <p style="font-weight: bold">{{"   von   " + repairDetails.from + "   bis   " + repairDetails.till}}</p>
                 </div>
                 <div class="row">
                     <p style="margin-right: 5px">Freigabeberechtigter: </p>

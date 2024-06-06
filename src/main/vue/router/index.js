@@ -16,6 +16,7 @@ import ReparaturCreate from "@/main/vue/pages/ReparaturAufträge/ReparaturCreate
 import ReparaturEdit from "@/main/vue/pages/ReparaturAufträge/ReparaturEdit.vue";
 import AdminMain from "@/main/vue/pages/Nutzerverwaltung/AdminMain.vue";
 import MapView from "../pages/Map/Map.vue"
+import TrackBuilderView from "@/main/vue/pages/TrackBuilder/TrackBuilderView.vue"
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -79,6 +80,11 @@ const router = createRouter({
             path: "/repair/:name/edit",
             name: "RepairEdit",
             component: ReparaturEdit
+        },
+        {
+            path: "/repair/:name/trackBuilder",
+            name: "TrackBuilder",
+            component: TrackBuilderView
         },
         {
             path: "/admin",

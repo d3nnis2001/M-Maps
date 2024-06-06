@@ -15,12 +15,11 @@ function changeBool() {
 
 </script>
 <template>
-    <q-layout v-if="$route.name === 'start'">
+    <q-layout v-if="$route.name === 'start' || $route.name === 'login' || $route.name === 'TrackBuilder'">
         <q-page-container>
             <router-view/>
         </q-page-container>
     </q-layout>
-
     <q-layout view="hHh lpR fFf" v-else>
         <q-header bordered class="q-py-xs" elevated>
             <q-toolbar>
