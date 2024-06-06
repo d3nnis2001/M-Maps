@@ -3,7 +3,7 @@ import {onMounted, onUnmounted, reactive, ref} from "vue";
 import router from "@/main/vue/router";
 import {deleteInspectionOrder, getInspectionOrder, sendNewStatus} from "@/main/vue/api/inspection";
 import {useQuasar} from "quasar";
-import axios from 'axios';
+
 
 export default {
     setup () {
@@ -152,16 +152,6 @@ export default {
             })
         }
 
-        async function modifyFileName (file) {
-            const id = currentRow.inspectionOrderId;
-            console.log("ID: ", id.value);
-            const newFileName = `${id}-${file.name}`;
-            console.log("newFileName: ", newFileName.value);
-            const newFile = new File([file], newFileName, { type: file.type });
-            return newFile;
-
-        }
-
 
         return {
             state,
@@ -183,7 +173,6 @@ export default {
             largeScreen,
             showPictureUploadDialog,
             onRejected,
-            modifyFileName
         }
     }
 }
@@ -277,9 +266,8 @@ export default {
                         url="/api/inspection/upload"
                         label="Restricted to images"
                         multiple
-                        accept=".jpg, image/*"
+                        accept=".jpg, .png, image/*"
                         @rejected="onRejected"
-                        :factory="modifyFileName"
                         with-credentials
                     />
                     <q-btn flat label="Abbrechen" color="negative" @click="showPictureUploadDialog = false"></q-btn>
