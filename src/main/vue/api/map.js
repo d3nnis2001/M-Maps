@@ -67,5 +67,18 @@ export const getIRImagesForTrackId = async(trackId) => {
     }
 }
 
+export const getVelodynPointsForTrackId = async(trackId, index) => {
+    try {
+        const cred = new URLSearchParams()
+        cred.append("trackid", trackId)
+        cred.append("index", index)
+        const response = await axios.post("/api/map/getVelodynPointsforTrack", cred)
+        console.log(response)
+        return response.data
+    }catch (error) {
+        console.log("Something went wrong, when getting the Velodyne Points!")
+    }
+}
+
 
 export default {getGeoData, getTrack};

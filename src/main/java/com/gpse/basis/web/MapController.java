@@ -1,6 +1,7 @@
 package com.gpse.basis.web;
 
 import com.gpse.basis.domain.GeoData;
+import com.gpse.basis.domain.VelodynePoint;
 import com.gpse.basis.services.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -53,6 +54,17 @@ public class MapController {
     public List<String> getIRCameraImageforTrack(final WebRequest request) {
         int trackId = Integer.parseInt(request.getParameter("trackid"));
         return rosBag.getIRImagesForTrack(trackId);
+    }
+
+    @PostMapping("/getVelodynPointsforTrack")
+    public List<List<VelodynePoint>> getVelodynPointsforTrack(final WebRequest request) {
+        int trackId = Integer.parseInt(request.getParameter("trackid"));
+        int index = Integer.parseInt(request.getParameter("index"));
+        var lst = rosBag.getVelodynePointsForTrack(trackId);
+        if(!lst.isEmpty())
+            return lst.subList(index, index+1);
+        else
+            return new ArrayList<>();
     }
 
 }

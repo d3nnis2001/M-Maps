@@ -170,35 +170,35 @@ public class RosBagServiceImpl implements RosBagService{
                     if (Objects.equals(topic.getName(), "/velodyne_points")) {
                         f.forMessagesOnTopic(topic.getName(), (message, connection) -> {
                             List<String> fields = message.getFieldNames();
-                            fields.forEach(System.out::println);
-                            System.out.println();
+                            //fields.forEach(System.out::println);
+                            //System.out.println();
                             List<VelodynePoint> klm = new ArrayList<>();
                             try {
                                 long point_step = message.<UInt32Type>getField("point_step").getValue();
-                                System.out.println("Point_step: " + point_step);
+                                //System.out.println("Point_step: " + point_step);
                                 var fld = message.<ArrayType>getField("fields").getFields();
                                 int offset_x = 0, offset_y = 0, offset_z = 0, offset_intensity = 0, offset_time = 0;
                                 for (Field pointField : fld) {
                                     MessageType pointMsg = (MessageType) pointField;
                                     if(Objects.equals(pointMsg.<StringType>getField("name").getValue(), "x")) {
                                         offset_x = Math.toIntExact(pointMsg.<UInt32Type>getField("offset").getValue());
-                                        System.out.println("Offset_x: " + offset_x);
+                                       // System.out.println("Offset_x: " + offset_x);
                                     }
                                     else if(Objects.equals(pointMsg.<StringType>getField("name").getValue(), "y")) {
                                         offset_y = Math.toIntExact(pointMsg.<UInt32Type>getField("offset").getValue());
-                                        System.out.println("Offset_y: " + offset_y);
+                                       // System.out.println("Offset_y: " + offset_y);
                                     }
                                     else if(Objects.equals(pointMsg.<StringType>getField("name").getValue(), "z")) {
                                         offset_z = Math.toIntExact(pointMsg.<UInt32Type>getField("offset").getValue());
-                                        System.out.println("Offset_z: " + offset_z);
+                                       // System.out.println("Offset_z: " + offset_z);
                                     }
                                     else if(Objects.equals(pointMsg.<StringType>getField("name").getValue(), "intensity")) {
                                         offset_intensity = Math.toIntExact(pointMsg.<UInt32Type>getField("offset").getValue());
-                                        System.out.println("Offset_z: " + offset_intensity);
+                                       // System.out.println("Offset_z: " + offset_intensity);
                                     }
                                     else if(Objects.equals(pointMsg.<StringType>getField("name").getValue(), "time")) {
                                         offset_time = Math.toIntExact(pointMsg.<UInt32Type>getField("offset").getValue());
-                                        System.out.println("Offset_time: " + offset_time);
+                                        //System.out.println("Offset_time: " + offset_time);
                                     }
                                 }
                                 var lst = message.<ArrayType>getField("data");
@@ -219,7 +219,7 @@ public class RosBagServiceImpl implements RosBagService{
                                         klm.add(new VelodynePoint(x, y, z, intensity));
                                         size++;
                                     }
-                                System.out.println("Size of Points: " + size);
+                                //System.out.println("Size of Points: " + size);
                             } catch (UninitializedFieldException e) {
                                 throw new RuntimeException(e);
                             }

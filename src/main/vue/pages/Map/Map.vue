@@ -8,12 +8,14 @@ import {
     getPartOfTrack,
     getPartOfGleislage,
     getImagesForTrackId,
-    getIRImagesForTrackId
+    getIRImagesForTrackId,
+    getVelodynPointsForTrackId
 } from "@/main/vue/api/map";
 import {useQuasar} from "quasar";
 import DateInput from "@/main/vue/pages/Map/DateInput.vue";
 import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";
 import router from "@/main/vue/router";
+import LidarPlot from "@/main/vue/pages/Map/LidarPlot.vue";
 
 const map = ref(null);
 var markers = [];
@@ -32,6 +34,9 @@ const selectedMarker = ref('')
 const dialogMarkerOne = ref(false)
 const slide = ref(1)
 const cameraimages = ref([])
+const velodynPoints = ref([])
+const showLidar = ref(false)
+var tempStreckenID = 0
 
 
 onMounted(async () => {
@@ -77,6 +82,7 @@ const onMarkerClicked = async (event) => {
 
     selectedMarker.value = marker
     dialogVisible.value = true;
+    tempStreckenID = marker.data.strecken_id
     console.log(marker.data.latitude)
     console.log(marker.data.longitude)
 };
@@ -94,6 +100,10 @@ const loadIRCameraPictures = async () => {
     if(cameraimages.value.length !== 0) {
         dialogMarkerOne.value = true
     }
+}
+
+const loadLidarData = async () => {
+    showLidar.value = true
 }
 
 const deleteStart = () => {
@@ -414,6 +424,9 @@ const checkForChanges = async () => {
                 </q-carousel>
             </div>
 
+    </q-dialog>
+    <q-dialog v-model="showLidar" full-width>
+        <LidarPlot :streckenid="tempStreckenID"/>
     </q-dialog>
 </template>
 

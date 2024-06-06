@@ -373,6 +373,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public void deleteDataSetsById(List<String> ids) {
+        //todo korrigieren
         Query query = new Query();
         query.addCriteria(Criteria.where("_id").in(ids));
         template.remove(query, "dataSets");
