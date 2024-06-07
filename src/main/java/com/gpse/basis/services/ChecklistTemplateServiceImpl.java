@@ -58,11 +58,11 @@ public class ChecklistTemplateServiceImpl implements ChecklistTemplateService {
     }
 
     @Override
-    public boolean editChecklist(ChecklistTemplate oldTemplate, ChecklistTemplate newTemplate) {
-        boolean success = addChecklist(newTemplate.getName(), newTemplate.getTasks(), newTemplate.getMaterial());
-        if (success) {
-            checklistTemplateRepository.deleteById(oldTemplate.getName());
+    public boolean editChecklist(ChecklistTemplate template) {
+        if (!checklistTemplateRepository.existsById(template.getName())) {
+            return false;
         }
-        return success;
+        checklistTemplateRepository.save(template);
+        return true;
     }
 }

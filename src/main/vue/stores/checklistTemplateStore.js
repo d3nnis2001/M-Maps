@@ -133,14 +133,15 @@ export const useChecklistTemplateStore = defineStore('checklistTemplates', () =>
         })
     }
 
-    function editChecklist() {
-        if (nameNotAllowed(templateEdit.value.name)) {
-
-        } else if (checkListsEmpty(templateEdit.value.tasks, templateEdit.value.material)) {
+    function editChecklist(taskList, materialList) {
+        templateEdit.value = template.value
+        templateEdit.value.tasks = taskList.map(entry => entry.text);
+        templateEdit.value.material = materialList.map(entry => entry.text)
+        if (checkListsEmpty(templateEdit.value.tasks, templateEdit.value.material)) {
 
         } else {
             return new Promise((resolve, reject) => {
-                api.checklistTemplate.editTemplate(template, templateEdit)
+                api.checklistTemplate.editTemplate(templateEdit.value)
                     .then(res => {
                         templateAdded.value = res.data
                         template.value = templateEdit.value

@@ -11,7 +11,9 @@ export default {
         return axios.post('/api/templates/create', checklist)
     },
     getTemplate(name) {
-        return axios.get(`/api/templates/${name}`)
+        const test = axios.get(`/api/templates/${name}`)
+        console.log(test)
+        return test
     },
     deleteTemplate(name) {
         return axios.delete(`/api/templates/delete/${name}`)
@@ -19,7 +21,8 @@ export default {
     duplicateTemplate(template) {
         return axios.post(`/api/templates/duplicate`, template)
     },
-    editTemplate(template, newTemplate) {
-        return axios.post(`/api/templates/edit`, oldTemplate, newTemplate)
+    editTemplate(template) {
+        console.log(template)
+        return axios.post(`/api/templates/edit`, template)
     }
 }

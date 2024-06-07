@@ -54,7 +54,7 @@ public class ChecklistTemplateController {
     }
 
     @PostMapping("/edit")
-    public boolean editChecklist(@RequestBody ChecklistTemplate oldTemplate, @RequestBody ChecklistTemplate newTemplate) {
-        return checklistTemplateService.editChecklist(oldTemplate, newTemplate);
+    public boolean editChecklist(@RequestBody ChecklistTemplate templateEdit) {
+        return checklistTemplateService.editChecklist(templateEdit);
     }
 }

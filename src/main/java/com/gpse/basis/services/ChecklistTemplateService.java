@@ -14,5 +14,5 @@ public interface ChecklistTemplateService {
 
     void deleteTemplate(String templateName);
     String duplicateTemplate(ChecklistTemplate template);
-    boolean editChecklist(ChecklistTemplate oldTemplate, ChecklistTemplate newTemplate);
+    boolean editChecklist(ChecklistTemplate template);
 }
