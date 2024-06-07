@@ -2,22 +2,28 @@
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import router from "@/main/vue/router";
+import {getUserForEdit} from "@/main/vue/api/admin";
 
 export default {
     setup () {
         const route = useRoute();
-        const roles = ref([]);
+        const roles = ref({});
+        const username = route.params.username;
+        const user = ref([])
 
         onMounted( async  () => {
-            const username = route.params.username;
+            console.log(username)
+            user.value = await getUserForEdit(username);
         })
 
         const abort = () => {
             router.push(`/admin`);
+
         };
 
         return {
             abort,
+            username,
             group: ref([]),
             options: [
                 { label: 'Admin', value: 'admin' },

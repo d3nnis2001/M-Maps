@@ -19,3 +19,16 @@ export const deleteUser = async function deleteUser() {
     }
 }
 
+export const getUserForEdit = async function getUserForEdit(username) {
+    try {
+        const response = await axios.get("/admin/:username/editUser", {
+            params: {
+                username: username
+            }
+        });
+        return response.data
+    } catch (error) {
+        console.error("Error while try to get User data for editing:", error);
+        return false
+    }
+}

@@ -217,9 +217,51 @@ const removeRow = (selectedUser) => {
         </q-dialog>
     </div>
 </template>
+
 <style scoped>
-tr.q-table__row--selected {
-    background-color: #42b983 !important;
+.option-button {
+    cursor: pointer;
+    padding: 8px;
+    font-size: 16px;
+    transition-duration: 0.4s;
 }
+.extra-margin {
+    margin-top: 20px;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.option-button:hover {
+    background-color: #e6e4e4;
+}
+
+.handleButton {
+    margin-top: 20px;
+
+}
+</style>
+
+<style lang="sass">
+.my-sticky-header-table
+    height: 500px
+    .q-table__top,
+    .q-table__bottom,
+    thead tr:first-child th
+        background-color: $blue-grey-5
+    thead tr th
+        position: sticky
+        z-index: 0
+    thead tr:first-child th
+        top: 0
+    &.q-table--loading thead tr:last-child th
+        top: 48px
+    tbody
+        scroll-margin-top: 48px
+
+.my-sticky-header-table2
+    .q-table__top,
+    .q-table__bottom,
+    thead tr:first-child th
+        background-color: $blue-grey-5
 </style>
 
