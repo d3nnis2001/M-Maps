@@ -1,7 +1,8 @@
 <script>
 import {onMounted, reactive, ref} from "vue";
 import router from "@/main/vue/router";
-import {getInspectionOrder} from "@/main/vue/api/inspection";
+import {deleteInspectionOrder, getInspectionOrder} from "@/main/vue/api/inspection";
+import {deleteRepairOrder} from "@/main/vue/api/reparatur";
 
 export default {
     setup () {
@@ -41,7 +42,9 @@ export default {
         })
 
         const showDialog = ref(false);
+        const showConfirmDialog = ref(false);
         const currentRow = ref({});
+        const rowToDelete = ref(null);
 
         const rowClick = async (evt, rowData) => {
             currentRow.value = rowData;
@@ -60,15 +63,43 @@ export default {
         function acceptInspectionOrder() {
             // Nächster Sprint - UserID benötigt
         }
+
+        function archiveOrder() {
+            // archivieren
+        }
+
+        const confirmDeleteOrder = (row) => {
+            rowToDelete.value = row;
+            showConfirmDialog.value = true;
+        };
+
+        const deleteOrder = async () => {
+            const id = rowToDelete.value.inspectionOrderId;
+            await deleteInspectionOrder(id);
+            removeRow(id);
+            showConfirmDialog.value = false;
+            showDialog.value = false;
+        };
+
+        const removeRow = (name) => {
+            const index = state.rows.findIndex(row => row.name === name);
+            if (index !== -1) {
+                state.rows.splice(index, 1);
+            }
+        };
         return {
             state,
             filter: ref(''),
             createInspectionOrder,
             editInspectionOrder,
             acceptInspectionOrder,
+            deleteOrder,
+            archiveOrder,
             rowClick,
             currentRow,
             showDialog,
+            showConfirmDialog,
+            confirmDeleteOrder
         }
 
     }
@@ -77,7 +108,12 @@ export default {
 </script>
 
 <template>
-    <div class="q-pa-md">
+    <div class="q-pa-md extra-margin">
+        <q-input borderless dense debounce="300" v-model="state.filter" placeholder="Search">
+            <template v-slot:append>
+                <q-icon name="search" />
+            </template>
+        </q-input>
         <q-table
             class="my-sticky-header-table"
             flat bordered
@@ -90,23 +126,35 @@ export default {
     </div>
 
     <div class="q-pa-md">
-        <q-btn label="Neuen Auftrag erstellen" @click="createInspectionOrder" color="primary"  class=""></q-btn>
+        <q-btn class="handleButton" style="width: 100%; max-width: 218px" size="16px" no-caps rounded label="Auftrag erstellen" @click="createInspectionOrder" color="primary"></q-btn>
 
         <q-dialog v-model="showDialog">
             <q-card>
                 <q-card-section>
                     <div class="option-button" @click="editInspectionOrder">Bearbeiten</div>
+                    <q-separator v-if="currentRow.status !== 'abgeschlossen' " />
+                    <div class="option-button" @click="confirmDeleteOrder(currentRow)">Löschen</div>
                     <q-separator />
-                    <!--
-                    <div class="option-button" @click="deleteOrder">Löschen</div>
-                    <q-separator />
-                    <div class="option-button" @click="archiveOrder">Archivieren</div>
-                    <q-separator />
-                    -->
+                    <q-separator v-if="currentRow.status === 'storniert'" />
+                    <div class="option-button" v-if="currentRow.status === 'storniert'" @click="archiveOrder">Archivieren</div>
                     <div class="option-button" @click="acceptInspectionOrder">Auftrag annehmen</div>
                 </q-card-section>
                 <q-card-section>
                     <q-btn flat label="Schließen" color="primary" @click="showDialog = false"></q-btn>
+                </q-card-section>
+            </q-card>
+        </q-dialog>
+        <q-dialog v-model="showConfirmDialog">
+            <q-card>
+                <q-card-section>
+                    <div class="text-h6">Bestätigung</div>
+                </q-card-section>
+                <q-card-section>
+                    Sind Sie sich sicher, dass sie diesen Prüfautrag löschen wollen?
+                </q-card-section>
+                <q-card-section>
+                    <q-btn flat label="Abbrechen" color="positive" @click="showConfirmDialog = false"></q-btn>
+                    <q-btn flat label="Löschen" color="negative" @click="deleteOrder"></q-btn>
                 </q-card-section>
             </q-card>
         </q-dialog>

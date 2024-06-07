@@ -70,4 +70,15 @@ export const sendDataById = async function sendDataById(id, courseId, startLocat
     }
 }
 
+export const deleteInspectionOrder = async function deleteInspectionOrder(inspectionOrderId) {
+    try {
+        const cred = new URLSearchParams()
+        cred.append("inspectionOrderId", inspectionOrderId)
+        const response = await axios.post("/api/inspection/deleteInspectionOrder", cred)
+        return response
+    } catch (error) {
+        console.log("Unseen error when changing the status")
+    }
+}
+
 

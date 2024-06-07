@@ -4,8 +4,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 
 @Document(collection = "RepChecklist")
 public class ReparaturChecklist {
@@ -14,7 +15,7 @@ public class ReparaturChecklist {
     private Checklist checkPoints;
     private ArrayList<String> checkSel;
     @Field
-    private Date terminiert;
+    private LocalDate terminiert;
 
     public ReparaturChecklist(String id, Checklist checkPoints, ArrayList<String> checkSel) {
         this.id = id;
@@ -46,11 +47,11 @@ public class ReparaturChecklist {
         this.id = id;
     }
 
-    public Date getTerminiert() {
+    public LocalDate getTerminiert() {
         return terminiert;
     }
 
-    public void setTerminiert(Date terminiert) {
+    public void setTerminiert(LocalDate terminiert) {
         this.terminiert = terminiert;
     }
 }

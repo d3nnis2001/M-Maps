@@ -3,7 +3,6 @@ import axios from 'axios';
 export const getGeoData = async function getGeoData() {
     try {
         const response = await axios.get("/api/map/gettracks")
-        console.log(response)
         return response.data;
     } catch (error) {
     }
@@ -11,8 +10,8 @@ export const getGeoData = async function getGeoData() {
 export const getTrack = async function getTrack(trackID) {
     try {
         const cred = new URLSearchParams()
-        cred.append("trackid", trackID)
-        const response = await axios.post("/api/map/gettrack", cred)
+        cred.append("id", trackID)
+        const response = await axios.post("/api/map/getmapbyid", cred)
         return response.data
     } catch (error) {
         console.log("Something went wrong when getting the trackID")
@@ -32,16 +31,18 @@ export const getPartOfTrack = async function getPartOfTrack(from, till) {
     }
 }
 
-export const getPartOfGleislage = async function getPartOfGleislage(id) {
+export const getTimeFromHeatmap = async function getTimeFromHeatmap(strecke, from, till) {
     try {
         const cred = new URLSearchParams()
-        cred.append("id", id)
-        const response = await axios.post("/api/map/fromcolours", cred)
+        cred.append("strecke", strecke)
+        cred.append("from", from)
+        cred.append("till", till)
+        const response = await axios.post("/api/map/getpartheatmap", cred)
         return response.data
-    } catch (error) {
-        console.log("Something went wrong when getting the Gleislagedaten!")
+    }  catch (error) {
+        console.log("Something went wrong when getting the Heatmap data!")
     }
 }
 
 
-export default {getGeoData, getTrack};
+export default {getGeoData, getTrack, getTimeFromHeatmap};

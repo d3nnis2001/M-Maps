@@ -32,13 +32,22 @@ function changeBool() {
                     Datenverwaltung
                 </q-toolbar-title>
                 <q-toolbar-title v-if="$route.name === 'Repair'" align="middle">
-                    Reperaturaufträge
+                    Reparaturaufträge
                 </q-toolbar-title>
                 <q-toolbar-title v-if="$route.name === 'RepairCreate'" align="middle">
-                    Reperaturauftrag erstellen
+                    Reparaturauftrag erstellen
                 </q-toolbar-title>
                 <q-toolbar-title v-if="$route.name === 'RepairEdit'" align="middle">
-                    Reperaturauftrag bearbeiten
+                    Reparaturauftrag bearbeiten
+                </q-toolbar-title>
+                <q-toolbar-title v-if="$route.name === 'inspectionOrderOverview'" align="middle">
+                    Prüfaufträge
+                </q-toolbar-title>
+                <q-toolbar-title v-if="$route.name === 'createInspectionOrder'" align="middle">
+                    Prüfaufträge erstellen
+                </q-toolbar-title>
+                <q-toolbar-title v-if="$route.name === 'editInspectionOrder'" align="middle">
+                    Prüfaufträge bearbeiten
                 </q-toolbar-title>
                 <q-toolbar-title v-if="$route.name === 'adminmain'" align="middle">
                     Nutzerverwaltung
@@ -69,7 +78,12 @@ function changeBool() {
                 </q-item>
                 <q-item clickable v-ripple>
                     <q-item-section align="middle" class="text-black">
-                        <router-link to="/repair">Reperaturaufträge</router-link>
+                        <router-link to="/repair">Reparaturaufträge</router-link>
+                    </q-item-section>
+                </q-item>
+                <q-item clickable v-ripple>
+                    <q-item-section align="middle" class="text-black">
+                        <router-link to="/inspectionOrder">Prüfaufträge</router-link>
                     </q-item-section>
                 </q-item>
                 <q-item clickable v-ripple>

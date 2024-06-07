@@ -7,6 +7,7 @@ import com.gpse.basis.repositories.DataSetRepository;
 import com.gpse.basis.repositories.GeoTrackData;
 import com.gpse.basis.repositories.GleisLageDatenRepository;
 import com.gpse.basis.repositories.GleisVDataRepository;
+import org.apache.avro.util.MapEntry;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.parquet.hadoop.ParquetReader;
@@ -20,6 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 
 import java.io.*;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -351,7 +354,9 @@ public class FileServiceImpl implements FileService {
         query.addCriteria(Criteria.where("dataSetid").in(ids));
         template.remove(query, "GleisLageDaten");
     }
-
+    /**
+     * Returns the all available Geodata
+     **/
     @Override
     public ArrayList<GeoData> getGeoData() {
         Iterable<GeoData> iterable = geoTrack.findAll();
@@ -364,6 +369,9 @@ public class FileServiceImpl implements FileService {
         return geoArr;
     }
 
+    /**
+     * Returns the all available Geodata from a track
+     **/
     @Override
     public ArrayList<GeoData> getTrackGeoData(int trackID) {
         Iterable<GeoData> iterable = geoTrack.findAll();
@@ -380,7 +388,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public ArrayList<GeoData> getPartGeoData(int from, int till) {
+    public List<Map.Entry<DataService.Colors, String>> getPartGeoData(int from, int till) {
         Iterable<GeoData> iterable = geoTrack.findAll();
         boolean isright = true;
         if (from > till) {
@@ -402,9 +410,9 @@ public class FileServiceImpl implements FileService {
             }
         }
         System.out.println(geoArr.size());
-        return geoArr;
+        List<Map.Entry<DataService.Colors, String>> ltg = dService.getNewestColorsforGeoData(geoArr);
+        return ltg;
     }
-
 
 
     private List<File> getAllFiles(File folder) {
@@ -430,5 +438,13 @@ public class FileServiceImpl implements FileService {
         dService.getGeoDatabyTrackId(6100);
 
         return lst;
+    }
+
+    //return null, if from > till
+    public List<Map.Entry<DataService.Colors, String>> getPartHeatmap(int strecke, LocalDateTime from, LocalDateTime till) {
+        if (from.isAfter(till)) {
+            return null;
+        }
+         return dService.getGeoDataByDate(strecke, from, till);
     }
 }
