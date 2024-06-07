@@ -12,7 +12,7 @@ export const getInspectionOrder = async function getInspectionOrder() {
 }
 
 export const sendInspectionOrder = async function sendInspectionOrder(courseId, startLocation, endLocation, startTime,
-                                                                      endTime, department, dataInspec, remarks) {
+                                                                      endTime, department, dataInspec, remarks, priority) {
     try {
         const derc = new URLSearchParams();
         derc.append("courseId", courseId);
@@ -23,6 +23,7 @@ export const sendInspectionOrder = async function sendInspectionOrder(courseId, 
         derc.append("department", department);
         derc.append("inspectionData", dataInspec);
         derc.append("remarks", remarks);
+        derc.append("priority", priority);
         const response = await axios.post("/api/inspection/senddata", derc)
         return response;
 
@@ -35,7 +36,6 @@ export const sendInspectionOrder = async function sendInspectionOrder(courseId, 
 
 export const getDataById = async function getDataById(id) {
     try {
-        console.log("TEST-GETDATABYID");
         const response = await axios.get("/api/inspection/getById", {
             params: {
                 inspectionOrderId: id
@@ -49,7 +49,7 @@ export const getDataById = async function getDataById(id) {
 }
 
 export const sendDataById = async function sendDataById(id, courseId, startLocation, endLocation, startTime,
-                                                        endTime, department, dataInspec, remarks) {
+                                                        endTime, department, dataInspec, remarks, priority) {
     try {
         const derc = new URLSearchParams();
         derc.append("inspectionOrderId", id);
@@ -61,6 +61,7 @@ export const sendDataById = async function sendDataById(id, courseId, startLocat
         derc.append("department", department);
         derc.append("inspectionData", dataInspec);
         derc.append("remarks", remarks);
+        derc.append("priority", priority);
         const response = await axios.post("/api/inspection/sendById", derc)
         return response;
 

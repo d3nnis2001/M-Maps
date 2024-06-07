@@ -19,6 +19,10 @@ export default {
         const inspectionData = ref('')
         const inspectionDataValues = ref([])
         const remarks = ref('')
+        const priority = ref('')
+        const priorityLow = ref(false)
+        const priorityMiddle = ref(false)
+        const priorityHigh = ref(false)
         const dense = ref(false)
         const route = useRoute();
         let currentInspectionOrderId = route.params.inspectionOrderId
@@ -33,7 +37,15 @@ export default {
             department.value = inspectionOrder.department;
             inspectionData.value = inspectionOrder.inspectionData;
             remarks.value = inspectionOrder.remarks;
+            priority.value = inspectionOrder.priority;
 
+            if (priority.value === 'niedrig') {
+                priorityLow.value = true;
+            } else if (priority.value === 'mittel') {
+                priorityMiddle.value = true;
+            } else if (priority.value === 'hoch') {
+                priorityHigh.value = true;
+            }
             inspectionDataValues.value.push("Gleislagedaten")
             inspectionDataValues.value.push("Sonstige Daten")
 
@@ -80,13 +92,33 @@ export default {
         function sendData() {
             const inputs = checkInputs()
             console.log(inputs)
+            if (priorityLow.value) {
+                priority.value = 'niedrig';
+            } else if (priorityMiddle.value) {
+                priority.value = 'mittel';
+            } else if (priorityHigh.value) {
+                priority.value = 'hoch';
+            }
             if (inputs) {
                 router.push('/inspectionOrder')
                 return sendDataById(currentInspectionOrderId, courseId.value, startLocation.value, endLocation.value, startTime.value,
-                    endTime.value, department.value, inspectionData.value, remarks.value)
+                    endTime.value, department.value, inspectionData.value, remarks.value, priority.value)
 
             }
         }
+
+        const updateCheckbox = (option) => {
+            if (option === 'niedrig') {
+                priorityMiddle.value = false;
+                priorityHigh.value = false;
+            } else if (option === 'mittel') {
+                priorityLow.value = false;
+                priorityHigh.value = false;
+            } else if (option === 'hoch') {
+                priorityLow.value = false;
+                priorityMiddle.value = false;
+            }
+        };
 
         return {
             currentInspectionOrderId,
@@ -100,6 +132,10 @@ export default {
             inspectionDataValues,
             remarks,
             sendData,
+            updateCheckbox,
+            priorityLow,
+            priorityMiddle,
+            priorityHigh,
             dense
         }
     }
@@ -167,6 +203,13 @@ export default {
             <div class="checkListInput">
                 <p style="font-weight: bold;">Messdaten</p>
                 <q-select class="" outlined v-model="inspectionData" :options="inspectionDataValues" label="Messdaten"></q-select>
+            </div>
+            <div class="">
+                <p style="font-weight: bold;">Priorität</p>
+                <q-checkbox v-model="priorityLow" val="niedrig" label="niedrig" @update:model-value="updateCheckbox('niedrig')"/>
+                <q-checkbox v-model="priorityMiddle" val="mittel" label="mittel" @update:model-value="updateCheckbox('mittel')"/>
+                <q-checkbox v-model="priorityHigh" val="hoch" label="hoch" @update:model-value="updateCheckbox('hoch')"/>
+
             </div>
         </div>
         <div>

@@ -18,6 +18,9 @@ export default {
         const inspectionData = ref('')
         const inspectionDataValues = ref([])
         const remarks = ref('')
+        const priorityLow = ref(false)
+        const priorityMiddle = ref(false)
+        const priorityHigh = ref(false)
         const dense = ref(false);
 
         onMounted(async () => {
@@ -50,6 +53,10 @@ export default {
                 console.log(errormsg);
                 errormsg.push("Please select a data type");
             }
+            if (!priorityLow.value && !priorityMiddle.value && !priorityHigh.value) {
+                console.log(errormsg);
+                errormsg.push("Please select a priority");
+            }
 
             if (errormsg.length > 0) {
                 for (let i = 0; i < errormsg.length; i++) {
@@ -65,14 +72,35 @@ export default {
 
         function sendData() {
             const inputs = checkInputs()
+            const priority = ref('');
+            if (priorityLow.value) {
+                priority.value = 'niedrig';
+            } else if (priorityMiddle.value) {
+                priority.value = 'mittel';
+            } else if (priorityHigh.value) {
+                priority.value = 'hoch';
+            }
             console.log(inputs)
             if (inputs) {
                 router.push('/inspectionOrder')
                 return sendInspectionOrder(courseId.value, startLocation.value, endLocation.value, startTime.value,
-                    endTime.value, department.value, inspectionData.value, remarks.value)
+                    endTime.value, department.value, inspectionData.value, remarks.value, priority.value)
 
             }
         }
+
+        const updateCheckbox = (option) => {
+            if (option === 'niedrig') {
+                priorityMiddle.value = false;
+                priorityHigh.value = false;
+            } else if (option === 'mittel') {
+                priorityLow.value = false;
+                priorityHigh.value = false;
+            } else if (option === 'hoch') {
+                priorityLow.value = false;
+                priorityMiddle.value = false;
+            }
+        };
 
         return {
             courseId,
@@ -84,7 +112,11 @@ export default {
             inspectionData,
             inspectionDataValues,
             remarks,
+            priorityLow,
+            priorityMiddle,
+            priorityHigh,
             sendData,
+            updateCheckbox,
             dense
         }
     }
@@ -148,6 +180,13 @@ export default {
                     <p style="font-weight: bold;">Messdaten</p>
                     <q-select class="" outlined v-model="inspectionData" :options="inspectionDataValues" label="Messdaten" />
                 </div>
+                <div class="">
+                    <p style="font-weight: bold;">Priorität</p>
+                    <q-checkbox v-model="priorityLow" val="niedrig" label="niedrig" @update:model-value="updateCheckbox('niedrig')"/>
+                    <q-checkbox v-model="priorityMiddle" val="mittel" label="mittel" @update:model-value="updateCheckbox('mittel')"/>
+                    <q-checkbox v-model="priorityHigh" val="hoch" label="hoch" @update:model-value="updateCheckbox('hoch')"/>
+
+                </div>
             </div>
             <div>
                 <p style="font-weight: bold;">Bemerkungen</p>
@@ -157,45 +196,6 @@ export default {
         </div>
     </div>
 
-
-
-
-
-    <!-- #############################################################################################
-    <div class="q-pa-md">
-        <div class="q-gutter-y-md column" style="max-width: 300px">
-            <q-input outlined v-model="courseId" label="StreckenID" :dense="dense" />
-
-            <q-input outlined v-model="startLocation" label="Startort" :dense="dense" />
-
-            <q-input outlined v-model="endLocation" label="Endort" :dense="dense" />
-
-            <q-input outlined v-model="startTime" label="Von" :dense="dense">
-                <template v-slot:prepend>
-                    <q-icon name="event" />
-                </template>
-            </q-input>
-
-            <q-input outlined v-model="endTime" label="Bis" :dense="dense">
-                <template v-slot:prepend>
-                    <q-icon name="event" />
-                </template>
-            </q-input>
-
-            <q-input outlined v-model="department" label="Fachabteilung" :dense="dense" />
-
-            <q-input outlined v-model="inspectionData" label="Zu überprüfende Messdaten" :dense="dense" />
-
-            <q-input
-                v-model="remarks" label="Bemerkungen" :dense="dense"
-                filled
-                autogrow
-            />
-            <q-btn label="Erstellen" @click="sendData" color="primary" class=""></q-btn>
-            <q-btn label="Abbrechen" @click="$router.push('/inspectionOrder')" color="primary" class=""></q-btn>
-        </div>
-    </div>
-    -->
 </template>
 
 

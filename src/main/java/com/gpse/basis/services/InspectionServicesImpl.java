@@ -27,7 +27,7 @@ public class InspectionServicesImpl implements InspectionServices {
 
         InspectionOrder inspectionOrder = new InspectionOrder(inspectionOrderId, inspecArray.get(0), defaultUserId,
             inspecArray.get(1), inspecArray.get(2), inspecArray.get(3), inspecArray.get(4),
-            inspecArray.get(5), inspecArray.get(6), defaultStatus, inspecArray.get(7), defaultArchived);
+            inspecArray.get(5), inspecArray.get(6), defaultStatus, inspecArray.get(7), defaultArchived, inspecArray.get(8));
         inspec.save(inspectionOrder);
     }
 
@@ -49,6 +49,7 @@ public class InspectionServicesImpl implements InspectionServices {
         inspecOld.setDepartment(inspecNew.getDepartment());
         inspecOld.setInspectionData(inspecNew.getInspectionData());
         inspecOld.setRemarks(inspecNew.getRemarks());
+        inspecOld.setPriority(inspecNew.getPriority());
         inspec.save(inspecOld);
     }
 

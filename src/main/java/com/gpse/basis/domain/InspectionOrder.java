@@ -19,9 +19,10 @@ public class InspectionOrder {
     private String status;
     private String remarks;
     private boolean archived;
+    private String priority;
 
     public InspectionOrder(String inspectionOrderId, String courseId, String userId, String startLocation, String endLocation, String startTime, String endTime,
-                           String department, String inspectionData, String status, String remarks, boolean archived) {
+                           String department, String inspectionData, String status, String remarks, boolean archived, String priority) {
         this.inspectionOrderId = inspectionOrderId;
         this.courseId = courseId;
         this.userId = userId;
@@ -34,6 +35,7 @@ public class InspectionOrder {
         this.status = status;
         this.remarks = remarks;
         this.archived = archived;
+        this.priority = priority;
     }
 
     public String getInspectionOrderId() {
@@ -127,5 +129,13 @@ public class InspectionOrder {
 
     public void setArchived(boolean archived) {
         this.archived = archived;
+    }
+
+    public String getPriority() {
+        return priority;
+    }
+
+    public void setPriority(String priority) {
+        this.priority = priority;
     }
 }

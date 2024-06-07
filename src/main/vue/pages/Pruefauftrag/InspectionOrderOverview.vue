@@ -1,7 +1,7 @@
 <script>
 import {onMounted, onUnmounted, reactive, ref} from "vue";
 import router from "@/main/vue/router";
-import {deleteInspectionOrder, getInspectionOrder, sendNewStatus} from "@/main/vue/api/inspection";
+import {deleteInspectionOrder, getDataById, getInspectionOrder, sendNewStatus} from "@/main/vue/api/inspection";
 import {useQuasar} from "quasar";
 
 
@@ -20,6 +20,7 @@ export default {
                 { name: 'inspectionData', label: 'Messdaten', align: 'left', field: 'inspectionData' },
                 { name: 'department', label: 'Fachabteilung', align: 'left', field: 'department' },
                 { name: 'status', label: 'Status', align: 'left', field: 'status' },
+                { name: 'priority', label: 'Priorität', align: 'left', field: 'priority' }
             ],
             rows: []
 
@@ -42,26 +43,31 @@ export default {
         const showDialog = ref(false);
         const showConfirmDialog = ref(false);
         const showPictureUploadDialog = ref(false);
+        const showFurtherInformationDialog = ref(false);
         const currentRow = ref({});
         const rowToDelete = ref(null);
 
 
+        const userId = ref('');
+        const remarks = ref('');
+
         const fetchData = async () => {
             const response = await getInspectionOrder()
             console.log("API Response:", response);
-            for (let i = 0; i < response.length; i++) {
-                state.rows.push({
-                    inspectionOrderId: response[i]["inspectionOrderId"],
-                    courseId: response[i]["courseId"],
-                    startLocation: response[i]["startLocation"],
-                    endLocation: response[i]["endLocation"],
-                    startTime: response[i]["startTime"],
-                    endTime: response[i]["endTime"],
-                    inspectionData: response[i]["inspectionData"],
-                    department: response[i]["department"],
-                    status: response[i]["status"]
-                })
-            }
+            state.rows = response
+                .filter(row => row.status !== 'archiviert')
+                .map(row => ({
+                    inspectionOrderId: row.inspectionOrderId,
+                    courseId: row.courseId,
+                    startLocation: row.startLocation,
+                    endLocation: row.endLocation,
+                    startTime: row.startTime,
+                    endTime: row.endTime,
+                    inspectionData: row.inspectionData,
+                    department: row.department,
+                    status: row.status,
+                    priority: row.priority
+                }));
             console.log("State Rows:", state.rows);
         };
         const checkScreenSize = () => {
@@ -78,6 +84,7 @@ export default {
 
         function createInspectionOrder() {
             router.push("inspectionOrder/create");
+            fetchData();
         }
         function editInspectionOrder() {
             const inspectionOrderId = currentRow.value["inspectionOrderId"]
@@ -85,44 +92,46 @@ export default {
             router.push(`inspectionOrder/${inspectionOrderId}/edit`)
         }
 
-        function acceptInspectionOrder() {
-            // UserId Änderung!!!!
+        async function acceptInspectionOrder() {
+            // TODO: UserId Änderung!!!!
             showDialog.value = false;
             const id = currentRow.value.inspectionOrderId;
-            sendNewStatus(id, "in Bearbeitung");
-            // Statusänderung auf 'in Bearbeitung'
+            await sendNewStatus(id, "in Bearbeitung");
+            updateRowStatus(id, "in Bearbeitung");
+
         }
 
-        function markArchived() {
+        async function markArchived() {
             showDialog.value = false;
             const id = currentRow.value.inspectionOrderId;
-            sendNewStatus(id, "archiviert");
-            // Statusänderung auf 'archiviert'
+            await sendNewStatus(id, "archiviert");
+            updateRowStatus(id, "archiviert");
+            await fetchData();
         }
 
         async function markFinished() {
-            // Bild speichern
+            // TODO: Bild im inspectionOrderId-Ordner speichern
 
             showPictureUploadDialog.value = false;
             showDialog.value = false;
             const id = currentRow.value.inspectionOrderId;
-            sendNewStatus(id, "abgeschlossen");
-            // Statusänderung auf 'abgeschlossen'
+            await sendNewStatus(id, "abgeschlossen");
+            updateRowStatus(id, "abgeschlossen");
 
         }
 
-        function markCancelled() {
+        async function markCancelled() {
             showDialog.value = false;
             const id = currentRow.value.inspectionOrderId;
-            sendNewStatus(id, "storniert");
-            // Statusänderung auf 'storniert'
+            await sendNewStatus(id, "storniert");
+            updateRowStatus(id, "storniert");
         }
 
-        function markOrdered() {
+        async function markOrdered() {
             showDialog.value = false;
             const id = currentRow.value.inspectionOrderId;
-            sendNewStatus(id, "beauftragt");
-            // Statusänderung auf 'beauftragt'
+            await sendNewStatus(id, "beauftragt");
+            updateRowStatus(id, "beauftragt");
         }
 
         const confirmDeleteOrder = (row) => {
@@ -136,6 +145,7 @@ export default {
             removeRow(id);
             showConfirmDialog.value = false;
             showDialog.value = false;
+            await fetchData();
         };
 
         const removeRow = (name) => {
@@ -150,6 +160,22 @@ export default {
                 type: 'negative',
                 message: `${rejectedEntries.length} file(s) did not pass validation constraints`
             })
+        }
+
+        const updateRowStatus = (inspectionOrderId, status) => {
+            const row = state.rows.find(row => row.inspectionOrderId === inspectionOrderId);
+            if (row) {
+                row.status = status;
+            }
+        };
+
+        async function showFurtherInformation() {
+            showFurtherInformationDialog.value = true;
+            const inspecOrder = await getDataById(currentRow.value.inspectionOrderId);
+            userId.value = inspecOrder.userId;
+            console.log("userId: ", userId);
+            remarks.value = inspecOrder.remarks;
+            console.log("remarks: ", remarks);
         }
 
 
@@ -173,6 +199,10 @@ export default {
             largeScreen,
             showPictureUploadDialog,
             onRejected,
+            showFurtherInformation,
+            showFurtherInformationDialog,
+            userId,
+            remarks
         }
     }
 }
@@ -231,6 +261,8 @@ export default {
                     <div class="option-button" v-if="currentRow.status === 'beauftragt' && currentRow.status !== 'storniert'" @click="markCancelled">Stornieren</div>
                     <q-separator />
                     <div class="option-button" v-if="currentRow.status === 'storniert' && currentRow.status !== 'beauftragt'" @click="markOrdered">Beauftragen</div>
+                    <q-separator />
+                    <div class="option-button"  @click="showFurtherInformation">Weitere Informationen </div>
                 </q-card-section>
                 <q-card-section>
                     <q-btn flat label="Schließen" color="primary" @click="showDialog = false"></q-btn>
@@ -273,6 +305,28 @@ export default {
                     <q-btn flat label="Abbrechen" color="negative" @click="showPictureUploadDialog = false"></q-btn>
                     <q-btn flat label="Prüfauftrag abschließen" color="positive" @click="markFinished"></q-btn>
                 </q-card-section>
+            </q-card>
+        </q-dialog>
+        <q-dialog v-model="showFurtherInformationDialog">
+            <q-card>
+                <q-card-section>
+                    <div class="text-h6">Weitere Informationen</div>
+                </q-card-section>
+                <div>
+                    <div class="row">
+                        <p style="font-weight: bold; margin-left: 5px; margin-right: 5px"> UserId: </p>
+                        <p style="">{{ userId }}</p>
+                    </div>
+                </div>
+                <div>
+                    <div class="row">
+                        <p style="margin-left: 5px; font-weight: bold; margin-right: 5px"> Bemerkungen: </p>
+                        <p style="">{{ remarks }}</p>
+                    </div>
+                </div>
+                <q-card-section>
+                    <q-btn flat label="Schließen" color="primary" @click="showFurtherInformationDialog = false"></q-btn>
+                </q-card-section>3
             </q-card>
         </q-dialog>
 
