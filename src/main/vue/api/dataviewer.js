@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-export const getTrackLayoutData = async function getData() {
+export const getTrackLayoutData = async function getData(trackId) {
     try {
         //const response = await axios.get("/api/dataviewer/getTrackData")
-        const response2 = await axios.get("/api/dataviewer/getTrackData2")
+        const response2 = await axios.get("/api/dataviewer/getTrackData2", {params: {trackId}})
         console.log(response2.data)
         //console.log(response.data)
         return response2.data

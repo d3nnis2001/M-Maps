@@ -1,7 +1,7 @@
 <script>
-import {ref} from "vue";
+import {ref, computed} from "vue";
 import {useQuasar} from "quasar";
-import {useRouter} from "vue-router";
+import {useRouter, useRoute} from "vue-router";
 
 export default {
   setup(){
@@ -9,14 +9,29 @@ export default {
       const routeID = ref('')
       const $q = useQuasar()
       const router = useRouter()
+      const route = useRoute()
+      const site = ref(0)
+
+      const NOTIFY_OPTIONS = {
+          noDatapoint: {
+              type: 'negative',
+              message: 'Please enter a Datapoint ID'
+          },
+          noRoute: {
+              type: 'negative',
+              message: 'Please enter a Route ID'
+          },
+          wrongRoute: {
+              type: 'negative',
+              message: 'The Route ID does not exist. Enter existing Route ID'
+          }
+      };
 
       function showData() {
           if (datapoint.value === '') {
               console.log(false)
-              $q.notify({
-                  type: 'negative',
-                  message: "Please enter a Datapoint ID"
-              })
+              $q.notify(NOTIFY_OPTIONS.noDatapoint)
+              datapoint.value = ''
           } else {
               console.log(true)
               const pointId = datapoint.value
@@ -25,24 +40,32 @@ export default {
       }
 
       function showRoute() {
-          if (routeID.value === '') {
-              console.log(false)
-              $q.notify({
-                  type: 'negative',
-                  message: "Please enter a Route ID"
-              })
-          } else {
+          if (routeID.value === '6100') {
               console.log(true)
               const routeId = routeID.value
               router.push(`/dataviewer/route/${routeId}`)
+          } else if (routeID.value === '') {
+              console.log(false)
+              $q.notify(NOTIFY_OPTIONS.noRoute)
+              routeID.value = ''
+          } else {
+              console.log(false)
+              $q.notify(NOTIFY_OPTIONS.wrongRoute)
+              routeID.value = ''
           }
       }
 
+      const isPointPath = computed(() => route.path.includes('/dataviewer/point'))
+      const isRoutePath = computed(() => route.path.includes('/dataviewer/route'))
+
       return {
+          site,
           datapoint,
           routeID,
           showData,
-          showRoute
+          showRoute,
+          isPointPath,
+          isRoutePath
       }
   }
 };
@@ -52,14 +75,14 @@ export default {
 <div>
     <div class="q-pa-xs">
         <div class="align-mult">
-            <div class="align-basic">
+            <div v-if="!isPointPath" class="align-basic">
                 <p>Datenpunkt ID</p>
                 <q-input class="extra-mar" outlined v-model="datapoint"></q-input>
                 <div class="q-pa-xs">
                     <q-btn label="Daten anzeigen" @click=showData class=""></q-btn>
                 </div>
             </div>
-            <div class="align-basic">
+            <div v-if="!isRoutePath" class="align-basic">
                 <p>Strecken ID</p>
                 <q-input class="extra-mar" outlined v-model="routeID" ></q-input>
                 <div class="q-pa-xs">

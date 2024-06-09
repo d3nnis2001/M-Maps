@@ -1,19 +1,126 @@
 <script>
 import Dataviewer from "@/main/vue/pages/Dataviewer/Dataviewer.vue";
 import {getTrackLayoutData} from "@/main/vue/api/dataviewer";
+import VueApexCharts from 'vue3-apexcharts';
 
 import { Bar } from 'vue-chartjs'
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js'
 import {ref, onMounted, reactive} from "vue";
 import {getUserData} from "@/main/vue/api/admin";
+import {useRoute} from "vue-router";
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
 export default {
     components: {
-        Dataviewer
+        Dataviewer,
+        apexchart: VueApexCharts,
     },
     setup() {
+        const loaded = ref(false);
+        const route = useRoute();
+        const routeId = ref('')
+
+        const chartOptions = ref({
+            chart: {
+                type: 'bar',
+                height: '350',
+                id: 'vuechart-example'
+            },
+            plotOptions: {
+                bar: {
+                    colors: {
+                        ranges: [{
+                            from: -100,
+                            to: -46,
+                            color: '#F15B46'
+                        }, {
+                            from: -45,
+                            to: 0,
+                            color: '#FEB019'
+                        }]
+                    },
+                    columnWidth: '100%',
+                }
+            },
+            dataLabels: {
+                enabled: false
+            },
+            yaxis: {
+                forceNiceScale: true,
+                labels: {
+                    formatter: (value) => {return value}
+                },
+                title: {
+                    text: 'Längenhöhe [mm]'
+                }
+            },
+            xaxis: {
+                type: 'numeric',
+                //categories: [],
+                labels: {
+                    rotate: -90
+                },
+                title: {
+                    text: 'Streckenkilometer [km]'
+                }
+            },
+            annotations: {
+                yaxis: [
+                    {
+                        y: 10.5,
+                        borderColor: '#e30000',
+                        strokeDashArray: 0
+                        /*
+                        label: {
+                            borderColor: '#00E396',
+                            style: {
+                                color: '#fff',
+                                background: '#e3001a'
+                            },
+                            text: ''
+                        }*/
+                    },
+                    {
+                        y: 7.5,
+                        borderColor: '#e3c500',
+                        strokeDashArray: 0
+                    },
+                    {
+                        y: 3.5,
+                        borderColor: '#00e30b',
+                        strokeDashArray: 0
+                    },
+                    {
+                        y: -10.5,
+                        borderColor: '#e30000',
+                        strokeDashArray: 0
+                    },
+                    {
+                        y: -7.5,
+                        borderColor: '#e3c500',
+                        strokeDashArray: 0
+                    },
+                    {
+                        y: -3.5,
+                        borderColor: '#00e30b',
+                        strokeDashArray: 0
+                    }
+                ]
+            }
+        });
+
+        const seriesLinks = ref([{
+            name: 'Längenhöhe',
+            data: []
+        }]);
+
+        const seriesRechts = ref([{
+            name: 'Längenhöhe',
+            data: []
+        }]);
+
+        /*
         const state = reactive({
             filter: '',
             columns: [
@@ -27,33 +134,58 @@ export default {
                     sortable: true
                 },
                 {name: 'id', label: 'ID', align: 'left', field: row => row.id, format: val => `${val}`, sortable: true},
-                {name: 'E-Mail', label: 'E-Mail', align: 'left', field: 'username', sortable: true},
-                {name: 'First Name', label: 'First Name', align: 'left', field: 'firstname', sortable: true},
-                {name: 'Last Name', label: 'Last Name', align: 'left', field: 'lastname', sortable: true},
+                {name: 'E-Mail', label: 'Left Railab', align: 'left', field: 'left', sortable: true},
+                {name: 'First Name', label: 'Rigth Railab', align: 'left', field: 'right', sortable: true},
+                {name: 'Last Name', label: 'Str km', align: 'left', field: 'str_km', sortable: true},
             ],
             rows: []
         });
 
-        function getData() {}
-
-        onMounted( () => {
-            const data = getTrackLayoutData()
+        function transformData() {}
+         */
+        onMounted( async () => {
+            console.log(loaded.value)
+            routeId.value = route.params.id
+            console.log(routeId.value)
+            const data = await getTrackLayoutData(routeId.value)
+            let i = 0
+            //const categories = []
+            //const seriesData = []
             console.log(data)
-            data.then(allUsers => {
-                console.log(allUsers)
-                allUsers.forEach(user => {
-                    console.log(user)
-                    state.rows.push( {
-                        id: 'not in Database',
-                        username: user.username,
-                        firstname: user.firstname,
-                        lastname: user.lastname,
-                    })
-                })
+            seriesRechts.value[0].data.push([127,0.0])
+            seriesLinks.value[0].data.push([127,0.0])
+            data.forEach(user => {
+                    //console.log(user)
+                if (i < 2000){
+                    seriesRechts.value[0].data.push([user.str_km,user.z_rechts_railab_3p])
+                    seriesLinks.value[0].data.push([user.str_km,user.z_links_railab_3p])
+                    /*
+                    if (user.str_km % 2 === 0) {
+                        chartOptions.value.xaxis.categories.push(user.str_km)
+                    }
+                    else {
+                        console.log(Math.round(user.str_km))
+                        chartOptions.value.xaxis.categories.push('')
+                    }*/
+                    i += 1
+                }
+
+                    /*state.rows.push( {
+                        id: user.id,
+                        left: user.z_links_railab_3p,
+                        right: user.z_rechts_railab_3p,
+                        str_km: user.str_km,
+                    })*/
             })
+            //chartOptions.value.xaxis.categories = categories
+            //series.value.data = seriesData
+            loaded.value = true
+            //console.log(chartOptions.value.xaxis.categories)
+            console.log(seriesLinks.value[0].data)
+            console.log(loaded.value)
         })
 
-        return {getData, state}
+        return {chartOptions, seriesLinks, seriesRechts, loaded}
     }
 }
 
@@ -183,6 +315,7 @@ export default {
     <q-page>
         <Dataviewer/>
         <div>
+            <!--
             <div class="q-pa-md">
                 <q-table
                     title="User Data"
@@ -190,6 +323,18 @@ export default {
                     :columns="state.columns"
                     row-key="name"
                 />
+            </div>
+            -->
+            <div class="outline">
+                <q-banner align="middle">Längenhöhe - z_links_railab_3p</q-banner>
+                <q-banner v-if="!loaded">Loading</q-banner>
+                <apexchart v-else type="bar" height="350" :options="chartOptions" :series="seriesLinks"></apexchart>
+            </div>
+            <q-space/>
+            <div class="outline">
+                <q-banner align="middle">Längenhöhe - z_rechts_railab_3p</q-banner>
+                <q-banner v-if="!loaded">Loading</q-banner>
+                <apexchart v-else type="bar" height="350" :options="chartOptions" :series="seriesRechts"></apexchart>
             </div>
         </div>
     </q-page>

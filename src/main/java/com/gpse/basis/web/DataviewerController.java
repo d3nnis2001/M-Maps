@@ -7,6 +7,7 @@ import com.gpse.basis.services.FileService;
 import com.gpse.basis.services.UserServices;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ public class DataviewerController {
     public ArrayList<GleisLageDatenpunkt> getAllTrackLayoutData() { return fileService.getTrackData(6100);}
 
     @GetMapping("/getTrackData2")
-    public ArrayList<GleisLageDatenpunkt> getAllTrackLayoutData2() { return fileService.getData(6100);}
+    public ArrayList<GleisLageDatenpunkt> getAllTrackLayoutData2(@RequestParam int trackId) { return fileService.getData(trackId);}
 
     /*
     @GetMapping("/getTrackData")
