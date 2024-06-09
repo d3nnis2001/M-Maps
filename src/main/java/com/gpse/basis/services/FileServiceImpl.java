@@ -12,8 +12,11 @@ import org.apache.hadoop.fs.Path;
 import org.apache.parquet.hadoop.ParquetReader;
 import org.apache.parquet.hadoop.util.HadoopInputFile;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
 import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.MatchOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
@@ -449,7 +452,7 @@ public class FileServiceImpl implements FileService {
         Iterator<GleisLageDatenpunkt> iterator = iterable.iterator();
         while (iterator.hasNext()) {
             GleisLageDatenpunkt dataPoint = iterator.next();
-            if (dataPoint.getStr_km() > 70 && dataPoint.getStr_km() < 100) {
+            if (dataPoint.getStr_km() > 70 && dataPoint.getStr_km() < 74) {
                 dataPoints.add(dataPoint);
             }
         }
@@ -470,6 +473,35 @@ public class FileServiceImpl implements FileService {
         while (iterator.hasNext()) {
             GleisLageDatenpunkt gld = iterator.next();
             dataPoints.add(gld);
+        }
+        return dataPoints;
+    }
+
+    public List<GleisLageDatenpunkt> getDataPointsForTrack(int trackId) {
+        MongoTemplate tmpl = new MongoTemplate(new SimpleMongoClientDatabaseFactory("mongodb://localhost:27017/project_12"));
+        List<GeoData> lst = getTrackGeoData(trackId);
+        System.out.println(lst.size() + " Geodata fertig");
+        MatchOperation matchOperation = Aggregation.match(Criteria.where("iDlocation").in(lst.parallelStream().map(GeoData::getId).toList()));
+        System.out.println("matchoperation fertig");
+        Aggregation aggregation = Aggregation.newAggregation(matchOperation);
+        System.out.println("aggregation fertig");
+        List<GleisLageDatenpunkt> results = tmpl.aggregate(aggregation, "GleisLageDaten", GleisLageDatenpunkt.class).getMappedResults();
+        System.out.println(results.size());
+        return results;
+    }
+
+    public ArrayList<GleisLageDatenpunkt> getData(int trackId) {
+        List<GleisLageDatenpunkt> lst = getDataPointsForTrack(trackId);
+        System.out.println(lst.size());
+        ArrayList<GleisLageDatenpunkt> dataPoints = new ArrayList<>();
+        int i = 0;
+        for (GleisLageDatenpunkt gld : lst) {
+            GleisLageDatenpunkt gld2 = gld;
+            dataPoints.add(gld2);
+            i += 1;
+            if (i % 1000 == 0) {
+                System.out.println(i);
+            }
         }
         return dataPoints;
     }

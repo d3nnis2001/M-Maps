@@ -2,9 +2,11 @@ import axios from 'axios';
 
 export const getTrackLayoutData = async function getData() {
     try {
-        const response = await axios.get("/api/dataviewer/getTrackData")
-        console.log(response.data)
-        return response.data
+        //const response = await axios.get("/api/dataviewer/getTrackData")
+        const response2 = await axios.get("/api/dataviewer/getTrackData2")
+        console.log(response2.data)
+        //console.log(response.data)
+        return response2.data
         //return transformData(response.data)
     } catch (error) {
         console.error("Something went wrong when getting the data:", error)

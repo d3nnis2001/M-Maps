@@ -30,6 +30,9 @@ public class DataviewerController {
     @GetMapping("/getTrackData")
     public ArrayList<GleisLageDatenpunkt> getAllTrackLayoutData() { return fileService.getTrackData(6100);}
 
+    @GetMapping("/getTrackData2")
+    public ArrayList<GleisLageDatenpunkt> getAllTrackLayoutData2() { return fileService.getData(6100);}
+
     /*
     @GetMapping("/getTrackData")
     public ArrayList<DataSet> getAllTrackLayoutData() {

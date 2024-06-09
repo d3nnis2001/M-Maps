@@ -26,5 +26,5 @@ public interface FileService {
     ArrayList<GleisLageDatenpunkt> getAllTrackData();
     ArrayList<GleisLageDatenpunkt> getTrackData(int trackId);
     ArrayList<String> getDataforId(int trackId);
-
+    ArrayList<GleisLageDatenpunkt> getData(int trackId);
 }
