@@ -82,7 +82,7 @@ const router = createRouter({
             component: ReparaturEdit
         },
         {
-            path: "/repair/:name/trackBuilder",
+            path: "/repair-order-trackbuilder",
             name: "TrackBuilder",
             component: TrackBuilderView
         },

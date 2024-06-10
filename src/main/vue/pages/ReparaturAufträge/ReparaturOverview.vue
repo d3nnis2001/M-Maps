@@ -1,7 +1,8 @@
 <script setup>
 import { ref, reactive, onMounted, onUnmounted } from 'vue';
-import { deleteRepairOrder, repair, updateStatus } from "@/main/vue/api/reparatur";
+import {deleteRepairOrder, repair, trackBuilderPathAxios, updateStatus} from "@/main/vue/api/reparatur";
 import router from "@/main/vue/router";
+import {useQuasar} from "quasar";
 
 const smallScreen = ref(false);
 const largeScreen = ref(true);
@@ -57,8 +58,11 @@ onUnmounted(() => {
 
 const showDialog = ref(false);
 const showConfirmDialog = ref(false);
+const showConfirmDialogtwo = ref(false);
 const currentRow = reactive({});
 const rowToDelete = ref(null);
+const emailTrackBuilder = ref('');
+const $q = useQuasar();
 
 const rowClick = (evt, rowData) => {
     Object.assign(currentRow, rowData);
@@ -98,10 +102,28 @@ const reapplyOrder = async () => {
     showDialog.value = false;
 };
 
-const sendToTrackBuilder = async () => {
-    const name = currentRow.name;
-    router.push(`/repair/${name}/trackBuilder`);
+const sendEmailToTrackBuilder = async () => {
+    const res = trackBuilderPathAxios(emailTrackBuilder.value)
+    if (res) {
+        $q.notify({
+            type: 'positive',
+            message: 'An email with the link has been sent to the track builder!'
+        });
+    } else {
+        $q.notify({
+            type: 'negative',
+            message: 'Error',
+            caption: 'Something went wrong. Please send again!'
+        });
+    }
+    showConfirmDialogtwo.value = false;
 };
+
+const isValidEmail = async (email) => {
+    const regex = /^[A-Za-z0-9+_.-]+@[A-Za-z+_]+\.[A-Za-z+_.-]+$/;
+    return regex.test(email);
+};
+
 
 const confirmDeleteOrder = (row) => {
     rowToDelete.value = row;
@@ -231,7 +253,7 @@ const removeRow = (name) => {
                     <q-separator v-if="currentRow.status === 'abgeschlossen'" />
                     <div class="option-button" v-if="currentRow.status === 'storniert'" @click="reapplyOrder">Neu beantragen</div>
                     <q-separator v-if="currentRow.status === 'terminiert'" />
-                    <div class="option-button" v-if="currentRow.status === 'terminiert'" @click="sendToTrackBuilder">Link an Gleisbauer</div>
+                    <div class="option-button" v-if="currentRow.status === 'terminiert'" @click="showConfirmDialogtwo = true">Link an Gleisbauer</div>
                 </q-card-section>
                 <q-card-section>
                     <q-btn flat label="Schließen" color="primary" @click="showDialog = false"></q-btn>
@@ -250,6 +272,23 @@ const removeRow = (name) => {
                 <q-card-section>
                     <q-btn flat label="Abbrechen" color="positive" @click="showConfirmDialog = false"></q-btn>
                     <q-btn flat label="Löschen" color="negative" @click="deleteOrder"></q-btn>
+                </q-card-section>
+            </q-card>
+        </q-dialog>
+
+        <q-dialog v-model="showConfirmDialogtwo">
+            <q-card>
+                <q-card-section>
+                    <div class="text-h6">Reparaturauftrag verschicken</div>
+                </q-card-section>
+                <q-card-section>
+                    <q-input v-model="emailTrackBuilder" label="E-Mail Eingabe"
+                             :rules="[val => isValidEmail(val) || 'Invalid email address']"
+                    />
+                </q-card-section>
+                <q-card-section>
+                    <q-btn flat label="Abbrechen" @click="showConfirmDialogtwo = false"></q-btn>
+                    <q-btn flat label="Senden" color="positive" @click="sendEmailToTrackBuilder"></q-btn>
                 </q-card-section>
             </q-card>
         </q-dialog>

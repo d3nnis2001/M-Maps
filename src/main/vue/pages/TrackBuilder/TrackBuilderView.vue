@@ -1,10 +1,7 @@
 <script>
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import {
-    getDetailsByID,
-    getTickedItems,
-} from "@/main/vue/api/reparatur";
+import {getDetailsByID, getTickedItems} from "@/main/vue/api/reparatur";
 import router from "@/main/vue/router";
 import {useQuasar} from "quasar";
 
@@ -89,7 +86,7 @@ export default {
                         </div>
                         <div class="row">
                             <p style="margin-right: 5px">Status: </p>
-                            <p style="font-weight: bold">{{repairDetails.status + "   zum   " + repairDetails.date }}</p>
+                            <p style="font-weight: bold">{{repairDetails.status + "   zum   " }}</p>
                         </div>
                     </div>
                     <q-separator size="2px" color="primary" style="margin-top: 30px"></q-separator>
