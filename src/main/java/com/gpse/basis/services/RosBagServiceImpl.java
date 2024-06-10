@@ -49,7 +49,8 @@ public class RosBagServiceImpl implements RosBagService{
     }
 
     @Override
-    public void saveCameraImagesForTrack(int trackId, String filename) {
+    public List<CameraImage> saveCameraImagesForTrack(int trackId, String filename) {
+        List<CameraImage> cameraImagelst = new ArrayList<>();
             try {
                 BagFile f = BagReader.readFile(filename);
                 for (TopicInfo topic : f.getTopics()) {
@@ -78,7 +79,7 @@ public class RosBagServiceImpl implements RosBagService{
                                 System.out.println(outputfile.getAbsolutePath());
                                 try {
                                     ImageIO.write(image, "png", outputfile);
-                                    template.save(new CameraImage(trackId, "http://localhost:8080" + directory_name + name , 0), "CameraImages");
+                                    cameraImagelst.add(new CameraImage(trackId, "http://localhost:8080" + directory_name + name , 0, ""));
                                 } catch (IOException e) {
                                     throw new RuntimeException(e);
                                 }
@@ -89,7 +90,7 @@ public class RosBagServiceImpl implements RosBagService{
                             }
 
                             xyz.getAndIncrement();
-                            return true;
+                            return xyz.get() < 5;
                         });
 
                     }
@@ -99,11 +100,12 @@ public class RosBagServiceImpl implements RosBagService{
                 throw new RuntimeException(e);
             }
 
-
+        return cameraImagelst;
     }
 
     @Override
-    public void saveInfraRedImagesForTrack(int trackId, String fileName) {
+    public List<CameraImage> saveInfraRedImagesForTrack(int trackId, String fileName) {
+        List<CameraImage> imageList = new ArrayList<>();
             try {
                 BagFile f = BagReader.readFile(fileName);
                 for (TopicInfo topic : f.getTopics()) {
@@ -116,7 +118,6 @@ public class RosBagServiceImpl implements RosBagService{
                             System.out.println();
                             message.getFieldNames().forEach(System.out::println);
                             System.out.println();
-
                              */
                             try {
                                 long width = message.<UInt32Type>getField("width").getValue();
@@ -139,7 +140,7 @@ public class RosBagServiceImpl implements RosBagService{
                                 xyz.getAndIncrement();
                                 try {
                                     ImageIO.write(irImage, "png", outputfile);
-                                    template.save(new CameraImage(trackId, "http://localhost:8080" + directory_name + name , 1), "CameraImages");
+                                    imageList.add(new CameraImage(trackId, "http://localhost:8080" + directory_name + name , 1, ""));
                                 } catch (IOException e) {
                                     throw new RuntimeException(e);
                                 }
@@ -147,14 +148,14 @@ public class RosBagServiceImpl implements RosBagService{
                                 throw new RuntimeException(e);
                             }
 
-                            return true;
+                            return xyz.get() < 5;
                         });
                     }
                 }
             } catch (BagReaderException e) {
                 throw new RuntimeException(e);
             }
-
+        return imageList;
     }
 
     @Override

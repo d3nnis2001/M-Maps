@@ -13,14 +13,25 @@ public class CameraImage {
 
     private int type;
 
-    public CameraImage(int track_id, String path, int t) {
+    private String dataSetid;
+
+    public CameraImage(int track_id, String path, int t, String dId) {
         this.track_id = track_id;
         this.path = path;
         this.type = t;
+        this.dataSetid = dId;
     }
 
     public CameraImage() {
 
+    }
+
+    public String getDataSetid() {
+        return dataSetid;
+    }
+
+    public void setDataSetid(String dataSetid) {
+        this.dataSetid = dataSetid;
     }
 
     public CameraImage(String id, int track_id, String path) {

@@ -94,7 +94,7 @@ public class InitializeDatabase implements InitializingBean {
             }
         });
         if(!found.get())
-            geoTrackRepository.save(new GeoData(1, 52.17027,  9.08446,0));
+            geoTrackRepository.save(new GeoData(1, 52.17027,  9.08446,0, "1"));
     }
 
 }

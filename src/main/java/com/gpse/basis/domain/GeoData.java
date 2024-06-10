@@ -17,6 +17,16 @@ public class GeoData {
     @Indexed
     private Double track_km;
 
+    private String dataSetid;
+
+    public String getDataSetid() {
+        return dataSetid;
+    }
+
+    public void setDataSetid(String dataSetid) {
+        this.dataSetid = dataSetid;
+    }
+
     public String getId() {
         return id;
     }
@@ -29,11 +39,12 @@ public class GeoData {
         this.track_km = track_km;
     }
 
-    public GeoData(int strecken_id, double longitude, double latitude, double track_km) {
+    public GeoData(int strecken_id, double longitude, double latitude, double track_km, String id) {
         this.strecken_id = strecken_id;
         this.longitude = longitude;
         this.latitude = latitude;
         this.track_km = track_km;
+        this.dataSetid = id;
     }
     public int getStrecken_id() {
         return strecken_id;
