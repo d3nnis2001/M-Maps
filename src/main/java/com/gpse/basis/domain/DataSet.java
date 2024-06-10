@@ -12,7 +12,7 @@ public class DataSet {
 
     private String fileName;
 
-    private String streckenId;
+    private int streckenId;
 
     private Date uploadDate;
 
@@ -32,11 +32,11 @@ public class DataSet {
         this.fileName = fileName;
     }
 
-    public String getStreckenId() {
+    public int getStreckenId() {
         return streckenId;
     }
 
-    public void setStreckenId(String streckenId) {
+    public void setStreckenId(int streckenId) {
         this.streckenId = streckenId;
     }
 

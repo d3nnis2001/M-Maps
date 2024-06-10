@@ -1,16 +1,35 @@
 package com.gpse.basis.domain;
 
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
 @Document(collection = "GeoTrackData")
 public class GeoData {
+    @MongoId
+    private String id;
+
+    @Indexed
     private int strecken_id;
     private double longitude;
-    @MongoId
+
     private double latitude;
-    private int track_km;
-    public GeoData(int strecken_id, double longitude, double latitude, int track_km) {
+    @Indexed
+    private Double track_km;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setTrack_km(Double track_km) {
+        this.track_km = track_km;
+    }
+
+    public GeoData(int strecken_id, double longitude, double latitude, double track_km) {
         this.strecken_id = strecken_id;
         this.longitude = longitude;
         this.latitude = latitude;
@@ -40,11 +59,11 @@ public class GeoData {
         this.latitude = latitude;
     }
 
-    public int getTrack_km() {
+    public double getTrack_km() {
         return track_km;
     }
 
-    public void setTrack_km(int track_km) {
+    public void setTrack_km(double track_km) {
         this.track_km = track_km;
     }
 

@@ -60,6 +60,7 @@
 
 <script>
 import axios from "axios";
+import {deleteDataSets} from "@/main/vue/api/dataimport";
 
 export default {
     name: "deleteComponent",
@@ -126,25 +127,7 @@ export default {
             this.datasets = this.datasets.filter((elem, idx) => {
                 return !indicesToDelete.includes(idx);
             });
-
-
-            axios
-                .delete("http://localhost:8080/api/files/deleteFiles", {
-                    data: formData,
-                    headers: {
-                        "Content-Type": "multipart/form-data",
-                    },
-                })
-                .then((response) => {
-                    console.log("Response:", response.data);
-                })
-                .catch((error) => {
-                    this.$q.notify({
-                        message: error.toString(),
-                        timeout: 5000,
-                    });
-                    console.error("Error:", error);
-                });
+            deleteDataSets(formData);
         },
     },
 };
