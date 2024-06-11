@@ -25,6 +25,11 @@ const selectedMarker = ref('')
 let data = ref([])
 let heatData = ref([])
 const toggle_value = ref(false)
+const silver_filter = ref(true)
+const green_filter = ref(true)
+const orange_filter = ref(true)
+const red_filter = ref(true)
+
 
 /**
  * Sets map up and gets all GeoData for standard view
@@ -110,6 +115,7 @@ const onMarkerClicked = (event) => {
     dialogVisible.value = true;
 };
 
+// ---------------------------- On Changes ------------------------------
 
 const onChange = (newValue, oldValue) => {
     if (newValue === true) {
@@ -121,7 +127,76 @@ const onChange = (newValue, oldValue) => {
     }
 };
 
+const onChangeSilver = (newValue, oldValue) => {
+    if (newValue === true) {
+        getAllHeatDataColor("silver")
+    } else {
+        let deleted = [];
+        for (let i = markers.length - 1; i >= 0; i--) {
+            var temp = markers[i];
+            if (temp.data[1] === "silver") {
+                markers.splice(i, 1);
+                deleted.push(temp);
+            }
+        }
+        deleted.forEach((m) => map.value.removeLayer(m.marker));
+    }
+};
+
+const onChangeGreen = (newValue, oldValue) => {
+    if (newValue === true) {
+        getAllHeatDataColor("green")
+    } else {
+        let deleted = [];
+        for (let i = markers.length - 1; i >= 0; i--) {
+            var temp = markers[i];
+            if (temp.data[1] === "green") {
+                markers.splice(i, 1);
+                deleted.push(temp);
+            }
+        }
+        deleted.forEach((m) => map.value.removeLayer(m.marker));
+    }
+};
+
+const onChangeOrange = (newValue, oldValue) => {
+    if (newValue === true) {
+        getAllHeatDataColor("orange")
+    } else {
+        let deleted = [];
+        for (let i = markers.length - 1; i >= 0; i--) {
+            var temp = markers[i];
+            if (temp.data[1] === "orange") {
+                markers.splice(i, 1);
+                deleted.push(temp);
+            }
+        }
+        deleted.forEach((m) => map.value.removeLayer(m.marker));
+    }
+};
+
+const onChangeRed = (newValue, oldValue) => {
+    if (newValue === true) {
+        getAllHeatDataColor("red")
+    } else {
+        let deleted = [];
+        for (let i = markers.length - 1; i >= 0; i--) {
+            var temp = markers[i];
+            if (temp.data[1] === "red") {
+                markers.splice(i, 1);
+                deleted.push(temp);
+            }
+        }
+        deleted.forEach((m) => map.value.removeLayer(m.marker));
+    }
+};
+
 watch(toggle_value, onChange);
+watch(silver_filter, onChangeSilver);
+watch(green_filter, onChangeGreen);
+watch(orange_filter, onChangeOrange);
+watch(red_filter, onChangeRed);
+
 // ---------------------------- Filter -----------------------------------
 
 // ---------------------------- HEATMAP ----------------------------------
@@ -140,7 +215,7 @@ function getAllGeoPointsWithColor(dataPoint) {
     let output = []
     for(let i = 0;i < dataPoint.length;i++) {
         if(dataPoint[i].NORMAL !== undefined) {
-            output.push([getLatLng(dataPoint[i].NORMAL), "black"])
+            output.push([getLatLng(dataPoint[i].NORMAL), "silver"])
         } else if (dataPoint[i].LOW !== undefined) {
             output.push([getLatLng(dataPoint[i].LOW), "green"])
         } else if (dataPoint[i].MEDIUM !== undefined) {
@@ -171,6 +246,30 @@ const setValueStreckenID = async () => {
         }
     }
 };
+
+async function getAllHeatDataColor(color) {
+    var colors = getAllGeoPointsWithColor(heatData)
+    var temp = []
+    for (let i = 0; i < colors.length; i++) {
+        console.log(colors[i][1])
+        if (colors[i][1] === color) {
+            markers.push({
+                marker: L.circleMarker([colors[i][0][0], colors[i][0][1]], {
+                    color: colors[i][1],
+                    radius: 5,
+                    fillColor: colors[i][1],
+                    fillOpacity: 1.0
+                }),
+                data: colors[i],
+            });
+            temp.push(markers[markers.length-1])
+        }
+    }
+    temp.forEach((m) => {
+        m.marker.addTo(map.value);
+        m.marker.on('click', onMarkerClicked);
+    });
+}
 
 async function getAllHeatmapData() {
     heatData = await getHeatmap()
@@ -311,6 +410,14 @@ const addEnd = () => {
                                 label="Geodata / Heatmap"
                             />
                         </q-item-section>
+                    </q-item>
+                    <q-item>
+                        <div class="q-gutter-sm">
+                            <q-checkbox v-model="silver_filter" val="Silver" label="Silver" color="silver" />
+                            <q-checkbox v-model="green_filter" val="Green" label="Green" color="green" />
+                            <q-checkbox v-model="orange_filter" val="Orange" label="Orange" color="orange" />
+                            <q-checkbox v-model="red_filter" val="Red" label="Red" color="red" />
+                        </div>
                     </q-item>
                 </q-list>
             </q-expansion-item>
