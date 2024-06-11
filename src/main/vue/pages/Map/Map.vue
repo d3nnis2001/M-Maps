@@ -1,7 +1,7 @@
 <script setup>
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import {onMounted, ref} from 'vue';
+import {onMounted, ref, watch} from 'vue';
 import {getGeoData, getHeatmap, getTimeFromHeatmap} from "@/main/vue/api/map";
 import {useQuasar} from "quasar";
 import DateInput from "@/main/vue/pages/Map/DateInput.vue";
@@ -24,6 +24,7 @@ const kmEnd = ref('')
 const selectedMarker = ref('')
 let data = ref([])
 let heatData = ref([])
+const toggle_value = ref(false)
 
 /**
  * Sets map up and gets all GeoData for standard view
@@ -108,6 +109,19 @@ const onMarkerClicked = (event) => {
     selectedMarker.value = marker
     dialogVisible.value = true;
 };
+
+
+const onChange = (newValue, oldValue) => {
+    if (newValue === true) {
+        getAllHeatmapData()
+    } else {
+        markers.forEach((m) => map.value.removeLayer(m.marker));
+        markers = []
+        setGeoData()
+    }
+};
+
+watch(toggle_value, onChange);
 // ---------------------------- Filter -----------------------------------
 
 // ---------------------------- HEATMAP ----------------------------------
@@ -289,9 +303,13 @@ const addEnd = () => {
                     </q-item>
                     <q-item clickable v-ripple>
                         <q-item-section>
-                            <div class="expan_items" @click="getAllHeatmapData">
-                                Heatmap anzeigen
-                            </div>
+                            <q-toggle
+                                v-model="toggle_value"
+                                color="red"
+                                keep-color
+                                readonly
+                                label="Geodata / Heatmap"
+                            />
                         </q-item-section>
                     </q-item>
                 </q-list>
