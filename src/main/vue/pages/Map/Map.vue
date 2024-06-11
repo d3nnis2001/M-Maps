@@ -76,15 +76,33 @@ async function setGeoData() {
 async function setPartGeoData(trackID) {
     markers.forEach((m) => map.value.removeLayer(m.marker));
     markers = []
+    var minlat = 180, maxlat = -180, minlong = 180, maxlong = -180
     data.forEach((m) => {
         if (String(m.strecken_id) === String(trackID)) {
             markers.push({marker: L.circle([m.longitude, m.latitude], {color: "black", radius: 50}), data: m})
+            console.log(m)
+            if(m.latitude < minlat)
+                minlat = m.latitude
+            if(m.latitude > maxlat)
+                maxlat = m.latitude
+            if(m.longitude < minlong)
+                minlong = m.longitude
+            if(m.longitude > maxlong)
+                maxlong = m.longitude
         }
     });
     markers.forEach((m) => {
         m.marker.addTo(map.value);
         m.marker.on('click', onMarkerClicked);
     });
+    var lat = L.latLng(minlong, minlat)
+    var lon = L.latLng(maxlong, maxlat)
+    console.log(minlat)
+    console.log(minlong)
+    console.log(maxlat)
+    console.log(maxlong)
+    var bounds = L.latLngBounds(lat, lon);
+    map.value.fitBounds(bounds)
 }
 
 async function setPartGeoDataKm(km_start, km_end) {
@@ -413,10 +431,10 @@ const addEnd = () => {
                     </q-item>
                     <q-item>
                         <div class="q-gutter-sm">
-                            <q-checkbox v-model="silver_filter" val="Silver" label="Silver" color="silver" />
-                            <q-checkbox v-model="green_filter" val="Green" label="Green" color="green" />
-                            <q-checkbox v-model="orange_filter" val="Orange" label="Orange" color="orange" />
-                            <q-checkbox v-model="red_filter" val="Red" label="Red" color="red" />
+                            <q-checkbox v-model="silver_filter"  val="Silver" label="Silver" color="silver" :disable="!toggle_value"/>
+                            <q-checkbox v-model="green_filter" val="Green" label="Green" color="green" :disable="!toggle_value"/>
+                            <q-checkbox v-model="orange_filter" val="Orange" label="Orange" color="orange" :disable="!toggle_value"/>
+                            <q-checkbox v-model="red_filter" val="Red" label="Red" color="red" :disable="!toggle_value"/>
                         </div>
                     </q-item>
                 </q-list>
