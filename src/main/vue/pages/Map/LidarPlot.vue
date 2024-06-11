@@ -34,7 +34,7 @@ const createGeometry = () => {
     const color = new THREE.Color();
 
     velodynPoints.value[0].forEach((p) => {
-        positions.push(p.x, p.z, p.y);
+        positions.push(p.x, p.y, p.z);
         intensities.push(p.intensity);
         if(p.intensity < min) min = p.intensity
         if(p.intensity > max) max = p.intensity
@@ -62,6 +62,7 @@ const init = () => {
     scene.background = new THREE.Color(0x000000);
 
     camera = new THREE.PerspectiveCamera(25, window.innerWidth / window.innerHeight, 1, 1000);
+    camera.up = new THREE.Vector3(0,0,1)
 
     let axes = new THREE.AxesHelper(25);
 
@@ -78,8 +79,8 @@ const animate = (t) => {
     let time = t / 10000;
     camera.position.set(
         Math.sin(time) * 70,
-        30,
-        Math.cos(time) * 70);
+        Math.cos(time) * 70,
+        30);
     camera.lookAt(0,0,0);
     renderer.render(scene , camera);
     requestAnimationFrame(animate);

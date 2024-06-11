@@ -69,14 +69,11 @@ public class RosBagServiceImpl implements RosBagService{
                                 long width = message.<UInt32Type>getField("width").getValue();
                                 long height = message.<UInt32Type>getField("height").getValue();
                                 var lst = message.<ArrayType>getField("data");
-                                System.out.println(width + "   " + height);
                                 var a = lst.getAsBytes();
-                                System.out.println(a.length);
                                 BufferedImage image = demosaic(a, (int) width, (int) height);
                                 long unixTimestamp = Instant.now().getEpochSecond();
                                 String name = "/BagCameraImage" + "-" + unixTimestamp + xyz + ".png";
                                 File outputfile = new File(IMAGE_DIRECTORY + name);
-                                System.out.println(outputfile.getAbsolutePath());
                                 try {
                                     ImageIO.write(image, "png", outputfile);
                                     cameraImagelst.add(new CameraImage(trackId, "http://localhost:8080" + directory_name + name , 0, ""));
@@ -90,7 +87,7 @@ public class RosBagServiceImpl implements RosBagService{
                             }
 
                             xyz.getAndIncrement();
-                            return xyz.get() < 5;
+                            return true;
                         });
 
                     }
@@ -148,7 +145,7 @@ public class RosBagServiceImpl implements RosBagService{
                                 throw new RuntimeException(e);
                             }
 
-                            return xyz.get() < 5;
+                            return true;
                         });
                     }
                 }
