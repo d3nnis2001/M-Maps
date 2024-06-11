@@ -29,6 +29,7 @@ const silver_filter = ref(true)
 const green_filter = ref(true)
 const orange_filter = ref(true)
 const red_filter = ref(true)
+const cityName = ref("")
 
 
 /**
@@ -216,6 +217,46 @@ watch(orange_filter, onChangeOrange);
 watch(red_filter, onChangeRed);
 
 // ---------------------------- Filter -----------------------------------
+
+async function zoomToCity(cityName) {
+    try {
+        var url = `https://nominatim.openstreetmap.org/search?format=json&q=${cityName}`;
+
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.length > 0) {
+            var city = data[0];
+            var lat = city.lat;
+            var lon = city.lon;
+            map.value.setView([lat, lon], 10);
+        } else {
+            console.log('City not found');
+            if (window.cityBoundaryLayer) {
+                map.value.removeLayer(window.cityBoundaryLayer);
+            }
+            return;
+        }
+
+        const boundaryResponse = await fetch(`https://nominatim.openstreetmap.org/search.php?q=${cityName}&polygon_geojson=1&format=json`);
+        const boundaryData = await boundaryResponse.json();
+
+        if (boundaryData.length > 0) {
+            const cityBoundaries = boundaryData[0].geojson;
+
+            if (window.cityBoundaryLayer) {
+                map.value.removeLayer(window.cityBoundaryLayer);
+            }
+
+            window.cityBoundaryLayer = L.geoJSON(cityBoundaries).addTo(map.value);
+        } else {
+            console.log('City boundaries not found');
+        }
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        console.log('Error fetching data');
+    }
+}
 
 // ---------------------------- HEATMAP ----------------------------------
 
@@ -436,6 +477,19 @@ const addEnd = () => {
                             <q-checkbox v-model="orange_filter" val="Orange" label="Orange" color="orange" :disable="!toggle_value"/>
                             <q-checkbox v-model="red_filter" val="Red" label="Red" color="red" :disable="!toggle_value"/>
                         </div>
+                    </q-item>
+                    <q-item>
+                        <StandardInput v-model="cityName">
+
+                        </StandardInput>
+                        <q-btn
+                            class=""
+                            icon="search"
+                            round
+                            flat
+                            @click="zoomToCity(cityName)"
+                            aria-label="Center to City"
+                        />
                     </q-item>
                 </q-list>
             </q-expansion-item>
