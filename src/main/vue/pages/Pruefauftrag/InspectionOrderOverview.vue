@@ -20,7 +20,7 @@ export default {
                 { name: 'inspectionData', label: 'Messdaten', align: 'left', field: 'inspectionData' },
                 { name: 'department', label: 'Fachabteilung', align: 'left', field: 'department' },
                 { name: 'status', label: 'Status', align: 'left', field: 'status' },
-                { name: 'priority', label: 'Priorität', align: 'left', field: 'priority' }
+                { name: 'priority', label: 'Priorität', align: 'left', field: 'priority', sortable: true }
             ],
             rows: []
 
@@ -70,12 +70,12 @@ export default {
                 }));
             console.log("State Rows:", state.rows);
         };
+
         const checkScreenSize = () => {
             const screenSize = window.innerWidth;
             smallScreen.value = screenSize <= 500;
             largeScreen.value = screenSize > 500;
         };
-
 
         const rowClick = async (evt, rowData) => {
             currentRow.value = rowData;
@@ -178,6 +178,12 @@ export default {
             console.log("remarks: ", remarks);
         }
 
+        router.afterEach((to, from) => {
+            if (from.name === 'editInspectionOrder') {
+                fetchData();
+            }
+        });
+
 
         return {
             state,
@@ -204,7 +210,7 @@ export default {
             userId,
             remarks
         }
-    }
+    },
 }
 
 </script>
@@ -225,7 +231,7 @@ export default {
             :rows="state.rows"
             :columns="state.columns"
             row-key="inspectionOrderId"
-            :filter = "filter"
+            :filter = "state.filter"
             @row-click="rowClick" />
 
         <q-table
@@ -237,7 +243,7 @@ export default {
             :rows="state.rows"
             :columns="state.columns"
             row-key="inspectionOrderId"
-            :filter = "filter"
+            :filter = "state.filter"
             hide-header
             @row-click="rowClick" />
     </div>
@@ -345,6 +351,7 @@ export default {
         /* bg color is important for th; just specify one */
         background-color: $blue-grey-5
 
+
     thead tr th
         position: sticky
         z-index: 1
@@ -360,4 +367,5 @@ export default {
     .q-table__bottom,
     thead tr:first-child th
         background-color: $blue-grey-5
+
 </style>

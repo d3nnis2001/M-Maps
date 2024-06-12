@@ -31,7 +31,6 @@ public class InitializeDatabase implements InitializingBean {
     @Override
     public void afterPropertiesSet() {
         initUsers();
-        initInspectionOrder();
         initChecklists();
         initRanges();
     }
@@ -72,13 +71,6 @@ public class InitializeDatabase implements InitializingBean {
         glrRepo.save(range1);
         glrRepo.save(range2);
         glrRepo.save(range3);
-    }
-
-    public void initInspectionOrder() {
-        InspectionOrder inspec = new InspectionOrder("1716728251294","1234", "1000", "Bielefeld",
-            "Hannover", "2024/01/01", "2024/01/02",
-            " ", " ", "archiviert", "", true, "niedrig");
-        ioRepo.save(inspec);
     }
 
 

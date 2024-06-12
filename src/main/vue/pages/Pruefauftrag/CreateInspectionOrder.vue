@@ -6,6 +6,7 @@ import router from "@/main/vue/router";
 import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";
 
 export default {
+    name: "createInspectionOrder",
     components: {StandardInput},
     setup () {
         const $q = useQuasar()
@@ -56,6 +57,9 @@ export default {
             if (!priorityLow.value && !priorityMiddle.value && !priorityHigh.value) {
                 console.log(errormsg);
                 errormsg.push("Please select a priority");
+            }
+            if (endTime.value < startTime.value) {
+                errormsg.push("The second date has to be later than the first!")
             }
 
             if (errormsg.length > 0) {
