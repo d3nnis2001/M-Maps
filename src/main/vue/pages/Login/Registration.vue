@@ -1,12 +1,11 @@
 <script setup>
-import {ref, toRaw} from 'vue'
-import {useRegistrationStore} from "../../stores/RegistrationStore"
+import {ref} from 'vue'
 import {useQuasar} from 'quasar'
 import {useRouter} from 'vue-router'
+import registerUs from "@/main/vue/api/register";
 
 const $q = useQuasar()
 const router = useRouter()
-const regStore = useRegistrationStore()
 
 const firstName = ref('')
 const name = ref('')
@@ -85,7 +84,7 @@ function register() {
         const region = model2.value ? [{ label: model2.value.label}] : [];
         const service = model3.value ? [{ label: model3.value.label}] : [];
         console.log(roles)
-        if (regStore.registerUser(email.value, pass.value, firstName.value, name.value,region[0].label, service[0].label, roles)) {
+        if (registerUs(email.value, pass.value, firstName.value, name.value,region[0].label, service[0].label, roles)) {
             $q.notify({
                 type: 'positive',
                 message: 'Registration was successful!',
