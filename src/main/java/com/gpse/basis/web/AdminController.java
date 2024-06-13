@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
-
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
@@ -29,8 +28,9 @@ public class AdminController {
 
     @GetMapping("/getUserById")
     public UserModel getUserById(final WebRequest request) {
-        UserModel user = userService.loadUserByUsername(request.getParameter("username"));
-        return user;
+        //UserModel user = userService.loadUserByUsername(request.getParameter("username"));
+        //return user;
+        return null;
     }
 
     @DeleteMapping("/deleteUser")

@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import {createRouter, createWebHistory} from 'vue-router'
 
 import StartView from '../pages/Start.vue'
 import MapView from '../pages/Map/Map.vue'
@@ -20,8 +20,8 @@ import AdminMain from "@/main/vue/pages/Nutzerverwaltung/AdminMain.vue";
 import EditUser from "@/main/vue/pages/Nutzerverwaltung/EditUser.vue";
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
+    history: createWebHistory(import.meta.env.BASE_URL),
+    routes: [
         {
             path: '/',
             name: 'start',
