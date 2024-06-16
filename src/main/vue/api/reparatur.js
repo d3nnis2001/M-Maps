@@ -114,10 +114,12 @@ export const setTerminated = async function setTerminated(id, date) {
     }
 }
 
-export const trackBuilderPathAxios = async function (email) {
+export const trackBuilderPathAxios = async function (email, id) {
     try {
         const cred = new URLSearchParams()
         cred.append("email", email)
+        cred.append("id", id)
+        console.log(id)
         console.log(email)
         const response = await axios.post("api/repair/emailTrackBuilder",cred)
         return response

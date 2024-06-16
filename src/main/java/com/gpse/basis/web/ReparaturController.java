@@ -119,7 +119,8 @@ public class ReparaturController {
     @PostMapping("/emailTrackBuilder")
     public ResponseEntity<Boolean> emailTrackBuilder(final WebRequest request) {
         String trackBuilderEmail = request.getParameter("email");
-        emailService.builtEmailTrackBuilder(trackBuilderEmail);
+        String id = request.getParameter("id");
+        emailService.builtEmailTrackBuilder(trackBuilderEmail, id);
         return ResponseEntity.ok(true);
     }
 }

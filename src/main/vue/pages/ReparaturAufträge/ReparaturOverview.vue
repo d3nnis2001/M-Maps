@@ -103,7 +103,8 @@ const reapplyOrder = async () => {
 };
 
 const sendEmailToTrackBuilder = async () => {
-    const res = trackBuilderPathAxios(emailTrackBuilder.value)
+    const res = trackBuilderPathAxios(emailTrackBuilder.value, currentRow.name)
+    console.log(currentRow.name)
     if (res) {
         $q.notify({
             type: 'positive',
@@ -151,6 +152,12 @@ const removeRow = (name) => {
         state.rows.splice(index, 1);
     }
 };
+
+const finishRepairOrder = async (name) => {
+    await updateStatus(name, "bestätigt");
+    updateRowStatus(name, "bestätigt")
+    showDialog.value = false;
+}
 </script>
 
 <template>
@@ -246,14 +253,16 @@ const removeRow = (name) => {
                     <div class="option-button" @click="editOrder">Bearbeiten</div>
                     <q-separator v-if="currentRow.status !== 'abgeschlossen'" />
                     <div class="option-button" v-if="currentRow.status === 'storniert'" @click="confirmDeleteOrder(currentRow)">Löschen</div>
-                    <q-separator v-if="currentRow.status === 'storniert'" />
-                    <div class="option-button" v-if="currentRow.status === 'storniert'" @click="archiveOrder">Archivieren</div>
+                    <q-separator v-if="currentRow.status === 'bestätigt'" />
+                    <div class="option-button" v-if="currentRow.status === 'bestätigt'" @click="archiveOrder">Archivieren</div>
                     <q-separator v-if="currentRow.status !== 'abgeschlossen'" />
                     <div class="option-button" v-if="currentRow.status !== 'storniert'" @click="cancelOrder">Stornieren</div>
                     <q-separator v-if="currentRow.status === 'abgeschlossen'" />
                     <div class="option-button" v-if="currentRow.status === 'storniert'" @click="reapplyOrder">Neu beantragen</div>
                     <q-separator v-if="currentRow.status === 'terminiert'" />
                     <div class="option-button" v-if="currentRow.status === 'terminiert'" @click="showConfirmDialogtwo = true">Link an Gleisbauer</div>
+                    <q-separator v-if="currentRow.status === 'abgeschlossen'" />
+                    <div class="option-button" v-if="currentRow.status === 'abgeschlossen'" @click="finishRepairOrder(currentRow.name)">Bestätigen</div>
                 </q-card-section>
                 <q-card-section>
                     <q-btn flat label="Schließen" color="primary" @click="showDialog = false"></q-btn>

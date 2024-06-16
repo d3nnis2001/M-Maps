@@ -1,8 +1,7 @@
 <script>
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import {getDetailsByID, getTickedItems} from "@/main/vue/api/reparatur";
-import router from "@/main/vue/router";
+import {getDetailsByID, getTickedItems, updateStatus} from "@/main/vue/api/reparatur";
 import {useQuasar} from "quasar";
 
 export default {
@@ -16,8 +15,9 @@ export default {
         const $q = useQuasar();
 
         onMounted(async () => {
-            const name = route.params.name;
-            repairDetails.value = await getDetailsByID(name);
+            const id = route.query.id;
+            console.log(route.query.id);
+            repairDetails.value = await getDetailsByID(id);
 
             if (repairDetails.value && repairDetails.value.checklist) {
                 for (let i = 0; i < repairDetails.value.checklist.checkSel.length; i++) {
@@ -46,12 +46,17 @@ export default {
             })
         }
 
+        async function confirmRepairOrder() {
+            await updateStatus(route.query.id, "abgeschlossen");
+        }
+
         return {
             repairDetails,
             ticked,
             options,
             terminationDate,
             onRejected,
+            confirmRepairOrder,
             date
         };
     }
@@ -86,7 +91,7 @@ export default {
                         </div>
                         <div class="row">
                             <p style="margin-right: 5px">Status: </p>
-                            <p style="font-weight: bold">{{repairDetails.status + "   zum   " }}</p>
+                            <p style="font-weight: bold">{{"terminiert zum   "}}</p>
                         </div>
                     </div>
                     <q-separator size="2px" color="primary" style="margin-top: 30px"></q-separator>
@@ -113,6 +118,7 @@ export default {
                         </div>
                     </div>
                     </div>
+                    <q-btn style="width: 100%; max-width: 218px" size="16px" no-caps rounded label="Bestätigen" color="primary" @click=confirmRepairOrder></q-btn>
                 </div>
             </div>
         </q-page-container>

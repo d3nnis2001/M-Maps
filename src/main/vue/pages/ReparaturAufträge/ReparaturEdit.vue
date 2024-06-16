@@ -4,7 +4,6 @@ import { useRoute } from 'vue-router';
 import {
     getDetailsByID,
     getTickedItems,
-    sendRepair,
     setTerminated,
     updateRepChecklist,
     updateStatus
@@ -81,7 +80,7 @@ export default {
                 </div>
                 <div class="row">
                     <p style="margin-right: 5px">Zeitraum: </p>
-                    <p style="font-weight: bold">{{"   von   " + repairDetails.from + "   bis   " + repairDetails.till}}</p>
+                    <p style="font-weight: bold">{{ repairDetails.from }}</p>
                 </div>
                 <div class="row">
                     <p style="margin-right: 5px">Freigabeberechtigter: </p>

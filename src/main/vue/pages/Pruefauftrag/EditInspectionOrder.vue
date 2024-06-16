@@ -172,49 +172,6 @@ export default {
 
         </div>
     </div>
-
-
-
-
-
-
-    <!-- ###########################################################################
-    <div class="q-pa-md">
-        <div class="q-gutter-y-md column" style="max-width: 300px">
-
-            <q-input outlined v-model="courseId" label="StreckenID" :dense="dense" />
-
-            <q-input outlined v-model="startLocation" label="Startort" :dense="dense" />
-
-            <q-input outlined v-model="endLocation" label="Endort" :dense="dense" />
-
-            <q-input outlined v-model="startTime" label="Von" :dense="dense">
-                <template v-slot:prepend>
-                    <q-icon name="event" />
-                </template>
-            </q-input>
-
-            <q-input outlined v-model="endTime" label="Bis" :dense="dense">
-                <template v-slot:prepend>
-                    <q-icon name="event" />
-                </template>
-            </q-input>
-
-            <q-input outlined v-model="department" label="Fachabteilung" :dense="dense" />
-
-            <q-input outlined v-model="inspectionData" label="Zu überprüfende Messdaten" :dense="dense" />
-
-            <q-input
-                v-model="remarks" label="Bemerkungen" :dense="dense"
-                filled
-                autogrow
-            />
-
-            <q-btn label="Speichern" @click="sendData" color="primary" class=""></q-btn>
-        </div>
-    </div>
-    -->
-
 </template>
 
 
