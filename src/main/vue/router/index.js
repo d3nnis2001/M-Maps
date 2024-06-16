@@ -91,7 +91,7 @@ const router = createRouter({
             component: Dataviewer
         },
         {
-            path: "/dataviewer/route/:id",
+            path: "/dataviewer/route/:id/from/:fromId/to/:toId",
             name: "DataviewerRoute",
             component: DataviewerRoute
         },

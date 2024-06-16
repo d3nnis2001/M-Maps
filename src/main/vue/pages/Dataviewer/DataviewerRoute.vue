@@ -7,7 +7,8 @@ import { Bar } from 'vue-chartjs'
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js'
 import {ref, onMounted, reactive} from "vue";
 import {getUserData} from "@/main/vue/api/admin";
-import {useRoute} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
+import Plotly from 'plotly.js-dist';
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
@@ -17,9 +18,52 @@ export default {
         apexchart: VueApexCharts,
     },
     setup() {
+        const plotlyChart = ref(null);
         const loaded = ref(false);
         const route = useRoute();
         const routeId = ref('')
+        const from = ref('')
+        const to = ref('')
+        const fromStrKm = ref('')
+        const toStrKm = ref('')
+        const router = useRouter()
+        const data = ref([])
+        /*
+        const x = ref([20,25,23,24,19,21,22,20,25,23,24,19,21,22])
+        const y = ref([0.5,0.2,0.3,0.4,0,1,-0.2,-0.5,-0.2,-0.3,-0.4,0,-1,0.2])
+        const z = ref([1,2,3,4,5,6,7,8,9,10,11,12,13,14])
+         */
+
+        const x = ref([])
+        const y = ref([])
+        const z = ref([])
+
+        const plot3D = () => {
+            const trace = {
+                x: x.value,
+                y: y.value,
+                z: z.value,
+                mode: 'markers',
+                marker: {
+                    size: 5,
+                    color: z.value,
+                    colorscale: 'Viridis',
+                    opacity: 0.8,
+                },
+                type: 'scatter3d',
+            };
+
+            const layout = {
+                //title: '3D Scatter Plot',
+                scene: {
+                    xaxis: {title: 'Streckenkm'},
+                    yaxis: {title: 'mm'},
+                    zaxis: {title: 'Time'},
+                },
+            };
+
+            Plotly.newPlot(plotlyChart.value, [trace], layout);
+        };
 
         const chartOptions = ref({
             chart: {
@@ -59,7 +103,11 @@ export default {
                 type: 'numeric',
                 //categories: [],
                 labels: {
-                    rotate: -90
+                    rotate: -90,
+                    /*
+                    formatter: function (value) {
+                        return value.toFixed(0);
+                    }*/
                 },
                 title: {
                     text: 'Streckenkilometer [km]'
@@ -120,6 +168,45 @@ export default {
             data: []
         }]);
 
+        function buildDataset(from, to, id) {
+            seriesLinks.value[0].data = []
+            seriesRechts.value[0].data = []
+            x.value = []
+            y.value = []
+            z.value = []
+            data.value.forEach(user => {
+                if (user.str_km >= from && user.str_km <= to){
+                    console.log("1")
+                    seriesLinks.value[0].data.push([user.str_km,user.z_links_railab_3p])
+                    seriesRechts.value[0].data.push([user.str_km,user.z_rechts_railab_3p])
+                    const timestamp = user.time_unix
+                    const date = new Date(timestamp * 1000)
+                    const formattedDate = date.toISOString().slice(0, 19).replace('T', ' ')
+                    x.value.push(user.str_km)
+                    y.value.push(user.z_rechts_railab_3p)
+                    z.value.push(formattedDate)
+                }
+            })
+            plot3D()
+        }
+
+        function refreshRoute() {
+            console.log(fromStrKm.value)
+            const routeId2 = routeId.value
+            const fromStrKm2 = fromStrKm.value
+            const toStrKm2 = toStrKm.value
+            //const vst = seriesLinks.value[0].data
+            /*data.value.forEach(value => {
+                console.log(value.str_km)
+            })*/
+            buildDataset(fromStrKm2, toStrKm2, routeId2)
+            //console.log(vst)
+            //vst.push([1,1])
+            //seriesLinks.value[0].data = vst
+            console.log(seriesLinks.value[0].data)
+            router.push(`/dataviewer/route/${routeId2}/from/${fromStrKm2}/to/${toStrKm2}`)
+        }
+
         /*
         const state = reactive({
             filter: '',
@@ -146,19 +233,32 @@ export default {
         onMounted( async () => {
             console.log(loaded.value)
             routeId.value = route.params.id
-            console.log(routeId.value)
-            const data = await getTrackLayoutData(routeId.value)
+            from.value = route.params.fromId
+            to.value = route.params.toId
+            console.log(routeId.value, from.value, to.value)
+            const data2 = await getTrackLayoutData(routeId.value)
+            data.value = data2
             let i = 0
             //const categories = []
             //const seriesData = []
-            console.log(data)
-            seriesRechts.value[0].data.push([127,0.0])
-            seriesLinks.value[0].data.push([127,0.0])
-            data.forEach(user => {
+            console.log(data2)
+            //seriesRechts.value[0].data.push([127,0.0])
+            //seriesLinks.value[0].data.push([127,0.0])
+            //buildDataset(from, to, routeId)
+
+            data2.forEach(user => {
                     //console.log(user)
-                if (i < 2000){
+                //data.value.push([user])
+                if (/*i < 2000 &&*/ user.str_km >= from.value && user.str_km <= to.value){
+                    console.log(user.str_km >= from.value)
                     seriesRechts.value[0].data.push([user.str_km,user.z_rechts_railab_3p])
                     seriesLinks.value[0].data.push([user.str_km,user.z_links_railab_3p])
+                    const timestamp = user.time_unix
+                    const date = new Date(timestamp * 1000)
+                    const formattedDate = date.toISOString().slice(0, 19).replace('T', ' ')
+                    x.value.push(user.str_km)
+                    y.value.push(user.z_rechts_railab_3p)
+                    z.value.push(formattedDate)
                     /*
                     if (user.str_km % 2 === 0) {
                         chartOptions.value.xaxis.categories.push(user.str_km)
@@ -166,8 +266,8 @@ export default {
                     else {
                         console.log(Math.round(user.str_km))
                         chartOptions.value.xaxis.categories.push('')
-                    }*/
-                    i += 1
+                    }
+                    //i += 1*/
                 }
 
                     /*state.rows.push( {
@@ -177,15 +277,17 @@ export default {
                         str_km: user.str_km,
                     })*/
             })
+            plot3D()
             //chartOptions.value.xaxis.categories = categories
             //series.value.data = seriesData
+            console.log(data.value)
             loaded.value = true
             //console.log(chartOptions.value.xaxis.categories)
             console.log(seriesLinks.value[0].data)
             console.log(loaded.value)
         })
 
-        return {chartOptions, seriesLinks, seriesRechts, loaded}
+        return {chartOptions, seriesLinks, seriesRechts, loaded, plotlyChart, refreshRoute, fromStrKm, toStrKm}
     }
 }
 
@@ -313,7 +415,34 @@ export default {
 -->
 <template>
     <q-page>
-        <Dataviewer/>
+        <div class="align-mult">
+            <Dataviewer/>
+            <div>
+                <div class="align-mult">
+                    <div>
+                        <p>von</p>
+                        <q-input class="q-pa-xs" outlined v-model="fromStrKm"></q-input>
+                    </div>
+                    <div>
+                        <p>bis</p>
+                        <q-input class="q-pa-xs" outlined v-model="toStrKm"></q-input>
+                    </div>
+                </div>
+                <div>
+                    <div class="q-pa-xs">
+                        <q-btn label="Strecken km aktualisieren" @click=refreshRoute class=""></q-btn>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="q-pa-xs align-mult">
+            <div class="q-pa-xs">
+                <q-btn label="Dataviever" @click="" class=""></q-btn>
+            </div>
+            <div class="q-pa-xs">
+                <q-btn label="Profil" @click="" class=""></q-btn>
+            </div>
+        </div>
         <div>
             <!--
             <div class="q-pa-md">
@@ -335,6 +464,12 @@ export default {
                 <q-banner align="middle">Längenhöhe - z_rechts_railab_3p</q-banner>
                 <q-banner v-if="!loaded">Loading</q-banner>
                 <apexchart v-else type="bar" height="350" :options="chartOptions" :series="seriesRechts"></apexchart>
+            </div>
+            <q-space/>
+            <div class="outline">
+                <q-banner align="middle">Längenhöhe - z_rechts_railab_3p</q-banner>
+                <q-banner v-if="!loaded">Loading</q-banner>
+                <div ref="plotlyChart" style="width: 100%; height: 100%;"></div>
             </div>
         </div>
     </q-page>
