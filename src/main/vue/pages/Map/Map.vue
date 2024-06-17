@@ -31,7 +31,108 @@ const orange_filter = ref(true)
 const red_filter = ref(true)
 const cityName = ref("")
 let information = ref([])
+const geoJsonData = ref([])
+const regions = [{label:"BY", value: []},
+                {label:"BW", value: []},
+                {label:"SW", value: []},
+                {label:"H", value: []},
+                {label:"SO", value: []},
+                {label:"NRW", value: []},
+                {label:"NO", value: []},
+                {label:"NB", value: []},
+                {label:"N", value: []}]
+const BY = ref(false)
+const BW = ref(false)
+const SW = ref(false)
+const H = ref(false)
+const SO = ref(false)
+const NRW = ref(false)
+const NO = ref(false)
+const NB = ref(false)
+const N = ref(false)
 
+watch(BY, onRegionChange)
+watch(BW, onRegionChange)
+watch(SW, onRegionChange)
+watch(H, onRegionChange)
+watch(SO, onRegionChange)
+watch(NRW, onRegionChange)
+watch(NO, onRegionChange)
+watch(NB, onRegionChange)
+watch(N, onRegionChange)
+
+function datapointsFromRegion(region) {
+    for (let i = 0; i < markers.length; i++) {
+        const result = leafletPip.pointInLayer([markers[i].data.longitude, markers[i].data.latitude], geoJsonData.value);
+        if (result > 0) {
+
+        } else  {
+            map.value.removeLayer(markers[i].marker)
+        }
+    }
+}
+
+function onRegionChange() {
+    map.value.removeLayer(geoJsonData.value)
+    var temp = []
+    if(BY.value === true) {
+        temp = temp.concat(regions[0].value)
+        datapointsFromRegion(regions[0].value)
+    }
+    if(BW.value === true) {
+        temp = temp.concat(regions[1].value)
+        datapointsFromRegion(regions[1].value)
+    }
+    if(SW.value === true) {
+        temp = temp.concat(regions[2].value)
+        datapointsFromRegion(regions[2].value)
+    }
+    if(H.value === true) {
+        temp = temp.concat(regions[3].value)
+        datapointsFromRegion(regions[3].value)
+    }
+    if(SO.value === true) {
+        temp = temp.concat(regions[4].value)
+        datapointsFromRegion(regions[4].value)
+    }
+    if(NRW.value === true) {
+        temp = temp.concat(regions[5].value)
+        datapointsFromRegion(regions[5].value)
+    }
+    if(NO.value === true) {
+        temp = temp.concat(regions[6].value)
+        datapointsFromRegion(regions[6].value)
+    }
+
+    if(NB.value === true) {
+        temp = temp.concat(regions[7].value)
+        datapointsFromRegion(regions[7].value)
+    }
+    if(N.value === true) {
+        temp = temp.concat(regions[8].value)
+        datapointsFromRegion(regions[8].value)
+    }
+    geoJsonData.value = L.geoJSON(temp, {
+        style: {
+            color: 'blue',
+            weight: 2,
+            opacity: 0.5,
+            fillOpacity: 0.0,
+        },
+    })
+    geoJsonData.value.addTo(map.value);
+}
+
+/**
+ * Region Nord (N): Schleswigwig Holstein und Hamburg
+ * Region Niedersachsen (NB): Bremen, Niedersachsen
+ * Region Nordost (NO): Berlin, Brandenburg, Mecklenburg Vorpommern
+ * Region NRW: NRW
+ * Region Südost (SO) : Sachsenanhalt, Sachsen, Thüringen
+ * Region Hessen(H) : Hessen
+ * Region Südwest(SW): Saarland, Rheinland -Pfalz
+ * Region Badenwüttenberg(BW): Badenwüttenberg
+ * Region Bayern (BY): Bayern **/
 
 /**
  * Sets map up and gets all GeoData for standard view
@@ -47,6 +148,40 @@ onMounted(async () => {
             [47.2701, 15.0419]
         ]
     });
+    fetch('https://raw.githubusercontent.com/isellsoap/deutschlandGeoJSON/main/2_bundeslaender/4_niedrig.geo.json')
+        .then(response => response.json())
+        .then(data => {
+            geoJsonData.value = L.geoJSON(data, {
+                style: {
+                    color: 'blue',
+                    weight: 2,
+                    opacity: 0.8,
+                    fillOpacity: 0.0,
+                },
+            })
+            geoJsonData.value.addTo(map.value);
+            data.features.forEach((s) => {
+                switch(s.properties.id) {
+                    case 'DE-BW': regions[1].value.push(s); break;
+                    case 'DE-BY': regions[0].value.push(s); break;
+                    case 'DE-BE': regions[6].value.push(s); break;
+                    case 'DE-BB': regions[6].value.push(s); break;
+                    case 'DE-HB': regions[7].value.push(s); break;
+                    case 'DE-HH': regions[8].value.push(s); break;
+                    case 'DE-HE': regions[3].value.push(s); break;
+                    case 'DE-MV': regions[6].value.push(s); break;
+                    case 'DE-NI': regions[7].value.push(s); break;
+                    case 'DE-NW': regions[5].value.push(s); break;
+                    case 'DE-RP': regions[2].value.push(s); break;
+                    case 'DE-SL': regions[2].value.push(s); break;
+                    case 'DE-ST': regions[4].value.push(s); break;
+                    case 'DE-SN': regions[4].value.push(s); break;
+                    case 'DE-SH': regions[8].value.push(s); break;
+                    case 'DE-TH': regions[4].value.push(s); break;
+
+                }
+            })
+        });
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -60,6 +195,24 @@ onMounted(async () => {
     data = await getGeoData();
     setGeoData()
 });
+// Von https://stackoverflow.com/questions/31790344/determine-if-a-point-reside-inside-a-leaflet-polygon
+function isMarkerInsidePolygon(marker, poly) {
+    var inside = false;
+    var x = marker.getLatLng().lat, y = marker.getLatLng().lng;
+    for (var ii=0;ii<poly.getLatLngs().length;ii++){
+        var polyPoints = poly.getLatLngs()[ii];
+        for (var i = 0, j = polyPoints.length - 1; i < polyPoints.length; j = i++) {
+            var xi = polyPoints[i].lat, yi = polyPoints[i].lng;
+            var xj = polyPoints[j].lat, yj = polyPoints[j].lng;
+
+            var intersect = ((yi > y) != (yj > y))
+                && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+            if (intersect) inside = !inside;
+        }
+    }
+
+    return inside;
+};
 
 
 // --------------------- SET DATA ----------------------
@@ -244,6 +397,7 @@ watch(silver_filter, onChangeSilver);
 watch(green_filter, onChangeGreen);
 watch(orange_filter, onChangeOrange);
 watch(red_filter, onChangeRed);
+
 
 // ---------------------------- Filter -----------------------------------
 
@@ -521,6 +675,24 @@ const addEnd = () => {
                             @click="zoomToCity(cityName)"
                             aria-label="Center to City"
                         />
+                    </q-item>
+                    <q-item>
+                        <div class="col">
+                            <p>Regionen</p>
+                            <div class="q-gutter-sm">
+                                <q-checkbox v-model="BY"  val="BY" label="BY" color="black"/>
+                                <q-checkbox v-model="BW"  val="BW" label="BW" color="black"/>
+                                <q-checkbox v-model="SW"  val="SW" label="SW" color="black"/>
+                                <q-checkbox v-model="H"  val="H" label="H" color="black"/>
+                                <q-checkbox v-model="SO"  val="SO" label="SO" color="black"/>
+                            </div>
+                            <div class="q-gutter-sm">
+                                <q-checkbox v-model="NRW"  val="NRW" label="NRW" color="black"/>
+                                <q-checkbox v-model="NO"  val="NO" label="NO" color="black"/>
+                                <q-checkbox v-model="NB"  val="NB" label="NB" color="black"/>
+                                <q-checkbox v-model="N"  val="N" label="N" color="black"/>
+                            </div>
+                        </div>
                     </q-item>
                 </q-list>
             </q-expansion-item>
