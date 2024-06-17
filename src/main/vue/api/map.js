@@ -30,5 +30,16 @@ export const getTimeFromHeatmap = async function getTimeFromHeatmap(strecke, fro
     }
 }
 
+export const getInformationForGeoPoint = async function getInformationForGeoPoint(id) {
+    try {
+        const cred = new URLSearchParams()
+        cred.append("id", id)
+        const response = await axios.post("/api/map/getDataGeoTrack", cred)
+        return response.data
+    }  catch (error) {
+        console.log("Something went wrong when getting the data for a GeoPoint!")
+    }
+}
+
 
 export default {getGeoData, getHeatmap, getTimeFromHeatmap};

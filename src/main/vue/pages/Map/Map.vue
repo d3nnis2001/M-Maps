@@ -2,7 +2,7 @@
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {onMounted, ref, watch} from 'vue';
-import {getGeoData, getHeatmap, getTimeFromHeatmap} from "@/main/vue/api/map";
+import {getGeoData, getHeatmap, getInformationForGeoPoint, getTimeFromHeatmap} from "@/main/vue/api/map";
 import {useQuasar} from "quasar";
 import DateInput from "@/main/vue/pages/Map/DateInput.vue";
 import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";
@@ -30,6 +30,7 @@ const green_filter = ref(true)
 const orange_filter = ref(true)
 const red_filter = ref(true)
 const cityName = ref("")
+let information = ref([])
 
 
 /**
@@ -59,6 +60,7 @@ onMounted(async () => {
     data = await getGeoData();
     setGeoData()
 });
+
 
 // --------------------- SET DATA ----------------------
 
@@ -125,14 +127,41 @@ async function setPartGeoDataKm(km_start, km_end) {
     });
 }
 
-const onMarkerClicked = (event) => {
+const onMarkerClicked = async (event) => {
     const circle = event.target;
     const marker = markers.find((m) => {
+
         return m.data.longitude === circle.getLatLng().lat && m.data.latitude === circle.getLatLng().lng;
     });
+    console.log(marker.data)
     selectedMarker.value = marker
     dialogVisible.value = true;
+    information.value = []
+    const informationGeo = await getInformationForGeoPoint(selectedMarker.value.data.id)
+    displayInformation(informationGeo)
 };
+
+async function displayInformation(info) {
+    let output = []
+    output.push("Strecken-ID: " + selectedMarker.value.data.strecken_id);
+    for (let i = 0;i < info.length;i++) {
+        switch(i) {
+            case 0:
+                output.push("Maximale Linksabweichung: "+info[i].toString())
+                break;
+            case 1:
+                output.push("Maximale Rechtsabweichung: "+info[i].toString())
+                break;
+            case 2:
+                output.push("Zugelassene Maximal Geschwindigkeit: "+info[i].toString())
+                break;
+            case 3:
+                output.push("Durchschnittliche Geschwindigkeit: "+info[i].toString())
+                break;
+        }
+    }
+    information.value = output
+ }
 
 // ---------------------------- On Changes ------------------------------
 
@@ -274,13 +303,14 @@ function getAllGeoPointsWithColor(dataPoint) {
     let output = []
     for(let i = 0;i < dataPoint.length;i++) {
         if(dataPoint[i].NORMAL !== undefined) {
-            output.push([getLatLng(dataPoint[i].NORMAL), "silver"])
+            console.log(dataPoint[i].NORMAL)
+            output.push([getLatLng(dataPoint[i].NORMAL), "silver", dataPoint[i].NORMAL])
         } else if (dataPoint[i].LOW !== undefined) {
-            output.push([getLatLng(dataPoint[i].LOW), "green"])
+            output.push([getLatLng(dataPoint[i].LOW), "green", dataPoint[i].LOW])
         } else if (dataPoint[i].MEDIUM !== undefined) {
-            output.push([getLatLng(dataPoint[i].MEDIUM), "orange"])
+            output.push([getLatLng(dataPoint[i].MEDIUM), "orange", dataPoint[i].MEDIUM])
         } else if (dataPoint[i].HIGH !== undefined) {
-            output.push([getLatLng(dataPoint[i].HIGH), "red"])
+            output.push([getLatLng(dataPoint[i].HIGH), "red", dataPoint[i].HIGH])
         }
     }
     return output
@@ -310,7 +340,6 @@ async function getAllHeatDataColor(color) {
     var colors = getAllGeoPointsWithColor(heatData)
     var temp = []
     for (let i = 0; i < colors.length; i++) {
-        console.log(colors[i][1])
         if (colors[i][1] === color) {
             markers.push({
                 marker: L.circleMarker([colors[i][0][0], colors[i][0][1]], {
@@ -319,7 +348,7 @@ async function getAllHeatDataColor(color) {
                     fillColor: colors[i][1],
                     fillOpacity: 1.0
                 }),
-                data: colors[i],
+                data: { latitude: colors[i][0][1], longitude: colors[i][0][0], id: colors[i][2]},
             });
             temp.push(markers[markers.length-1])
         }
@@ -351,7 +380,7 @@ async function getAllHeatmapData() {
                 fillColor: colors[i][1],
                 fillOpacity: 1.0
             }),
-            data: colors[i],
+            data: { latitude: colors[i][0][1], longitude: colors[i][0][0], id: colors[i][2]},
         });
     }
     markers.forEach((m) => {
@@ -362,7 +391,9 @@ async function getAllHeatmapData() {
 
 
 async function getHeatmapWithTime() {
-    const timeData = await getTimeFromHeatmap(streckenID, date._value, date2._value)
+    console.log(streckenID)
+    console.log(date._value)
+    const timeData = await getTimeFromHeatmap(streckenID._value, date._value, date2._value)
     console.log(timeData)
 }
 
@@ -445,9 +476,9 @@ const addEnd = () => {
                 class="expansion_settings"
             >
                 <q-list>
-                    <q-item clickable v-ripple>
+                    <q-item v-ripple :disable="streckenID === ''">
                         <q-item-section>
-                            <div class="expan_items" @click="alert2=true">
+                            <div class="expan_items" @click="streckenID !== '' && (alert2=true)">
                                 Zeitraum
                             </div>
                         </q-item-section>
@@ -506,8 +537,8 @@ const addEnd = () => {
         </div>
         <div id="map"></div>
         <div class="flexbox_map">
-            <q-dialog v-model="alert2">
-                <q-card>
+            <q-dialog v-model="alert2" >
+                <q-card :disable="!toggle_value">
                     <q-card-section>
                         <div class="text-h6">Wähle einen Zeitraum</div>
                     </q-card-section>
@@ -609,6 +640,15 @@ const addEnd = () => {
                             color="primary"
                             v-close-popup
                         />
+                    </q-card-actions>
+                </q-card>
+                <q-card>
+                    <q-card-actions>
+                        <q-icon name="info" style="margin-left: 8px;">
+                            <q-tooltip anchor="top middle">
+                                <p v-for="info in information" :key="info">{{info}}</p>
+                            </q-tooltip>
+                        </q-icon>
                     </q-card-actions>
                 </q-card>
 

@@ -1,6 +1,7 @@
 package com.gpse.basis.services;
 
 import com.gpse.basis.domain.GeoData;
+import com.gpse.basis.domain.GleisLageDatenpunkt;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -23,4 +24,8 @@ public interface DataService {
     List<Map.Entry<Colors, String>> getGeoDataByDate(int track_id, LocalDateTime from, LocalDateTime till);
 
     ArrayList<GeoData> getGeoData();
+
+    Double[] getDataForGeoPart(String id);
+
+
 }

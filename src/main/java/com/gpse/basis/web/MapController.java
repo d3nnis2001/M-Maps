@@ -1,6 +1,7 @@
 package com.gpse.basis.web;
 
 import com.gpse.basis.domain.GeoData;
+import com.gpse.basis.domain.GleisLageDatenpunkt;
 import com.gpse.basis.domain.Utils;
 import com.gpse.basis.services.DataService;
 import com.gpse.basis.services.FileService;
@@ -11,7 +12,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
 import java.awt.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -38,10 +41,12 @@ public class MapController {
         String strecke = request.getParameter("strecke");
         String from = request.getParameter("from");
         String till = request.getParameter("till");
-        System.out.println(from);
-        LocalDateTime fromDate = LocalDateTime.parse(from);
-        LocalDateTime tillDate = LocalDateTime.parse(till);
-        System.out.println("Datum: "+fromDate);
+        LocalDate fromD = LocalDate.parse(from, DateTimeFormatter.ISO_LOCAL_DATE);
+        LocalDate tillD = LocalDate.parse(till, DateTimeFormatter.ISO_LOCAL_DATE);
+        LocalDateTime fromDate = fromD.atStartOfDay();
+        LocalDateTime tillDate = tillD.atStartOfDay();
+        System.out.println("Datum-Form: " + fromDate);
+        System.out.println("Datum-Till: " + tillDate);
         List<Map.Entry<DataService.Colors, String>> lst = dataService.getGeoDataByDate(Integer.parseInt(strecke), fromDate, tillDate);
         List<ResponseColor> k = new ArrayList<>(lst.size());
         for(int i = 0; i < lst.size(); ++i)
@@ -69,5 +74,13 @@ public class MapController {
             else if(color == DataService.Colors.HIGH)
                 this.color = 3;
         }
+    }
+
+
+    @PostMapping("/getDataGeoTrack")
+    public Double[] getDatatoGeoTrack(final WebRequest request) {
+        String strecke = request.getParameter("id");
+        // links-Abweichung, rechts-abweichung, durschnittliche zulässige geschwindigkeit, durchschnittliche gefahrene Geschwindigkeit
+        return dataService.getDataForGeoPart(strecke);
     }
 }

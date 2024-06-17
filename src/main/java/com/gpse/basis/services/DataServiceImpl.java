@@ -276,4 +276,18 @@ public class DataServiceImpl implements DataService {
         System.out.println("Wir sind im Dataservice: "+col.size());
         return col;
     }
+
+    public Double[] getDataForGeoPart(String id) {
+        MatchOperation matchOperation = Aggregation.match(Criteria.where("iDlocation").is(id));
+        Aggregation aggregation = Aggregation.newAggregation(matchOperation);
+        List<GleisLageDatenpunkt> results = template.aggregate(aggregation, "GleisLageDaten", GleisLageDatenpunkt.class).getMappedResults();
+        if(!results.isEmpty()) {
+            double max_left = Math.round(results.parallelStream().mapToDouble(GleisLageDatenpunkt::getZ_links_railab_3p).max().getAsDouble() * 100.0) / 100.0;
+            double max_right = Math.round(results.parallelStream().mapToDouble(GleisLageDatenpunkt::getZ_rechts_railab_3p).max().getAsDouble() * 100.0) / 100.0;
+            double vul_zul = Math.round(results.parallelStream().mapToDouble(GleisLageDatenpunkt::getV_zul).average().getAsDouble() * 100.0) / 100.0;
+            double vul = Math.round(results.parallelStream().mapToDouble(GleisLageDatenpunkt::getGeschwindigkeit).average().getAsDouble() * 100.0) / 100.0;
+            return new Double[] {max_left, max_right, vul_zul, vul};
+        }
+        return null;
+    }
 }
