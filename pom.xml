@@ -29,7 +29,7 @@
 
         <!-- Checkstyle versions -->
         <checkstylePlugin.version>3.3.1</checkstylePlugin.version>
-        <checkstyle.version>8.38</checkstyle.version>
+        <checkstyle.version>9.3</checkstyle.version>
 
         <!-- Spotbugs versions -->
         <spotbugsPlugin.version>4.8.3.1</spotbugsPlugin.version>
