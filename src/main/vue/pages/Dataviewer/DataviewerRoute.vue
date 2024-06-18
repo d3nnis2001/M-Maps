@@ -435,11 +435,11 @@ export default {
                 </div>
             </div>
         </div>
-        <div class="q-pa-xs align-mult">
-            <div class="q-pa-xs">
+        <div class="align-mult">
+            <div>
                 <q-btn label="Dataviever" @click="" class=""></q-btn>
             </div>
-            <div class="q-pa-xs">
+            <div>
                 <q-btn label="Profil" @click="" class=""></q-btn>
             </div>
         </div>
