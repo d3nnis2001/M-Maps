@@ -2,10 +2,12 @@ package com.gpse.basis.services;
 
 import com.github.swrirobotics.bags.reader.BagFile;
 import com.github.swrirobotics.bags.reader.BagReader;
+import com.github.swrirobotics.bags.reader.MessageHandler;
 import com.github.swrirobotics.bags.reader.TopicInfo;
 import com.github.swrirobotics.bags.reader.exceptions.BagReaderException;
 import com.github.swrirobotics.bags.reader.exceptions.UninitializedFieldException;
 import com.github.swrirobotics.bags.reader.messages.serialization.*;
+import com.github.swrirobotics.bags.reader.records.Connection;
 import com.gpse.basis.domain.CameraImage;
 import com.gpse.basis.domain.DataSet;
 import com.gpse.basis.domain.VelodynePoint;
@@ -27,9 +29,17 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
+
 
 @Service
 public class RosBagServiceImpl implements RosBagService{
@@ -51,52 +61,34 @@ public class RosBagServiceImpl implements RosBagService{
     @Override
     public List<CameraImage> saveCameraImagesForTrack(int trackId, String filename) {
         List<CameraImage> cameraImagelst = new ArrayList<>();
+        Lock lock = new ReentrantLock();
+        ExecutorService executorService = Executors.newFixedThreadPool(30);
+        List<Worker> workers = new ArrayList<>();
             try {
                 BagFile f = BagReader.readFile(filename);
                 for (TopicInfo topic : f.getTopics()) {
                     if (Objects.equals(topic.getName(), "/ColourCam/image_raw")) {
-                        AtomicInteger xyz = new AtomicInteger(1);
-                        f.forMessagesOnTopic(topic.getName(), (message, connection) -> {
-                            /*
-                            MessageType header = message.getField("header");
-                            header.getFieldNames().forEach(System.out::println);
-                            System.out.println();
-                            message.getFieldNames().forEach(System.out::println);
-                            System.out.println();
-                            */
-                            try {
-                                //todo: proceed only when bayer_rggb8 encoded
-                                long width = message.<UInt32Type>getField("width").getValue();
-                                long height = message.<UInt32Type>getField("height").getValue();
-                                var lst = message.<ArrayType>getField("data");
-                                var a = lst.getAsBytes();
-                                BufferedImage image = demosaic(a, (int) width, (int) height);
-                                long unixTimestamp = Instant.now().getEpochSecond();
-                                String name = "/BagCameraImage" + "-" + unixTimestamp + xyz + ".png";
-                                File outputfile = new File(IMAGE_DIRECTORY + name);
-                                try {
-                                    ImageIO.write(image, "png", outputfile);
-                                    cameraImagelst.add(new CameraImage(trackId, "http://localhost:8080" + directory_name + name , 0, ""));
-                                } catch (IOException e) {
-                                    throw new RuntimeException(e);
-                                }
+                        long count = topic.getMessageCount();
+                        System.out.println("Message-count: " + count);
 
-                            } catch (UninitializedFieldException e) {
-                                System.out.println(e.getMessage());
-                                throw new RuntimeException(e);
-                            }
+                        for(int i = 0; i < count; ++i) {
+                            workers.add(new Worker(filename, cameraImagelst, lock, i, trackId));
+                            executorService.submit(workers.getLast());
+                        }
 
-                            xyz.getAndIncrement();
-                            return true;
-                        });
-
+                        executorService.shutdown();
+                        try {
+                            var t = executorService.awaitTermination(60, TimeUnit.SECONDS);
+                            System.out.println(t);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
                     }
 
             } catch (BagReaderException e) {
                 throw new RuntimeException(e);
             }
-
         return cameraImagelst;
     }
 
@@ -120,7 +112,6 @@ public class RosBagServiceImpl implements RosBagService{
                                 long width = message.<UInt32Type>getField("width").getValue();
                                 long height = message.<UInt32Type>getField("height").getValue();
                                 var lst = message.<ArrayType>getField("data");
-                                System.out.println(width + "   " + height);
                                 var a = lst.getAsBytes();
                                 int index = 0;
                                 BufferedImage irImage = new BufferedImage((int) width, (int) height, BufferedImage.TYPE_INT_RGB);
@@ -133,11 +124,10 @@ public class RosBagServiceImpl implements RosBagService{
                                 long unixTimestamp = Instant.now().getEpochSecond();
                                 String name = "/IRCameraImage" + "-" + unixTimestamp + xyz + ".png";
                                 File outputfile = new File(IMAGE_DIRECTORY + name);
-                                System.out.println(outputfile.getAbsolutePath());
                                 xyz.getAndIncrement();
                                 try {
                                     ImageIO.write(irImage, "png", outputfile);
-                                    imageList.add(new CameraImage(trackId, "http://localhost:8080" + directory_name + name , 1, ""));
+                                    imageList.add(new CameraImage(trackId, "http://localhost:8080" + directory_name + name , 1, "", xyz.get()));
                                 } catch (IOException e) {
                                     throw new RuntimeException(e);
                                 }
@@ -241,7 +231,8 @@ public class RosBagServiceImpl implements RosBagService{
         q.addCriteria(Criteria.where("track_id").is(trackId));
         q.addCriteria(Criteria.where("type").is(0));
         var itr = template.find(q, CameraImage.class);
-        itr.forEach(w -> lst.add(w.getPath()));
+        var sort_itr = itr.parallelStream().sorted(Comparator.comparingInt(CameraImage::getIndex)).toList();
+        sort_itr.forEach(w -> lst.add(w.getPath()));
         return lst;
     }
 
@@ -259,6 +250,58 @@ public class RosBagServiceImpl implements RosBagService{
 
     private boolean inRange(int x, int y) {
         return x >= 0 && x < 3008 && y >= 0 && y < 4112;
+    }
+
+    private class Worker implements Runnable {
+
+        private final String filename;
+
+        List<CameraImage> cameraImagesList;
+        Lock lock;
+        int xyz;
+
+        int trackId;
+        public Worker(String filename, List<CameraImage> cameraImagesList, Lock lock, int xyz, int trackId) {
+            this.filename = filename;
+            this.cameraImagesList = cameraImagesList;
+            this.lock = lock;
+            this.xyz = xyz;
+            this.trackId = trackId;
+        }
+        @Override
+        public void run() {
+            try {
+                BagFile f = BagReader.readFile(filename);
+                MessageType message = f.getMessageOnTopicAtIndex("/ColourCam/image_raw", xyz);
+                long width = message.<UInt32Type>getField("width").getValue();
+                long height = message.<UInt32Type>getField("height").getValue();
+                var lst = message.<ArrayType>getField("data");
+                var a = lst.getAsBytes();
+                BufferedImage image = demosaic(a, (int) width, (int) height);
+                long unixTimestamp = Instant.now().getEpochSecond();
+                String name = "/BagCameraImage" + "-" + unixTimestamp + xyz + ".png";
+                File outputfile = new File(IMAGE_DIRECTORY + name);
+                try {
+                    ImageIO.write(image, "png", outputfile);
+                    lock.lock();
+                    cameraImagesList.add(new CameraImage(trackId, "http://localhost:8080" + directory_name + name , 0, "", xyz));
+                    lock.unlock();
+                } catch (IOException e) {
+                    System.out.println(e.getMessage());
+                    throw new RuntimeException(e);
+                }
+
+            } catch (UninitializedFieldException e) {
+                System.out.println(e.getMessage());
+                throw new RuntimeException(e);
+            } catch (Exception e) {
+                System.out.println("Exception: ");
+                e.printStackTrace();
+            } catch(Error e) {
+                System.out.println("Error: ");
+                e.printStackTrace();
+            }
+        }
     }
 
   /*
@@ -386,14 +429,13 @@ public class RosBagServiceImpl implements RosBagService{
                         rgbImage.setRGB(j, i, new Color(rd, grn, pic[i][j]).getRGB());
 
                     }
-
-
                 }
 
             }
         }
         return rgbImage;
     }
+
     public float byteArrayToFloat(byte[] bytes, ByteOrder byteOrder) {
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
         buffer.order(byteOrder);

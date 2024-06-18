@@ -111,7 +111,7 @@ public class FileServiceImpl implements FileService {
                             }
                             if(!kk.isEmpty()) {
                                 for(var image : kk ) {
-                                    image.setDataSetid(st.getId());
+                                   image.setDataSetid(st.getId());
                                     template.save(image);
                                 }
                             }

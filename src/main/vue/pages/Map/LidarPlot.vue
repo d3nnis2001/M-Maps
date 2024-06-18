@@ -8,6 +8,7 @@ const index = ref(0)
 const velodynPoints = ref([])
 const next = ref(true)
 const $q = useQuasar()
+var stop = false
 
 const props = defineProps({
     streckenid: Number
@@ -83,7 +84,8 @@ const animate = (t) => {
         30);
     camera.lookAt(0,0,0);
     renderer.render(scene , camera);
-    requestAnimationFrame(animate);
+    if(!stop)
+        requestAnimationFrame(animate);
 }
 
 function normalizeIntensity(intensity, minIntensity, maxIntensity) {
@@ -151,6 +153,7 @@ const incIndex = async () => {
     index.value = index.value + 1;
     const data = await getVelodynPointsForTrackId(props.streckenid, index.value)
     if(data.length > 0) {
+        stop = false
         velodynPoints.value = data
         target.value.removeChild(renderer.domElement)
         init()
@@ -162,16 +165,33 @@ const incIndex = async () => {
     }
 }
 
-const decIndex = () => {
-    if(index.value > 0)
+const decIndex = async ()  => {
+    if(index.value > 0) {
         index.value = index.value - 1;
+        const data = await getVelodynPointsForTrackId(props.streckenid, index.value)
+        stop = false
+        velodynPoints.value = data
+        target.value.removeChild(renderer.domElement)
+        init()
+        animate()
+    }
+}
+
+const handleClick = () => {
+    if(stop === true) {
+        stop = false
+        animate(0);
+    }
+    else {
+        stop = true
+    }
 }
 
 </script>
 
 <template>
     <div>
-        <div ref="target"></div>
+        <div ref="target" @click="handleClick"></div>
         <q-card flat square bordered>
             <div class="row">
                 <q-btn
