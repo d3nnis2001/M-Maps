@@ -22,7 +22,7 @@ const table = reactive( {
         },
         {name: 'firstname', label: 'First Name', align: 'left', field: 'firstname', sortable: true},
         {name: 'lastname', label: 'Last Name', align: 'left', field: 'lastname', sortable: true},
-        //{name: 'Roles', label: 'Roles', align: 'left', field: 'roles', sortable: true},
+        {name: 'roles', label: 'Roles', align: 'left', field: 'roles', sortable: true},
     ],
     rows: []
 });
@@ -35,15 +35,37 @@ const showConfirmDialog = ref(false);
 const currentRow = reactive({});
 const rowToDelete = ref(null);
 
+/*
 async function getData() {
     const data = await getUserData()
-    table.rows = data.map(user => ({
+    let roles = data.map(user => user.role);
+    console.log(data)
+    console.log(roles)
+    let role = [];
+    table.rows = data.map(user =>
+        //role = user.roles.forEach(role.push())
+        ({
         username: user.username,
         firstname: user.firstname,
         lastname: user.lastname,
+        roles: user.roles,
     }));
 }
 
+ */
+async function getData() {
+    const data = await getUserData()
+    let roles = data.map(user => user.role);
+    let role = [];
+    data.forEach((user) => {
+        table.rows.push({
+            username: user.username,
+            firstname: user.firstname,
+            lastname: user.lastname,
+            roles: user.roles,
+        })
+    })
+}
 const checkScreenSize = () => {
     const screenSize = window.innerWidth;
     smallScreen.value = screenSize <= 500;
@@ -135,11 +157,9 @@ const removeRow = (selectedUser) => {
                     <q-td key="lastname" :props="props">
                         {{ props.row.lastname }}
                     </q-td>
-                    <!--
                     <q-td key="roles" :props="props">
                         {{ props.row.roles }}
                     </q-td>
-                    -->
                 </q-tr>
             </template>
         </q-table>

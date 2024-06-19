@@ -15,4 +15,6 @@ public interface UserServices extends UserDetailsService {
     String getToken(String email);
     boolean setPasswordNew(String email, String password, String token);
     ArrayList<UserModel> getAllUsers();
+    UserModel loadUserByUsername(String email);
+    boolean updateRoles(String email, ArrayList<String> roles);
 }

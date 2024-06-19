@@ -53,6 +53,7 @@ public class UserModel implements UserDetails {
             }
         }
     }
+    public ArrayList<String> getRoles() { return roles; }
 
     public void setEmail(String email) {
         this.email = email;

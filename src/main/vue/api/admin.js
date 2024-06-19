@@ -1,5 +1,4 @@
 import axios from 'axios';
-import {useUserStore} from "@/main/vue/stores/UserStore";
 
 export const getUserData = async function getData() {
     try {
@@ -18,15 +17,15 @@ export const deleteUser = async function deleteUser(username) {
         const response = await axios.delete("api/admin/deleteUser", cred)
         return response
     } catch (error) {
-        console.log("Unssen error while deleting User");
+        console.log("Unseen error while deleting User");
     }
 }
 
-export const getUserById = async function getUserById(id) {
+export const getUserByUsername = async function getUserByUsername(username) {
     try {
-        const response = await axios.get("api/admin/getUserById", {
+        const response = await axios.get("api/admin/getUserByUsername", {
             params: {
-                username: id
+                userName: username
             }
         });
         return response.data;
@@ -36,10 +35,16 @@ export const getUserById = async function getUserById(id) {
     }
 }
 
-export const setRolesById = async function setRolesById(id){
+export const updateRoles = async function updateRoles(username, roles){
     try {
-        const cred = new URLSearchParams()
+        console.log("Die Rollen: " + roles);
+        const cred = new URLSearchParams();
+        const rolesString = roles.join(",");
+        cred.append("userName", username);
+        cred.append("roles", rolesString);
+        return await axios.post("api/admin/updateRoles");
     } catch (error) {
-
+        console.log("Unseen error when making role changes")
+        return false
     }
 }

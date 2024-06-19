@@ -2,20 +2,22 @@
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import router from "@/main/vue/router";
-import {getUserById} from "@/main/vue/api/admin";
+import {getUserByUsername, updateRoles} from "@/main/vue/api/admin";
 
 export default {
     setup () {
         const route = useRoute();
+        const user = ref({user: []})
         const username = route.params.username;
         const firstname = ref('')
         const lastname = ref('')
         const allRoles = ref(['Admin', 'Datenverwalter', 'Bearbeiter', 'Prüfer']);
-        const roles = ref({selected_roles: []})
+        const updatedRoles = ref({selected_roles: []})
 
         onMounted( async  () => {
             console.log(username)
-            const user = await getUserById(username);
+            user.value = await getUserByUsername(username);
+            console.log(user.value.user)
             firstname.value = user.firstname
             console.log(firstname.value)
             lastname.value =user.lastname
@@ -25,8 +27,20 @@ export default {
             router.push(`/admin`);
         };
 
-        const saveRoles = (roles) => {
-
+        async function saveRoles() {
+            if (updatedRoles.value.selected_roles != null){
+                const newRoles = []
+                for (let i = 0; i < updatedRoles.value.selected_roles.length; i++) {
+                    newRoles.push(updatedRoles.value.selected_roles[i])
+                    //console.log(updatedRoles.value.selected_roles[i])
+                }
+                newRoles.forEach((role) => {
+                    console.log(role.toString())
+                })
+                await updateRoles(username, newRoles)
+            } else {
+                console.log("Array ist NUll")
+            }
         }
 
         return {
@@ -35,7 +49,7 @@ export default {
             firstname,
             lastname,
             allRoles,
-            roles,
+            updatedRoles,
             abort,
             saveRoles,
             /*
@@ -89,11 +103,11 @@ export default {
                     :val="allRoles"
                 />
                 -->
-                {{roles}}
+                {{updatedRoles}}
                 <div v-for="allRoles in allRoles">
                     <q-checkbox
                         :label="allRoles"
-                        v-model="roles.selected_roles"
+                        v-model="updatedRoles.selected_roles"
                         :val="allRoles"
                     />
                 </div>

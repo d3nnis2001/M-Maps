@@ -26,16 +26,28 @@ public class AdminController {
         return userService.getAllUsers();
     }
 
-    @GetMapping("/getUserById")
-    public UserModel getUserById(final WebRequest request) {
-        //UserModel user = userService.loadUserByUsername(request.getParameter("username"));
-        //return user;
-        return null;
+    @GetMapping("/getUserByUsername")
+    public UserModel getUserByUsername(final WebRequest request) {
+        return userService.loadUserByUsername(request.getParameter("userName"));
     }
 
     @DeleteMapping("/deleteUser")
     public ResponseEntity<Boolean> deleteUser(final WebRequest request) {
         String username = request.getParameter("username");
         return ResponseEntity.ok(userService.deleteUser(username));
+    }
+
+    @PostMapping("/updateRoles")
+    public ResponseEntity<Boolean> updateRoles(final WebRequest request) {
+        String rolesString = request.getParameter("roles");
+        assert rolesString != null;
+        String[] rolesList = rolesString.split(",");
+        ArrayList<String> roles = new ArrayList<>();
+        for (String role : rolesList) {
+            roles.add(role.trim());
+        }
+        String username = request.getParameter("username");
+        userService.updateRoles(username, roles);
+        return ResponseEntity.ok(true);
     }
 }

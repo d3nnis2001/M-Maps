@@ -3,13 +3,9 @@ package com.gpse.basis.services;
 import com.gpse.basis.domain.UserModel;
 import com.gpse.basis.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Optional;
@@ -28,6 +24,7 @@ public class UserServicesImpl implements UserServices {
         return userRepo.findById(username)
             .orElseThrow(() -> new UsernameNotFoundException("ExampleUser name " + username + " not found."));
     }
+
     @Override
     public boolean checkExistanceEmail(String email) {
         return userRepo.existsById(email);
@@ -83,5 +80,21 @@ public class UserServicesImpl implements UserServices {
             System.out.println(userModel.getLastname());
         }
         return users;
+    }
+    @Override
+    public boolean updateRoles(String email, ArrayList<String> roles) {
+        UserModel us = loadUserByUsername(email);
+        ArrayList<String> oldRoles = us.getRoles();
+        for (String role : oldRoles) {
+            if (!roles.contains(role)){
+                us.deleteRole(role);
+            }
+        }
+        for (String role : roles) {
+            if (!oldRoles.contains(role)){
+                us.addRole(role);
+            }
+        }
+        return true;
     }
 }

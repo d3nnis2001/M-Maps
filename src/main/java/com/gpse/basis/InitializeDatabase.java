@@ -43,9 +43,12 @@ public class InitializeDatabase implements InitializingBean {
         user.addRole("Admin");
         UserModel user3 = new UserModel("affe@web.de", "affe", "Charlie", "Monkey");
         user.addRole("Prüfer");
+        UserModel user4 = new UserModel("test", "abc", "Hi", "Du");
+        user4.addRole("Prüfer");
         usRepo.save(user);
         usRepo.save(user2);
         usRepo.save(user3);
+        usRepo.save(user4);
     }
     public void initChecklists() {
         ArrayList<String> items = new ArrayList<>();
