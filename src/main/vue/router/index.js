@@ -115,6 +115,7 @@ const router = createRouter({
         {
             path: "/impressum",
             name: "impressum",
+
         }
     ]
 })
