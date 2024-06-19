@@ -73,7 +73,6 @@
 </template>
 
 <script>
-import axios from "axios";
 import {search, importFiles} from "@/main/vue/api/dataimport";
 
 export default {

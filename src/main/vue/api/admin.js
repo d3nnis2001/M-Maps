@@ -1,5 +1,4 @@
 import axios from 'axios';
-import {useUserStore} from "@/main/vue/stores/UserStore";
 
 export const getUserData = async function getData() {
     try {

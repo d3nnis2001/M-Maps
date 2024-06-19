@@ -3,12 +3,9 @@ package com.gpse.basis.web;
 import com.gpse.basis.domain.Checklist;
 import com.gpse.basis.domain.GeoCords;
 import com.gpse.basis.domain.Reparatur;
-import com.gpse.basis.domain.Utils;
 import com.gpse.basis.services.ChecklistService;
 import com.gpse.basis.services.ReparaturService;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
@@ -16,8 +13,6 @@ import org.springframework.web.context.request.WebRequest;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/repair")
