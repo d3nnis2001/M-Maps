@@ -17,15 +17,17 @@ public class InitializeDatabase implements InitializingBean {
     private final ReperaturRepository reRepo;
     private final ChecklistRepository checkRepo;
     private final GleisLageRangeRepository glrRepo;
+    private final SettingsRepository settingsRepository;
 
     @Autowired
     public InitializeDatabase(final UserRepository usRepo, final InspectionOrderRepository ioRepo, final ReperaturRepository reRepo,
-        final ChecklistRepository checkRepo, final GleisLageRangeRepository r) {
+        final ChecklistRepository checkRepo, final GleisLageRangeRepository r, final SettingsRepository settingsRepository) {
         this.usRepo = usRepo;
         this.ioRepo = ioRepo;
         this.reRepo = reRepo;
         this.checkRepo = checkRepo;
         this.glrRepo = r;
+        this.settingsRepository = settingsRepository;
     }
 
     @Override
@@ -34,6 +36,7 @@ public class InitializeDatabase implements InitializingBean {
         initInspectionOrder();
         initChecklists();
         initRanges();
+        initSettings();
     }
     public void initUsers() {
         // Test User 1
@@ -82,6 +85,11 @@ public class InitializeDatabase implements InitializingBean {
             "Hannover", "2024/01/01", "2024/01/02",
             " ", " ", "archiviert", "", true);
         ioRepo.save(inspec);
+    }
+
+    private void initSettings() {
+        Settings settings = new Settings("");
+        settingsRepository.save(settings);
     }
 
 

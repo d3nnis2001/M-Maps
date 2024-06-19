@@ -5,7 +5,8 @@ import com.gpse.basis.repositories.SettingsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.LinkedList;
+import java.util.List;
 
 @Service
 public class SettingsServiceImpl implements SettingsService {
@@ -16,7 +17,9 @@ public class SettingsServiceImpl implements SettingsService {
     }
 
     @Override
-    public Optional<Settings> getImpressum(String id) {
-        return settingsRepository.findById(id);
+    public Settings getImpressum() {
+        List<Settings> items = new LinkedList<>();
+        settingsRepository.findAll().forEach(items::add);
+        return items.getFirst();
     }
 }

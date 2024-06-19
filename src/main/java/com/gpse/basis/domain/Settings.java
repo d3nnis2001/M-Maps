@@ -9,6 +9,10 @@ public class Settings {
     private String id;
     private String impressum;
 
+    public Settings(String impressum) {
+        this.impressum = impressum;
+    }
+
     public String getId() {
         return id;
     }
