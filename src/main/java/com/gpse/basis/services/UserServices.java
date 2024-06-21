@@ -1,9 +1,8 @@
 package com.gpse.basis.services;
 
 import com.gpse.basis.domain.UserModel;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.web.context.request.WebRequest;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.ArrayList;
 
@@ -17,4 +16,6 @@ public interface UserServices extends UserDetailsService {
     ArrayList<UserModel> getAllUsers();
     UserModel loadUserByUsername(String email);
     boolean updateRoles(String email, ArrayList<String> roles);
+
+    UserModel getUserByUsername(String username);
 }

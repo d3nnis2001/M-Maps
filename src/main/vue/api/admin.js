@@ -14,8 +14,7 @@ export const deleteUser = async function deleteUser(username) {
     try {
         const cred = new URLSearchParams()
         cred.append("username", username)
-        const response = await axios.delete("api/admin/deleteUser", cred)
-        return response
+        return await axios.delete("api/admin/deleteUser", cred)
     } catch (error) {
         console.log("Unseen error while deleting User");
     }
@@ -23,11 +22,17 @@ export const deleteUser = async function deleteUser(username) {
 
 export const getUserByUsername = async function getUserByUsername(username) {
     try {
+        /*
         const response = await axios.get("api/admin/getUserByUsername", {
             params: {
                 userName: username
             }
         });
+
+         */
+        const response = await axios.get("api/admin/getUserByUsername" + username);
+        console.log(response)
+        console.log(response.data)
         return response.data;
     } catch (error) {
         console.error("Unseen error while try to get User data for editing:", error);
@@ -38,13 +43,21 @@ export const getUserByUsername = async function getUserByUsername(username) {
 export const updateRoles = async function updateRoles(username, roles){
     try {
         console.log("Die Rollen: " + roles);
+        console.log(username)
         const cred = new URLSearchParams();
         const rolesString = roles.join(",");
         cred.append("userName", username);
         cred.append("roles", rolesString);
-        return await axios.post("api/admin/updateRoles");
+        //const response = await axios.post("api/admin/updateRoles", cred);
+        const response = await axios.post("http://localhost:8080/api/admin/updateRoles", cred)
+        return response;
     } catch (error) {
-        console.log("Unseen error when making role changes")
-        return false
+        console.error("Error making role changes:", error);
+        if (error.response && error.response.status === 404) {
+            console.log("Error making role changes: Resource not found");
+        } else {
+            console.log("Error making role changes:", error.message);
+        }
+        throw new Error(`Error making role changes: ${error.message}`);
     }
 }

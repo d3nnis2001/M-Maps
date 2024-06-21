@@ -97,4 +97,15 @@ public class UserServicesImpl implements UserServices {
         }
         return true;
     }
+
+    @Override
+    public UserModel getUserByUsername(final String username) {
+        Iterable<UserModel> iterable = userRepo.findAll();
+        for (UserModel userModel : iterable) {
+            if (userModel.getUsername().equals(username)) {
+                return userModel;
+            }
+        }
+        return null;
+    }
 }

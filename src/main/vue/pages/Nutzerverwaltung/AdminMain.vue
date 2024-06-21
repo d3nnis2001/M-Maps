@@ -35,28 +35,11 @@ const showConfirmDialog = ref(false);
 const currentRow = reactive({});
 const rowToDelete = ref(null);
 
-/*
 async function getData() {
     const data = await getUserData()
-    let roles = data.map(user => user.role);
-    console.log(data)
+    let roles = data.map(user => user.roles);
     console.log(roles)
-    let role = [];
-    table.rows = data.map(user =>
-        //role = user.roles.forEach(role.push())
-        ({
-        username: user.username,
-        firstname: user.firstname,
-        lastname: user.lastname,
-        roles: user.roles,
-    }));
-}
-
- */
-async function getData() {
-    const data = await getUserData()
-    let roles = data.map(user => user.role);
-    let role = [];
+    console.log(data)
     data.forEach((user) => {
         table.rows.push({
             username: user.username,
@@ -95,14 +78,15 @@ async function deleteUsername(selectedUser) {
 }
 
 function unlockUser(selectedUser) {
-    if (selectedUser[0] === undefined) {
+    console.log(selectedUser)
+    if (selectedUser === undefined) {
         this.$q.notify({
             message: "Wähle einen Nutzer aus!",
             timeout: 5000,
         });
     } else {
         this.$q.notify({
-            message: `Nutzer mit der ID: '${selectedUser[0].username}' wurde freigeschaltet!`,
+            message: `Nutzer mit der ID: '${selectedUser}' wurde freigeschaltet!`,
             timeout: 5000,
         });
     }
@@ -213,6 +197,7 @@ const removeRow = (selectedUser) => {
             <q-card>
                 <q-card-section>
                     <div class="option-button" @click="editUser">Editieren</div>
+                    <div class="option-button" @click="unlockUser(currentRow.username)">Freischalten</div>
                     <div class="option-button" @click="confirmDeleteUsername(currentRow)">Löschen</div>
                 </q-card-section>
                 <q-card-section>

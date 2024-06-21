@@ -1,26 +1,50 @@
 <script>
-import { onMounted, ref } from 'vue';
+import {onMounted, ref, watch} from 'vue';
 import { useRoute } from 'vue-router';
 import router from "@/main/vue/router";
-import {getUserByUsername, updateRoles} from "@/main/vue/api/admin";
+import {getUserByUsername, getUserData, updateRoles} from "@/main/vue/api/admin";
 
 export default {
     setup () {
         const route = useRoute();
-        const user = ref({user: []})
-        const username = route.params.username;
+        const currentUser = ref({user: []})
+        const username = route.params.username.toString();
         const firstname = ref('')
         const lastname = ref('')
         const allRoles = ref(['Admin', 'Datenverwalter', 'Bearbeiter', 'Prüfer']);
         const updatedRoles = ref({selected_roles: []})
 
+        /**
+         * Problem mit der Funktion einen einzelnen User zu laden (response ist ein HTML document)
+         */
+        /*
         onMounted( async  () => {
+            console.log(typeof username)
             console.log(username)
             user.value = await getUserByUsername(username);
-            console.log(user.value.user)
-            firstname.value = user.firstname
-            console.log(firstname.value)
-            lastname.value =user.lastname
+            console.log("User Firstname: "+user.value)
+            console.log(user.value.firstname)
+            if (user.value) {
+                firstname.value = user.value.firstname;
+                lastname.value = user.value.lastname;
+            }
+        })
+         */
+
+        onMounted( async  () => {
+            const data = await getUserData()
+            data.forEach((user) => {
+                if (user.username === username) {
+                    currentUser.value = user;
+                    firstname.value = user.firstname;
+                    lastname.value = user.lastname;
+                    if (user.roles !== null) {
+                        user.roles.forEach((role) => {
+                            updatedRoles.value.selected_roles.push(role)
+                        })
+                    }
+                }
+            })
         })
 
         const abort = () => {
@@ -28,6 +52,12 @@ export default {
         };
 
         async function saveRoles() {
+            console.log(updatedRoles.value.selected_roles)
+            updatedRoles.value.selected_roles.forEach((data) => {
+                console.log(data)
+            })
+            await updateRoles(username, updatedRoles.value.selected_roles)
+            /*
             if (updatedRoles.value.selected_roles != null){
                 const newRoles = []
                 for (let i = 0; i < updatedRoles.value.selected_roles.length; i++) {
@@ -41,6 +71,8 @@ export default {
             } else {
                 console.log("Array ist NUll")
             }
+
+             */
         }
 
         return {
@@ -55,12 +87,11 @@ export default {
             /*
             group: ref([]),
             options: [
-                { label: 'Admin', value: 'admin' },
-                { label: 'Datenverwalter', value: 'datenverwalter', },
+                { label: 'Admin', value: 'admin', checked: false},
+                { label: 'Datenverwalter', value: 'datenverwalter', checked: true},
                 { label: 'Bearbeiter', value: 'bearbeiter', },
                 { label: 'Prüfer', value: 'prüfer', },
             ]
-
              */
         }
     }
@@ -93,22 +124,23 @@ export default {
                 </div>
             </div>
 
+            {{updatedRoles}}
             <div class="q-pa-lg">
-                <p style="margin-right: 5px">Rollen: </p>
                 <!--
+                <p style="margin-right: 5px">Rollen: </p>
                 <q-option-group
                     :options="options"
                     type="checkbox"
-                    v-model="roles.selected_roles"
+                    v-model="group"
                     :val="allRoles"
                 />
                 -->
-                {{updatedRoles}}
-                <div v-for="allRoles in allRoles">
+                <div class="checkbox-container" v-for="role in allRoles">
                     <q-checkbox
-                        :label="allRoles"
+                        :label="role"
                         v-model="updatedRoles.selected_roles"
-                        :val="allRoles"
+                        :val="role"
+                        size="lg"
                     />
                 </div>
                 <p></p>
@@ -122,7 +154,6 @@ export default {
                 size="16px"
                 no-caps rounded label="Abbrechen"
                 color="primary"
-
                 @click=abort >
             </q-btn>
             <q-btn
@@ -139,6 +170,8 @@ export default {
 
 
 <style scoped>
-
+.checkbox-container .q-checkbox {
+    font-size: 20px;
+}
 </style>
 
