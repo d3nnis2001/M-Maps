@@ -6,7 +6,6 @@ import router from "@/main/vue/router";
 import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";
 
 export default {
-    name: "createInspectionOrder",
     components: {StandardInput},
     setup () {
         const $q = useQuasar()
@@ -16,6 +15,7 @@ export default {
         const startTime = ref('2024/01/01')
         const endTime = ref('2024/01/02')
         const department = ref('')
+        const departmentValues = ref([])
         const inspectionData = ref('')
         const inspectionDataValues = ref([])
         const remarks = ref('')
@@ -26,7 +26,9 @@ export default {
 
         onMounted(async () => {
             inspectionDataValues.value.push("Gleislagedaten")
-            inspectionDataValues.value.push("Sonstige Daten")
+
+            departmentValues.value.push("DB Regio Schiene Nord-Ost (NO)")
+            departmentValues.value.push("DB Regio Schiene Süd-West (SW)")
         })
 
         function checkInputs() {
@@ -113,6 +115,7 @@ export default {
             startTime,
             endTime,
             department,
+            departmentValues,
             inspectionData,
             inspectionDataValues,
             remarks,
@@ -176,9 +179,9 @@ export default {
                 </div>
             </div>
             <div class="row extra-mar">
-                <div class="mar-right">
+                <div class="checkListInput">
                     <p style="font-weight: bold;">Fachabteilung</p>
-                    <StandardInput class="" v-model="department" label="Fachabteilung" ></StandardInput>
+                    <q-select class="" outlined v-model="department" :options="departmentValues" label="Fachabteilung" />
                 </div>
                 <div class="checkListInput">
                     <p style="font-weight: bold;">Messdaten</p>
@@ -247,6 +250,7 @@ p {
     width: 100%;
     max-width: 288px;
     margin-bottom: 20px;
+    margin-right: 20px;
 }
 
 .extra-mar {

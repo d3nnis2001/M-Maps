@@ -16,6 +16,7 @@ export default {
         const startTime = ref('')
         const endTime = ref('')
         const department = ref('')
+        const departmentValues = ref([])
         const inspectionData = ref('')
         const inspectionDataValues = ref([])
         const remarks = ref('')
@@ -47,7 +48,9 @@ export default {
                 priorityHigh.value = true;
             }
             inspectionDataValues.value.push("Gleislagedaten")
-            inspectionDataValues.value.push("Sonstige Daten")
+
+            departmentValues.value.push("DB Regio Schiene Nord-Ost (NO)")
+            departmentValues.value.push("DB Regio Schiene Süd-West (SW)")
 
         });
 
@@ -131,6 +134,7 @@ export default {
             startTime,
             endTime,
             department,
+            departmentValues,
             inspectionData,
             inspectionDataValues,
             remarks,
@@ -199,9 +203,9 @@ export default {
             </div>
 
         <div class="row extra-mar">
-            <div class="mar-right">
+            <div class="checkListInput">
                 <p style="font-weight: bold;">Fachabteilung</p>
-                <StandardInput class="" v-model="department" label="Fachabteilung" ></StandardInput>
+                <q-select class="" outlined v-model="department" :options="departmentValues" label="Fachabteilung"></q-select>
             </div>
             <div class="checkListInput">
                 <p style="font-weight: bold;">Messdaten</p>
@@ -269,5 +273,12 @@ p {
 
 .extra-mar {
     margin-bottom: 20px;
+}
+
+.checkListInput {
+    width: 100%;
+    max-width: 288px;
+    margin-bottom: 20px;
+    margin-right: 20px;
 }
 </style>

@@ -3,6 +3,7 @@ import {onMounted, onUnmounted, reactive, ref} from "vue";
 import router from "@/main/vue/router";
 import {deleteInspectionOrder, getDataById, getInspectionOrder, sendNewStatus} from "@/main/vue/api/inspection";
 import {useQuasar} from "quasar";
+import axios from "axios";
 
 
 export default {
@@ -50,6 +51,7 @@ export default {
 
         const userId = ref('');
         const remarks = ref('');
+        const files = ref([])
 
         const fetchData = async () => {
             const response = await getInspectionOrder()
@@ -183,6 +185,47 @@ export default {
                 fetchData();
             }
         });
+        // Foto Upload:
+        function onFileAdded(files) {
+            this.files = files;
+            console.log("onFileAdded");
+        }
+
+        function onFileRemoved(file) {
+            this.files = this.files.filter(f => f !== file);
+            console.log("onFileRemoved");
+        }
+        async function uploadFiles() {
+            let formData = new FormData();
+            console.log("TEST1")
+            formData.append('orderId', currentRow.value.inspectionOrderId);
+            this.files.forEach(file => {
+                formData.append('file', file);
+            });
+            console.log("TEST2")
+            try {
+                let response = await axios.post('/api/images/upload', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+                this.message = `Photo uploaded with ID: ${response.data}`;
+            } catch (error) {
+                this.message = 'Error uploading photo.';
+            }
+        }
+
+        function factory(files) {
+            return files.map(file => {
+                return {
+                    __key: currentRow.value.inspectionOrderId,
+                    name: file.name,
+                    size: file.size,
+                    type: file.type,
+                    __rawFile: file
+                };
+            });
+        }
 
 
         return {
@@ -208,7 +251,11 @@ export default {
             showFurtherInformation,
             showFurtherInformationDialog,
             userId,
-            remarks
+            remarks,
+            onFileAdded,
+            onFileRemoved,
+            uploadFiles,
+            factory
         }
     },
 }
@@ -292,12 +339,22 @@ export default {
         <q-dialog v-model="showPictureUploadDialog">
             <q-card>
                 <q-card-section>
-                    <div class="text-h6">Bestätigung</div>
+                    <div class="text-h6">Bewertung</div>
                 </q-card-section>
                 <q-card-section>
                     Wollen Sie noch Fotos für die Dokumentation hochladen?
                 </q-card-section>
                 <q-card-section>
+                    <q-uploader
+                        url=""
+                        label="Upload your photos"
+                        @added="onFileAdded"
+                        @removed="onFileRemoved"
+                        :factory="factory"
+                    />
+                    <q-btn label="Upload" color="primary" @click="uploadFiles" />
+
+                    <!--
                     <q-uploader
                         field-name="file"
                         style="max-width: 300px"
@@ -308,6 +365,7 @@ export default {
                         @rejected="onRejected"
                         with-credentials
                     />
+                    -->
                     <q-btn flat label="Abbrechen" color="negative" @click="showPictureUploadDialog = false"></q-btn>
                     <q-btn flat label="Prüfauftrag abschließen" color="positive" @click="markFinished"></q-btn>
                 </q-card-section>
