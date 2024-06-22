@@ -1,9 +1,7 @@
 package com.gpse.basis.services;
 
 import com.gpse.basis.domain.UserModel;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.web.context.request.WebRequest;
 
 import java.util.ArrayList;
 

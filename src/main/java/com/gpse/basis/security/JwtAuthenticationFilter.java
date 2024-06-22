@@ -1,6 +1,5 @@
 package com.gpse.basis.security;
 
-import com.gpse.basis.security.SecurityConstants;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.FilterChain;
