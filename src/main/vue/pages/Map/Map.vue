@@ -22,7 +22,6 @@ const markerEnd = ref('')
 const kmStart = ref('')
 const kmEnd = ref('')
 const selectedMarker = ref('')
-let data = ref([])
 let heatData = ref([])
 const toggle_value = ref(false)
 const silver_filter = ref(true)
@@ -41,6 +40,7 @@ const regions = [{label:"BY", value: []},
                 {label:"NO", value: []},
                 {label:"NB", value: []},
                 {label:"N", value: []}]
+
 const BY = ref(false)
 const BW = ref(false)
 const SW = ref(false)
@@ -51,92 +51,6 @@ const NO = ref(false)
 const NB = ref(false)
 const N = ref(false)
 
-watch(BY, onRegionChange)
-watch(BW, onRegionChange)
-watch(SW, onRegionChange)
-watch(H, onRegionChange)
-watch(SO, onRegionChange)
-watch(NRW, onRegionChange)
-watch(NO, onRegionChange)
-watch(NB, onRegionChange)
-watch(N, onRegionChange)
-
-function datapointsFromRegion(region) {
-    for (let i = 0; i < markers.length; i++) {
-        const result = leafletPip.pointInLayer([markers[i].data.longitude, markers[i].data.latitude], geoJsonData.value);
-        if (result > 0) {
-
-        } else  {
-            map.value.removeLayer(markers[i].marker)
-        }
-    }
-}
-
-function onRegionChange() {
-    map.value.removeLayer(geoJsonData.value)
-    var temp = []
-    if(BY.value === true) {
-        temp = temp.concat(regions[0].value)
-        datapointsFromRegion(regions[0].value)
-    }
-    if(BW.value === true) {
-        temp = temp.concat(regions[1].value)
-        datapointsFromRegion(regions[1].value)
-    }
-    if(SW.value === true) {
-        temp = temp.concat(regions[2].value)
-        datapointsFromRegion(regions[2].value)
-    }
-    if(H.value === true) {
-        temp = temp.concat(regions[3].value)
-        datapointsFromRegion(regions[3].value)
-    }
-    if(SO.value === true) {
-        temp = temp.concat(regions[4].value)
-        datapointsFromRegion(regions[4].value)
-    }
-    if(NRW.value === true) {
-        temp = temp.concat(regions[5].value)
-        datapointsFromRegion(regions[5].value)
-    }
-    if(NO.value === true) {
-        temp = temp.concat(regions[6].value)
-        datapointsFromRegion(regions[6].value)
-    }
-
-    if(NB.value === true) {
-        temp = temp.concat(regions[7].value)
-        datapointsFromRegion(regions[7].value)
-    }
-    if(N.value === true) {
-        temp = temp.concat(regions[8].value)
-        datapointsFromRegion(regions[8].value)
-    }
-    geoJsonData.value = L.geoJSON(temp, {
-        style: {
-            color: 'blue',
-            weight: 2,
-            opacity: 0.5,
-            fillOpacity: 0.0,
-        },
-    })
-    geoJsonData.value.addTo(map.value);
-}
-
-/**
- * Region Nord (N): Schleswigwig Holstein und Hamburg
- * Region Niedersachsen (NB): Bremen, Niedersachsen
- * Region Nordost (NO): Berlin, Brandenburg, Mecklenburg Vorpommern
- * Region NRW: NRW
- * Region Südost (SO) : Sachsenanhalt, Sachsen, Thüringen
- * Region Hessen(H) : Hessen
- * Region Südwest(SW): Saarland, Rheinland -Pfalz
- * Region Badenwüttenberg(BW): Badenwüttenberg
- * Region Bayern (BY): Bayern **/
-
-/**
- * Sets map up and gets all GeoData for standard view
- **/
 onMounted(async () => {
     map.value = L.map('map', {
         center: [51.1657, 10.4515],
@@ -192,32 +106,132 @@ onMounted(async () => {
             attribution: '<a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors</a>, Style: <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA 2.0</a> <a href="http://www.openrailwaymap.org/">OpenRailwayMap</a> and OpenStreetMap',
             tileSize: 256
         }).addTo(map.value);
-    data = await getGeoData();
-    setGeoData()
+    const data = await getGeoData();
+    await setGeoData(data)
 });
-// Von https://stackoverflow.com/questions/31790344/determine-if-a-point-reside-inside-a-leaflet-polygon
-function isMarkerInsidePolygon(marker, poly) {
-    var inside = false;
-    var x = marker.getLatLng().lat, y = marker.getLatLng().lng;
-    for (var ii=0;ii<poly.getLatLngs().length;ii++){
-        var polyPoints = poly.getLatLngs()[ii];
-        for (var i = 0, j = polyPoints.length - 1; i < polyPoints.length; j = i++) {
-            var xi = polyPoints[i].lat, yi = polyPoints[i].lng;
-            var xj = polyPoints[j].lat, yj = polyPoints[j].lng;
 
-            var intersect = ((yi > y) != (yj > y))
-                && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
-            if (intersect) inside = !inside;
+
+// -------------------------- REGIONS --------------------------
+
+/**
+ * Region Nord (N): Schleswigwig Holstein und Hamburg
+ * Region Niedersachsen (NB): Bremen, Niedersachsen
+ * Region Nordost (NO): Berlin, Brandenburg, Mecklenburg Vorpommern
+ * Region NRW: NRW
+ * Region Südost (SO) : Sachsenanhalt, Sachsen, Thüringen
+ * Region Hessen(H) : Hessen
+ * Region Südwest(SW): Saarland, Rheinland -Pfalz
+ * Region Badenwüttenberg(BW): Badenwüttenberg
+ * Region Bayern (BY): Bayern **/
+
+/**
+ * Sets map up and gets all GeoData for standard view
+ **/
+
+watch(BY, onRegionChange)
+watch(BW, onRegionChange)
+watch(SW, onRegionChange)
+watch(H, onRegionChange)
+watch(SO, onRegionChange)
+watch(NRW, onRegionChange)
+watch(NO, onRegionChange)
+watch(NB, onRegionChange)
+watch(N, onRegionChange)
+
+function datapointsFromRegion(region) {
+    for (let i = 0; i < markers.length; i++) {
+        var result = false;
+        for(let j = 0; j < region.value.length; j++) {
+            result = result || isMarkerInsidePolygon(markers[i], region.value[j])
+        }
+        console.log(result)
+        if(result) {
+            markers[i].marker.setStyle({opacity: 1, fillOpacity: 1})
+        }
+        else {
+            markers[i].marker.setStyle({opacity: 0, fillOpacity: 0})
         }
     }
+}
 
+function onRegionChange() {
+
+    map.value.removeLayer(geoJsonData.value)
+    var temp = []
+    if(BY.value === true) {
+        temp = temp.concat(regions[0].value)
+        datapointsFromRegion(regions[0])
+    }
+    if(BW.value === true) {
+        temp = temp.concat(regions[1].value)
+        datapointsFromRegion(regions[1])
+    }
+    if(SW.value === true) {
+        temp = temp.concat(regions[2].value)
+        datapointsFromRegion(regions[2])
+    }
+    if(H.value === true) {
+        temp = temp.concat(regions[3].value)
+        datapointsFromRegion(regions[3])
+    }
+    if(SO.value === true) {
+        temp = temp.concat(regions[4].value)
+        datapointsFromRegion(regions[4])
+    }
+    if(NRW.value === true) {
+        temp = temp.concat(regions[5].value)
+        datapointsFromRegion(regions[5])
+    }
+    if(NO.value === true) {
+        temp = temp.concat(regions[6].value)
+        datapointsFromRegion(regions[6])
+    }
+
+    if(NB.value === true) {
+        temp = temp.concat(regions[7].value)
+        datapointsFromRegion(regions[7])
+    }
+    if(N.value === true) {
+        temp = temp.concat(regions[8].value)
+        datapointsFromRegion(regions[8])
+    }
+    geoJsonData.value = L.geoJSON(temp, {
+        style: {
+            color: 'blue',
+            weight: 2,
+            opacity: 0.5,
+            fillOpacity: 0.0,
+        },
+    })
+    geoJsonData.value.addTo(map.value);
+}
+
+
+// Von https://stackoverflow.com/questions/31790344/determine-if-a-point-reside-inside-a-leaflet-polygon
+function isMarkerInsidePolygon(marker, poly) {
+    var polyPoints = [];
+    for (var i = 0; i < poly.geometry.coordinates.length; i++) {
+        polyPoints = polyPoints.concat(poly.geometry.coordinates[i][0]);
+    }
+
+    var x = marker.marker.getLatLng().lat, y = marker.marker.getLatLng().lng;
+    var inside = false;
+    for (var i = 0, j = polyPoints.length - 1; i < polyPoints.length; j = i++) {
+        var xi = polyPoints[i][1], yi = polyPoints[i][0]; // [lng, lat]
+        var xj = polyPoints[j][1], yj = polyPoints[j][0]; // [lng, lat]
+
+        var intersect = ((yi > y) != (yj > y))
+            && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+        if (intersect) inside = !inside;
+    }
     return inside;
-};
+}
+
 
 
 // --------------------- SET DATA ----------------------
 
-async function setGeoData() {
+async function setGeoData(data) {
     markers.forEach((m) => map.value.removeLayer(m.marker));
     data.forEach((m) => markers.push({
         marker : L.circle([m.longitude, m.latitude], {color: "black", radius: 50}),
@@ -230,53 +244,42 @@ async function setGeoData() {
 }
 
 async function setPartGeoData(trackID) {
-    markers.forEach((m) => map.value.removeLayer(m.marker));
-    markers = []
-    var minlat = 180, maxlat = -180, minlong = 180, maxlong = -180
-    data.forEach((m) => {
-        if (String(m.strecken_id) === String(trackID)) {
-            markers.push({marker: L.circle([m.longitude, m.latitude], {color: "black", radius: 50}), data: m})
-            console.log(m)
-            if(m.latitude < minlat)
-                minlat = m.latitude
-            if(m.latitude > maxlat)
-                maxlat = m.latitude
-            if(m.longitude < minlong)
-                minlong = m.longitude
-            if(m.longitude > maxlong)
-                maxlong = m.longitude
+    var minlat = 180, maxlat = -180, minlong = 180, maxlong = -180, counter = 0
+    markers.forEach((m) => {
+        if (String(m.data.strecken_id) === String(trackID)) {
+            counter++
+            if(m.data.latitude < minlat)
+                minlat = m.data.latitude
+            if(m.data.latitude > maxlat)
+                maxlat = m.data.latitude
+            if(m.data.longitude < minlong)
+                minlong = m.data.longitude
+            if(m.data.longitude > maxlong)
+                maxlong = m.data.longitude
+            m.marker.setStyle({opacity: 1, fillOpacity: 1})
+        }
+        else {
+            m.marker.setStyle({opacity: 0, fillOpacity: 0})
         }
     });
-    markers.forEach((m) => {
-        m.marker.addTo(map.value);
-        m.marker.on('click', onMarkerClicked);
-    });
-    var lat = L.latLng(minlong, minlat)
-    var lon = L.latLng(maxlong, maxlat)
-    console.log(minlat)
-    console.log(minlong)
-    console.log(maxlat)
-    console.log(maxlong)
-    var bounds = L.latLngBounds(lat, lon);
-    map.value.fitBounds(bounds)
+    if(counter > 0) {
+        var lat = L.latLng(minlong, minlat)
+        var lon = L.latLng(maxlong, maxlat)
+        var bounds = L.latLngBounds(lat, lon);
+        map.value.fitBounds(bounds)
+    }
 }
 
 async function setPartGeoDataKm(km_start, km_end) {
-    markers.forEach((m) => map.value.removeLayer(m.marker));
-    markers = []
     if (km_start > km_end) {
         let temp = km_start
         km_start = km_end
         km_end = temp
     }
-    data.forEach((m) => {
-        if (m.track_km >= km_start && m.track_km <= km_end) {
-            markers.push({marker: L.circle([m.longitude, m.latitude], {color: "black", radius: 50}), data: m})
-        }
-    });
     markers.forEach((m) => {
-        m.marker.addTo(map.value);
-        m.marker.on('click', onMarkerClicked);
+        if (!(m.data.track_km >= km_start && m.data.track_km <= km_end)) {
+            m.marker.setStyle({opacity: 0, fillOpacity: 0})
+        }
     });
 }
 
@@ -286,7 +289,6 @@ const onMarkerClicked = async (event) => {
 
         return m.data.longitude === circle.getLatLng().lat && m.data.latitude === circle.getLatLng().lng;
     });
-    console.log(marker.data)
     selectedMarker.value = marker
     dialogVisible.value = true;
     information.value = []
@@ -316,7 +318,69 @@ async function displayInformation(info) {
     information.value = output
  }
 
-// ---------------------------- On Changes ------------------------------
+// ---------------------------- Filter -----------------------------------
+
+const setValueStreckenID = async () => {
+    if (streckenID.value === "") {
+        $q.notify({
+            type: 'negative',
+            message: "Please enter a Track ID",
+            caption: 'Choose please'
+        });
+    } else {
+        setPartGeoData(streckenID.value)
+        if (markers.length === 0) {
+            $q.notify({
+                type: 'negative',
+                message: "Track ID doesn't exist",
+                caption: 'Please choose a different Track ID'
+            });
+        }
+    }
+};
+
+async function zoomToCity(cityName) {
+    try {
+        var url = `https://nominatim.openstreetmap.org/search?format=json&q=${cityName}`;
+
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.length > 0) {
+            var city = data[0];
+            var lat = city.lat;
+            var lon = city.lon;
+            map.value.setView([lat, lon], 10);
+        } else {
+            console.log('City not found');
+            if (window.cityBoundaryLayer) {
+                map.value.removeLayer(window.cityBoundaryLayer);
+            }
+            return;
+        }
+
+        const boundaryResponse = await fetch(`https://nominatim.openstreetmap.org/search.php?q=${cityName}&polygon_geojson=1&format=json`);
+        const boundaryData = await boundaryResponse.json();
+
+        if (boundaryData.length > 0) {
+            const cityBoundaries = boundaryData[0].geojson;
+
+            if (window.cityBoundaryLayer) {
+                map.value.removeLayer(window.cityBoundaryLayer);
+            }
+
+            window.cityBoundaryLayer = L.geoJSON(cityBoundaries).addTo(map.value);
+        } else {
+            console.log('City boundaries not found');
+        }
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        console.log('Error fetching data');
+    }
+}
+
+// ---------------------------- HEATMAP ----------------------------------
+
 
 const onChange = (newValue, oldValue) => {
     if (newValue === true) {
@@ -398,52 +462,6 @@ watch(green_filter, onChangeGreen);
 watch(orange_filter, onChangeOrange);
 watch(red_filter, onChangeRed);
 
-
-// ---------------------------- Filter -----------------------------------
-
-async function zoomToCity(cityName) {
-    try {
-        var url = `https://nominatim.openstreetmap.org/search?format=json&q=${cityName}`;
-
-        const response = await fetch(url);
-        const data = await response.json();
-
-        if (data.length > 0) {
-            var city = data[0];
-            var lat = city.lat;
-            var lon = city.lon;
-            map.value.setView([lat, lon], 10);
-        } else {
-            console.log('City not found');
-            if (window.cityBoundaryLayer) {
-                map.value.removeLayer(window.cityBoundaryLayer);
-            }
-            return;
-        }
-
-        const boundaryResponse = await fetch(`https://nominatim.openstreetmap.org/search.php?q=${cityName}&polygon_geojson=1&format=json`);
-        const boundaryData = await boundaryResponse.json();
-
-        if (boundaryData.length > 0) {
-            const cityBoundaries = boundaryData[0].geojson;
-
-            if (window.cityBoundaryLayer) {
-                map.value.removeLayer(window.cityBoundaryLayer);
-            }
-
-            window.cityBoundaryLayer = L.geoJSON(cityBoundaries).addTo(map.value);
-        } else {
-            console.log('City boundaries not found');
-        }
-    } catch (error) {
-        console.error('Error fetching data:', error);
-        console.log('Error fetching data');
-    }
-}
-
-// ---------------------------- HEATMAP ----------------------------------
-
-
 function getLatLng(geopoint) {
     for (let i = 0;i<data.length;i++) {
         if (data[i].id === geopoint) {
@@ -469,26 +487,6 @@ function getAllGeoPointsWithColor(dataPoint) {
     }
     return output
 }
-
-
-const setValueStreckenID = async () => {
-    if (streckenID.value === "") {
-        $q.notify({
-            type: 'negative',
-            message: "Please enter a Track ID",
-            caption: 'Choose please'
-        });
-    } else {
-        setPartGeoData(streckenID.value)
-        if (markers.length === 0) {
-            $q.notify({
-                type: 'negative',
-                message: "Track ID doesn't exist",
-                caption: 'Please choose a different Track ID'
-            });
-        }
-    }
-};
 
 async function getAllHeatDataColor(color) {
     var colors = getAllGeoPointsWithColor(heatData)
