@@ -7,7 +7,6 @@ import com.gpse.basis.repositories.DataSetRepository;
 import com.gpse.basis.repositories.GeoTrackData;
 import com.gpse.basis.repositories.GleisLageDatenRepository;
 import com.gpse.basis.repositories.GleisVDataRepository;
-import org.apache.avro.util.MapEntry;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.parquet.hadoop.ParquetReader;
@@ -22,7 +21,6 @@ import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 
 import java.io.*;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -37,7 +35,6 @@ public class FileServiceImpl implements FileService {
 
     private final DataSetRepository datasetRepro;
 
-    private final GleisLageDatenRepository glDatenRepro;
 
     private final GeoTrackData geoTrack;
 
@@ -49,9 +46,9 @@ public class FileServiceImpl implements FileService {
 
     Lock lock = new ReentrantLock();
     @Autowired
-    FileServiceImpl(DataSetRepository repro, GleisLageDatenRepository rpr, GeoTrackData gt, MongoTemplate tmp, GleisVDataRepository rprr, DataService dstr) {
+    FileServiceImpl(DataSetRepository repro, GeoTrackData gt,
+                    MongoTemplate tmp, GleisVDataRepository rprr, DataService dstr) {
         datasetRepro = repro;
-        glDatenRepro = rpr;
         geoTrack = gt;
         template = tmp;
         gleisV = rprr;
@@ -75,7 +72,7 @@ public class FileServiceImpl implements FileService {
                 try {
                     saveLHHFile(file);
                 } catch (IndexOutOfBoundsException | IOException e) {
-                    rsp.add(new FileUploadResponse(file.getName(), false, "Fehlerhafte Datei!"));
+                    rsp.add(new FileUploadResponse(file.getName(), false, "Fehlerhafte Datei!!"));
                 }
                 rsp.add(new FileUploadResponse(file.getName(), true, ""));
                 continue;
@@ -86,14 +83,14 @@ public class FileServiceImpl implements FileService {
                     saveCsvFile(file);
                 } catch(Exception e) {
                     System.out.println(e.getMessage());
-                    rsp.add(new FileUploadResponse(file.getName(), false, "Fehlerhafte Datei!"));
+                    rsp.add(new FileUploadResponse(file.getName(), false, "Fehlerhafte Datei!!!"));
                 }
                 rsp.add(new FileUploadResponse(file.getName(), true, ""));
                 continue;
             }
 
             if(!checkFileName(file.getName())) {
-                if(Objects.equals(streckenId, "missing")) {
+                if(Objects.equals(streckenId, "missing!")) {
                     rsp.add(new FileUploadResponse(file.getName(), false, "Missing Track_ID"));
                 }
                 else {
@@ -106,11 +103,11 @@ public class FileServiceImpl implements FileService {
 
                     } catch(IndexOutOfBoundsException e) {
                         System.out.println(e.getMessage());
-                        rsp.add(new FileUploadResponse(file.getName(), false, "Fehlerhafte Parquet-Format"));
+                        rsp.add(new FileUploadResponse(file.getName(), false, "Fehlerhafte Parquet-Format!"));
                         continue;
                     } catch (IOException | RuntimeException e) {
                         System.out.println(e.getMessage());
-                        rsp.add(new FileUploadResponse(file.getName(), false, "Fehlerhafte Datei!"));
+                        rsp.add(new FileUploadResponse(file.getName(), false, "Fehlerhafte Datei"));
                         continue;
                     }
                     rsp.add(new FileUploadResponse(file.getName(), true, ""));
@@ -118,8 +115,9 @@ public class FileServiceImpl implements FileService {
             }
             else {
                 try {
-                    String str = saveFile(file, Objects.equals(streckenId, "missing") ? extractStreckeId(file.getName()) : Integer.parseInt(streckenId));
-                    if(str != null) {
+                    String str = saveFile(file, Objects.equals(streckenId, "missing")
+                        ? extractStreckeId(file.getName()) : Integer.parseInt(streckenId));
+                    if (str != null) {
                         rsp.add(new FileUploadResponse(file.getName(), false, str));
                         continue;
                     }
@@ -142,21 +140,24 @@ public class FileServiceImpl implements FileService {
         BufferedReader reader = new BufferedReader(new FileReader(file));
         //read header and skip
         String line = reader.readLine();
+        String zeichen = "\\+";
+        String comma = ",";
+        String dot = ".";
         while((line = reader.readLine()) != null){
             String[] columns = line.split(";");
-            String[] von = columns[2].split("\\+");
+            String[] von = columns[2].split(zeichen);
             von[0] = von[0].trim();
             von[1] = von[1].trim();
-            String[] bis = columns[3].split("\\+");
+            String[] bis = columns[3].split(zeichen);
             bis[0] = bis[0].trim();
             bis[1] = bis[1].trim();
             lst.add(new GleisVData(
                 Integer.parseInt(columns[0]),
                 Integer.parseInt(columns[1]),
-                Double.parseDouble(von[0].replace(",",".")),
-                Double.parseDouble((von[1].replace(",", "."))),
-                Double.parseDouble((bis[0].replace(",", "."))),
-                Double.parseDouble((bis[1].replace("," , "."))),
+                Double.parseDouble(von[0].replace(comma, dot)),
+                Double.parseDouble((von[1].replace(comma, dot))),
+                Double.parseDouble((bis[0].replace(comma, dot))),
+                Double.parseDouble((bis[1].replace(comma, dot))),
                 Integer.parseInt(columns[4]),
                 Integer.parseInt(columns[5]),
                 columns[6]
@@ -228,7 +229,6 @@ public class FileServiceImpl implements FileService {
                 lst.add(new GleisLageDatenpunkt((Double) values.get(0), (Double) values.get(1), (Double) values.get(2), (Double) values.get(3), (Double) values.get(4), st.getId(), null, -1));
                 row = reader.read();
             }
-            //glDatenRepro.saveAll(lst);
             System.out.println(lst.size());
             int no_threads = 30;
             int sts = lst.size() / no_threads;
@@ -274,8 +274,8 @@ public class FileServiceImpl implements FileService {
             return null;
     }
 
-    private class Thr implements Runnable {
-        int batchSize = 40000;
+    private static class Thr implements Runnable {
+        final int batchSize = 40000;
 
         private final List<GleisLageDatenpunkt> lst;
 
@@ -336,10 +336,9 @@ public class FileServiceImpl implements FileService {
     public List<DataSet> getDataSets(String searchString) {
         List<DataSet> s = new ArrayList<>();
         datasetRepro.findAll().forEach(s::add);
-        if(searchString.toLowerCase().equals("all")) {
+        if (searchString.toLowerCase().equals("all")) {
             return s;
-        }
-        else{
+        } else {
             return s.stream().filter(xt -> xt.getId().contains(searchString)).collect(toList());
         }
     }

@@ -4,17 +4,13 @@ import com.gpse.basis.domain.Checklist;
 import com.gpse.basis.domain.ReparaturChecklist;
 import com.gpse.basis.repositories.ChecklistRepository;
 import com.gpse.basis.repositories.RepChecklistRepository;
-import org.apache.kerby.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.Iterator;
 
 @Service
@@ -27,7 +23,7 @@ public class ChecklistServiceImpl implements ChecklistService {
         this.repcheckRepo = repcheckRepo;
     }
     public ArrayList<String> getAllNames() {
-        ArrayList <String> arr = new ArrayList<>();
+        ArrayList<String> arr = new ArrayList<>();
         Iterable it = checkRepo.findAll();
         Iterator<Checklist> iterator = it.iterator();
         while (iterator.hasNext()) {
@@ -42,7 +38,7 @@ public class ChecklistServiceImpl implements ChecklistService {
     }
     public ReparaturChecklist loadRepCheckById(final String id) {
         return repcheckRepo.findById(id)
-            .orElseThrow(() -> new UsernameNotFoundException("Repair Checklist not found"));
+            .orElseThrow(() -> new UsernameNotFoundException("Repair Checklist not found!"));
     }
     public Boolean changeRepChecklist(final String id, String[]arr) {
         ReparaturChecklist rep1 = repcheckRepo.findById(id)
