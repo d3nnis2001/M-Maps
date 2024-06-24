@@ -4,6 +4,7 @@ import com.gpse.basis.domain.InspectionOrder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public interface InspectionServices {
 
@@ -17,4 +18,9 @@ public interface InspectionServices {
     ArrayList<InspectionOrder> getInspecData();
     InspectionOrder loadInspecById(String inspectionOrderId) throws UsernameNotFoundException;
 
+    List<InspectionOrder> getArchivedInspectionOrders();
+
+    void unarchiveInspectionOrder(String id);
+
+    void deleteArchivedInspectionOrder(String id);
 }

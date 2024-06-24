@@ -17,6 +17,7 @@ public class Reparatur {
     private String status;
     private String freigabeberechtigter;
     private GeoCords geocords;
+    private boolean archived = false;
 
     public Reparatur(String id, int track, LocalDate from, LocalDate till, ReparaturChecklist checklist, String remarks, String status, String freigabeberechtigter, GeoCords geocords) {
         this.id = id;
@@ -95,5 +96,13 @@ public class Reparatur {
     }
     public void setGeocords(GeoCords geocords) {
         this.geocords = geocords;
+    }
+
+    public boolean isArchived() {
+        return archived;
+    }
+
+    public void setArchived(boolean archived) {
+        this.archived = archived;
     }
 }

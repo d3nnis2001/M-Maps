@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public interface ReparaturService {
     ArrayList<Reparatur> getRepData();
@@ -17,4 +18,11 @@ public interface ReparaturService {
     Boolean changeStatus(String name, String newStatus);
 
     Boolean deleteOrder(String name);
+
+    List<Reparatur> getArchivedRep();
+
+    void unarchiveRep(String id);
+
+    void deleteArchivedRep(String id);
+
 }

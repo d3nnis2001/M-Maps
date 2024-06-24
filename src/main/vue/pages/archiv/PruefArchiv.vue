@@ -1,13 +1,13 @@
 <script setup>
 
 import {onMounted, onUnmounted, ref} from "vue";
-import {getArchivedPruef, undoPruef} from "@/main/vue/api/archiv";
+import {deletePruef, getArchivedPruef, undoPruef} from "@/main/vue/api/archiv";
 
 const smallScreen = ref(false)
 const largeScreen = ref(false)
 const showDialog = ref(false)
 var selectedRow = null
-const rows = ref("")
+const rows = ref([])
 
 onMounted(async () => {
     rows.value = await getArchivedPruef();
@@ -31,34 +31,33 @@ const onRowClick = (row) => {
 }
 
 const showColumn = (columnName) => {
-    // Check if the column should be shown based on the visibleColumns array
     return this.visibleColumns.includes(columnName);
 }
 
 const undo = async () => {
-    await undoPruef(selectedRow.name)
+    await undoPruef(selectedRow.inspectionOrderId)
     rows.value = await getArchivedPruef();
+}
+
+const deleteInsp = async () => {
+    await deletePruef(selectedRow.inspectionOrderId)
+    rows.value = await getArchivedPruef()
 }
 
 const visibleColumns = ["id", "start", "destination"]
 
-const columns = [
-    { name: 'id', required: true, label: 'ID', align: 'left', field: row => row.name, format: val => `${val}`, sortable: true },
-    { name: 'start', label: 'Startort', align: 'left', field: 'start', sortable: true },
-    { name: 'destination', label: 'Zielort', align: 'left', field: 'ziel', sortable: true },
-    { name: 'timeStart', label: 'von', align: 'left', field: 'von' },
-    { name: 'timeDestination', label: 'bis', align: 'left', field: 'bis' },
-    { name: 'data', label: 'Messdaten', align: 'left', field: 'data' },
-    { name: 'department', label: 'Fachabteilung', align: 'left', field: 'abteilung' },
+const columns =  [
+    { name: 'inspectionOrderId', required: true, label: 'ID', align: 'left', field: row => row.inspectionOrderId, format: val => `${val}`, sortable: true },
+    { name: 'courseId', label: 'StreckenId', align: 'left', field: 'courseId', sortable: true },
+    { name: 'startLocation', label: 'Startort', align: 'left', field: 'startLocation', sortable: true },
+    { name: 'endLocation', label: 'Zielort', align: 'left', field: 'endLocation', sortable: true },
+    { name: 'startTime', label: 'von', align: 'left', field: 'startTime' },
+    { name: 'endTime', label: 'bis', align: 'left', field: 'endTime' },
+    { name: 'inspectionData', label: 'Messdaten', align: 'left', field: 'inspectionData' },
+    { name: 'department', label: 'Fachabteilung', align: 'left', field: 'department' },
     { name: 'status', label: 'Status', align: 'left', field: 'status' },
 ]
-/*
-const rows = [
-    { name: 'Prüfauftrag 1', start: 'Bielefeld', ziel: 'Hannover', von: '07-04-2024', bis: '08-04-2024', abteilung: ' ', status: "storniert" },
-    { name: 'Prüfauftrag 2', start: 'Bielefeld', ziel: 'Berlin', von: '10-05-2023', bis: '12-05-2023', abteilung: ' ', status: "storniert"  },
-    { name: 'Prüfauftrag 3', start: 'Bielefeld', ziel: 'Berlin', von: '10-05-2023', bis: '12-05-2023', abteilung: ' ', status: "storniert"  },
-]
-*/
+
 </script>
 
 <template>
@@ -66,21 +65,38 @@ const rows = [
         <q-dialog
             v-model="showDialog"
         >
-            <q-card style="width: 300px">
-                <q-card-section>
-                    <div class="centered-section ">
-                        <q-icon name="unarchive" size="xl"></q-icon>
+            <q-card flat square bordered>
+                <div class="row">
+                    Prüfauftrag: {{selectedRow.inspectionOrderId}}
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <q-btn
+                            style="align-items: end; justify-content: end"
+                            flat
+                            no-caps
+                            @click="undo"
+                            label=""
+                            color="primary"
+                            v-close-popup
+                        >
+                            <q-icon name="undo" style="margin-left: 8px;" />
+                        </q-btn>
                     </div>
-                    <div class="text-section">
-                        Archivieren von {{selectedRow.name}}  rückgängig machen?
+                    <div class="col-6">
+                        <q-btn
+                            style="align-items: end; justify-content: end"
+                            flat
+                            no-caps
+                            @click="deleteInsp"
+                            label=""
+                            color="primary"
+                            v-close-popup
+                        >
+                            <q-icon name="delete" style="margin-left: 8px;" />
+                        </q-btn>
                     </div>
-                </q-card-section>
-
-                <q-separator />
-
-                <q-card-actions vertical>
-                    <q-btn flat @click="undo">Ja</q-btn>
-                </q-card-actions>
+                </div>
             </q-card>
         </q-dialog>
 
@@ -89,32 +105,35 @@ const rows = [
             class="my-sticky-header-table"
             flat bordered
             title="Prüfaufträge"
-            :rows="rows.value"
+            :rows="rows"
             :columns="columns"
             row-key="id"
         >
             <template v-slot:body="props">
                 <q-tr :props="props" @click="onRowClick(props.row)">
-                    <q-td key="id" :props="props">
-                        {{ props.row.name }}
+                    <q-td key="inspectionOrderId" :props="props">
+                        {{ props.row.inspectionOrderId }}
                     </q-td>
-                    <q-td key="start" :props="props">
-                        {{ props.row.start }}
+                    <q-td key="courseId" :props="props">
+                        {{ props.row.courseId }}
                     </q-td>
-                    <q-td key="destination" :props="props">
-                        {{ props.row.ziel }}
+                    <q-td key="startLocation" :props="props">
+                        {{ props.row.startLocation }}
                     </q-td>
-                    <q-td key="timeStart" :props="props">
-                        {{ props.row.von }}
+                    <q-td key="endLocation" :props="props">
+                        {{ props.row.endLocation }}
                     </q-td>
-                    <q-td key="timeDestination" :props="props">
-                        {{ props.row.bis }}
+                    <q-td key="startTime" :props="props">
+                        {{ props.row.startTime }}
                     </q-td>
-                    <q-td key="data" :props="props">
-                        {{ props.row.data }}
+                    <q-td key="endTime" :props="props">
+                        {{ props.row.endTime }}
+                    </q-td>
+                    <q-td key="inspectionData" :props="props">
+                        {{ props.row.inspectionData }}
                     </q-td>
                     <q-td key="department" :props="props">
-                        {{ props.row.abteilung }}
+                        {{ props.row.department }}
                     </q-td>
                     <q-td key="status" :props="props">
                         {{ props.row.status }}
@@ -129,7 +148,7 @@ const rows = [
             grid
             grid-header
             title="Prüfaufträge"
-            :rows="rows.value"
+            :rows="rows"
             :columns="columns"
             row-key="id"
             hide-header

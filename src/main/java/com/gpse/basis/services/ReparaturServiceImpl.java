@@ -4,6 +4,9 @@ import com.gpse.basis.domain.*;
 import com.gpse.basis.repositories.RepChecklistRepository;
 import com.gpse.basis.repositories.ReperaturRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -11,16 +14,20 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 @Service
 
 public class ReparaturServiceImpl implements ReparaturService {
     private ReperaturRepository rep;
     private RepChecklistRepository checkRepo;
+
+    private MongoTemplate template;
     @Autowired
-    public ReparaturServiceImpl(ReperaturRepository rep, RepChecklistRepository checkRepo) {
+    public ReparaturServiceImpl(ReperaturRepository rep, RepChecklistRepository checkRepo, MongoTemplate template) {
         this.rep = rep;
         this.checkRepo = checkRepo;
+        this.template = template;
     }
 
     public ArrayList<Reparatur> getRepData() {
@@ -29,7 +36,8 @@ public class ReparaturServiceImpl implements ReparaturService {
         Iterator<Reparatur> iterator = it.iterator();
         while (iterator.hasNext()) {
             Reparatur repSolo = iterator.next();
-            repArr.add(repSolo);
+            if(!repSolo.isArchived())
+                repArr.add(repSolo);
         }
         return repArr;
     }
@@ -67,4 +75,30 @@ public class ReparaturServiceImpl implements ReparaturService {
             return false;
         }
     }
+
+    @Override
+    public List<Reparatur> getArchivedRep() {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("archived").is(true));
+        return template.find(query, Reparatur.class);
+    }
+
+    @Override
+    public void unarchiveRep(String id) {
+        var rep = template.findById(id, Reparatur.class);
+        if(rep != null) {
+            rep.setArchived(false);
+            Query q = new Query();
+            q.addCriteria(Criteria.where("_id").is(id));
+            template.replace(q, rep);
+        }
+    }
+
+    @Override
+    public void deleteArchivedRep(String id) {
+        Query q = new Query();
+        q.addCriteria(Criteria.where("_id").is(id));
+        template.remove(q, Reparatur.class);
+    }
+
 }

@@ -4,19 +4,26 @@ import com.gpse.basis.domain.InspectionOrder;
 import com.gpse.basis.domain.Reparatur;
 import com.gpse.basis.repositories.InspectionOrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 @Service
 public class InspectionServicesImpl implements InspectionServices {
 
     private InspectionOrderRepository inspec;
+
+    private MongoTemplate template;
     @Autowired
-    public InspectionServicesImpl(InspectionOrderRepository inspec) {
+    public InspectionServicesImpl(InspectionOrderRepository inspec, MongoTemplate template) {
         this.inspec = inspec;
+        this.template = template;
     }
 
     @Override
@@ -89,4 +96,31 @@ public class InspectionServicesImpl implements InspectionServices {
         return inspec.findById(inspectionOrderId).orElseThrow(()
             -> new UsernameNotFoundException("Inspection Order Id " + inspectionOrderId + " not found."));
     }
+
+    @Override
+    public List<InspectionOrder> getArchivedInspectionOrders() {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("archived").is(true));
+        return template.find(query, InspectionOrder.class);
+    }
+
+    @Override
+    public void unarchiveInspectionOrder(String id) {
+        var insp = template.findById(id, InspectionOrder.class);
+        if(insp != null) {
+            insp.setArchived(false);
+            Query q = new Query();
+            q.addCriteria(Criteria.where("inspectionOrderId").is(id));
+            template.replace(q, insp);
+        }
+    }
+
+    @Override
+    public void deleteArchivedInspectionOrder(String id) {
+        Query q = new Query();
+        q.addCriteria(Criteria.where("inspectionOrderId").is(id));
+        template.remove(q, InspectionOrder.class);
+    }
+
+
 }
