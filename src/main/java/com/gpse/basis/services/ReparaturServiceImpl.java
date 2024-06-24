@@ -7,17 +7,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
-import java.util.Random;
 
 @Service
 
 public class ReparaturServiceImpl implements ReparaturService {
-    private ReperaturRepository rep;
-    private RepChecklistRepository checkRepo;
+    private final ReperaturRepository rep;
+    private final RepChecklistRepository checkRepo;
     @Autowired
     public ReparaturServiceImpl(ReperaturRepository rep, RepChecklistRepository checkRepo) {
         this.rep = rep;
@@ -34,13 +32,13 @@ public class ReparaturServiceImpl implements ReparaturService {
         }
         return repArr;
     }
-    public boolean addRepairOrder(int track, Date date1,
-                           Date date2, String authorized, Checklist checklist, String remarks) {
+    public boolean addRepairOrder(int track, LocalDate date1,
+                           LocalDate date2, String authorized, Checklist checklist, String remarks, GeoCords geo) {
         Utils util = new Utils();
         String uniqueID = util.generateID();
         ArrayList<String> selected = new ArrayList<>();
         ReparaturChecklist check = new ReparaturChecklist(uniqueID, checklist, selected);
-        Reparatur newRep = new Reparatur(uniqueID, track, date1, date2, check, remarks, "beauftragt", authorized);
+        Reparatur newRep = new Reparatur(uniqueID, track, date1, date2, check, remarks, "beauftragt", authorized, geo);
         rep.save(newRep);
         checkRepo.save(check);
         return true;

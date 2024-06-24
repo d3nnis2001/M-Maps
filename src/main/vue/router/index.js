@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import {createRouter, createWebHistory} from 'vue-router'
 
 import StartView from '../pages/Start.vue'
 import MapView from '../pages/Map/Map.vue'
@@ -9,14 +9,19 @@ import Password from "../pages/Login/Password.vue";
 import ForgotPassword from "../pages/Login/ForgotPassword.vue";
 import ResetPassword from "../pages/Login/ResetPassword.vue";
 import Start from "../pages/Start.vue";
+import Archiv from "@/main/vue/pages/archiv/Archiv.vue";
+import InspectionOrderOverview from "@/main/vue/pages/Pruefauftrag/InspectionOrderOverview.vue";
+import CreateInspectionOrder from "../pages/Pruefauftrag/CreateInspectionOrder.vue";
+import EditInspectionOrder from "../pages/Pruefauftrag/EditInspectionOrder.vue";
 import ReparaturOverview from "@/main/vue/pages/ReparaturAufträge/ReparaturOverview.vue";
 import ReparaturCreate from "@/main/vue/pages/ReparaturAufträge/ReparaturCreate.vue";
 import ReparaturEdit from "@/main/vue/pages/ReparaturAufträge/ReparaturEdit.vue";
 import AdminMain from "@/main/vue/pages/Nutzerverwaltung/AdminMain.vue";
+import EditUser from "@/main/vue/pages/Nutzerverwaltung/EditUser.vue";
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
+    history: createWebHistory(import.meta.env.BASE_URL),
+    routes: [
         {
             path: '/',
             name: 'start',
@@ -31,6 +36,11 @@ const router = createRouter({
             path: '/dataimport',
             name: 'dataimport',
             component: DataImport
+        },
+        {
+          path: '/archiv',
+          name: 'archiv',
+          component: Archiv
         },
         {
             path: "/",
@@ -83,10 +93,30 @@ const router = createRouter({
             component: AdminMain
         },
         {
+            path: "/admin/:username/editUser",
+            name: "editUser",
+            component: EditUser
+        },
+        {
+            path: "/inspectionOrder",
+            name: "inspectionOrderOverview",
+            component: InspectionOrderOverview
+        },
+        {
+            path: "/inspectionOrder/create",
+            name: "createInspectionOrder",
+            component: CreateInspectionOrder
+        },
+        {
+            path: "/inspectionOrder/:inspectionOrderId/edit",
+            name: "editInspectionOrder",
+            component: EditInspectionOrder
+        },
+        {
             path: "/impressum",
             name: "impressum",
         }
-  ]
+    ]
 })
 
 router.beforeEach((to) => {

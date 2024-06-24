@@ -1,25 +1,25 @@
 package com.gpse.basis.web;
 
 import com.gpse.basis.domain.Checklist;
+import com.gpse.basis.domain.GeoCords;
 import com.gpse.basis.domain.Reparatur;
-import com.gpse.basis.domain.Utils;
 import com.gpse.basis.services.ChecklistService;
 import com.gpse.basis.services.ReparaturService;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 
 @RestController
 @RequestMapping("/api/repair")
 public class ReparaturController {
     private ReparaturService service;
     private ChecklistService checkService;
-    Utils utils = new Utils();
+    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     @Autowired
     public ReparaturController(ReparaturService service, ChecklistService checkService) {
         this.service = service;
@@ -33,19 +33,24 @@ public class ReparaturController {
     @PostMapping("/senddata")
     public ResponseEntity<Boolean> sendData(final WebRequest request) {
         String track = request.getParameter("track");
-        System.out.println(track);
         String date1 = request.getParameter("from");
-        Date acDate1 = utils.transformString(date1);
+        LocalDate acDate1 = LocalDate.parse(date1.replace("/", "-"), formatter);
+        System.out.println(acDate1.toString());
         String date2 = request.getParameter("till");
-        Date acDate2 = utils.transformString(date2);
+        LocalDate acDate2 = LocalDate.parse(date2.replace("/", "-"), formatter);
         String authorized = request.getParameter("authorized");
         String checklist = request.getParameter("checklist");
-        System.out.println(checklist);
         String remarks = request.getParameter("remarks");
-        System.out.println(remarks);
         Checklist checker = checkService.loadChecklistByName(checklist);
         System.out.println(checker.getName());
-        return ResponseEntity.ok(service.addRepairOrder(Integer.parseInt(track), acDate1, acDate2, authorized, checker, remarks));
+        String latitude = request.getParameter("latitude");
+        String longitude = request.getParameter("longitude");
+        GeoCords geo = new GeoCords(latitude, longitude);
+        if (latitude.equals("") ) {
+            geo = null;
+        }
+
+        return ResponseEntity.ok(service.addRepairOrder(Integer.parseInt(track), acDate1, acDate2, authorized, checker, remarks, geo));
     }
     @PostMapping("/allchecklists")
     public ArrayList<String> getChecklists() {
@@ -89,7 +94,7 @@ public class ReparaturController {
     @PostMapping("/setterminated")
     public ResponseEntity<Boolean> setTerminated(final WebRequest request) {
         String id = request.getParameter("id");
-        Date date1 = utils.transformString(request.getParameter("date"));
+        LocalDate date1 = LocalDate.parse(request.getParameter("date").replace("/", "-"), formatter);
         return ResponseEntity.ok(checkService.setTerminatedDate(id, date1));
     }
 }

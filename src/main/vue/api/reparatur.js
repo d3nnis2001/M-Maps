@@ -9,7 +9,7 @@ export const repair = async function getRepairs() {
         return false
     }
 }
-export const sendRepair = async function sendRepair(track, from, till, authorized, checklist, remarks) {
+export const sendRepair = async function sendRepair(track, from, till, authorized, checklist, remarks, long, lat) {
     try {
         const cred = new URLSearchParams()
         cred.append("track", track)
@@ -18,6 +18,8 @@ export const sendRepair = async function sendRepair(track, from, till, authorize
         cred.append("authorized", authorized)
         cred.append("checklist", checklist)
         cred.append("remarks", remarks)
+        cred.append("longitude", long)
+        cred.append("latitude", lat)
         const response = await axios.post("/api/repair/senddata", cred)
         return response
     } catch (error) {

@@ -2,8 +2,11 @@
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {onMounted, ref} from 'vue';
-import {geoData, getTrack, getPartOfTrack, getPartOfGleislage} from "@/main/vue/api/map";
+import {getGeoData, getTrack, getPartOfTrack, getTimeFromHeatmap} from "@/main/vue/api/map";
 import {useQuasar} from "quasar";
+import DateInput from "@/main/vue/pages/Map/DateInput.vue";
+import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";
+import router from "@/main/vue/router";
 
 const map = ref(null);
 var markers = [];
@@ -19,6 +22,7 @@ const markerEnd = ref('')
 const kmStart = ref('')
 const kmEnd = ref('')
 const selectedMarker = ref('')
+let data = ref([])
 
 
 onMounted(async () => {
@@ -43,7 +47,7 @@ onMounted(async () => {
             maxZoom: 19,
             tileSize: 256
         }).addTo(map.value);
-    const data = await geoData();
+    data = await getGeoData();
     data.forEach((m) => markers.push({
         marker : L.circle([m.longitude, m.latitude], {color: "black", radius: 50}),
         data: m,
@@ -59,12 +63,11 @@ onMounted(async () => {
 const onMarkerClicked = (event) => {
     const circle = event.target;
     const marker = markers.find((m) => {
-            return m.data.longitude === circle.getLatLng().lat && m.data.latitude === circle.getLatLng().lng;
+        return m.data.longitude === circle.getLatLng().lat && m.data.latitude === circle.getLatLng().lng;
     });
     selectedMarker.value = marker
     dialogVisible.value = true;
-    console.log(marker.data.latitude)
-    console.log(marker.data.longitude)
+    console.log(selectedMarker.value.data)
 };
 
 const deleteStart = () => {
@@ -79,12 +82,37 @@ const deleteEnd = () => {
 
 const addStart = () => {
     markerStart.value = selectedMarker;
+
     kmStart.value = selectedMarker.value.data.track_km;
 };
 const addEnd = () => {
     markerEnd.value = selectedMarker;
     kmEnd.value = selectedMarker.value.data.track_km;
 };
+
+function getLetLng(geopoint) {
+    for (let i = 0;i<data.length;i++) {
+        if (data[i].id === geopoint) {
+            return [data[i].longitude, data[i].latitude]
+        }
+    }
+}
+
+function getAllGeoPointsWithColor(dataPoint) {
+    let output = []
+    for(let i = 0;i < dataPoint.length;i++) {
+        if(dataPoint[i].NORMAL !== undefined) {
+            output.push([getLetLng(dataPoint[i].NORMAL), "black"])
+        } else if (dataPoint[i].LOW !== undefined) {
+            output.push([getLetLng(dataPoint[i].LOW), "green"])
+        } else if (dataPoint[i].MEDIUM !== undefined) {
+            output.push([getLetLng(dataPoint[i].MEDIUM), "orange"])
+        } else if (dataPoint[i].HIGH !== undefined) {
+            output.push([getLetLng(dataPoint[i].HIGH), "red"])
+        }
+    }
+    return output
+}
 
 const refreshMarkers = async () => {
     if (streckenID.value === "") {
@@ -95,7 +123,7 @@ const refreshMarkers = async () => {
         });
     } else {
         const data = await getTrack(streckenID.value);
-        console.log(data.length)
+        const newData = getAllGeoPointsWithColor(data)
         if (data.length === 0) {
             $q.notify({
                 type: 'negative',
@@ -104,11 +132,10 @@ const refreshMarkers = async () => {
             });
         }
         markers.forEach((m) => map.value.removeLayer(m.marker));
-        markers = []
-        for (let i = 0;i<data.length;i++) {
+        for (let i = 0; i < newData.length; i++) {
             markers.push({
-                marker : L.circle([data[i].longitude, data[i].latitude], {color: "black", radius: 50}),
-                data: data[i],
+                marker: L.circle([newData[i][0][0], newData[i][0][1]], {color: newData[i][1], radius: 50}),
+                data: newData[i],
             });
         }
         markers.forEach((m) => {
@@ -119,11 +146,30 @@ const refreshMarkers = async () => {
     }
 };
 
+const createRepairOrder = async () => {
+    console.log(selectedMarker.value)
+    const longitude = selectedMarker.value.data.longitude
+    const latitude = selectedMarker.value.data.latitude
+    const streckenID = selectedMarker.value.data.strecken_id
+    await router.push({
+        path: "/repair/create",
+        query: {
+            longitude: longitude,
+            latitude: latitude,
+            streckenID: streckenID
+        }
+    });
+}
+
+async function getHeatmapWithTime() {
+    const timeData = await getTimeFromHeatmap(streckenID, date._value, date2._value)
+    console.log(timeData)
+}
 
 const onLocationFound = (e) => {
     const radius = e.accuracy;
     const userLocation = e.latlng;
-    L.circle(userLocation, { color: 'blue', radius: 200}).addTo(map.value);
+    L.circle(userLocation, {color: 'blue', radius: 200}).addTo(map.value);
 }
 const centerToUserLocation = async () => {
     const options = {
@@ -143,9 +189,9 @@ const checkForChanges = async () => {
         console.log(data)
         markers.forEach((m) => map.value.removeLayer(m.marker));
         markers = []
-        for (let i = 0;i<data.length;i++) {
+        for (let i = 0; i < data.length; i++) {
             markers.push({
-                marker : L.circle([data[i].longitude, data[i].latitude], {color: "black", radius: 50}),
+                marker: L.circle([data[i].longitude, data[i].latitude], {color: "black", radius: 50}),
                 data: data[i],
             });
         }
@@ -163,33 +209,31 @@ const checkForChanges = async () => {
 <template>
     <div class="mapSettings">
         <div class="row putStart">
-            <div class="">
-                <q-expansion-item
-                    icon="settings"
-                    label="Optionen"
-                    expand-icon="arrow_drop_down"
-                    dense
-                    class="expansion_settings"
-                >
-                    <q-list>
-                        <q-item clickable v-ripple>
-                            <q-item-section>
-                                <div class="expan_items" @click="alert2=true">
-                                    Zeitraum
-                                </div>
-                            </q-item-section>
-                        </q-item>
-                        <q-item clickable v-ripple>
-                            <q-item-section>
-                                <div class="expan_items" @click="alert=true">
-                                    Strecken-ID auswählen
-                                </div>
-                            </q-item-section>
-                        </q-item>
-                    </q-list>
-                </q-expansion-item>
-            </div>
-            <div class="    ">
+            <q-expansion-item
+                icon="settings"
+                label="Verfügbare Filter"
+                expand-icon="arrow_drop_down"
+                dense
+                class="expansion_settings"
+            >
+                <q-list>
+                    <q-item clickable v-ripple>
+                        <q-item-section>
+                            <div class="expan_items" @click="alert2=true">
+                                Zeitraum
+                            </div>
+                        </q-item-section>
+                    </q-item>
+                    <q-item clickable v-ripple>
+                        <q-item-section>
+                            <div class="expan_items" @click="alert=true">
+                                Strecken-ID auswählen
+                            </div>
+                        </q-item-section>
+                    </q-item>
+                </q-list>
+            </q-expansion-item>
+            <div class="location_button">
                 <q-btn
                     class="button_settings"
                     icon="my_location"
@@ -210,64 +254,16 @@ const checkForChanges = async () => {
 
                     <q-card-section class="q-pt-none">
                         <div class="q-pa-md" style="max-width: 300px">
-                            <q-input filled v-model="date">
-                                <template v-slot:prepend>
-                                    <q-icon name="event" class="cursor-pointer">
-                                        <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                                            <q-date v-model="date" mask="YYYY-MM-DD HH:mm">
-                                                <div class="row items-center justify-end">
-                                                    <q-btn v-close-popup label="Close" color="primary" flat />
-                                                </div>
-                                            </q-date>
-                                        </q-popup-proxy>
-                                    </q-icon>
-                                </template>
-
-                                <template v-slot:append>
-                                    <q-icon name="access_time" class="cursor-pointer">
-                                        <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                                            <q-time v-model="date" mask="YYYY-MM-DD HH:mm" format24h>
-                                                <div class="row items-center justify-end">
-                                                    <q-btn v-close-popup label="Close" color="primary" flat />
-                                                </div>
-                                            </q-time>
-                                        </q-popup-proxy>
-                                    </q-icon>
-                                </template>
-                            </q-input>
+                            <DateInput v-model="date"></DateInput>
                         </div>
                         <div class="q-pa-md" style="max-width: 300px">
-                            <q-input filled v-model="date2">
-                                <template v-slot:prepend>
-                                    <q-icon name="event" class="cursor-pointer">
-                                        <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                                            <q-date v-model="date2" mask="YYYY-MM-DD HH:mm">
-                                                <div class="row items-center justify-end">
-                                                    <q-btn v-close-popup label="Close" color="primary" flat />
-                                                </div>
-                                            </q-date>
-                                        </q-popup-proxy>
-                                    </q-icon>
-                                </template>
-
-                                <template v-slot:append>
-                                    <q-icon name="access_time" class="cursor-pointer">
-                                        <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                                            <q-time v-model="date2" mask="YYYY-MM-DD HH:mm" format24h>
-                                                <div class="row items-center justify-end">
-                                                    <q-btn v-close-popup label="Close" color="primary" flat />
-                                                </div>
-                                            </q-time>
-                                        </q-popup-proxy>
-                                    </q-icon>
-                                </template>
-                            </q-input>
+                            <DateInput v-model="date2"></DateInput>
                         </div>
                     </q-card-section>
 
                     <q-card-actions align="center">
-                        <q-btn flat label="Filter anwenden" color="primary" v-close-popup/>
-                        <q-btn flat label="Abbrechen" color="primary" v-close-popup />
+                        <q-btn flat @click="getHeatmapWithTime" label="Filter anwenden" color="primary" v-close-popup/>
+                        <q-btn flat label="Abbrechen" color="primary" v-close-popup/>
                     </q-card-actions>
                 </q-card>
             </q-dialog>
@@ -276,10 +272,10 @@ const checkForChanges = async () => {
                     <q-card-section>
                         <div class="text-h6">Wähle eine Strecken-ID</div>
                     </q-card-section>
-                    <q-input class="" v-model="streckenID" label="Strecken-ID Eingabe"/>
+                    <StandardInput v-model="streckenID" label="Strecken-ID Eingabe"></StandardInput>
                     <q-card-actions align="center">
                         <q-btn @click="refreshMarkers" flat label="Filter anwenden" color="primary" v-close-popup/>
-                        <q-btn flat label="Abbrechen" color="primary" v-close-popup />
+                        <q-btn flat label="Abbrechen" color="primary" v-close-popup/>
                     </q-card-actions>
                 </q-card>
             </q-dialog>
@@ -329,16 +325,40 @@ const checkForChanges = async () => {
                     </q-card>
                 </div>
                 <q-card flat square bordered>
-                    <q-card-actions align="center">
-                        <q-btn flat @click="checkForChanges" label="Speichern" color="primary" v-close-popup />
+                    <q-card-actions>
+                        <q-btn
+                            style="align-items: end; justify-content: end"
+                            flat
+                            no-caps
+                            @click="createRepairOrder"
+                            label="Reparatur anlegen"
+                            color="primary"
+                            v-close-popup
+                        >
+                            <q-icon name="build" style="margin-left: 8px;"/>
+                        </q-btn>
                     </q-card-actions>
                 </q-card>
+                <q-card flat square bordered>
+                    <q-card-actions>
+                        <q-btn
+                            flat
+                            no-caps
+                            @click="checkForChanges"
+                            label="Speichern"
+                            color="primary"
+                            v-close-popup
+                        />
+                    </q-card-actions>
+                </q-card>
+
             </div>
         </div>
     </q-dialog>
 </template>
 
-<style>
+<style lang="scss">
+
 .full-width {
     flex: 1;
     margin: 0;
@@ -374,7 +394,9 @@ const checkForChanges = async () => {
 #map {
     width: 95vw;
     height: 80vh;
-    border: 3px solid black;
+    border: 3px solid $primary;
+    border-radius: 15px;
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
 }
 
 .mapSettings {
@@ -398,14 +420,25 @@ const checkForChanges = async () => {
     flex-direction: column;
 }
 
-.button_settings {
+.expansion_settings {
+    position: absolute;
+    z-index: 2000;
+}
+
+.location_button {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    width: 100%;
+    margin-right: 5vw;
 }
 
 </style>
 
 <script>
 
-import { ref } from 'vue'
+import {ref} from 'vue'
 
 const columns = [
     {
@@ -415,7 +448,7 @@ const columns = [
         field: row => row.name,
         sortable: true
     },
-    { name: 'StreckenID', align: 'center', label: 'Strecken-ID', field: 'streckenid', sortable: true }
+    {name: 'StreckenID', align: 'center', label: 'Strecken-ID', field: 'streckenid', sortable: true}
 ]
 const rows = [
     {
@@ -425,7 +458,7 @@ const rows = [
         streckenid: '6061'
     }
 ]
-const options =  [
+const options = [
     "Zeitraum",
     "ID des Streckenabschnitts",
     "Abschnitt der Karte"
