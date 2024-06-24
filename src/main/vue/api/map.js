@@ -41,5 +41,16 @@ export const getInformationForGeoPoint = async function getInformationForGeoPoin
     }
 }
 
+export const getReparaturForMap = async function getReparaturForMap() {
+    try {
+
+        const response = await axios.post("/api/map/getReparaturForMap")
+        console.log(response.data)
+        return response.data
+    }  catch (error) {
+        console.log("Something went wrong when getting the reparatur Aufträge")
+    }
+}
+
 
 export default {getGeoData, getHeatmap, getTimeFromHeatmap};

@@ -11,6 +11,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
 
 @Service
 
@@ -66,5 +68,19 @@ public class ReparaturServiceImpl implements ReparaturService {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    @Override
+    public List<Reparatur> getReparaturForMap() {
+        Iterable it = rep.findAll();
+        ArrayList<Reparatur> repArr = new ArrayList<>();
+        Iterator<Reparatur> iterator = it.iterator();
+        while (iterator.hasNext()) {
+            Reparatur repSolo = iterator.next();
+            if(Objects.equals(repSolo.getStatus(), "beauftragt")){
+                repArr.add(repSolo);
+            }
+        }
+        return repArr;
     }
 }

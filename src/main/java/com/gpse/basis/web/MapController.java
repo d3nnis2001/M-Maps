@@ -2,9 +2,11 @@ package com.gpse.basis.web;
 
 import com.gpse.basis.domain.GeoData;
 import com.gpse.basis.domain.GleisLageDatenpunkt;
+import com.gpse.basis.domain.Reparatur;
 import com.gpse.basis.domain.Utils;
 import com.gpse.basis.services.DataService;
 import com.gpse.basis.services.FileService;
+import com.gpse.basis.services.ReparaturService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Repository;
@@ -24,10 +26,15 @@ import java.util.Date;
 @RequestMapping("/api/map")
 public class MapController {
 
-    @Autowired
+
     private final DataService dataService;
-    public MapController(DataService dataService) {
+
+    private final ReparaturService repService;
+
+    @Autowired
+    public MapController(DataService dataService, ReparaturService rps) {
         this.dataService = dataService;
+        this.repService = rps;
     }
 
     @GetMapping("/gettracks")
@@ -82,5 +89,10 @@ public class MapController {
         String strecke = request.getParameter("id");
         // links-Abweichung, rechts-abweichung, durschnittliche zulässige geschwindigkeit, durchschnittliche gefahrene Geschwindigkeit
         return dataService.getDataForGeoPart(strecke);
+    }
+
+    @PostMapping("/getReparaturForMap")
+    public List<Reparatur> getReparaturforMap() {
+        return repService.getReparaturForMap();
     }
 }

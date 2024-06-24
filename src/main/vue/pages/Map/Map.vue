@@ -2,7 +2,13 @@
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {onMounted, ref, watch} from 'vue';
-import {getGeoData, getHeatmap, getInformationForGeoPoint, getTimeFromHeatmap} from "@/main/vue/api/map";
+import {
+    getGeoData,
+    getHeatmap,
+    getInformationForGeoPoint,
+    getReparaturForMap,
+    getTimeFromHeatmap
+} from "@/main/vue/api/map";
 import {useQuasar} from "quasar";
 import DateInput from "@/main/vue/pages/Map/DateInput.vue";
 import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";
@@ -50,6 +56,7 @@ const NRW = ref(false)
 const NO = ref(false)
 const NB = ref(false)
 const N = ref(false)
+const reparatur = ref([])
 
 onMounted(async () => {
     map.value = L.map('map', {
@@ -106,6 +113,23 @@ onMounted(async () => {
             attribution: '<a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors</a>, Style: <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA 2.0</a> <a href="http://www.openrailwaymap.org/">OpenRailwayMap</a> and OpenStreetMap',
             tileSize: 256
         }).addTo(map.value);
+
+    var Icon = L.icon({
+        iconUrl: 'src/main/resources/construction.png',
+        iconSize: [45, 45],
+        iconAnchor: [0, 30]
+    });
+    const reparaturData = await getReparaturForMap()
+    reparaturData.forEach((rep) => { reparatur.value.push( {
+        marker: L.marker([rep.geocords.longitude,rep.geocords.latitude], {icon: Icon} ),
+        reparaturAuftrag: rep
+    }
+    )
+       reparatur.value[reparatur.value.length - 1].marker.addTo(map.value)
+        reparatur.value[reparatur.value.length - 1].marker.on('click', onReparaturClicked);
+    })
+
+
     const data = await getGeoData();
     await setGeoData(data)
 });
@@ -141,15 +165,17 @@ watch(N, onRegionChange)
 function datapointsFromRegion(region) {
     for (let i = 0; i < markers.length; i++) {
         var result = false;
-        for(let j = 0; j < region.value.length; j++) {
-            result = result || isMarkerInsidePolygon(markers[i], region.value[j])
+        for (let j = region.length - 1; j >= 0; j--) {
+            if (!result) {
+                result = isMarkerInsidePolygon(markers[i], region[j]);
+                if (!result)
+                    result = isMarkerInsidePolygon2(markers[i], region[j])
+            } else break;
         }
-        console.log(result)
-        if(result) {
-            markers[i].marker.setStyle({opacity: 1, fillOpacity: 1})
-        }
-        else {
-            markers[i].marker.setStyle({opacity: 0, fillOpacity: 0})
+        if (result) {
+            markers[i].marker.setStyle({opacity: 1, fillOpacity: 1});
+        } else {
+            markers[i].marker.setStyle({opacity: 0, fillOpacity: 0});
         }
     }
 }
@@ -160,40 +186,31 @@ function onRegionChange() {
     var temp = []
     if(BY.value === true) {
         temp = temp.concat(regions[0].value)
-        datapointsFromRegion(regions[0])
     }
     if(BW.value === true) {
         temp = temp.concat(regions[1].value)
-        datapointsFromRegion(regions[1])
     }
     if(SW.value === true) {
         temp = temp.concat(regions[2].value)
-        datapointsFromRegion(regions[2])
     }
     if(H.value === true) {
         temp = temp.concat(regions[3].value)
-        datapointsFromRegion(regions[3])
     }
     if(SO.value === true) {
         temp = temp.concat(regions[4].value)
-        datapointsFromRegion(regions[4])
     }
     if(NRW.value === true) {
         temp = temp.concat(regions[5].value)
-        datapointsFromRegion(regions[5])
     }
     if(NO.value === true) {
         temp = temp.concat(regions[6].value)
-        datapointsFromRegion(regions[6])
     }
 
     if(NB.value === true) {
         temp = temp.concat(regions[7].value)
-        datapointsFromRegion(regions[7])
     }
     if(N.value === true) {
         temp = temp.concat(regions[8].value)
-        datapointsFromRegion(regions[8])
     }
     geoJsonData.value = L.geoJSON(temp, {
         style: {
@@ -204,10 +221,12 @@ function onRegionChange() {
         },
     })
     geoJsonData.value.addTo(map.value);
+    datapointsFromRegion(temp)
 }
 
 
 // Von https://stackoverflow.com/questions/31790344/determine-if-a-point-reside-inside-a-leaflet-polygon
+
 function isMarkerInsidePolygon(marker, poly) {
     var polyPoints = [];
     for (var i = 0; i < poly.geometry.coordinates.length; i++) {
@@ -217,13 +236,35 @@ function isMarkerInsidePolygon(marker, poly) {
     var x = marker.marker.getLatLng().lat, y = marker.marker.getLatLng().lng;
     var inside = false;
     for (var i = 0, j = polyPoints.length - 1; i < polyPoints.length; j = i++) {
-        var xi = polyPoints[i][1], yi = polyPoints[i][0]; // [lng, lat]
-        var xj = polyPoints[j][1], yj = polyPoints[j][0]; // [lng, lat]
+        var xi = polyPoints[i][1], yi = polyPoints[i][0];
+        var xj = polyPoints[j][1], yj = polyPoints[j][0];
 
         var intersect = ((yi > y) != (yj > y))
             && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
         if (intersect) inside = !inside;
     }
+    return inside;
+}
+
+function isMarkerInsidePolygon2(marker, poly) {
+    var polyPoints = [];
+    for (var i = 0; i < poly.geometry.coordinates.length; i++) {
+        for (var j = 0; j < poly.geometry.coordinates[i].length; j++) {
+            polyPoints.push(L.latLng(poly.geometry.coordinates[i][j][1], poly.geometry.coordinates[i][j][0]));
+        }
+    }
+    var x = marker.marker.getLatLng().lat;
+    var y = marker.marker.getLatLng().lng;
+
+    var inside = false;
+    for (var i = 0, j = polyPoints.length - 1; i < polyPoints.length; j = i++) {
+        var xi = polyPoints[i].lat, yi = polyPoints[i].lng;
+        var xj = polyPoints[j].lat, yj = polyPoints[j].lng;
+
+        var intersect = ((yi > y) != (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+        if (intersect) inside = !inside;
+    }
+
     return inside;
 }
 
@@ -281,6 +322,16 @@ async function setPartGeoDataKm(km_start, km_end) {
             m.marker.setStyle({opacity: 0, fillOpacity: 0})
         }
     });
+}
+
+const onReparaturClicked = async (event) => {
+    const marker = event.target
+    const lat = marker.getLatLng().lat
+    const lng = marker.getLatLng().lng
+    const rep = reparatur.value.find((r) => {
+        return (lat == r.reparaturAuftrag.geocords.longitude && lng == r.reparaturAuftrag.geocords.latitude)
+    })
+    router.push(`/repair/${rep.reparaturAuftrag.id}/edit`)
 }
 
 const onMarkerClicked = async (event) => {
