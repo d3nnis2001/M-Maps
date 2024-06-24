@@ -23,6 +23,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 
 import java.io.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -497,6 +499,9 @@ public class FileServiceImpl implements FileService {
         int i = 0;
         for (GleisLageDatenpunkt gld : lst) {
             GleisLageDatenpunkt gld2 = gld;
+            BigDecimal bd = new BigDecimal(Double.toString(gld2.getStr_km()));
+            bd = bd.setScale(3, RoundingMode.HALF_UP);
+            gld2.setStr_km(bd.doubleValue());
             dataPoints.add(gld2);
             i += 1;
             if (i % 1000 == 0) {
@@ -504,5 +509,19 @@ public class FileServiceImpl implements FileService {
             }
         }
         return dataPoints;
+    }
+
+    public ArrayList<GeoData> getPointData(double lat, double lon) {
+        Iterable<GeoData> iterable = geoTrack.findAll();
+        ArrayList<GeoData> geoArr = new ArrayList<>();
+        Iterator<GeoData> iterator = iterable.iterator();
+        while (iterator.hasNext()) {
+            GeoData geo = iterator.next();
+            if (geo.getLatitude() == lat && geo.getLongitude() == lon) {
+                geoArr.add(geo);
+            }
+        }
+        System.out.println(geoArr.size());
+        return geoArr;
     }
 }

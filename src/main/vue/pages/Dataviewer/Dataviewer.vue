@@ -6,6 +6,8 @@ import {useRouter, useRoute} from "vue-router";
 export default {
   setup(){
       const datapoint = ref('')
+      const dpLon = ref('')
+      const dpLat = ref('')
       const routeID = ref('')
       const fromStrKm = ref('')
       const toStrKm = ref('')
@@ -17,7 +19,7 @@ export default {
       const NOTIFY_OPTIONS = {
           noDatapoint: {
               type: 'negative',
-              message: 'Please enter a Datapoint ID'
+              message: 'Please enter a Datapoint Long and Lat'
           },
           noRoute: {
               type: 'negative',
@@ -30,14 +32,15 @@ export default {
       };
 
       function showData() {
-          if (datapoint.value === '') {
+          if (dpLon.value === '' || dpLat.value === '') {
               console.log(false)
               $q.notify(NOTIFY_OPTIONS.noDatapoint)
               datapoint.value = ''
           } else {
               console.log(true)
-              const pointId = datapoint.value
-              router.push(`/dataviewer/point/${pointId}`)
+              const lon = dpLon.value
+              const lat = dpLat.value
+              router.push(`/dataviewer/point/${lon}/${lat}`)
           }
       }
 
@@ -66,7 +69,8 @@ export default {
 
       return {
           site,
-          datapoint,
+          dpLon,
+          dpLat,
           routeID,
           fromStrKm,
           toStrKm,
@@ -84,9 +88,11 @@ export default {
 <div>
     <div class="q-pa-xs">
         <div class="align-mult">
-            <div v-if="!isPointPath" class="align-basic">
-                <p>Datenpunkt ID</p>
-                <q-input class="q-pa-xs" outlined v-model="datapoint"></q-input>
+            <div class="align-basic">
+                <p>Longitude</p>
+                <q-input class="q-pa-xs" outlined v-model="dpLon"></q-input>
+                <p>Lattitude</p>
+                <q-input class="q-pa-xs" outlined v-model="dpLat"></q-input>
                 <div class="q-pa-xs">
                     <q-btn label="Daten anzeigen" @click=showData class=""></q-btn>
                 </div>

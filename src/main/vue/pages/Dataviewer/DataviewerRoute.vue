@@ -5,7 +5,7 @@ import VueApexCharts from 'vue3-apexcharts';
 
 import { Bar } from 'vue-chartjs'
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js'
-import {ref, onMounted, reactive} from "vue";
+import {ref, onMounted, reactive, nextTick} from "vue";
 import {getUserData} from "@/main/vue/api/admin";
 import {useRoute, useRouter} from "vue-router";
 import Plotly from 'plotly.js-dist';
@@ -18,7 +18,8 @@ export default {
         apexchart: VueApexCharts,
     },
     setup() {
-        const plotlyChart = ref(null);
+        const plotlyChartLeft = ref(null);
+        const plotlyChartRight = ref(null);
         const loaded = ref(false);
         const route = useRoute();
         const routeId = ref('')
@@ -28,25 +29,32 @@ export default {
         const toStrKm = ref('')
         const router = useRouter()
         const data = ref([])
+        const isProfile = ref(false)
+        const leftEmpty = ref(false)
+        const rightEmpty = ref(false)
         /*
         const x = ref([20,25,23,24,19,21,22,20,25,23,24,19,21,22])
         const y = ref([0.5,0.2,0.3,0.4,0,1,-0.2,-0.5,-0.2,-0.3,-0.4,0,-1,0.2])
         const z = ref([1,2,3,4,5,6,7,8,9,10,11,12,13,14])
          */
 
-        const x = ref([])
-        const y = ref([])
-        const z = ref([])
+        const xLeft = ref([])
+        const yLeft = ref([])
+        const zLeft = ref([])
 
-        const plot3D = () => {
+        const xRight = ref([])
+        const yRight = ref([])
+        const zRight = ref([])
+
+        const plot3DLeft = () => {
             const trace = {
-                x: x.value,
-                y: y.value,
-                z: z.value,
+                x: xLeft.value,
+                y: yLeft.value,
+                z: zLeft.value,
                 mode: 'markers',
                 marker: {
                     size: 5,
-                    color: z.value,
+                    color: zLeft.value,
                     colorscale: 'Viridis',
                     opacity: 0.8,
                 },
@@ -62,7 +70,42 @@ export default {
                 },
             };
 
-            Plotly.newPlot(plotlyChart.value, [trace], layout);
+            if (plotlyChartLeft.value) {
+                Plotly.newPlot(plotlyChartLeft.value, [trace], layout);
+            }
+
+            //Plotly.newPlot(plotlyChart.value, [trace], layout);
+        };
+
+        const plot3DRight = () => {
+            const trace = {
+                x: xRight.value,
+                y: yRight.value,
+                z: zRight.value,
+                mode: 'markers',
+                marker: {
+                    size: 5,
+                    color: zRight.value,
+                    colorscale: 'Viridis',
+                    opacity: 0.8,
+                },
+                type: 'scatter3d',
+            };
+
+            const layout = {
+                //title: '3D Scatter Plot',
+                scene: {
+                    xaxis: {title: 'Streckenkm'},
+                    yaxis: {title: 'mm'},
+                    zaxis: {title: 'Time'},
+                },
+            };
+
+            if (plotlyChartRight.value) {
+                Plotly.newPlot(plotlyChartRight.value, [trace], layout);
+            }
+
+            //Plotly.newPlot(plotlyChart.value, [trace], layout);
         };
 
         const chartOptions = ref({
@@ -115,6 +158,7 @@ export default {
             },
             annotations: {
                 yaxis: [
+                    /*
                     {
                         y: 10.5,
                         borderColor: '#e30000',
@@ -127,8 +171,9 @@ export default {
                                 background: '#e3001a'
                             },
                             text: ''
-                        }*/
+                        }
                     },
+                    /*
                     {
                         y: 7.5,
                         borderColor: '#e3c500',
@@ -153,7 +198,7 @@ export default {
                         y: -3.5,
                         borderColor: '#00e30b',
                         strokeDashArray: 0
-                    }
+                    }*/
                 ]
             }
         });
@@ -171,9 +216,9 @@ export default {
         function buildDataset(from, to, id) {
             seriesLinks.value[0].data = []
             seriesRechts.value[0].data = []
-            x.value = []
-            y.value = []
-            z.value = []
+            xLeft.value = []
+            yLeft.value = []
+            zLeft.value = []
             data.value.forEach(user => {
                 if (user.str_km >= from && user.str_km <= to){
                     console.log("1")
@@ -181,13 +226,28 @@ export default {
                     seriesRechts.value[0].data.push([user.str_km,user.z_rechts_railab_3p])
                     const timestamp = user.time_unix
                     const date = new Date(timestamp * 1000)
-                    const formattedDate = date.toISOString().slice(0, 19).replace('T', ' ')
-                    x.value.push(user.str_km)
-                    y.value.push(user.z_rechts_railab_3p)
-                    z.value.push(formattedDate)
+                    const formattedDate = date.toISOString().slice(11, 16)
+                    //console.log(formattedDate)
+                    //const formattedDate = date.toISOString().slice(0, 19).replace('T', ' ')
+                    xLeft.value.push(user.str_km)
+                    yLeft.value.push(user.z_links_railab_3p)
+                    zLeft.value.push(formattedDate)
+                    xRight.value.push(user.str_km)
+                    yRight.value.push(user.z_rechts_railab_3p)
+                    zRight.value.push(formattedDate)
                 }
             })
-            plot3D()
+            if (seriesLinks.value[0].data.length === 0) {
+                leftEmpty.value = true
+            }
+            if (seriesRechts.value[0].data.length === 0) {
+                rightEmpty.value = true
+            }
+            nextTick(() => {
+                plot3DLeft();
+                plot3DRight();
+            })
+            //plot3D()
         }
 
         function refreshRoute() {
@@ -205,6 +265,16 @@ export default {
             //seriesLinks.value[0].data = vst
             console.log(seriesLinks.value[0].data)
             router.push(`/dataviewer/route/${routeId2}/from/${fromStrKm2}/to/${toStrKm2}`)
+        }
+
+        function switchDataviewer() { isProfile.value = false }
+
+        function switchProfil() {
+            isProfile.value = true
+            nextTick(() => {
+                plot3DLeft();
+                plot3DRight();
+            })
         }
 
         /*
@@ -255,10 +325,13 @@ export default {
                     seriesLinks.value[0].data.push([user.str_km,user.z_links_railab_3p])
                     const timestamp = user.time_unix
                     const date = new Date(timestamp * 1000)
-                    const formattedDate = date.toISOString().slice(0, 19).replace('T', ' ')
-                    x.value.push(user.str_km)
-                    y.value.push(user.z_rechts_railab_3p)
-                    z.value.push(formattedDate)
+                    const formattedDate = date.toISOString().slice(11, 16)
+                    xLeft.value.push(user.str_km)
+                    yLeft.value.push(user.z_links_railab_3p)
+                    zLeft.value.push(formattedDate)
+                    xRight.value.push(user.str_km)
+                    yRight.value.push(user.z_rechts_railab_3p)
+                    zRight.value.push(formattedDate)
                     /*
                     if (user.str_km % 2 === 0) {
                         chartOptions.value.xaxis.categories.push(user.str_km)
@@ -276,8 +349,19 @@ export default {
                         right: user.z_rechts_railab_3p,
                         str_km: user.str_km,
                     })*/
-            })
-            plot3D()
+            });
+            nextTick(() => {
+                plot3DLeft();
+                plot3DRight();
+            });
+            if (seriesLinks.value[0].data.length === 0) {
+                leftEmpty.value = true
+            }
+            if (seriesRechts.value[0].data.length === 0) {
+                rightEmpty.value = true
+            }
+
+            //plot3D()
             //chartOptions.value.xaxis.categories = categories
             //series.value.data = seriesData
             console.log(data.value)
@@ -287,7 +371,12 @@ export default {
             console.log(loaded.value)
         })
 
-        return {chartOptions, seriesLinks, seriesRechts, loaded, plotlyChart, refreshRoute, fromStrKm, toStrKm}
+        return {
+            chartOptions, seriesLinks, seriesRechts, loaded,
+            plotlyChartLeft, refreshRoute, fromStrKm, toStrKm,
+            switchDataviewer, switchProfil, isProfile, plot3DLeft,
+            leftEmpty, rightEmpty, plotlyChartRight
+        }
     }
 }
 
@@ -437,10 +526,10 @@ export default {
         </div>
         <div class="align-mult">
             <div>
-                <q-btn label="Dataviever" @click="" class=""></q-btn>
+                <q-btn label="Dataviever" @click="switchDataviewer" class=""></q-btn>
             </div>
             <div>
-                <q-btn label="Profil" @click="" class=""></q-btn>
+                <q-btn label="Profil" @click="switchProfil" class=""></q-btn>
             </div>
         </div>
         <div>
@@ -453,23 +542,34 @@ export default {
                     row-key="name"
                 />
             </div>
+            <q-banner v-else-if="rightEmpty">There is no Data for this Part</q-banner>
             -->
-            <div class="outline">
+            <div v-if="!isProfile" class="outline">
                 <q-banner align="middle">Längenhöhe - z_links_railab_3p</q-banner>
                 <q-banner v-if="!loaded">Loading</q-banner>
                 <apexchart v-else type="bar" height="350" :options="chartOptions" :series="seriesLinks"></apexchart>
             </div>
             <q-space/>
-            <div class="outline">
+            <div v-if="!isProfile" class="outline">
                 <q-banner align="middle">Längenhöhe - z_rechts_railab_3p</q-banner>
                 <q-banner v-if="!loaded">Loading</q-banner>
                 <apexchart v-else type="bar" height="350" :options="chartOptions" :series="seriesRechts"></apexchart>
             </div>
             <q-space/>
-            <div class="outline">
-                <q-banner align="middle">Längenhöhe - z_rechts_railab_3p</q-banner>
-                <q-banner v-if="!loaded">Loading</q-banner>
-                <div ref="plotlyChart" style="width: 100%; height: 100%;"></div>
+            <div>
+                <div v-if="isProfile" class="outline">
+                    <q-banner align="middle">Längenhöhe - z_rechts_railab_3p</q-banner>
+                    <q-banner v-if="!loaded">Loading</q-banner>
+                    <div ref="plotlyChartLeft" style="width: 100%; height: 100%;"></div>
+                </div>
+            </div>
+            <q-space/>
+            <div>
+                <div v-if="isProfile" class="outline">
+                    <q-banner align="middle">Längenhöhe - z_links_railab_3p</q-banner>
+                    <q-banner v-if="!loaded">Loading</q-banner>
+                    <div ref="plotlyChartRight" style="width: 100%; height: 100%;"></div>
+                </div>
             </div>
         </div>
     </q-page>

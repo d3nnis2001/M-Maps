@@ -1,6 +1,7 @@
 package com.gpse.basis.web;
 
 import com.gpse.basis.domain.DataSet;
+import com.gpse.basis.domain.GeoData;
 import com.gpse.basis.domain.GleisLageDatenpunkt;
 import com.gpse.basis.domain.UserModel;
 import com.gpse.basis.services.FileService;
@@ -33,6 +34,9 @@ public class DataviewerController {
 
     @GetMapping("/getTrackData2")
     public ArrayList<GleisLageDatenpunkt> getAllTrackLayoutData2(@RequestParam int trackId) { return fileService.getData(trackId);}
+
+    @GetMapping("/getPointData")
+    public ArrayList<GeoData> getAllPointLayoutData(@RequestParam double lat, double lon) { return fileService.getPointData(lat, lon);}
 
     /*
     @GetMapping("/getTrackData")

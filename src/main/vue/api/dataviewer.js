@@ -14,15 +14,18 @@ export const getTrackLayoutData = async function getData(trackId) {
     }
 }
 
-function transformData(response) {
-    const arr = []
-    for(let i = 0; i < response.length;i++) {
-        const data = response[i]
-        const point = {x: data["z_links_railab_3p"], y: data["str_km"]}
-        arr.push(point)
-        //console.log(data)
+export const getPointData = async function getPointData(lon, lat) {
+    try {
+        //const response = await axios.get("/api/dataviewer/getTrackData")
+        const response = await axios.get("/api/dataviewer/getPointData", {params: {lat, lon}})
+        //console.log(response2.data)
+        console.log(response.data)
+        return response.data
+    } catch (error) {
+        console.error("Something went wrong when getting the data:", error)
+        return false
     }
-    return arr
+    //const response = await axios.get("/api/dataviewer/getPointData", {params: {lon, lat}})
 }
 
 export default {getTrackLayoutData}
