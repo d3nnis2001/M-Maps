@@ -38,7 +38,6 @@ public class AdminController {
     @DeleteMapping("/deleteUser")
     public ResponseEntity<Boolean> deleteUser(final WebRequest request) {
         String username = request.getParameter("userName");
-        System.out.println(username);
         return ResponseEntity.ok(userService.deleteUser(username));
     }
 

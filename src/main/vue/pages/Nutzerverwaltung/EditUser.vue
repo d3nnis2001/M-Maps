@@ -14,9 +14,6 @@ export default {
         const allRoles = ref(['Admin', 'Datenverwalter', 'Bearbeiter', 'Prüfer']);
         const updatedRoles = ref({selected_roles: []})
 
-        /**
-         * Problem mit der Funktion einen einzelnen User zu laden (response ist ein HTML document)
-         */
         onMounted( async  () => {
             currentUser.value = await getUserByUsername(username);
             if (currentUser.value) {
@@ -24,6 +21,7 @@ export default {
                 lastname.value = currentUser.value.lastname;
                 if (currentUser.value.roles !== null) {
                     currentUser.value.roles.forEach((role) => {
+                        console.log(role)
                         updatedRoles.value.selected_roles.push(role)
                     })
                 }

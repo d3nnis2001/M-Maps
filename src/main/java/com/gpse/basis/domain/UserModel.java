@@ -46,14 +46,15 @@ public class UserModel implements UserDetails {
             this.roles = new ArrayList<>();
             this.roles.add(role);
         } else {
-            this.roles.add(role);
+            if (!this.roles.contains(role)) {
+                this.roles.add(role);
+            }
         }
     }
     public void deleteRole(String role) {
-        for(String r : roles) {
-            if (r.equals(role)) {
-                roles.remove(r);
-            }
+        roles.removeIf(r -> r.equals(role));
+        if (roles.isEmpty()) {
+            roles = null;
         }
     }
     public ArrayList<String> getRoles() { return roles; }

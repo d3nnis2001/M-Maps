@@ -40,7 +40,7 @@ async function getData() {
     const data = await getUserData()
     console.log(data)
     data.forEach((user) => {
-        if (user.unlocked) {
+        if (!user.unlocked) {
             table.rows.push({
                 username: user.username,
                 firstname: user.firstname,
@@ -55,7 +55,6 @@ async function getData() {
                 roles: user.roles,
             })
         }
-
     })
 }
 
@@ -85,10 +84,6 @@ async function deleteUsername(selectedUser) {
     removeRow(selectedUser);
     showConfirmDialog.value = false;
     showDialog.value = false;
-}
-
-async function isUnlocked(user) {
-    return await locked(user);
 }
 
 function unlockUser(selectedUser) {

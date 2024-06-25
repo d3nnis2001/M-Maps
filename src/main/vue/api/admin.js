@@ -45,10 +45,10 @@ export const updateRoles = async function updateRoles(username, roles){
         console.log(username)
         const cred = new URLSearchParams();
         const rolesString = roles.join(",");
+        console.log(rolesString)
         cred.append("userName", username);
         cred.append("roles", rolesString);
-        const response = await axios.post("/api/admin/updateRoles", cred);
-        return response;
+        return await axios.post("/api/admin/updateRoles", cred);
     } catch (error) {
         console.error("Error making role changes:", error);
         if (error.response && error.response.status === 404) {

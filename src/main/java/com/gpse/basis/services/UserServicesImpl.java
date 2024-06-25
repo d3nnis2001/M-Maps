@@ -88,19 +88,23 @@ public class UserServicesImpl implements UserServices {
         return users;
     }
     @Override
-    public boolean updateRoles(String email, ArrayList<String> roles) {
-        UserModel us = loadUserByUsername(email);
+    public boolean updateRoles(String username, ArrayList<String> newRoles) {
+        UserModel us = getUserByUsername(username);
         ArrayList<String> oldRoles = us.getRoles();
-        for (String role : oldRoles) {
-            if (!roles.contains(role)){
-                us.deleteRole(role);
+        ArrayList<String> toDelete = new ArrayList<>();
+        for (String oldRole : oldRoles) {
+            if (!newRoles.contains(oldRole)) {
+                toDelete.add(oldRole);
             }
         }
-        for (String role : roles) {
-            if (!oldRoles.contains(role)){
-                us.addRole(role);
-            }
+        for(String role : toDelete) {
+            us.deleteRole(role);
         }
+        for (String newRole : newRoles) {
+            us.addRole(newRole);
+        }
+        System.out.println(us.getRoles());
+        userRepo.save(us);
         return true;
     }
 
