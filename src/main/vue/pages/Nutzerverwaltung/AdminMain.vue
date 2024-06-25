@@ -34,21 +34,31 @@ const showDialog = ref(false);
 const showConfirmDialog = ref(false);
 const currentRow = reactive({});
 const rowToDelete = ref(null);
+const allRoles = ['Admin', 'Datenverwalter', 'Bearbeiter', 'Prüfer'];
 
 async function getData() {
     const data = await getUserData()
-    let roles = data.map(user => user.roles);
-    console.log(roles)
     console.log(data)
     data.forEach((user) => {
-        table.rows.push({
-            username: user.username,
-            firstname: user.firstname,
-            lastname: user.lastname,
-            roles: user.roles,
-        })
+        if (user.unlocked) {
+            table.rows.push({
+                username: user.username,
+                firstname: user.firstname,
+                lastname: user.lastname,
+                roles: user.roles,
+            })
+        } else {
+            table.rows.push({
+                username: user.username,
+                firstname: user.firstname,
+                lastname: user.lastname,
+                roles: user.roles,
+            })
+        }
+
     })
 }
+
 const checkScreenSize = () => {
     const screenSize = window.innerWidth;
     smallScreen.value = screenSize <= 500;
@@ -75,6 +85,10 @@ async function deleteUsername(selectedUser) {
     removeRow(selectedUser);
     showConfirmDialog.value = false;
     showDialog.value = false;
+}
+
+async function isUnlocked(user) {
+    return await locked(user);
 }
 
 function unlockUser(selectedUser) {

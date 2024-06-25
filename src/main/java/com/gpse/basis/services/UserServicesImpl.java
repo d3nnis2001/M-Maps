@@ -35,8 +35,14 @@ public class UserServicesImpl implements UserServices {
         return true;
     }
     @Override
-    public boolean deleteUser(String email) {
-        return true;
+    public boolean deleteUser(String username) {
+        try {
+            Optional<UserModel> user = userRepo.findById(username);
+            user.ifPresent(userRepo::delete);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public boolean checkCredentials(String email, String password) {
@@ -100,12 +106,7 @@ public class UserServicesImpl implements UserServices {
 
     @Override
     public UserModel getUserByUsername(final String username) {
-        Iterable<UserModel> iterable = userRepo.findAll();
-        for (UserModel userModel : iterable) {
-            if (userModel.getUsername().equals(username)) {
-                return userModel;
-            }
-        }
-        return null;
+        Optional<UserModel> user = userRepo.findById(username);
+        return user.orElse(null);
     }
 }

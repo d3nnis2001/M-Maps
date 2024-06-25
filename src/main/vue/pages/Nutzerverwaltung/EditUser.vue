@@ -17,34 +17,17 @@ export default {
         /**
          * Problem mit der Funktion einen einzelnen User zu laden (response ist ein HTML document)
          */
-        /*
         onMounted( async  () => {
-            console.log(typeof username)
-            console.log(username)
-            user.value = await getUserByUsername(username);
-            console.log("User Firstname: "+user.value)
-            console.log(user.value.firstname)
-            if (user.value) {
-                firstname.value = user.value.firstname;
-                lastname.value = user.value.lastname;
-            }
-        })
-         */
-
-        onMounted( async  () => {
-            const data = await getUserData()
-            data.forEach((user) => {
-                if (user.username === username) {
-                    currentUser.value = user;
-                    firstname.value = user.firstname;
-                    lastname.value = user.lastname;
-                    if (user.roles !== null) {
-                        user.roles.forEach((role) => {
-                            updatedRoles.value.selected_roles.push(role)
-                        })
-                    }
+            currentUser.value = await getUserByUsername(username);
+            if (currentUser.value) {
+                firstname.value = currentUser.value.firstname;
+                lastname.value = currentUser.value.lastname;
+                if (currentUser.value.roles !== null) {
+                    currentUser.value.roles.forEach((role) => {
+                        updatedRoles.value.selected_roles.push(role)
+                    })
                 }
-            })
+            }
         })
 
         const abort = () => {
@@ -84,15 +67,6 @@ export default {
             updatedRoles,
             abort,
             saveRoles,
-            /*
-            group: ref([]),
-            options: [
-                { label: 'Admin', value: 'admin', checked: false},
-                { label: 'Datenverwalter', value: 'datenverwalter', checked: true},
-                { label: 'Bearbeiter', value: 'bearbeiter', },
-                { label: 'Prüfer', value: 'prüfer', },
-            ]
-             */
         }
     }
 }
@@ -126,15 +100,6 @@ export default {
 
             {{updatedRoles}}
             <div class="q-pa-lg">
-                <!--
-                <p style="margin-right: 5px">Rollen: </p>
-                <q-option-group
-                    :options="options"
-                    type="checkbox"
-                    v-model="group"
-                    :val="allRoles"
-                />
-                -->
                 <div class="checkbox-container" v-for="role in allRoles">
                     <q-checkbox
                         :label="role"

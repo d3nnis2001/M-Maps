@@ -12,9 +12,12 @@ export const getUserData = async function getData() {
 
 export const deleteUser = async function deleteUser(username) {
     try {
-        const cred = new URLSearchParams()
-        cred.append("username", username)
-        return await axios.delete("api/admin/deleteUser", cred)
+        const response = await axios.delete("/api/admin/deleteUser", {
+            params: {
+                userName:username
+            }
+        });
+        return response.data;
     } catch (error) {
         console.log("Unseen error while deleting User");
     }
@@ -22,15 +25,11 @@ export const deleteUser = async function deleteUser(username) {
 
 export const getUserByUsername = async function getUserByUsername(username) {
     try {
-        /*
-        const response = await axios.get("api/admin/getUserByUsername", {
+        const response = await axios.get("/api/admin/getUserByUsername", {
             params: {
                 userName: username
             }
         });
-
-         */
-        const response = await axios.get("api/admin/getUserByUsername" + username);
         console.log(response)
         console.log(response.data)
         return response.data;
@@ -48,8 +47,7 @@ export const updateRoles = async function updateRoles(username, roles){
         const rolesString = roles.join(",");
         cred.append("userName", username);
         cred.append("roles", rolesString);
-        //const response = await axios.post("api/admin/updateRoles", cred);
-        const response = await axios.post("http://localhost:8080/api/admin/updateRoles", cred)
+        const response = await axios.post("/api/admin/updateRoles", cred);
         return response;
     } catch (error) {
         console.error("Error making role changes:", error);

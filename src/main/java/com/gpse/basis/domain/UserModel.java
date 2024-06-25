@@ -23,6 +23,7 @@ public class UserModel implements UserDetails {
     private String firstname;
     private String passwordToken;
     private String lastname;
+    private boolean unlocked;
     private ArrayList<String> region;
     private String service;
     private static final boolean accountNonExpired = true;
@@ -37,7 +38,9 @@ public class UserModel implements UserDetails {
         this.password = password;
         this.firstname = firstname;
         this.lastname = lastname;
+        unlocked = false;
     }
+
     public void addRole(String role) {
         if (this.roles == null) {
             this.roles = new ArrayList<>();
@@ -134,4 +137,13 @@ public class UserModel implements UserDetails {
     public void setService(String service) {
         this.service = service;
     }
+
+    public boolean getUnlocked() {
+        return unlocked;
+    }
+
+    public void setUnlocked(boolean unlocked) {
+        this.unlocked = unlocked;
+    }
+
 }

@@ -30,23 +30,15 @@ public class AdminController {
         return userService.getAllUsers();
     }
 
-    /*
     @GetMapping("/getUserByUsername")
-    @ResponseBody
     public UserModel getUserByUsername(final WebRequest request) {
-        log.debug("Request to show user with email: {}", request.getParameter("userName"));
-        return userService.loadUserByUsername(request.getParameter("userName"));
-    }
-
-     */
-    @GetMapping("/getUserByUsername")
-    public UserModel getUserByUsername(final String username) {
-        return userService.getUserByUsername(username);
+        return userService.getUserByUsername(request.getParameter("userName"));
     }
 
     @DeleteMapping("/deleteUser")
     public ResponseEntity<Boolean> deleteUser(final WebRequest request) {
-        String username = request.getParameter("username");
+        String username = request.getParameter("userName");
+        System.out.println(username);
         return ResponseEntity.ok(userService.deleteUser(username));
     }
 
