@@ -10,7 +10,6 @@
 .input-style {
     width: 100%;
     max-width: 288px;
-    margin: 0 auto;
 }
 .padding {
     padding-bottom: 16px;

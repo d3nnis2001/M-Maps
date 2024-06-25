@@ -8,8 +8,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public interface FileService {
     List<FileUploadResponse> handleImport(List<String> paths, List<String> streckenIds);
@@ -19,9 +21,11 @@ public interface FileService {
     void saveLHHFile(File file) throws IOException, IndexOutOfBoundsException;
     ArrayList<GeoData> getGeoData();
     ArrayList<GeoData> getTrackGeoData(int trackID);
-    ArrayList<GeoData> getPartGeoData(int from, int till);
+    List<Map.Entry<DataService.Colors, String>> getPartGeoData(int from, int till);
 
     List<List<String>> readFoler(String path);
+
+    List<Map.Entry<DataService.Colors, String>> getPartHeatmap(int strecke, LocalDateTime from, LocalDateTime till);
 
     ArrayList<GleisLageDatenpunkt> getAllTrackData();
     ArrayList<GleisLageDatenpunkt> getTrackData(int trackId);
