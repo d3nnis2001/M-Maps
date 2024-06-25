@@ -24,6 +24,7 @@ public class UserServicesImpl implements UserServices {
         return userRepo.findById(username)
             .orElseThrow(() -> new UsernameNotFoundException("ExampleUser name " + username + " not found."));
     }
+
     @Override
     public boolean checkExistanceEmail(String email) {
         return userRepo.existsById(email);
@@ -34,8 +35,14 @@ public class UserServicesImpl implements UserServices {
         return true;
     }
     @Override
-    public boolean deleteUser(String email) {
-        return true;
+    public boolean deleteUser(String username) {
+        try {
+            Optional<UserModel> user = userRepo.findById(username);
+            user.ifPresent(userRepo::delete);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public boolean checkCredentials(String email, String password) {
@@ -79,5 +86,27 @@ public class UserServicesImpl implements UserServices {
             System.out.println(userModel.getLastname());
         }
         return users;
+    }
+    @Override
+    public boolean updateRoles(String email, ArrayList<String> roles) {
+        UserModel us = loadUserByUsername(email);
+        ArrayList<String> oldRoles = us.getRoles();
+        for (String role : oldRoles) {
+            if (!roles.contains(role)){
+                us.deleteRole(role);
+            }
+        }
+        for (String role : roles) {
+            if (!oldRoles.contains(role)){
+                us.addRole(role);
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public UserModel getUserByUsername(final String username) {
+        Optional<UserModel> user = userRepo.findById(username);
+        return user.orElse(null);
     }
 }

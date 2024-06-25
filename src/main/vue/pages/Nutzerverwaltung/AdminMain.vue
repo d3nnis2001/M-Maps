@@ -22,7 +22,7 @@ const table = reactive( {
         },
         {name: 'firstname', label: 'First Name', align: 'left', field: 'firstname', sortable: true},
         {name: 'lastname', label: 'Last Name', align: 'left', field: 'lastname', sortable: true},
-        //{name: 'Roles', label: 'Roles', align: 'left', field: 'roles', sortable: true},
+        {name: 'roles', label: 'Roles', align: 'left', field: 'roles', sortable: true},
     ],
     rows: []
 });
@@ -34,14 +34,29 @@ const showDialog = ref(false);
 const showConfirmDialog = ref(false);
 const currentRow = reactive({});
 const rowToDelete = ref(null);
+const allRoles = ['Admin', 'Datenverwalter', 'Bearbeiter', 'Prüfer'];
 
 async function getData() {
     const data = await getUserData()
-    table.rows = data.map(user => ({
-        username: user.username,
-        firstname: user.firstname,
-        lastname: user.lastname,
-    }));
+    console.log(data)
+    data.forEach((user) => {
+        if (user.unlocked) {
+            table.rows.push({
+                username: user.username,
+                firstname: user.firstname,
+                lastname: user.lastname,
+                roles: user.roles,
+            })
+        } else {
+            table.rows.push({
+                username: user.username,
+                firstname: user.firstname,
+                lastname: user.lastname,
+                roles: user.roles,
+            })
+        }
+
+    })
 }
 
 const checkScreenSize = () => {
@@ -72,15 +87,20 @@ async function deleteUsername(selectedUser) {
     showDialog.value = false;
 }
 
+async function isUnlocked(user) {
+    return await locked(user);
+}
+
 function unlockUser(selectedUser) {
-    if (selectedUser[0] === undefined) {
+    console.log(selectedUser)
+    if (selectedUser === undefined) {
         this.$q.notify({
             message: "Wähle einen Nutzer aus!",
             timeout: 5000,
         });
     } else {
         this.$q.notify({
-            message: `Nutzer mit der ID: '${selectedUser[0].username}' wurde freigeschaltet!`,
+            message: `Nutzer mit der ID: '${selectedUser}' wurde freigeschaltet!`,
             timeout: 5000,
         });
     }
@@ -135,11 +155,9 @@ const removeRow = (selectedUser) => {
                     <q-td key="lastname" :props="props">
                         {{ props.row.lastname }}
                     </q-td>
-                    <!--
                     <q-td key="roles" :props="props">
                         {{ props.row.roles }}
                     </q-td>
-                    -->
                 </q-tr>
             </template>
         </q-table>
@@ -193,6 +211,7 @@ const removeRow = (selectedUser) => {
             <q-card>
                 <q-card-section>
                     <div class="option-button" @click="editUser">Editieren</div>
+                    <div class="option-button" @click="unlockUser(currentRow.username)">Freischalten</div>
                     <div class="option-button" @click="confirmDeleteUsername(currentRow)">Löschen</div>
                 </q-card-section>
                 <q-card-section>
