@@ -121,17 +121,17 @@ const router = createRouter({
         },
         {
             path: "/dataviewer",
-            name: "Dataviewer",
+            name: "dataviewer",
             component: Dataviewer
         },
         {
             path: "/dataviewer/route/:id/from/:fromId/to/:toId",
-            name: "DataviewerRoute",
+            name: "dataviewerRoute",
             component: DataviewerRoute
         },
         {
             path: "/dataviewer/point/:lon/:lat",
-            name: "DataviewerPoint",
+            name: "dataviewerPoint",
             component: DataviewerPoint
         }
     ]

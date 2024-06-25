@@ -526,10 +526,10 @@ export default {
         </div>
         <div class="align-mult">
             <div>
-                <q-btn label="Dataviever" @click="switchDataviewer" class=""></q-btn>
+                <q-btn label="Profil" @click="switchDataviewer" class=""></q-btn>
             </div>
             <div>
-                <q-btn label="Profil" @click="switchProfil" class=""></q-btn>
+                <q-btn label="Zeitreihe" @click="switchProfil" class=""></q-btn>
             </div>
         </div>
         <div>
