@@ -3,7 +3,7 @@ package com.gpse.basis.domain;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
-@Document(collection = "Pictures")
+@Document(collection = "Images")
 public class Image {
 
     @MongoId

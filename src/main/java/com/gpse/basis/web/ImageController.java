@@ -5,9 +5,8 @@ import com.gpse.basis.services.ImageService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.context.request.WebRequest;
 
-import java.io.IOException;
 import java.util.Optional;
 
 @RestController
@@ -17,13 +16,16 @@ public class ImageController {
     private ImageService imageService;
 
     @PostMapping("/upload")
-    public ResponseEntity<String> uploadPhoto(@RequestParam("orderId") String orderId, @RequestParam("file") MultipartFile file) {
-        try {
-            imageService.saveImage(orderId, file);
-            return new ResponseEntity<>(orderId, HttpStatus.OK);
-        } catch (IOException e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<String> uploadPhoto(final WebRequest request) {
+        String orderId = request.getParameter("orderId");
+        
+        byte[] file = request.getParameter("file").getBytes();
+        String name = request.getParameter("file").toString();
+        System.out.println("TEST:" + name);
+        System.out.println("Controller-Test1");
+        //imageService.saveImage(orderId, file);
+        System.out.println("Controller-Test2");
+        return new ResponseEntity<>(orderId, HttpStatus.OK);
     }
 
     @GetMapping("/download")

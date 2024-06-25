@@ -4,6 +4,7 @@ import router from "@/main/vue/router";
 import {deleteInspectionOrder, getDataById, getInspectionOrder, sendNewStatus} from "@/main/vue/api/inspection";
 import {useQuasar} from "quasar";
 import axios from "axios";
+import {sendImage} from "@/main/vue/api/image";
 
 
 export default {
@@ -48,10 +49,9 @@ export default {
         const currentRow = ref({});
         const rowToDelete = ref(null);
 
-
+        const files = ref([]);
         const userId = ref('');
         const remarks = ref('');
-        const files = ref([])
 
         const fetchData = async () => {
             const response = await getInspectionOrder()
@@ -186,33 +186,40 @@ export default {
             }
         });
         // Foto Upload:
-        function onFileAdded(files) {
-            this.files = files;
-            console.log("onFileAdded");
+
+        function onFileAdded(addedFiles) {
+            files.value.push(...addedFiles);
+            console.log("onFileAdded", files.value);
         }
 
-        function onFileRemoved(file) {
-            this.files = this.files.filter(f => f !== file);
-            console.log("onFileRemoved");
+        function onFileRemoved(removedFile) {
+            files.value = files.value.filter(f => f !== removedFile);
+            console.log("onFileRemoved", files.value);
         }
+
         async function uploadFiles() {
             let formData = new FormData();
-            console.log("TEST1")
+            console.log("TEST1");
             formData.append('orderId', currentRow.value.inspectionOrderId);
-            this.files.forEach(file => {
+            files.value.forEach(file => {
                 formData.append('file', file);
             });
-            console.log("TEST2")
+            await sendImage(formData);
+
+
+            /*
             try {
                 let response = await axios.post('/api/images/upload', formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     }
                 });
-                this.message = `Photo uploaded with ID: ${response.data}`;
+                console.log(`Photo uploaded with ID: ${response.data}`);
             } catch (error) {
-                this.message = 'Error uploading photo.';
+                console.error('Error uploading photo.');
             }
+
+             */
         }
 
         function factory(files) {
@@ -226,7 +233,6 @@ export default {
                 };
             });
         }
-
 
         return {
             state,
@@ -247,7 +253,6 @@ export default {
             smallScreen,
             largeScreen,
             showPictureUploadDialog,
-            onRejected,
             showFurtherInformation,
             showFurtherInformationDialog,
             userId,
@@ -255,7 +260,8 @@ export default {
             onFileAdded,
             onFileRemoved,
             uploadFiles,
-            factory
+            factory,
+            files
         }
     },
 }
