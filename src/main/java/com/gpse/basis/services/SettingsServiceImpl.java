@@ -20,6 +20,9 @@ public class SettingsServiceImpl implements SettingsService {
     public Settings getImpressum() {
         List<Settings> items = new LinkedList<>();
         settingsRepository.findAll().forEach(items::add);
+        if (items.size() == 0) {
+            return new Settings("");
+        }
         return items.getFirst();
     }
 }
