@@ -52,6 +52,7 @@ export default {
         const files = ref([]);
         const userId = ref('');
         const remarks = ref('');
+        const review = ref('');
 
         const fetchData = async () => {
             const response = await getInspectionOrder()
@@ -157,13 +158,6 @@ export default {
             }
         };
 
-        function onRejected (rejectedEntries) {
-            $q.notify({
-                type: 'negative',
-                message: `${rejectedEntries.length} file(s) did not pass validation constraints`
-            })
-        }
-
         const updateRowStatus = (inspectionOrderId, status) => {
             const row = state.rows.find(row => row.inspectionOrderId === inspectionOrderId);
             if (row) {
@@ -185,6 +179,7 @@ export default {
                 fetchData();
             }
         });
+
         // Foto Upload:
 
         function onFileAdded(addedFiles) {
@@ -197,17 +192,19 @@ export default {
             console.log("onFileRemoved", files.value);
         }
 
+
+
         async function uploadFiles() {
             let formData = new FormData();
             console.log("TEST1");
-            formData.append('orderId', currentRow.value.inspectionOrderId);
-            files.value.forEach(file => {
-                formData.append('file', file);
+
+            files.value.forEach((file, index) => {
+                formData.append(`file${index}`, file);
             });
-            await sendImage(formData);
 
 
-            /*
+            await sendImage(currentRow.value.inspectionOrderId, formData);
+            /* ODER:
             try {
                 let response = await axios.post('/api/images/upload', formData, {
                     headers: {
@@ -220,6 +217,8 @@ export default {
             }
 
              */
+            showPictureUploadDialog.value = false;
+            markFinished()
         }
 
         function factory(files) {
@@ -247,7 +246,6 @@ export default {
             showDialog,
             showConfirmDialog,
             confirmDeleteOrder,
-            markFinished,
             markCancelled,
             markOrdered,
             smallScreen,
@@ -261,7 +259,8 @@ export default {
             onFileRemoved,
             uploadFiles,
             factory,
-            files
+            files,
+            review
         }
     },
 }
@@ -358,7 +357,6 @@ export default {
                         @removed="onFileRemoved"
                         :factory="factory"
                     />
-                    <q-btn label="Upload" color="primary" @click="uploadFiles" />
 
                     <!--
                     <q-uploader
@@ -372,8 +370,11 @@ export default {
                         with-credentials
                     />
                     -->
+                    <q-card-section>
+                        <q-input class="input-bem text-with-input" outlined color="primary" rounded v-model="review" label="Bewertung" />
+                    </q-card-section>
                     <q-btn flat label="Abbrechen" color="negative" @click="showPictureUploadDialog = false"></q-btn>
-                    <q-btn flat label="Prüfauftrag abschließen" color="positive" @click="markFinished"></q-btn>
+                    <q-btn flat label="Prüfauftrag abschließen" color="positive" @click="uploadFiles"></q-btn>
                 </q-card-section>
             </q-card>
         </q-dialog>
@@ -432,4 +433,6 @@ export default {
     thead tr:first-child th
         background-color: $blue-grey-5
 
+.q-uploader
+    margin-left: 20px
 </style>

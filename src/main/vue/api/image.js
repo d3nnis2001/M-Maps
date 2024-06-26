@@ -1,15 +1,15 @@
 import axios from "axios";
 
-export const sendImage = async function sendImage(files) {
-    try {
-        const id = files.get("orderId");
-        console.log(id);
-        const derc = new URLSearchParams();
-        derc.append("orderId", id);
-        console.log(files.get("file"));
-        derc.append("file", files.get("file"));
 
-        const response = await axios.post("/api/images/upload", derc)
+export const sendImage = async function sendImage(id, formData) {
+    try {
+        formData.append("orderId", id);
+
+        const response = await axios.post("/api/images/upload", formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
         return response;
 
     } catch (error) {
@@ -17,3 +17,5 @@ export const sendImage = async function sendImage(files) {
         return false;
     }
 }
+
+

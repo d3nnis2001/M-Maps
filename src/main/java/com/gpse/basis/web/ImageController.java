@@ -5,7 +5,7 @@ import com.gpse.basis.services.ImageService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 
@@ -16,17 +16,22 @@ public class ImageController {
     private ImageService imageService;
 
     @PostMapping("/upload")
-    public ResponseEntity<String> uploadPhoto(final WebRequest request) {
-        String orderId = request.getParameter("orderId");
-        
-        byte[] file = request.getParameter("file").getBytes();
-        String name = request.getParameter("file").toString();
-        System.out.println("TEST:" + name);
-        System.out.println("Controller-Test1");
-        //imageService.saveImage(orderId, file);
-        System.out.println("Controller-Test2");
-        return new ResponseEntity<>(orderId, HttpStatus.OK);
+    public ResponseEntity<String> uploadPhoto(@RequestParam("orderId") String orderId,
+                                              @RequestParam("file") MultipartFile[] files) {
+        try {
+            for (MultipartFile file : files) {
+                String name = file.getOriginalFilename();
+                byte[] bytes = file.getBytes();
+                // Hier kann die Datei gespeichert oder weiter verarbeitet werden
+                System.out.println("Received file: " + name);
+                // imageService.saveImage(orderId, bytes);
+            }
+            return new ResponseEntity<>(orderId, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error uploading files", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
+
 
     @GetMapping("/download")
     public ResponseEntity<Image> getPhoto(@PathVariable String id) {
