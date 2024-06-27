@@ -52,7 +52,21 @@ public class AdminController {
         String[] rolesList = rolesString.split(",");
         ArrayList<String> roles = new ArrayList<>();
         Collections.addAll(roles, rolesList);
-        userService.updateRoles(username, roles);
-        return ResponseEntity.ok(true);
+        boolean unlockSuccessful = userService.updateRoles(username, roles);
+
+        return ResponseEntity.ok(unlockSuccessful);
+    }
+
+    @PostMapping("/unlockUser")
+    public ResponseEntity<Boolean> unlockUser(final WebRequest request) {
+        String username = request.getParameter("userName");
+        System.out.println(username);
+        if (username == null) {
+            System.out.println("Bad Request");
+            return ResponseEntity.badRequest().body(false);
+        }
+        boolean unlockSuccessful = userService.unlockUser(username);
+
+        return ResponseEntity.ok(unlockSuccessful);
     }
 }

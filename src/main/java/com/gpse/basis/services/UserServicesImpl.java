@@ -113,4 +113,12 @@ public class UserServicesImpl implements UserServices {
         Optional<UserModel> user = userRepo.findById(username);
         return user.orElse(null);
     }
+
+    public boolean unlockUser(final String username) {
+        UserModel us = getUserByUsername(username);
+        us.setUnlocked(true);
+        System.out.println(us.getUnlocked());
+        userRepo.save(us);
+        return true;
+    }
 }

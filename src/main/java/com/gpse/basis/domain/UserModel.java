@@ -33,6 +33,7 @@ public class UserModel implements UserDetails {
 
     @JsonIgnore
     private transient ArrayList<String> roles;
+
     public UserModel(String email, String password, String firstname, String lastname) {
         this.email = email;
         this.password = password;

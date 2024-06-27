@@ -18,4 +18,6 @@ public interface UserServices extends UserDetailsService {
     boolean updateRoles(String email, ArrayList<String> roles);
 
     UserModel getUserByUsername(String username);
+
+    boolean unlockUser(String username);
 }
