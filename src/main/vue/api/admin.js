@@ -34,7 +34,7 @@ export const getUserByUsername = async function getUserByUsername(username) {
         console.log(response.data)
         return response.data;
     } catch (error) {
-        console.error("Unseen error while try to get User data for editing:", error);
+        console.error("Unseen error while try to get User data for editing: ", error);
         return false
     }
 }
@@ -57,5 +57,17 @@ export const updateRoles = async function updateRoles(username, roles){
             console.log("Error making role changes:", error.message);
         }
         throw new Error(`Error making role changes: ${error.message}`);
+    }
+}
+
+export const unlockUser = async function unlockUser(username) {
+    try {
+        console.log(username)
+        const cred = new URLSearchParams();
+        cred.append("userName", username);
+        return await axios.post("/api/admin/unlockUser", cred);
+    } catch (error) {
+        console.error("Unseen error while try to unlock User: ", error);
+        return false
     }
 }

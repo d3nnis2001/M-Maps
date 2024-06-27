@@ -5,7 +5,7 @@ import EditUser from "@/main/vue/pages/Nutzerverwaltung/EditUser.vue";
 import {useQuasar} from "quasar";
 import {useRouter} from "vue-router";
 import {useLoginStore} from "@/main/vue/stores/LoginStore";
-import {getUserData, deleteUser} from "@/main/vue/api/admin";
+import {getUserData, deleteUser, unlockUser} from "@/main/vue/api/admin";
 
 
 const table = reactive( {
@@ -16,13 +16,14 @@ const table = reactive( {
             required: true,
             label: 'E-Mail',
             align: 'left',
-            field: row => row.username,
+            field: 'username',
             format: val => `${val}`,
             sortable: true
         },
         {name: 'firstname', label: 'First Name', align: 'left', field: 'firstname', sortable: true},
         {name: 'lastname', label: 'Last Name', align: 'left', field: 'lastname', sortable: true},
         {name: 'roles', label: 'Roles', align: 'left', field: 'roles', sortable: true},
+        {name: 'unlocked', label: 'Unlocked', align: 'left', field: 'unlocked', sortable: true},
     ],
     rows: []
 });
@@ -34,18 +35,21 @@ const showDialog = ref(false);
 const showConfirmDialog = ref(false);
 const currentRow = reactive({});
 const rowToDelete = ref(null);
+const {notify} = useQuasar();
 const allRoles = ['Admin', 'Datenverwalter', 'Bearbeiter', 'Prüfer'];
 
 async function getData() {
     const data = await getUserData()
     console.log(data)
     data.forEach((user) => {
+        console.log("Region: " + user.region)
         if (!user.unlocked) {
             table.rows.push({
                 username: user.username,
                 firstname: user.firstname,
                 lastname: user.lastname,
                 roles: user.roles,
+                unlocked: "Needs Activation!"
             })
         } else {
             table.rows.push({
@@ -80,22 +84,33 @@ const confirmDeleteUsername = (row) => {
 }
 
 async function deleteUsername(selectedUser) {
-    await deleteUser(selectedUser);
-    removeRow(selectedUser);
+    const deleteSuccessful = await deleteUser(selectedUser);
+    if (deleteSuccessful) {
+        removeRow(selectedUser);
+        notify({
+            message: "Nutzer wurde erfolgreich entfernt!",
+            timeout: 5000,
+        })
+    } else {
+        notify({
+            message: "Es gab ein Problem beim entfernen des Nutzer!",
+            timeout: 5000,
+        })
+    }
     showConfirmDialog.value = false;
     showDialog.value = false;
 }
 
-function unlockUser(selectedUser) {
+async function unlockCurrentUser(selectedUser) {
     console.log(selectedUser)
-    if (selectedUser === undefined) {
-        this.$q.notify({
-            message: "Wähle einen Nutzer aus!",
-            timeout: 5000,
-        });
+    const unlockSuccessful = await unlockUser(selectedUser);
+    if (unlockSuccessful) {
+        router.go(0);
     } else {
-        this.$q.notify({
-            message: `Nutzer mit der ID: '${selectedUser}' wurde freigeschaltet!`,
+        showDialog.value = false;
+        console.log("Problem")
+        notify({
+            message: "Es gab ein Problem mit dem freischalten des Nutzer!",
             timeout: 5000,
         });
     }
@@ -108,6 +123,9 @@ async function editUser() {
 }
 
 const rowClick = (evt, rowData) => {
+    console.log(typeof rowData)
+    console.log(rowData)
+    console.log(currentRow)
     Object.assign(currentRow, rowData);
     showDialog.value = true;
 }
@@ -153,6 +171,9 @@ const removeRow = (selectedUser) => {
                     <q-td key="roles" :props="props">
                         {{ props.row.roles }}
                     </q-td>
+                    <q-td key="unlocked" :props="props">
+                        {{ props.row.unlocked }}
+                    </q-td>
                 </q-tr>
             </template>
         </q-table>
@@ -176,11 +197,11 @@ const removeRow = (selectedUser) => {
                     <q-th :key="props.cols[0].name" :props="props">
                         {{ props.cols[0].label }}
                     </q-th>
-                    <q-th :key="props.cols[1].name" :props="props">
-                        {{ props.cols[1].label }}
-                    </q-th>
                     <q-th :key="props.cols[2].name" :props="props">
                         {{ props.cols[2].label }}
+                    </q-th>
+                    <q-th :key="props.cols[4].name" :props="props">
+                        {{ props.cols[4].label }}
                     </q-th>
                 </q-tr>
             </template>
@@ -206,9 +227,11 @@ const removeRow = (selectedUser) => {
             <q-card>
                 <q-card-section>
                     <div class="option-button" @click="editUser">Editieren</div>
-                    <div class="option-button" @click="unlockUser(currentRow.username)">Freischalten</div>
+                    <div v-if="currentRow.unlocked" class="option-button" @click="unlockCurrentUser(currentRow.username)">Freischalten</div>
+                    <div v-else-if="!currentRow.unlocked" class="option-button" :class="{ 'disabled-button': true }">Freischalten</div>
                     <div class="option-button" @click="confirmDeleteUsername(currentRow)">Löschen</div>
                 </q-card-section>
+
                 <q-card-section>
                     <q-btn flat label="Schließen" color="primary" @click="showDialog = false"></q-btn>
                 </q-card-section>
@@ -252,6 +275,12 @@ const removeRow = (selectedUser) => {
 .handleButton {
     margin-top: 20px;
 
+}
+
+.disabled-button {
+    pointer-events: none;
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 </style>
 
