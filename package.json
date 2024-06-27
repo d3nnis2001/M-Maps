@@ -8,18 +8,21 @@
   },
   "dependencies": {
     "@mapbox/leaflet-pip": "^1.1.0",
-    "@quasar/extras": "^1.16.9",
+    "apexcharts": "^3.49.2",
     "axios": "^1.6.7",
     "jsonwebtoken": "^9.0.2",
     "leaflet": "^1.9.4",
     "leaflet-pip": "^1.1.0",
     "leaflet.heat": "^0.2.0",
+    "material-icons": "^1.13.12",
     "pinia": "^2.1.7",
     "quasar": "^2.14.4",
     "vue": "^3.4.19",
+    "vue-apexcharts": "^1.6.2",
     "vue-router": "^4.2.5"
   },
   "devDependencies": {
+    "@quasar/extras": "^1.16.11",
     "@quasar/vite-plugin": "^1.6.0",
     "@vitejs/plugin-vue": "^5.0.4",
     "sass": "^1.71.0",

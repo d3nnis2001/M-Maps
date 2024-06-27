@@ -13,6 +13,7 @@ import {useQuasar} from "quasar";
 import DateInput from "@/main/vue/pages/Map/DateInput.vue";
 import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";
 import router from "@/main/vue/router";
+import WeatherComponent from "@/main/vue/pages/Map/WeatherComponent.vue";
 
 const map = ref(null);
 var markers = [];
@@ -57,6 +58,9 @@ const NO = ref(false)
 const NB = ref(false)
 const N = ref(false)
 const reparatur = ref([])
+const showWeather = ref(false)
+var weatherLat = 0.0
+var weatherLon = 0.0
 
 onMounted(async () => {
     map.value = L.map('map', {
@@ -129,10 +133,21 @@ onMounted(async () => {
         reparatur.value[reparatur.value.length - 1].marker.on('click', onReparaturClicked);
     })
 
+    map.value.on('dblclick', doubleClickOnMap);
+
 
     const data = await getGeoData();
     await setGeoData(data)
 });
+
+//-------------------------- Wetter ---------------------------
+function doubleClickOnMap(e) {
+    const { lat, lng } = e.latlng;
+    console.log(`Double click: lat: ${lat}, longitude: ${lng}`);
+    weatherLat = lat
+    weatherLon = lng
+    showWeather.value = true
+}
 
 
 // -------------------------- REGIONS --------------------------
@@ -876,6 +891,9 @@ const addEnd = () => {
             </div>
         </div>
     </q-dialog>
+    <q-dialog v-model="showWeather" class="fixed-dialog">
+        <WeatherComponent :lat="weatherLat" :lon="weatherLon"/>
+    </q-dialog>
 </template>
 
 <style lang="scss">
@@ -953,6 +971,11 @@ const addEnd = () => {
     justify-content: flex-end;
     width: 100%;
     margin-right: 5vw;
+}
+
+.fixed-dialog .q-dialog__inner {
+    width: 390px;  /* Set the desired width */
+    height: 800px; /* Set the desired height */
 }
 
 </style>
