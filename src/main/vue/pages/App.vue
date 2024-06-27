@@ -9,6 +9,7 @@ const links = [
     { name: 'dataimport', label: 'Datenverwaltung', to: '/dataimport' },
     { name: 'repair', label: 'Reparaturaufträge', to: '/repair' },
     { name: 'admin', label: 'Nutzerverwaltung', to: '/admin' },
+    { name: 'dataviewer', label: 'Dataviewer', to: '/dataviewer' }
 ]
 const links2 = [
     { name: 'home', label: 'Abmelden', to: '/' },
@@ -59,6 +60,15 @@ function changeBool() {
                 </q-toolbar-title>
                 <q-toolbar-title v-if="$route.name === 'impressum'" align="middle">
                     Impressum
+                </q-toolbar-title>
+                <q-toolbar-title v-if="$route.name === 'dataviewer'" align="middle">
+                    Dataviewer
+                </q-toolbar-title>
+                <q-toolbar-title v-if="$route.name === 'dataviewerRoute'" align="middle">
+                    Dataviewer für Route
+                </q-toolbar-title>
+                <q-toolbar-title v-if="$route.name === 'dataviewerPoint'" align="middle">
+                    Dataviewer für Punkt
                 </q-toolbar-title>
                 <q-btn dense flat round icon="menu" @click="toggleRightDrawer" align="right" />
             </q-toolbar>
