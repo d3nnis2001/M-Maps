@@ -62,6 +62,18 @@ export default {
           }
       }
 
+      function onClickHome() {
+          router.push(`/dataviewer`)
+      }
+
+      /*function onClickRoute() {
+          router.push(`/dataviewer/route/0/from/0/to/0`)
+      }*/
+
+      function onClickPoint() {
+          router.push(`/dataviewer/point/null/null`)
+      }
+
       function refreshRoute() {}
 
       const isPointPath = computed(() => route.path.includes('/dataviewer/point'))
@@ -78,7 +90,10 @@ export default {
           showRoute,
           isPointPath,
           isRoutePath,
-          refreshRoute
+          refreshRoute,
+          onClickHome,
+          //onClickRoute,
+          onClickPoint
       }
   }
 };
@@ -88,7 +103,7 @@ export default {
 <div>
     <div class="q-pa-xs">
         <div class="align-mult">
-            <div class="align-basic">
+            <div v-if="!isRoutePath" class="align-basic">
                 <p>Longitude</p>
                 <q-input class="q-pa-xs" outlined v-model="dpLon"></q-input>
                 <p>Lattitude</p>
@@ -97,8 +112,8 @@ export default {
                     <q-btn label="Daten anzeigen" @click=showData class=""></q-btn>
                 </div>
             </div>
-            <div v-if="!isRoutePath">
-                <div v-if="!isRoutePath" class="align-basic">
+            <div v-if="!isPointPath && !isRoutePath">
+                <div class="align-basic">
                     <p>Strecken ID</p>
                     <q-input class="q-pa-xs" outlined v-model="routeID" ></q-input>
                 </div>
@@ -116,12 +131,39 @@ export default {
                     <div v-if="!isRoutePath" class="q-pa-xs">
                         <q-btn label="Strecke visualisieren" @click=showRoute class=""></q-btn>
                     </div>
-                    <div v-if="isRoutePath" class="q-pa-xs">
-                        <q-btn label="Strecken km aktualisieren" @click=refreshRoute class=""></q-btn>
-                    </div>
                 </div>
             </div>
         </div>
+        <q-page-sticky position="bottom-right" :offset="[10, 10]" >
+            <div class="q-mt-lg">
+                <q-fab
+                    label="Actions"
+                    vertical-actions-align="left"
+                    color="red"
+                    icon="keyboard_arrow_left"
+                    direction="left"
+                >
+                    <q-fab-action
+                        color="red"
+                        @click="onClickHome"
+                        icon="home"
+                    />
+                    <!--
+                    <q-fab-action
+                        v-if="!isRoutePath"
+                        color="red"
+                        @click="onClickRoute"
+                        icon="analytics"
+                    />-->
+                    <q-fab-action
+                        v-if="!isPointPath"
+                        color="red"
+                        @click="onClickPoint"
+                        icon="place"
+                    />
+                </q-fab>
+            </div>
+        </q-page-sticky>
     </div>
 </div>
 </template>

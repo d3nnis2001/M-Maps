@@ -5,7 +5,7 @@ import VueApexCharts from 'vue3-apexcharts';
 
 import { Bar } from 'vue-chartjs'
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js'
-import {ref, onMounted, reactive, nextTick} from "vue";
+import {ref, onMounted, reactive, nextTick, watch} from "vue";
 import {getUserData} from "@/main/vue/api/admin";
 import {useRoute, useRouter} from "vue-router";
 import Plotly from 'plotly.js-dist';
@@ -58,6 +58,8 @@ export default {
                     colorscale: 'Viridis',
                     opacity: 0.8,
                 },
+                //type: 'surface',
+                //type: 'mesh3d',
                 type: 'scatter3d',
             };
 
@@ -112,7 +114,7 @@ export default {
             chart: {
                 type: 'bar',
                 height: '350',
-                id: 'vuechart-example'
+                id: 'vuechart'
             },
             plotOptions: {
                 bar: {
@@ -144,9 +146,13 @@ export default {
             },
             xaxis: {
                 type: 'numeric',
+                tickAmount: Math.ceil((toStrKm.value - fromStrKm.value) / 0.5),
+                min: parseFloat(fromStrKm.value),
+                max: parseFloat(toStrKm.value),
                 //categories: [],
                 labels: {
                     rotate: -90,
+                    formatter: (value) => parseFloat(value).toFixed(3)
                     /*
                     formatter: function (value) {
                         return value.toFixed(0);
@@ -221,7 +227,7 @@ export default {
             zLeft.value = []
             data.value.forEach(user => {
                 if (user.str_km >= from && user.str_km <= to){
-                    console.log("1")
+                    //console.log("1")
                     seriesLinks.value[0].data.push([user.str_km,user.z_links_railab_3p])
                     seriesRechts.value[0].data.push([user.str_km,user.z_rechts_railab_3p])
                     const timestamp = user.time_unix
@@ -243,11 +249,17 @@ export default {
             if (seriesRechts.value[0].data.length === 0) {
                 rightEmpty.value = true
             }
+
             nextTick(() => {
                 plot3DLeft();
                 plot3DRight();
             })
             //plot3D()
+
+
+            /*chartOptions.value.xaxis.min = parseFloat(from);
+            chartOptions.value.xaxis.max = parseFloat(to);
+            chartOptions.value.xaxis.tickAmount = Math.ceil((to - from) / 0.5);*/
         }
 
         function refreshRoute() {
@@ -305,6 +317,8 @@ export default {
             routeId.value = route.params.id
             from.value = route.params.fromId
             to.value = route.params.toId
+            fromStrKm.value = from.value
+            toStrKm.value = to.value
             console.log(routeId.value, from.value, to.value)
             const data2 = await getTrackLayoutData(routeId.value)
             data.value = data2
@@ -361,6 +375,11 @@ export default {
                 rightEmpty.value = true
             }
 
+
+            /*chartOptions.value.xaxis.min = parseFloat(from);
+            chartOptions.value.xaxis.max = parseFloat(to);
+            chartOptions.value.xaxis.tickAmount = Math.ceil((to - from) / 0.5);*/
+
             //plot3D()
             //chartOptions.value.xaxis.categories = categories
             //series.value.data = seriesData
@@ -371,11 +390,17 @@ export default {
             console.log(loaded.value)
         })
 
+        watch([fromStrKm, toStrKm], () => {
+            chartOptions.value.xaxis.tickAmount = Math.ceil((toStrKm.value - fromStrKm.value) / 0.5);
+            chartOptions.value.xaxis.min = parseFloat(fromStrKm.value);
+            chartOptions.value.xaxis.max = parseFloat(toStrKm.value);
+        });
+
         return {
             chartOptions, seriesLinks, seriesRechts, loaded,
             plotlyChartLeft, refreshRoute, fromStrKm, toStrKm,
             switchDataviewer, switchProfil, isProfile, plot3DLeft,
-            leftEmpty, rightEmpty, plotlyChartRight
+            leftEmpty, rightEmpty, plotlyChartRight, routeId
         }
     }
 }
@@ -504,10 +529,14 @@ export default {
 -->
 <template>
     <q-page>
-        <div class="align-mult">
+        <div class="align-mult q-pa-xs">
             <Dataviewer/>
             <div>
                 <div class="align-mult">
+                    <div>
+                        <p>Strecken ID</p>
+                        <q-input class="q-pa-xs" outlined v-model="routeId" ></q-input>
+                    </div>
                     <div>
                         <p>von</p>
                         <q-input class="q-pa-xs" outlined v-model="fromStrKm"></q-input>
@@ -524,7 +553,7 @@ export default {
                 </div>
             </div>
         </div>
-        <div class="align-mult">
+        <div class="align-mult q-pa-xs">
             <div>
                 <q-btn label="Profil" @click="switchDataviewer" class=""></q-btn>
             </div>
