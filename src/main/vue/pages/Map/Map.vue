@@ -974,8 +974,8 @@ const addEnd = () => {
 }
 
 .fixed-dialog .q-dialog__inner {
-    width: 390px;  /* Set the desired width */
-    height: 800px; /* Set the desired height */
+    width: 390px;
+    height: 800px;
 }
 
 </style>

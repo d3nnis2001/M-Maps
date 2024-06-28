@@ -19,7 +19,8 @@
     "quasar": "^2.14.4",
     "vue": "^3.4.19",
     "vue-apexcharts": "^1.6.2",
-    "vue-router": "^4.2.5"
+    "vue-router": "^4.2.5",
+    "vue3-apexcharts": "^1.5.3"
   },
   "devDependencies": {
     "@quasar/extras": "^1.16.11",
