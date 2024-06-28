@@ -11,7 +11,6 @@ const text = ref("")
 
 onMounted(async () => {
     await settingsStore.getImpressum()
-    console.log(oldText.value)
 })
 
 async function editImpressum() {
@@ -35,17 +34,32 @@ async function editImpressum() {
 </script>
 
 <template>
-    <div>
-        <h1 class="text-h4">altes Impressum</h1>
-        {{impressum}}
+    <div class="align">
+        <div>
+            <h1 class="text-h4">Aktuelles Impressum</h1>
+            <div>
+                {{impressum}}
+            </div>
+        </div>
+        <div>
+            <h2 class="text-h4">Impressum ändern</h2>
+            <div>
+                <q-input type="textarea" v-model="text" filled class="padding"/>
+                <q-btn label="Speichern" color="primary" @click="editImpressum"/>
+            </div>
+        </div>
     </div>
-    <div style="max-width: 480px">
-        <h2 class="text-h4">Impressum ändern</h2>
-        <q-input type="textarea" v-model="text" filled/>
-        <q-btn label="Speichern" color="primary" @click="editImpressum"/>
-    </div>
+
 </template>
 
 <style scoped>
+.padding {
+    padding-left: 32px;
+    padding-right: 32px;
+    padding-bottom: 16px
+}
+.align {
+    text-align: center
+}
 
 </style>
