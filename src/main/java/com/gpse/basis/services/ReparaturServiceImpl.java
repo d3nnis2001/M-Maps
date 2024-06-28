@@ -8,15 +8,14 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 @Service
 
 public class ReparaturServiceImpl implements ReparaturService {
-    private ReperaturRepository rep;
-    private RepChecklistRepository checkRepo;
+    private final ReperaturRepository rep;
+    private final RepChecklistRepository checkRepo;
     @Autowired
     public ReparaturServiceImpl(ReperaturRepository rep, RepChecklistRepository checkRepo) {
         this.rep = rep;

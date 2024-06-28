@@ -1,7 +1,6 @@
 package com.gpse.basis.services;
 
 import com.gpse.basis.domain.InspectionOrder;
-import com.gpse.basis.domain.Reparatur;
 import com.gpse.basis.repositories.InspectionOrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
