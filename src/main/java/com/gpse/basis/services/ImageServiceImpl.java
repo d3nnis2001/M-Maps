@@ -4,9 +4,7 @@ import com.gpse.basis.domain.Image;
 import com.gpse.basis.repositories.ImageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.Optional;
 import java.util.Random;
 
@@ -20,9 +18,10 @@ public class ImageServiceImpl implements ImageService {
         this.imRep = im;
     }
     @Override
-    public void saveImage(String orderId, MultipartFile file) throws IOException {
+    public void saveImage(String orderId, String imageString) {
         String newImageId = generateId();
-        Image image = new Image(newImageId, orderId, file.getOriginalFilename(), file.getContentType(), file.getBytes());
+        Image image = new Image(newImageId, orderId, imageString);
+        System.out.println("Success!!");
         imRep.save(image);
     }
 
@@ -34,7 +33,9 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public Optional<Image> getImage(String id) {
-        return imRep.findById(id);
+    public String getImage(String id) {
+        Optional<Image> image = imRep.findById(id);
+
+        return image.get().getImage();
     }
 }

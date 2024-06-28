@@ -11,24 +11,33 @@ public class Image {
     private String orderId;
     // Id of repair order or inspection order
     private String name;
-    private String type;
     private byte[] imageData;
 
-    public Image(String imageId, String orderId, String name, String type, byte[] imageData) {
+    private String image;
+    // in base64
+
+    public Image(String imageId, String orderId, String image) {
         this.imageId = imageId;
         this.orderId = orderId;
-        this.name = name;
-        this.type = type;
-        this.imageData = imageData;
+        this.image = image;
     }
 
     public String getImageId() {
         return imageId;
     }
 
-    public void setId(String id) {
-        this.imageId = id;
+    public void setImageId(String imageId) {
+        this.imageId = imageId;
     }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
     public String getOrderId() {
         return orderId;
     }
@@ -42,14 +51,6 @@ public class Image {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public byte[] getImageData() {

@@ -10,6 +10,21 @@ import {sendImage} from "@/main/vue/api/image";
 export default {
     setup () {
         const $q = useQuasar();
+        const files = ref([]);
+        const base64String = ref('');
+
+
+        const showDialog = ref(false);
+        const showConfirmDialog = ref(false);
+        const showPictureUploadDialog = ref(false);
+        const showFurtherInformationDialog = ref(false);
+        const currentRow = ref({});
+        const rowToDelete = ref(null);
+
+
+        const userId = ref('');
+        const remarks = ref('');
+        const review = ref('');
         const state = reactive ({
             filter: '',
             columns: [
@@ -42,17 +57,6 @@ export default {
             window.removeEventListener('resize', checkScreenSize);
         });
 
-        const showDialog = ref(false);
-        const showConfirmDialog = ref(false);
-        const showPictureUploadDialog = ref(false);
-        const showFurtherInformationDialog = ref(false);
-        const currentRow = ref({});
-        const rowToDelete = ref(null);
-
-        const files = ref([]);
-        const userId = ref('');
-        const remarks = ref('');
-        const review = ref('');
 
         const fetchData = async () => {
             const response = await getInspectionOrder()
@@ -182,56 +186,38 @@ export default {
 
         // Foto Upload:
 
-        function onFileAdded(addedFiles) {
-            files.value.push(...addedFiles);
-            console.log("onFileAdded", files.value);
-        }
-
         function onFileRemoved(removedFile) {
             files.value = files.value.filter(f => f !== removedFile);
             console.log("onFileRemoved", files.value);
         }
 
-
-
-        async function uploadFiles() {
-            let formData = new FormData();
-            console.log("TEST1");
-
-            files.value.forEach((file, index) => {
-                formData.append(`file${index}`, file);
-            });
-
-
-            await sendImage(currentRow.value.inspectionOrderId, formData);
-            /* ODER:
-            try {
-                let response = await axios.post('/api/images/upload', formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                });
-                console.log(`Photo uploaded with ID: ${response.data}`);
-            } catch (error) {
-                console.error('Error uploading photo.');
+        const onFileAdded = (newFiles) => {
+            if (newFiles.length > 0) {
+                const file = newFiles[0]; // Take the first file if multiple files are selected
+                console.log(base64String.value)
+                fileToBase64(file);
+                console.log(base64String.value)
+                sendImage(currentRow.value.inspectionOrderId, base64String.value);
             }
+        };
 
-             */
-            showPictureUploadDialog.value = false;
-            markFinished()
+        const fileToBase64 = (file) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => {
+                base64String.value = reader.result;
+                console.log(base64String.value)
+            };
+            reader.onerror = (error) => {
+                console.log('Error: ', error);
+            };
+        };
+
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
         }
 
-        function factory(files) {
-            return files.map(file => {
-                return {
-                    __key: currentRow.value.inspectionOrderId,
-                    name: file.name,
-                    size: file.size,
-                    type: file.type,
-                    __rawFile: file
-                };
-            });
-        }
+
 
         return {
             state,
@@ -257,10 +243,9 @@ export default {
             remarks,
             onFileAdded,
             onFileRemoved,
-            uploadFiles,
-            factory,
             files,
-            review
+            review,
+            base64String,
         }
     },
 }
@@ -351,30 +336,19 @@ export default {
                 </q-card-section>
                 <q-card-section>
                     <q-uploader
-                        url=""
-                        label="Upload your photos"
+                        v-model="files"
+                        label="Upload files"
                         @added="onFileAdded"
                         @removed="onFileRemoved"
-                        :factory="factory"
-                    />
-
-                    <!--
-                    <q-uploader
-                        field-name="file"
-                        style="max-width: 300px"
-                        url="/api/inspection/upload"
-                        label="Restricted to images"
+                        no-auto-upload="true"
                         multiple
-                        accept=".jpg, .png, image/*"
-                        @rejected="onRejected"
-                        with-credentials
+                        no-thumbnails
                     />
-                    -->
                     <q-card-section>
-                        <q-input class="input-bem text-with-input" outlined color="primary" rounded v-model="review" label="Bewertung" />
+                        <q-input class="input-bem text-with-input" outlined color="primary" v-model="review" label="Bewertung" />
                     </q-card-section>
                     <q-btn flat label="Abbrechen" color="negative" @click="showPictureUploadDialog = false"></q-btn>
-                    <q-btn flat label="Prüfauftrag abschließen" color="positive" @click="uploadFiles"></q-btn>
+                    <q-btn flat label="Prüfauftrag abschließen" color="positive" @click=""></q-btn>
                 </q-card-section>
             </q-card>
         </q-dialog>
