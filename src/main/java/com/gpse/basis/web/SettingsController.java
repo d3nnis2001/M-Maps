@@ -7,6 +7,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+/**
+ * This is the Controller that manages all methods associated with the settings,
+ * i.e. the impressum, the logo and the colors of the application.
+ */
 @RestController
 @RequestMapping("/api/settings")
 public class SettingsController {

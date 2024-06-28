@@ -3,6 +3,9 @@ package com.gpse.basis.domain;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
+/**
+ * This class represents the settings of the application, i.e. the settings, the logo and the colors of the application.
+ */
 @Document(collection = "settings")
 public class Settings {
     @MongoId

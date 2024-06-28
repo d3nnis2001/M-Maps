@@ -8,6 +8,9 @@ import org.springframework.stereotype.Service;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * This is the implementation of the Service that manages all the logic concerning the settings of the application.
+ */
 @Service
 public class SettingsServiceImpl implements SettingsService {
     private final SettingsRepository settingsRepository;
