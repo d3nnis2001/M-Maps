@@ -35,7 +35,6 @@ public class ImageServiceImpl implements ImageService {
     @Override
     public String getImage(String id) {
         Optional<Image> image = imRep.findById(id);
-
         return image.get().getImage();
     }
 }

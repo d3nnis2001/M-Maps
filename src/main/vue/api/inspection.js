@@ -96,11 +96,12 @@ export const sendNewStatus = async function sendNewStatus(inspectionOrderId, sta
     }
 }
 
-export const sendReview = async function sendReview(inspectionOrderId, review) {
+export const sendReview = async function sendReview(inspectionOrderId, review, date) {
     try {
         const derc = new URLSearchParams();
         derc.append("inspectionOrderId", inspectionOrderId);
         derc.append("review", review);
+        derc.append("date", date);
         console.log(review)
         const response = await axios.post("/api/inspection/sendReview", derc)
         return response;

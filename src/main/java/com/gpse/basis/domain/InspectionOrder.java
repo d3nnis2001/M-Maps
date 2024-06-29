@@ -21,6 +21,7 @@ public class InspectionOrder {
     private boolean archived;
     private String priority;
     private String review;
+    private String finishedDate;
 
     public InspectionOrder(String inspectionOrderId, String courseId, String userId, String startLocation, String endLocation, String startTime, String endTime,
                            String department, String inspectionData, String status, String remarks, boolean archived, String priority) {
@@ -145,5 +146,13 @@ public class InspectionOrder {
 
     public void setReview(String review) {
         this.review = review;
+    }
+
+    public String getFinishedDate() {
+        return finishedDate;
+    }
+
+    public void setFinishedDate(String finishedDate) {
+        this.finishedDate = finishedDate;
     }
 }

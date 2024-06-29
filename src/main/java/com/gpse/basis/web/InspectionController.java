@@ -76,7 +76,8 @@ public class InspectionController {
     public void sendReview(final WebRequest request) {
         String inspectionOrderId = request.getParameter("inspectionOrderId");
         String review = request.getParameter("review");
-        inspec.editReview(inspectionOrderId, review);
+        String date = request.getParameter("date");
+        inspec.editReview(inspectionOrderId, review, date);
     }
 
     @PostMapping("/upload")

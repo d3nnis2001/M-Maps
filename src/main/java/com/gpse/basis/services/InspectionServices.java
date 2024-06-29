@@ -16,7 +16,7 @@ public interface InspectionServices {
     Boolean deleteInspectionOrder( String id);
     void editStatus(String inspectionOrderId, String status);
 
-    void editReview(String inspectionOrderId, String review);
+    void editReview(String inspectionOrderId, String review, String date);
     ArrayList<InspectionOrder> getInspecData();
     InspectionOrder loadInspecById(String inspectionOrderId) throws UsernameNotFoundException;
 

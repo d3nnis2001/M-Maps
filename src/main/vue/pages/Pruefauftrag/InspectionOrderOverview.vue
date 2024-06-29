@@ -35,6 +35,8 @@ export default {
         const userId = ref('');
         const remarks = ref('');
         const review = ref('');
+        const finishedDate = ref('')
+
         const state = reactive ({
             filter: '',
             columns: [
@@ -206,7 +208,6 @@ export default {
                 if (base64String.value !== null) {
                     console.log("success in fileToBase64");
                 }
-
                 uploadImage(base64String.value, imageName.value);
 
             };
@@ -245,7 +246,7 @@ export default {
 
         function upload() {
             uploadImages();
-            uploadReview()
+            uploadReview();
         }
 
         const uploadImages = async () => {
@@ -274,17 +275,15 @@ export default {
                 }
                 await markFinished()
             }
-
-
         };
 
         async function uploadReview() {
             console.log(review.value)
-            await sendReview(currentRow.value.inspectionOrderId, review.value)
+            console.log(finishedDate.value)
+            await sendReview(currentRow.value.inspectionOrderId, review.value, finishedDate.value)
+            await markFinished();
+
         }
-
-
-
 
         return {
             state,
@@ -314,8 +313,8 @@ export default {
             review,
             base64String,
             uploadImages,
-            uploadReview,
-            upload
+            upload,
+            finishedDate
         }
     },
 }
@@ -415,7 +414,21 @@ export default {
                         no-thumbnails
                     />
                     <q-card-section>
+                        <q-input class="input-style mar-right" filled v-model="finishedDate" label="Abschlussdatum" mask="date" :rules="['date']">
+                            <template v-slot:append>
+                                <q-icon name="event" class="cursor-pointer">
+                                    <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                                        <q-date v-model="finishedDate">
+                                            <div class="row items-center justify-end">
+                                                <q-btn v-close-popup label="Close" color="primary" flat />
+                                            </div>
+                                        </q-date>
+                                    </q-popup-proxy>
+                                </q-icon>
+                            </template>
+                        </q-input>
                         <q-input class="input-bem text-with-input" outlined color="primary" v-model="review" label="Bewertung" />
+
                     </q-card-section>
                     <q-btn flat label="Abbrechen" color="negative" @click="showPictureUploadDialog = false"></q-btn>
                     <q-btn flat label="Prüfauftrag abschließen" color="positive" @click="upload"></q-btn>

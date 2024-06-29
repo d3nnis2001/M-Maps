@@ -80,9 +80,10 @@ public class InspectionServicesImpl implements InspectionServices {
     }
 
     @Override
-    public void editReview(String inspectionOrderId, String review) {
+    public void editReview(String inspectionOrderId, String review, String date) {
         InspectionOrder inspectionOrder = loadInspecById(inspectionOrderId);
         inspectionOrder.setReview(review);
+        inspectionOrder.setFinishedDate(date);
         inspec.save(inspectionOrder);
     }
 

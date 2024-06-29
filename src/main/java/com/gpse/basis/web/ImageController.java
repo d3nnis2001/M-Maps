@@ -31,8 +31,9 @@ public class ImageController {
 
 
     @GetMapping("/download")
-    public void getPhoto(final WebRequest request) {
-
+    public String getImage(final WebRequest request) {
+        String image = imageService.getImage(request.getParameter("inspectionOrderId"));
+        return image;
     }
 
 }

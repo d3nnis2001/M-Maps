@@ -21,5 +21,19 @@ export const sendImage = async function sendImage(id, image, name) {
     }
 }
 
+export const getImage = async function getImage(id) {
+    try {
+        const response = await axios.get("/api/inspection/download", {
+            params: {
+                inspectionOrderId: id
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Unseen error: ", error);
+        return false;
+    }
+}
+
 
 
