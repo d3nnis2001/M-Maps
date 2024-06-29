@@ -20,6 +20,7 @@ public class InspectionOrder {
     private String remarks;
     private boolean archived;
     private String priority;
+    private String review;
 
     public InspectionOrder(String inspectionOrderId, String courseId, String userId, String startLocation, String endLocation, String startTime, String endTime,
                            String department, String inspectionData, String status, String remarks, boolean archived, String priority) {
@@ -137,5 +138,12 @@ public class InspectionOrder {
 
     public void setPriority(String priority) {
         this.priority = priority;
+    }
+    public String getReview() {
+        return review;
+    }
+
+    public void setReview(String review) {
+        this.review = review;
     }
 }

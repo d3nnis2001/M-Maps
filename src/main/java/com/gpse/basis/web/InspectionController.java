@@ -72,6 +72,13 @@ public class InspectionController {
         inspec.editStatus(inspectionOrderId, status);
     }
 
+    @PostMapping("/sendReview")
+    public void sendReview(final WebRequest request) {
+        String inspectionOrderId = request.getParameter("inspectionOrderId");
+        String review = request.getParameter("review");
+        inspec.editReview(inspectionOrderId, review);
+    }
+
     @PostMapping("/upload")
     public void handleFileUpload(@RequestPart(value = "file") final MultipartFile uploadfile) throws IOException {
         saveUploadedFiles(uploadfile);

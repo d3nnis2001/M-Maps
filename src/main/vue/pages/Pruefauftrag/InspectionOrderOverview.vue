@@ -1,7 +1,13 @@
 <script>
 import {onMounted, onUnmounted, reactive, ref} from "vue";
 import router from "@/main/vue/router";
-import {deleteInspectionOrder, getDataById, getInspectionOrder, sendNewStatus} from "@/main/vue/api/inspection";
+import {
+    deleteInspectionOrder,
+    getDataById,
+    getInspectionOrder,
+    sendNewStatus,
+    sendReview
+} from "@/main/vue/api/inspection";
 import {useQuasar} from "quasar";
 import axios from "axios";
 import {sendImage} from "@/main/vue/api/image";
@@ -237,6 +243,11 @@ export default {
             console.log("onFileAdded", files.value)
         };
 
+        function upload() {
+            uploadImages();
+            uploadReview()
+        }
+
         const uploadImages = async () => {
             files.value.forEach(file => {
                 console.log("uploadImages: ", file.name);
@@ -266,6 +277,11 @@ export default {
 
 
         };
+
+        async function uploadReview() {
+            console.log(review.value)
+            await sendReview(currentRow.value.inspectionOrderId, review.value)
+        }
 
 
 
@@ -297,7 +313,9 @@ export default {
             files,
             review,
             base64String,
-            uploadImages
+            uploadImages,
+            uploadReview,
+            upload
         }
     },
 }
@@ -389,7 +407,7 @@ export default {
                 <q-card-section>
                     <q-uploader
                         v-model="files"
-                        label="Upload files"
+                        label="Laden Sie Ihre Fotos hoch"
                         @added="onFileAdded"
                         @removed="onFileRemoved"
                         no-auto-upload="true"
@@ -400,7 +418,7 @@ export default {
                         <q-input class="input-bem text-with-input" outlined color="primary" v-model="review" label="Bewertung" />
                     </q-card-section>
                     <q-btn flat label="Abbrechen" color="negative" @click="showPictureUploadDialog = false"></q-btn>
-                    <q-btn flat label="Prüfauftrag abschließen" color="positive" @click="uploadImages"></q-btn>
+                    <q-btn flat label="Prüfauftrag abschließen" color="positive" @click="upload"></q-btn>
                 </q-card-section>
             </q-card>
         </q-dialog>

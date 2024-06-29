@@ -96,5 +96,20 @@ export const sendNewStatus = async function sendNewStatus(inspectionOrderId, sta
     }
 }
 
+export const sendReview = async function sendReview(inspectionOrderId, review) {
+    try {
+        const derc = new URLSearchParams();
+        derc.append("inspectionOrderId", inspectionOrderId);
+        derc.append("review", review);
+        console.log(review)
+        const response = await axios.post("/api/inspection/sendReview", derc)
+        return response;
+
+    } catch (error) {
+        console.error("Unseen error: ", error);
+        return false;
+    }
+}
+
 
 

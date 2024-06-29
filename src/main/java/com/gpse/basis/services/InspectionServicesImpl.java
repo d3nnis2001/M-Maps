@@ -80,6 +80,13 @@ public class InspectionServicesImpl implements InspectionServices {
     }
 
     @Override
+    public void editReview(String inspectionOrderId, String review) {
+        InspectionOrder inspectionOrder = loadInspecById(inspectionOrderId);
+        inspectionOrder.setReview(review);
+        inspec.save(inspectionOrder);
+    }
+
+    @Override
     public ArrayList<InspectionOrder> getInspecData() {
         Iterable iterable = inspec.findAll();
         ArrayList<InspectionOrder> inspecArray = new ArrayList<>();
