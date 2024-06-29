@@ -17,6 +17,8 @@ import ReparaturOverview from "@/main/vue/pages/ReparaturAufträge/ReparaturOver
 import ReparaturCreate from "@/main/vue/pages/ReparaturAufträge/ReparaturCreate.vue";
 import ReparaturEdit from "@/main/vue/pages/ReparaturAufträge/ReparaturEdit.vue";
 import AdminMain from "@/main/vue/pages/Nutzerverwaltung/AdminMain.vue";
+import MapView from "../pages/Map/Map.vue"
+import TrackBuilderView from "@/main/vue/pages/TrackBuilder/TrackBuilderView.vue"
 import EditUser from "@/main/vue/pages/Nutzerverwaltung/EditUser.vue";
 
 const router = createRouter({
@@ -86,6 +88,11 @@ const router = createRouter({
             path: "/repair/:name/edit",
             name: "RepairEdit",
             component: ReparaturEdit
+        },
+        {
+            path: "/repair-order-trackbuilder",
+            name: "TrackBuilder",
+            component: TrackBuilderView
         },
         {
             path: "/admin",

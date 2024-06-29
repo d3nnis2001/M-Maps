@@ -4,7 +4,6 @@ import { useRoute } from 'vue-router';
 import {
     getDetailsByID,
     getTickedItems,
-    sendRepair,
     setTerminated,
     updateRepChecklist,
     updateStatus
@@ -26,7 +25,7 @@ export default {
 
             if (repairDetails.value && repairDetails.value.checklist) {
                 for (let i = 0; i < repairDetails.value.checklist.checkSel.length; i++) {
-                    ticked.value.push({label: i, value: repairDetails.value.checklist.checkSel.get(i)});
+                    ticked.value.push({label: repairDetails.value.checklist.checkSel.get(i), value: i});
                 }
                 for (let i = 0; i < repairDetails.value.checklist.checkPoints.items.length; i++) {
                     options.value.push({label: repairDetails.value.checklist.checkPoints.items[i], value: i});

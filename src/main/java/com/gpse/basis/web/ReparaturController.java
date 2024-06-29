@@ -4,12 +4,18 @@ import com.gpse.basis.domain.Checklist;
 import com.gpse.basis.domain.GeoCords;
 import com.gpse.basis.domain.Reparatur;
 import com.gpse.basis.services.ChecklistService;
+import com.gpse.basis.services.EmailServices;
 import com.gpse.basis.services.ReparaturService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -19,11 +25,13 @@ import java.util.ArrayList;
 public class ReparaturController {
     private ReparaturService service;
     private ChecklistService checkService;
+    private final EmailServices emailService;
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     @Autowired
-    public ReparaturController(ReparaturService service, ChecklistService checkService) {
+    public ReparaturController(ReparaturService service, ChecklistService checkService, EmailServices emailService) {
         this.service = service;
         this.checkService = checkService;
+        this.emailService = emailService;
     }
 
     @GetMapping("/getdata")
@@ -96,5 +104,23 @@ public class ReparaturController {
         String id = request.getParameter("id");
         LocalDate date1 = LocalDate.parse(request.getParameter("date").replace("/", "-"), formatter);
         return ResponseEntity.ok(checkService.setTerminatedDate(id, date1));
+    }
+    @PostMapping("/upload")
+    public void handleFileUpload(@RequestPart(value = "file") final MultipartFile uploadfile) throws IOException {
+        saveUploadedFiles(uploadfile);
+    }
+
+    private void saveUploadedFiles(final MultipartFile file) throws IOException {
+        final byte[] bytes = file.getBytes();
+        final Path path = Paths.get("src/main/resources/imagesRepair/" + file.getOriginalFilename());
+        Files.write(path, bytes);
+    }
+
+    @PostMapping("/emailTrackBuilder")
+    public ResponseEntity<Boolean> emailTrackBuilder(final WebRequest request) {
+        String trackBuilderEmail = request.getParameter("email");
+        String id = request.getParameter("id");
+        emailService.builtEmailTrackBuilder(trackBuilderEmail, id);
+        return ResponseEntity.ok(true);
     }
 }
