@@ -31,7 +31,6 @@ export default {
         const currentRow = ref({});
         const rowToDelete = ref(null);
 
-
         const userId = ref('');
         const remarks = ref('');
         const review = ref('');

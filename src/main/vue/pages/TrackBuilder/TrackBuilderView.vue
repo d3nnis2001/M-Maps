@@ -3,6 +3,8 @@ import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import {getDetailsByID, getTickedItems, updateStatus} from "@/main/vue/api/reparatur";
 import {useQuasar} from "quasar";
+import {sendImage} from "@/main/vue/api/image";
+import {sendReview} from "@/main/vue/api/inspection";
 
 export default {
     setup() {
@@ -12,10 +14,18 @@ export default {
         const date = ref(getDate());
         const options = ref([]);
         const terminationDate = ref('');
+        const id = ref('')
         const $q = useQuasar();
 
+        const files = ref([]);
+        const base64String = ref('');
+        const imageName = ref('')
+        const base64Strings = ref([]);
+        const errormsg = ref([])
+        const imagemsg = ref([])
+
         onMounted(async () => {
-            const id = route.query.id;
+            id.value = route.query.id;
             console.log(route.query.id);
             repairDetails.value = await getDetailsByID(id);
 
@@ -39,25 +49,94 @@ export default {
             return `${year}/${month}/${day}`;
         }
 
-        function onRejected (rejectedEntries) {
-            $q.notify({
-                type: 'negative',
-                message: `${rejectedEntries.length} file(s) did not pass validation constraints`
-            })
-        }
-
         async function confirmRepairOrder() {
             await updateStatus(route.query.id, "abgeschlossen");
         }
+
+
+        // Foto upload:
+        async function uploadImage(imageString, name) {
+            const res = await sendImage(id, imageString, name);
+            if (res === false) {
+                errormsg.value.push("There has been an error while uploading your image. Please try again or contact our support.");
+                console.log("error")
+            }
+            if (res === true) {
+                imagemsg.value.push("Your image has been successfully uploaded!")
+                console.log("success")
+            }
+
+        }
+
+        const onFileRemoved = (removedFile) => {
+            files.value = files.value.filter(f => f !== removedFile);
+            base64Strings.value = base64Strings.value.filter(base64 => base64.file !== removedFile);
+            console.log("onFileRemoved", files.value);
+        };
+
+        const onFileAdded = (newFiles) => {
+            newFiles.forEach(file => {
+                files.value.push(file);
+            });
+            console.log("onFileAdded", files.value)
+        };
+
+
+        const uploadImages = async () => {
+            files.value.forEach(file => {
+                console.log("uploadImages: ", file.name);
+                fileToBase64(file);
+            });
+            if (errormsg.value.length > 0) {
+                for (let i = 0; i < errormsg.value.length; i++) {
+                    $q.notify({
+                        type: 'negative',
+                        message: errormsg[i]
+                    })
+                    console.log("errormsg")
+                }
+            }
+
+            if (imagemsg.value.length > 0) {
+                for (let i = 0; i < imagemsg.value.length; i++) {
+                    $q.notify({
+                        type: 'positive',
+                        message: imagemsg[i]
+                    })
+                    console.log("imagemsg")
+                }
+            }
+        };
+
+        const fileToBase64 = (file) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => {
+                imageName.value = file.name;
+                console.log("name: ", imageName.value);
+                base64String.value = reader.result;
+                if (base64String.value !== null) {
+                    console.log("success in fileToBase64");
+                }
+                uploadImage(base64String.value, imageName.value);
+
+            };
+            reader.onerror = (error) => {
+                console.log('Error: ', error);
+            };
+        };
 
         return {
             repairDetails,
             ticked,
             options,
             terminationDate,
-            onRejected,
             confirmRepairOrder,
-            date
+            date,
+            onFileRemoved,
+            onFileAdded,
+            uploadImages,
+            files
         };
     }
 }
@@ -107,14 +186,15 @@ export default {
                     <div class="q-pa-md">
                         <div class="q-gutter-md row items-start">
                             <q-uploader
-                                field-name="file"
-                                style="max-width: 300px"
-                                url="/api/repair/upload"
-                                label="Restricted to images"
+                                v-model="files"
+                                label="Laden Sie Ihre Fotos hoch"
+                                @added="onFileAdded"
+                                @removed="onFileRemoved"
+                                no-auto-upload="true"
                                 multiple
-                                accept=".jpg, image/*"
-                                @rejected="onRejected"
+                                no-thumbnails
                             />
+                            <q-btn flat label="Prüfauftrag abschließen" color="positive" @click="uploadImages"></q-btn>
                         </div>
                     </div>
                     </div>

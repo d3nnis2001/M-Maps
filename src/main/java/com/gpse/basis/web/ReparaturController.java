@@ -8,14 +8,12 @@ import com.gpse.basis.services.EmailServices;
 import com.gpse.basis.services.ReparaturService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -105,16 +103,7 @@ public class ReparaturController {
         LocalDate date1 = LocalDate.parse(request.getParameter("date").replace("/", "-"), formatter);
         return ResponseEntity.ok(checkService.setTerminatedDate(id, date1));
     }
-    @PostMapping("/upload")
-    public void handleFileUpload(@RequestPart(value = "file") final MultipartFile uploadfile) throws IOException {
-        saveUploadedFiles(uploadfile);
-    }
 
-    private void saveUploadedFiles(final MultipartFile file) throws IOException {
-        final byte[] bytes = file.getBytes();
-        final Path path = Paths.get("src/main/resources/imagesRepair/" + file.getOriginalFilename());
-        Files.write(path, bytes);
-    }
 
     @PostMapping("/emailTrackBuilder")
     public ResponseEntity<Boolean> emailTrackBuilder(final WebRequest request) {
