@@ -19,9 +19,13 @@ public class ImageController {
     public void uploadPhoto(final WebRequest request) {
         String orderId = request.getParameter("orderId");
         String image = request.getParameter("image");
+        String name = request.getParameter("name");
         System.out.println("C-orderId: " + orderId);
-        System.out.println("C-image: " + image);
-        imageService.saveImage(orderId, image);
+        System.out.println("C-name: " + name);
+        if (image != null) {
+            System.out.println("C-image: Success");
+        }
+        imageService.saveImage(orderId, image, name);
     }
 
 

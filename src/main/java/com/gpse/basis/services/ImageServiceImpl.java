@@ -18,9 +18,9 @@ public class ImageServiceImpl implements ImageService {
         this.imRep = im;
     }
     @Override
-    public void saveImage(String orderId, String imageString) {
+    public void saveImage(String orderId, String imageString, String name) {
         String newImageId = generateId();
-        Image image = new Image(newImageId, orderId, imageString);
+        Image image = new Image(newImageId, orderId, imageString,name);
         System.out.println("Success!!");
         imRep.save(image);
     }

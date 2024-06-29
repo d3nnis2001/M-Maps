@@ -10,9 +10,13 @@ import {sendImage} from "@/main/vue/api/image";
 export default {
     setup () {
         const $q = useQuasar();
+
         const files = ref([]);
         const base64String = ref('');
-
+        const imageName = ref('')
+        const base64Strings = ref([]);
+        const errormsg = ref([])
+        const imagemsg = ref([])
 
         const showDialog = ref(false);
         const showConfirmDialog = ref(false);
@@ -117,7 +121,6 @@ export default {
         }
 
         async function markFinished() {
-            // TODO: Bild im inspectionOrderId-Ordner speichern
 
             showPictureUploadDialog.value = false;
             showDialog.value = false;
@@ -186,36 +189,84 @@ export default {
 
         // Foto Upload:
 
-        function onFileRemoved(removedFile) {
-            files.value = files.value.filter(f => f !== removedFile);
-            console.log("onFileRemoved", files.value);
-        }
-
-        const onFileAdded = (newFiles) => {
-            if (newFiles.length > 0) {
-                const file = newFiles[0]; // Take the first file if multiple files are selected
-                console.log(base64String.value)
-                fileToBase64(file);
-                console.log(base64String.value)
-                sendImage(currentRow.value.inspectionOrderId, base64String.value);
-            }
-        };
 
         const fileToBase64 = (file) => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = () => {
+                imageName.value = file.name;
+                console.log("name: ", imageName.value);
                 base64String.value = reader.result;
-                console.log(base64String.value)
+                if (base64String.value !== null) {
+                    console.log("success in fileToBase64");
+                }
+
+                uploadImage(base64String.value, imageName.value);
+
             };
             reader.onerror = (error) => {
                 console.log('Error: ', error);
             };
         };
 
-        function delay(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
+
+
+        async function uploadImage(imageString, name) {
+            const res = await sendImage(currentRow.value.inspectionOrderId, imageString, name);
+            if (res === false) {
+                errormsg.value.push("There has been an error while uploading your image. Please try again or contact our support.");
+                console.log("error")
+            }
+            if (res === true) {
+                imagemsg.value.push("Your image has been successfully uploaded!")
+                console.log("success")
+            }
+
         }
+
+        const onFileRemoved = (removedFile) => {
+            files.value = files.value.filter(f => f !== removedFile);
+            base64Strings.value = base64Strings.value.filter(base64 => base64.file !== removedFile);
+            console.log("onFileRemoved", files.value);
+        };
+
+        const onFileAdded = (newFiles) => {
+            newFiles.forEach(file => {
+                files.value.push(file);
+            });
+            console.log("onFileAdded", files.value)
+        };
+
+        const uploadImages = async () => {
+            files.value.forEach(file => {
+                console.log("uploadImages: ", file.name);
+                fileToBase64(file);
+
+            });
+            if (errormsg.value.length > 0) {
+                for (let i = 0; i < errormsg.value.length; i++) {
+                    $q.notify({
+                        type: 'negative',
+                        message: errormsg[i]
+                    })
+                    console.log("errormsg")
+                }
+            }
+
+            if (imagemsg.value.length > 0) {
+                for (let i = 0; i < imagemsg.value.length; i++) {
+                    $q.notify({
+                        type: 'positive',
+                        message: imagemsg[i]
+                    })
+                    console.log("imagemsg")
+                }
+                await markFinished()
+            }
+
+
+        };
+
 
 
 
@@ -246,6 +297,7 @@ export default {
             files,
             review,
             base64String,
+            uploadImages
         }
     },
 }
@@ -348,7 +400,7 @@ export default {
                         <q-input class="input-bem text-with-input" outlined color="primary" v-model="review" label="Bewertung" />
                     </q-card-section>
                     <q-btn flat label="Abbrechen" color="negative" @click="showPictureUploadDialog = false"></q-btn>
-                    <q-btn flat label="Prüfauftrag abschließen" color="positive" @click=""></q-btn>
+                    <q-btn flat label="Prüfauftrag abschließen" color="positive" @click="uploadImages"></q-btn>
                 </q-card-section>
             </q-card>
         </q-dialog>
