@@ -9,6 +9,7 @@ import {ref, onMounted, reactive, nextTick, watch} from "vue";
 import {getUserData} from "@/main/vue/api/admin";
 import {useRoute, useRouter} from "vue-router";
 import Plotly from 'plotly.js-dist';
+import {useQuasar} from "quasar";
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
@@ -25,6 +26,8 @@ export default {
         const routeId = ref('')
         const from = ref('')
         const to = ref('')
+        const upper = ref(null)
+        const lower = ref(null)
         const fromStrKm = ref('')
         const toStrKm = ref('')
         const router = useRouter()
@@ -32,11 +35,25 @@ export default {
         const isProfile = ref(false)
         const leftEmpty = ref(false)
         const rightEmpty = ref(false)
+        const isChanging = ref(false)
+        const $q = useQuasar()
+        const isFail = ref(false)
+        const rangeValues = ref({min: 10, max: 50})
+        const isTimeoutActive = ref(false);
         /*
         const x = ref([20,25,23,24,19,21,22,20,25,23,24,19,21,22])
         const y = ref([0.5,0.2,0.3,0.4,0,1,-0.2,-0.5,-0.2,-0.3,-0.4,0,-1,0.2])
         const z = ref([1,2,3,4,5,6,7,8,9,10,11,12,13,14])
          */
+
+        const NOTIFY_OPTIONS = {
+            fromHigherThanTo: {
+                type: 'negative',
+                message: 'The From value should be less then or equal to the To value '
+            },
+        };
+
+        //--------------------------3D Graph--------------------------------------------
 
         const xLeft = ref([])
         const yLeft = ref([])
@@ -109,6 +126,8 @@ export default {
 
             //Plotly.newPlot(plotlyChart.value, [trace], layout);
         };
+
+        //-------------------------Chart------------------------
 
         const chartOptions = ref({
             chart: {
@@ -219,6 +238,8 @@ export default {
             data: []
         }]);
 
+        //-----------------Dataset-----------------------------
+
         function buildDataset(from, to, id) {
             seriesLinks.value[0].data = []
             seriesRechts.value[0].data = []
@@ -262,22 +283,80 @@ export default {
             chartOptions.value.xaxis.tickAmount = Math.ceil((to - from) / 0.5);*/
         }
 
+        function reduceDataSet() {
+            const maxValues = 2000
+            const length = seriesLinks.value[0].data.length
+            const step = Math.ceil(length / maxValues);
+            const listLeft = []
+            const listRight = []
+            console.log(length)
+            if (length > maxValues) {
+                for (let i = 0; i < length; i += step) {
+                    listLeft.push(seriesLinks.value[0].data[i]);
+                    listRight.push(seriesRechts.value[0].data[i]);
+                }
+                seriesRechts.value[0].data = listRight
+                seriesLinks.value[0].data = listLeft
+                console.log(seriesRechts.value[0].data.length, xRight.value.length)
+            }
+            console.log("not")
+        }
+
         function refreshRoute() {
             console.log(fromStrKm.value)
             const routeId2 = routeId.value
+            //const [fromStrKm2, toStrKm2] = rangeValues.value;
             const fromStrKm2 = fromStrKm.value
             const toStrKm2 = toStrKm.value
             //const vst = seriesLinks.value[0].data
             /*data.value.forEach(value => {
                 console.log(value.str_km)
             })*/
-            buildDataset(fromStrKm2, toStrKm2, routeId2)
+            if (fromStrKm2 <= toStrKm2) {
+                isFail.value = false
+                buildDataset(fromStrKm2, toStrKm2, routeId2)
+                reduceDataSet()
+                router.push(`/dataviewer/route/${routeId2}/from/${fromStrKm2}/to/${toStrKm2}`)
+                isChanging.value = false;
+            } else {
+                $q.notify(NOTIFY_OPTIONS.fromHigherThanTo)
+                isFail.value = true
+            }
             //console.log(vst)
             //vst.push([1,1])
             //seriesLinks.value[0].data = vst
             console.log(seriesLinks.value[0].data)
-            router.push(`/dataviewer/route/${routeId2}/from/${fromStrKm2}/to/${toStrKm2}`)
+            //isChanging.value = true
         }
+
+        function refreshRoute2() {
+            console.log(fromStrKm.value)
+            const routeId2 = routeId.value
+            //const [fromStrKm2, toStrKm2] = rangeValues.value;
+            const fromStrKm2 = rangeValues.value.min
+            const toStrKm2 = rangeValues.value.max
+            //const vst = seriesLinks.value[0].data
+            /*data.value.forEach(value => {
+                console.log(value.str_km)
+            })*/
+            if (fromStrKm2 <= toStrKm2) {
+                isFail.value = false
+                buildDataset(fromStrKm2, toStrKm2, routeId2)
+                reduceDataSet()
+                router.push(`/dataviewer/route/${routeId2}/from/${fromStrKm2}/to/${toStrKm2}`)
+                isChanging.value = false;
+            } else {
+                $q.notify(NOTIFY_OPTIONS.fromHigherThanTo)
+                isFail.value = true
+            }
+            //console.log(vst)
+            //vst.push([1,1])
+            //seriesLinks.value[0].data = vst
+            console.log(seriesLinks.value[0].data)
+            //isChanging.value = true
+        }
+
+        //-------------Buttons-------------------------------
 
         function switchDataviewer() { isProfile.value = false }
 
@@ -287,6 +366,30 @@ export default {
                 plot3DLeft();
                 plot3DRight();
             })
+        }
+
+        //-------------Start---------------------
+
+        function findMinAndMax() {
+            data.value.forEach(user => {
+                const valueMin = Math.floor(user.str_km)
+                const valueMax = Math.ceil(user.str_km)
+                if (lower.value === null){
+                    lower.value = valueMin
+                } else if (upper.value === null) {
+                    if (lower.value < valueMax) {
+                        upper.value = valueMax
+                    }
+                } else {
+                    if (lower.value > valueMin) {
+                        lower.value = valueMin
+                    }
+                    if (upper.value < valueMax) {
+                        upper.value = valueMax
+                    }
+                }
+            })
+            console.log(lower.value, upper.value)
         }
 
         /*
@@ -312,6 +415,7 @@ export default {
 
         function transformData() {}
          */
+
         onMounted( async () => {
             console.log(loaded.value)
             routeId.value = route.params.id
@@ -322,6 +426,7 @@ export default {
             console.log(routeId.value, from.value, to.value)
             const data2 = await getTrackLayoutData(routeId.value)
             data.value = data2
+            findMinAndMax()
             let i = 0
             //const categories = []
             //const seriesData = []
@@ -329,7 +434,22 @@ export default {
             //seriesRechts.value[0].data.push([127,0.0])
             //seriesLinks.value[0].data.push([127,0.0])
             //buildDataset(from, to, routeId)
-
+            if (from.value === 'null') {
+                //from.value = '129'
+                from.value = lower.value
+                fromStrKm.value = from.value
+                console.log(1)
+            }
+            if (to.value === 'null') {
+                //to.value = '130'
+                to.value = upper.value
+                toStrKm.value = to.value
+                console.log(2)
+            }
+            rangeValues.value.min = parseFloat(fromStrKm.value)
+            rangeValues.value.max = parseFloat(toStrKm.value)
+            //rangeValues.value = [parseFloat(fromStrKm.value), parseFloat(toStrKm.value)]
+            console.log(from.value, to.value)
             data2.forEach(user => {
                     //console.log(user)
                 //data.value.push([user])
@@ -364,6 +484,7 @@ export default {
                         str_km: user.str_km,
                     })*/
             });
+            reduceDataSet()
             nextTick(() => {
                 plot3DLeft();
                 plot3DRight();
@@ -390,17 +511,69 @@ export default {
             console.log(loaded.value)
         })
 
+        //-----------------Watcher-------------------------
+
         watch([fromStrKm, toStrKm], () => {
-            chartOptions.value.xaxis.tickAmount = Math.ceil((toStrKm.value - fromStrKm.value) / 0.5);
-            chartOptions.value.xaxis.min = parseFloat(fromStrKm.value);
-            chartOptions.value.xaxis.max = parseFloat(toStrKm.value);
+            isChanging.value = true
+            setTimeout(() => {
+                refreshRoute();
+            }, 5000);
+
+            /*
+            const [minVal, maxVal] = rangeValues.value;
+            const diff = maxVal - minVal;
+
+            chartOptions.value.xaxis.tickAmount = diff > 10 ? Math.floor(diff) : Math.ceil(diff / 0.5);
+            chartOptions.value.xaxis.min = minVal;
+            chartOptions.value.xaxis.max = maxVal;*/
+
+            const minVal = parseFloat(fromStrKm.value);
+            const maxVal = parseFloat(toStrKm.value);
+            const diff = maxVal - minVal;
+
+            chartOptions.value.xaxis.tickAmount = diff > 10 ? diff : Math.ceil(diff / 0.5);
+            chartOptions.value.xaxis.min = minVal;
+            chartOptions.value.xaxis.max = maxVal;
         });
+
+        watch(rangeValues, () => {
+            isChanging.value = true
+
+            if (!isTimeoutActive.value) {
+                isTimeoutActive.value = true;
+
+                setTimeout(() => {
+                    console.log(rangeValues.value.max, rangeValues.value.min);
+                    refreshRoute2();
+                    isProfile.value = false
+                    isTimeoutActive.value = false;
+                    //isChanging.value = false;
+                }, 5000);
+            }
+            /*
+            setTimeout(() => {
+                console.log(rangeValues.value.max, rangeValues.value.min)
+                refreshRoute2()
+                //isChanging.value = false
+            }, 5000);*/
+
+            const minVal = rangeValues.value.min;
+            const maxVal = rangeValues.value.max;
+            const diff = maxVal - minVal;
+
+            chartOptions.value.xaxis.tickAmount = diff > 10 ? diff : Math.ceil(diff / 0.5);
+            chartOptions.value.xaxis.min = minVal;
+            chartOptions.value.xaxis.max = maxVal;
+        });
+
+        //---------------Return-------------------------
 
         return {
             chartOptions, seriesLinks, seriesRechts, loaded,
             plotlyChartLeft, refreshRoute, fromStrKm, toStrKm,
             switchDataviewer, switchProfil, isProfile, plot3DLeft,
-            leftEmpty, rightEmpty, plotlyChartRight, routeId
+            leftEmpty, rightEmpty, plotlyChartRight, routeId,
+            isChanging, rangeValues, upper, lower
         }
     }
 }
@@ -531,29 +704,44 @@ export default {
     <q-page>
         <div class="align-mult q-pa-xs">
             <Dataviewer/>
-            <div>
-                <div class="align-mult">
-                    <div>
-                        <p>Strecken ID</p>
-                        <q-input class="q-pa-xs" outlined v-model="routeId" ></q-input>
-                    </div>
-                    <div>
-                        <p>von</p>
-                        <q-input class="q-pa-xs" outlined v-model="fromStrKm"></q-input>
-                    </div>
-                    <div>
-                        <p>bis</p>
-                        <q-input class="q-pa-xs" outlined v-model="toStrKm"></q-input>
-                    </div>
+            <div class="q-pa-xs">
+                <div>
+                    <p>Strecken ID: {{routeId}}</p>
+                    <q-badge color="secondary">
+                        von {{ rangeValues.min }} bis {{ rangeValues.max }}
+                    </q-badge>
+                    <!--<q-input class="q-pa-xs" outlined v-model="routeId" ></q-input>
                 </div>
                 <div>
+                    <p>von</p>
+                    <q-input class="q-pa-xs" outlined v-model="fromStrKm"></q-input>
+                </div>
+                <div>
+                    <p>bis</p>
+                    <q-input class="q-pa-xs" outlined v-model="toStrKm"></q-input>-->
+                </div>
+            </div>
+            <q-linear-progress indeterminate color="black" v-if="!loaded" class="q-mt-sm">Loading</q-linear-progress>
+            <div v-else class="q-pa-lg">
+                <q-space/>
+                <q-range
+                    v-model="rangeValues"
+                    :min="lower !== null ? lower : 0"
+                    :max="upper !== null ? upper : 1000"
+                    step="0.5"
+                    dense
+                    label-always
+                />
+                <div>
+                    <!--
                     <div class="q-pa-xs">
                         <q-btn label="Strecken km aktualisieren" @click=refreshRoute class=""></q-btn>
                     </div>
+                    -->
                 </div>
             </div>
         </div>
-        <div class="align-mult q-pa-xs">
+        <div class="q-mt-lg q-ml-md q-mr-md">
             <div>
                 <q-btn label="Profil" @click="switchDataviewer" class=""></q-btn>
             </div>
@@ -575,29 +763,29 @@ export default {
             -->
             <div v-if="!isProfile" class="outline">
                 <q-banner align="middle">Längenhöhe - z_links_railab_3p</q-banner>
-                <q-banner v-if="!loaded">Loading</q-banner>
+                <q-linear-progress indeterminate color="black" v-if="!loaded || isChanging" class="q-mt-sm">Loading</q-linear-progress>
                 <apexchart v-else type="bar" height="350" :options="chartOptions" :series="seriesLinks"></apexchart>
             </div>
             <q-space/>
             <div v-if="!isProfile" class="outline">
                 <q-banner align="middle">Längenhöhe - z_rechts_railab_3p</q-banner>
-                <q-banner v-if="!loaded">Loading</q-banner>
+                <q-linear-progress indeterminate color="black" v-if="!loaded || isChanging" class="q-mt-sm">Loading</q-linear-progress>
                 <apexchart v-else type="bar" height="350" :options="chartOptions" :series="seriesRechts"></apexchart>
             </div>
             <q-space/>
             <div>
                 <div v-if="isProfile" class="outline">
                     <q-banner align="middle">Längenhöhe - z_rechts_railab_3p</q-banner>
-                    <q-banner v-if="!loaded">Loading</q-banner>
-                    <div ref="plotlyChartLeft" style="width: 100%; height: 100%;"></div>
+                    <q-linear-progress indeterminate color="black" v-if="!loaded || isChanging" class="q-mt-sm">Loading</q-linear-progress>
+                    <div v-else ref="plotlyChartLeft" style="width: 100%; height: 100%;"></div>
                 </div>
             </div>
             <q-space/>
             <div>
                 <div v-if="isProfile" class="outline">
                     <q-banner align="middle">Längenhöhe - z_links_railab_3p</q-banner>
-                    <q-banner v-if="!loaded">Loading</q-banner>
-                    <div ref="plotlyChartRight" style="width: 100%; height: 100%;"></div>
+                    <q-linear-progress indeterminate color="black" v-if="!loaded || isChanging" class="q-mt-sm">Loading</q-linear-progress>
+                    <div v-else ref="plotlyChartRight" style="width: 100%; height: 100%;"></div>
                 </div>
             </div>
         </div>

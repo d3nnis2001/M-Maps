@@ -14,10 +14,10 @@ export const getTrackLayoutData = async function getData(trackId) {
     }
 }
 
-export const getPointData = async function getPointData(lon, lat) {
+export const getPointData = async function getPointData(pointId) {
     try {
         //const response = await axios.get("/api/dataviewer/getTrackData")
-        const response = await axios.get("/api/dataviewer/getPointData", {params: {lat, lon}})
+        const response = await axios.get("/api/dataviewer/getPointData", {params: {pointId}})
         //console.log(response2.data)
         console.log(response.data)
         return response.data

@@ -528,13 +528,13 @@ public class FileServiceImpl implements FileService {
         return dataPoints;
     }
 
-    public ArrayList<GeoData> getPointData(double lat, double lon) {
+    public ArrayList<GeoData> getPointData(String pointId) {
         Iterable<GeoData> iterable = geoTrack.findAll();
         ArrayList<GeoData> geoArr = new ArrayList<>();
         Iterator<GeoData> iterator = iterable.iterator();
         while (iterator.hasNext()) {
             GeoData geo = iterator.next();
-            if (geo.getLatitude() == lat && geo.getLongitude() == lon) {
+            if (geo.getId().equals(pointId)) {
                 geoArr.add(geo);
             }
         }

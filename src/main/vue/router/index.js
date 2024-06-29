@@ -130,7 +130,12 @@ const router = createRouter({
             component: DataviewerRoute
         },
         {
-            path: "/dataviewer/point/:lon/:lat",
+            path: "/dataviewer/route/:id",
+            name: "dataviewerRouteOnly",
+            component: DataviewerRoute
+        },
+        {
+            path: "/dataviewer/point/:pointId",
             name: "dataviewerPoint",
             component: DataviewerPoint
         }
