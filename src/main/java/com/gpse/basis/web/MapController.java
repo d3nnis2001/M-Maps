@@ -1,26 +1,19 @@
 package com.gpse.basis.web;
 
 import com.gpse.basis.domain.GeoData;
-import com.gpse.basis.domain.GleisLageDatenpunkt;
 import com.gpse.basis.domain.Reparatur;
-import com.gpse.basis.domain.Utils;
 import com.gpse.basis.services.DataService;
-import com.gpse.basis.services.FileService;
 import com.gpse.basis.services.ReparaturService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
-import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
-import java.awt.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Date;
 
 @RestController
 @RequestMapping("/api/map")

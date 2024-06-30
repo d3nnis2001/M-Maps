@@ -40,7 +40,8 @@ public class ReparaturServiceImpl implements ReparaturService {
         String uniqueID = util.generateID();
         ArrayList<String> selected = new ArrayList<>();
         ReparaturChecklist check = new ReparaturChecklist(uniqueID, checklist, selected);
-        Reparatur newRep = new Reparatur(uniqueID, track, date1, date2, check, remarks, "beauftragt", authorized, geo);
+        Reparatur newRep = new Reparatur(uniqueID, track, date1, date2, check, remarks, "beauftragt", authorized);
+        newRep.setGeocords(geo);
         rep.save(newRep);
         checkRepo.save(check);
         return true;

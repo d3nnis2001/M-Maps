@@ -301,7 +301,7 @@ async function setGeoData(data) {
 
 async function addAllDatapoints() {
     markers.forEach((m) => {
-        m.marker.setStyle({opacity: 1, fillOpacity: 1})
+        m.marker.setStyle({opacity: 1, fillOpacity: 1, color: "#000000", fillColor: "#000000"})
     });
 }
 
@@ -605,11 +605,13 @@ const getPartOfGeoData = async () => {
 const deleteStart = () => {
     markerStart.value = null;
     kmStart.value = '';
+    addAllDatapoints()
 };
 
 const deleteEnd = () => {
     markerEnd.value = null;
     kmEnd.value = '';
+    addAllDatapoints()
 };
 
 const addStart = () => {
