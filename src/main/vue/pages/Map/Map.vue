@@ -299,6 +299,12 @@ async function setGeoData(data) {
     });
 }
 
+async function addAllDatapoints() {
+    markers.forEach((m) => {
+        m.marker.setStyle({opacity: 1, fillOpacity: 1})
+    });
+}
+
 async function setPartGeoData(trackID) {
     var minlat = 180, maxlat = -180, minlong = 180, maxlong = -180, counter = 0
     markers.forEach((m) => {
@@ -452,75 +458,56 @@ const onChange = (newValue, oldValue) => {
     if (newValue === true) {
         getAllHeatmapData()
     } else {
-        markers.forEach((m) => map.value.removeLayer(m.marker));
-        markers = []
-        setGeoData()
+        addAllDatapoints()
     }
 };
 
+// ---------------------------- Heatmap Filter ----------------------------------
+
 const onChangeSilver = (newValue, oldValue) => {
     if (newValue === true) {
-        getAllHeatDataColor("silver")
+        setMarkerByColor("silver", true)
     } else {
-        let deleted = [];
-        for (let i = markers.length - 1; i >= 0; i--) {
-            var temp = markers[i];
-            if (temp.data[1] === "silver") {
-                markers.splice(i, 1);
-                deleted.push(temp);
-            }
-        }
-        deleted.forEach((m) => map.value.removeLayer(m.marker));
+        setMarkerByColor("silver", false)
     }
 };
 
 const onChangeGreen = (newValue, oldValue) => {
     if (newValue === true) {
-        getAllHeatDataColor("green")
+        setMarkerByColor("green", true)
     } else {
-        let deleted = [];
-        for (let i = markers.length - 1; i >= 0; i--) {
-            var temp = markers[i];
-            if (temp.data[1] === "green") {
-                markers.splice(i, 1);
-                deleted.push(temp);
-            }
-        }
-        deleted.forEach((m) => map.value.removeLayer(m.marker));
+        setMarkerByColor("green", false)
     }
 };
 
 const onChangeOrange = (newValue, oldValue) => {
     if (newValue === true) {
-        getAllHeatDataColor("orange")
+        setMarkerByColor("orange", true)
     } else {
-        let deleted = [];
-        for (let i = markers.length - 1; i >= 0; i--) {
-            var temp = markers[i];
-            if (temp.data[1] === "orange") {
-                markers.splice(i, 1);
-                deleted.push(temp);
-            }
-        }
-        deleted.forEach((m) => map.value.removeLayer(m.marker));
+        setMarkerByColor("orange", false)
     }
 };
 
 const onChangeRed = (newValue, oldValue) => {
     if (newValue === true) {
-        getAllHeatDataColor("red")
+        setMarkerByColor("red", true)
     } else {
-        let deleted = [];
-        for (let i = markers.length - 1; i >= 0; i--) {
-            var temp = markers[i];
-            if (temp.data[1] === "red") {
-                markers.splice(i, 1);
-                deleted.push(temp);
-            }
-        }
-        deleted.forEach((m) => map.value.removeLayer(m.marker));
+        setMarkerByColor("red", false)
     }
 };
+
+function setMarkerByColor(color, enable) {
+    for (let i = 0;i < markers.length;i++) {
+        if (markers[i].marker.options.color === color) {
+            if (enable === false) {
+                markers[i].marker.setStyle({opacity: 0, fillOpacity: 0})
+            } else {
+                markers[i].marker.setStyle({opacity: 1, fillOpacity: 1})
+            }
+        }
+    }
+}
+
 
 watch(toggle_value, onChange);
 watch(silver_filter, onChangeSilver);
@@ -528,83 +515,39 @@ watch(green_filter, onChangeGreen);
 watch(orange_filter, onChangeOrange);
 watch(red_filter, onChangeRed);
 
-function getLatLng(geopoint) {
-    for (let i = 0;i<data.length;i++) {
-        if (data[i].id === geopoint) {
-            return [data[i].longitude, data[i].latitude]
+
+// --------------------------------------------------------------
+
+function changeColorGeopoint(geopoint, color) {
+    for (let i = 0;i<markers.length;i++) {
+        if (markers[i].data.id === geopoint) {
+            markers[i].marker.setStyle({color: color, fillColor: color, opacity: 1, fillOpacity: 1})
         }
     }
 }
 
 
 function getAllGeoPointsWithColor(dataPoint) {
-    let output = []
     for(let i = 0;i < dataPoint.length;i++) {
         if(dataPoint[i].NORMAL !== undefined) {
-            console.log(dataPoint[i].NORMAL)
-            output.push([getLatLng(dataPoint[i].NORMAL), "silver", dataPoint[i].NORMAL])
+            changeColorGeopoint(dataPoint[i].NORMAL, "silver")
         } else if (dataPoint[i].LOW !== undefined) {
-            output.push([getLatLng(dataPoint[i].LOW), "green", dataPoint[i].LOW])
+            changeColorGeopoint(dataPoint[i].LOW, "green")
         } else if (dataPoint[i].MEDIUM !== undefined) {
-            output.push([getLatLng(dataPoint[i].MEDIUM), "orange", dataPoint[i].MEDIUM])
+            changeColorGeopoint(dataPoint[i].MEDIUM, "orange")
         } else if (dataPoint[i].HIGH !== undefined) {
-            output.push([getLatLng(dataPoint[i].HIGH), "red", dataPoint[i].HIGH])
+            changeColorGeopoint(dataPoint[i].HIGH, "red")
         }
     }
-    return output
 }
 
-async function getAllHeatDataColor(color) {
-    var colors = getAllGeoPointsWithColor(heatData)
-    var temp = []
-    for (let i = 0; i < colors.length; i++) {
-        if (colors[i][1] === color) {
-            markers.push({
-                marker: L.circleMarker([colors[i][0][0], colors[i][0][1]], {
-                    color: colors[i][1],
-                    radius: 5,
-                    fillColor: colors[i][1],
-                    fillOpacity: 1.0
-                }),
-                data: { latitude: colors[i][0][1], longitude: colors[i][0][0], id: colors[i][2]},
-            });
-            temp.push(markers[markers.length-1])
-        }
-    }
-    temp.forEach((m) => {
-        m.marker.addTo(map.value);
-        m.marker.on('click', onMarkerClicked);
-    });
-}
 
 async function getAllHeatmapData() {
     heatData = await getHeatmap()
-    var colors = getAllGeoPointsWithColor(heatData)
-    console.log(colors)
-    if (data.length === 0) {
-        $q.notify({
-            type: 'negative',
-            message: "Track ID doesn't exist",
-            caption: 'Please choose a different Track ID'
-        });
-    }
-    markers.forEach((m) => map.value.removeLayer(m.marker));
-    markers = []
-    for (let i = 0; i < colors.length; i++) {
-        markers.push({
-            marker: L.circleMarker([colors[i][0][0], colors[i][0][1]], {
-                color: colors[i][1],
-                radius: 5,
-                fillColor: colors[i][1],
-                fillOpacity: 1.0
-            }),
-            data: { latitude: colors[i][0][1], longitude: colors[i][0][0], id: colors[i][2]},
-        });
-    }
     markers.forEach((m) => {
-        m.marker.addTo(map.value);
-        m.marker.on('click', onMarkerClicked);
+        m.marker.setStyle({opacity: 0, fillOpacity: 0})
     });
+    getAllGeoPointsWithColor(heatData)
 }
 
 
