@@ -12,14 +12,19 @@ import org.apache.hadoop.fs.Path;
 import org.apache.parquet.hadoop.ParquetReader;
 import org.apache.parquet.hadoop.util.HadoopInputFile;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
 import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.MatchOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 
 import java.io.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
@@ -35,6 +40,7 @@ public class FileServiceImpl implements FileService {
 
     private final DataSetRepository datasetRepro;
 
+    private final GleisLageDatenRepository glDatenRepro;
 
     private final GeoTrackData geoTrack;
 
@@ -46,9 +52,10 @@ public class FileServiceImpl implements FileService {
 
     Lock lock = new ReentrantLock();
     @Autowired
-    FileServiceImpl(DataSetRepository repro, GeoTrackData gt,
+    FileServiceImpl(DataSetRepository repro, GeoTrackData gt, GleisLageDatenRepository rpr,
                     MongoTemplate tmp, GleisVDataRepository rprr, DataService dstr) {
         datasetRepro = repro;
+        glDatenRepro = rpr;
         geoTrack = gt;
         template = tmp;
         gleisV = rprr;
@@ -413,7 +420,6 @@ public class FileServiceImpl implements FileService {
         return ltg;
     }
 
-
     private List<File> getAllFiles(File folder) {
         File[] files = folder.listFiles();
         List<File> fileList = new ArrayList<>();
@@ -445,5 +451,94 @@ public class FileServiceImpl implements FileService {
             return null;
         }
          return dService.getGeoDataByDate(strecke, from, till);
+    }
+
+    public ArrayList<String> getDataforId(int trackId) {
+        List<DataSet> sets = getDataSets("all");
+        ArrayList<String> dataIds = new ArrayList<>();
+        for (DataSet set : sets) {
+            if (set.getStreckenId() == trackId) {
+                dataIds.add(set.getId());
+            }
+        }
+        return dataIds;
+    }
+
+    public ArrayList<GleisLageDatenpunkt> getTrackData(int trackId) {
+        ArrayList<GleisLageDatenpunkt> dataPoints = new ArrayList<>();
+        ArrayList<String> dataIds = getDataforId(trackId);
+        Iterable<GleisLageDatenpunkt> iterable = glDatenRepro.findAll();
+        Iterator<GleisLageDatenpunkt> iterator = iterable.iterator();
+        while (iterator.hasNext()) {
+            GleisLageDatenpunkt dataPoint = iterator.next();
+            if (dataPoint.getStr_km() > 70 && dataPoint.getStr_km() < 74) {
+                dataPoints.add(dataPoint);
+            }
+        }
+        /*
+        while (iterator.hasNext()) {
+            GleisLageDatenpunkt gld = iterator.next();
+            if (dataIds.contains(gld.getId())) {
+                dataPoints.add(gld);
+            }
+        }*/
+        return dataPoints;
+    }
+
+    public ArrayList<GleisLageDatenpunkt> getAllTrackData() {
+        Iterable<GleisLageDatenpunkt> iterable = glDatenRepro.findAll();
+        ArrayList<GleisLageDatenpunkt> dataPoints = new ArrayList<>();
+        Iterator<GleisLageDatenpunkt> iterator = iterable.iterator();
+        while (iterator.hasNext()) {
+            GleisLageDatenpunkt gld = iterator.next();
+            dataPoints.add(gld);
+        }
+        return dataPoints;
+    }
+
+    public List<GleisLageDatenpunkt> getDataPointsForTrack(int trackId) {
+        MongoTemplate tmpl = new MongoTemplate(new SimpleMongoClientDatabaseFactory("mongodb://localhost:27017/project_12"));
+        List<GeoData> lst = getTrackGeoData(trackId);
+        System.out.println(lst.size() + " Geodata fertig");
+        MatchOperation matchOperation = Aggregation.match(Criteria.where("iDlocation").in(lst.parallelStream().map(GeoData::getId).toList()));
+        System.out.println("matchoperation fertig");
+        Aggregation aggregation = Aggregation.newAggregation(matchOperation);
+        System.out.println("aggregation fertig");
+        List<GleisLageDatenpunkt> results = tmpl.aggregate(aggregation, "GleisLageDaten", GleisLageDatenpunkt.class).getMappedResults();
+        System.out.println(results.size());
+        return results;
+    }
+
+    public ArrayList<GleisLageDatenpunkt> getData(int trackId) {
+        List<GleisLageDatenpunkt> lst = getDataPointsForTrack(trackId);
+        System.out.println(lst.size());
+        ArrayList<GleisLageDatenpunkt> dataPoints = new ArrayList<>();
+        int i = 0;
+        for (GleisLageDatenpunkt gld : lst) {
+            GleisLageDatenpunkt gld2 = gld;
+            BigDecimal bd = new BigDecimal(Double.toString(gld2.getStr_km()));
+            bd = bd.setScale(3, RoundingMode.HALF_UP);
+            gld2.setStr_km(bd.doubleValue());
+            dataPoints.add(gld2);
+            i += 1;
+            if (i % 1000 == 0) {
+                System.out.println(i);
+            }
+        }
+        return dataPoints;
+    }
+
+    public ArrayList<GeoData> getPointData(double lat, double lon) {
+        Iterable<GeoData> iterable = geoTrack.findAll();
+        ArrayList<GeoData> geoArr = new ArrayList<>();
+        Iterator<GeoData> iterator = iterable.iterator();
+        while (iterator.hasNext()) {
+            GeoData geo = iterator.next();
+            if (geo.getLatitude() == lat && geo.getLongitude() == lon) {
+                geoArr.add(geo);
+            }
+        }
+        System.out.println(geoArr.size());
+        return geoArr;
     }
 }
