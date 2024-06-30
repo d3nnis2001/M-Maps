@@ -31,5 +31,6 @@ public interface FileService {
     ArrayList<GleisLageDatenpunkt> getTrackData(int trackId);
     ArrayList<String> getDataforId(int trackId);
     ArrayList<GleisLageDatenpunkt> getData(int trackId);
-    ArrayList<GeoData> getPointData(String pointId);
+    GeoData getPointInformation(String pointId);
+    ArrayList<GleisLageDatenpunkt> getPointData(String pointId);
 }

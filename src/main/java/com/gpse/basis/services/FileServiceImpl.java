@@ -25,7 +25,10 @@ import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 import java.io.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -528,17 +531,65 @@ public class FileServiceImpl implements FileService {
         return dataPoints;
     }
 
-    public ArrayList<GeoData> getPointData(String pointId) {
+    public GeoData getPointInformation(String pointId) {
+        Iterable<GeoData> iterable = geoTrack.findAll();
+        GeoData geoData = null;
+        ArrayList<GleisLageDatenpunkt> dataPoints = new ArrayList<>();
+        Iterator<GeoData> iterator = iterable.iterator();
+        while (iterator.hasNext()) {
+            GeoData geo = iterator.next();
+            if (geo.getId().equals(pointId)) {
+                return geo;
+            }
+        }
+        return null;
+    }
+
+    public ArrayList<GleisLageDatenpunkt> getPointData(String pointId) {
         Iterable<GeoData> iterable = geoTrack.findAll();
         ArrayList<GeoData> geoArr = new ArrayList<>();
+        ArrayList<GleisLageDatenpunkt> dataPoints = new ArrayList<>();
+        int trackId = 0;
         Iterator<GeoData> iterator = iterable.iterator();
         while (iterator.hasNext()) {
             GeoData geo = iterator.next();
             if (geo.getId().equals(pointId)) {
                 geoArr.add(geo);
+                trackId = geo.getStrecken_id();
+                break;
             }
         }
-        System.out.println(geoArr.size());
-        return geoArr;
+        if (geoArr.isEmpty()) {
+            return dataPoints;
+        }
+        GeoData firstGeo = geoArr.getFirst();
+        double targetTrackKm = firstGeo.getTrack_km();
+        List<GleisLageDatenpunkt> lst = getDataPointsForTrack(trackId);
+        /*
+        for (GleisLageDatenpunkt gld : lst) {
+            if (Math.ceil(geoArr.getFirst().getTrack_km()) == Math.ceil(gld.getStr_km())) {
+                dataPoints.add(gld);
+            }
+        }
+        System.out.println(dataPoints.size());
+        return dataPoints;*/
+        Map<LocalDate, GleisLageDatenpunkt> nearestPointsByDay = new HashMap<>();
+
+        for (GleisLageDatenpunkt gld : lst) {
+            long timeInSeconds = (long) gld.getTime_unix();
+            LocalDate date = Instant.ofEpochSecond(timeInSeconds).atZone(ZoneId.systemDefault()).toLocalDate();
+            if (!nearestPointsByDay.containsKey(date)) {
+                nearestPointsByDay.put(date, gld);
+            } else {
+                GleisLageDatenpunkt existingGld = nearestPointsByDay.get(date);
+                if (Math.abs(gld.getStr_km() - targetTrackKm) < Math.abs(existingGld.getStr_km() - targetTrackKm)) {
+                    nearestPointsByDay.put(date, gld);
+                }
+            }
+        }
+
+        dataPoints.addAll(nearestPointsByDay.values());
+        System.out.println(dataPoints.size());
+        return dataPoints;
     }
 }

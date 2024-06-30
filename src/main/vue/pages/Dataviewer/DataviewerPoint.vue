@@ -2,11 +2,13 @@
 import Dataviewer from "@/main/vue/pages/Dataviewer/Dataviewer.vue";
 import {onMounted, ref} from "vue";
 import {useRoute} from "vue-router";
-import {getPointData} from "@/main/vue/api/dataviewer";
+import {getPointData, getPointInfo} from "@/main/vue/api/dataviewer";
+import VueApexCharts from "vue3-apexcharts";
 
 export default {
     components: {
-      Dataviewer
+        Dataviewer,
+        apexchart: VueApexCharts
     },
     setup(){
         const pointId = ref('')
@@ -15,14 +17,89 @@ export default {
         const trackId = ref('')
         const route = useRoute();
         const tab = ref('mails')
+        const loaded = ref(false)
+
+        //-----------Graph-----------------
+
+        const chartOptions = ref({
+            chart: {
+                type: 'bar',
+                height: '350',
+                id: 'vuechart'
+            },
+            plotOptions: {
+                bar: {
+                    colors: {
+                        ranges: [{
+                            from: -100,
+                            to: -46,
+                            color: '#F15B46'
+                        }, {
+                            from: -45,
+                            to: 0,
+                            color: '#FEB019'
+                        }]
+                    },
+                    columnWidth: '100%',
+                }
+            },
+            dataLabels: {
+                enabled: true
+            },
+            yaxis: {
+                forceNiceScale: true,
+                labels: {
+                    formatter: (value) => {return value}
+                },
+                title: {
+                    text: 'Längenhöhe [mm]'
+                }
+            },
+            xaxis: {
+                categories: [],
+                title: {
+                    text: 'Aufnahmezeit'
+                }
+            }
+        });
+
+        const series = ref([
+            {
+                name: 'z_links_railab_3p',
+                data: []
+            },
+            {
+                name: 'z_rechts_railab_3p',
+                data: []
+            }
+        ]);
+
+        //--------Start-----------
 
         onMounted(async () => {
             pointId.value = route.params.pointId
-            const response = await getPointData(pointId.value)
-            console.log(response[0])
-            lon.value = response[0].longitude
-            lat.value = response[0].latitude
-            trackId.value = response[0].strecken_id
+            const [response, responseInfo] = await Promise.all([
+                getPointData(pointId.value),
+                getPointInfo(pointId.value)
+            ])
+            console.log(responseInfo)
+            console.log(response)
+            lon.value = responseInfo.longitude
+            lat.value = responseInfo.latitude
+            trackId.value = responseInfo.strecken_id
+            response.forEach(data => {
+                const timestamp = data.time_unix
+                const date = new Date(timestamp * 1000)
+                const formattedDate = String(date.getDate()).padStart(2, '0') + '-' +
+                    String(date.getMonth() + 1).padStart(2, '0') + '-' +
+                    date.getFullYear() + ' ' +
+                    String(date.getHours()).padStart(2, '0') + ':' +
+                    String(date.getMinutes()).padStart(2, '0');
+                series.value[0].data.push(data.z_links_railab_3p)
+                series.value[1].data.push(data.z_rechts_railab_3p)
+                chartOptions.value.xaxis.categories.push(formattedDate)
+            })
+            loaded.value = true
         })
 
         return {
@@ -30,7 +107,10 @@ export default {
             lat,
             pointId,
             trackId,
-            tab
+            tab,
+            chartOptions,
+            series,
+            loaded
         }
     }
 }
@@ -56,8 +136,8 @@ export default {
                             align="justify"
                             narrow-indicator
                         >
-                            <q-tab name="mails" label="Mails" />
-                            <q-tab name="alarms" label="Alarms" />
+                            <q-tab name="mails" label="Gleislagedaten" />
+                            <q-tab name="alarms" label="Fotos" />
                             <q-tab name="movies" label="Movies" />
                         </q-tabs>
 
@@ -65,8 +145,10 @@ export default {
 
                         <q-tab-panels v-model="tab" animated>
                             <q-tab-panel name="mails">
-                                <div class="text-h6">Mails</div>
-                                Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                                <div class="outline">
+                                    <q-linear-progress indeterminate color="black" v-if="!loaded" class="q-mt-sm">Loading</q-linear-progress>
+                                    <apexchart v-else type="bar" height="350" :options="chartOptions" :series="series"></apexchart>
+                                </div>
                             </q-tab-panel>
 
                             <q-tab-panel name="alarms">

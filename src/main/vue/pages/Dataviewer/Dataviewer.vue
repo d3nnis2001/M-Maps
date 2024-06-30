@@ -43,7 +43,7 @@ export default {
       }
 
       function showRoute() {
-          if (routeID.value === '6100') {
+          if (routeID.value !== '') {
               console.log(true)
               const routeId2 = routeID.value
               const fromStrKm2 = fromStrKm.value
