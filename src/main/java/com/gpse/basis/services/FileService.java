@@ -22,6 +22,7 @@ public interface FileService {
     List<List<String>> readFoler(String path);
 
 
+    ArrayList<GeoData> getTrackGeoData(int trackId);
     ArrayList<GleisLageDatenpunkt> getAllTrackData();
     ArrayList<GleisLageDatenpunkt> getTrackData(int trackId);
     ArrayList<String> getDataforId(int trackId);

@@ -7,7 +7,6 @@ import com.gpse.basis.repositories.DataSetRepository;
 import com.gpse.basis.repositories.GeoTrackData;
 import com.gpse.basis.repositories.GleisLageDatenRepository;
 import com.gpse.basis.repositories.GleisVDataRepository;
-import org.apache.avro.util.MapEntry;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.parquet.hadoop.ParquetReader;
@@ -27,7 +26,6 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -363,7 +361,6 @@ public class FileServiceImpl implements FileService {
         template.remove(query, "GleisLageDaten");
     }
 
-
     private List<File> getAllFiles(File folder) {
         File[] files = folder.listFiles();
         List<File> fileList = new ArrayList<>();
@@ -436,6 +433,7 @@ public class FileServiceImpl implements FileService {
         return dataPoints;
     }
 
+
     public List<GleisLageDatenpunkt> getDataPointsForTrack(int trackId) {
         MongoTemplate tmpl = new MongoTemplate(new SimpleMongoClientDatabaseFactory("mongodb://localhost:27017/project_12"));
         List<GeoData> lst = getTrackGeoData(trackId);
@@ -475,6 +473,25 @@ public class FileServiceImpl implements FileService {
         while (iterator.hasNext()) {
             GeoData geo = iterator.next();
             if (geo.getLatitude() == lat && geo.getLongitude() == lon) {
+                geoArr.add(geo);
+            }
+        }
+        System.out.println(geoArr.size());
+        return geoArr;
+    }
+
+    //--------------------------------------------------------------
+    /**
+     * Returns the all available Geodata from a track
+     **/
+    @Override
+    public ArrayList<GeoData> getTrackGeoData(int trackID) {
+        Iterable<GeoData> iterable = geoTrack.findAll();
+        ArrayList<GeoData> geoArr = new ArrayList<>();
+        Iterator<GeoData> iterator = iterable.iterator();
+        while (iterator.hasNext()) {
+            GeoData geo = iterator.next();
+            if (geo.getStrecken_id() == trackID) {
                 geoArr.add(geo);
             }
         }
