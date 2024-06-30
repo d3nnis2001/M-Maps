@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 
@@ -62,6 +63,8 @@ public class ReparaturServiceImpl implements ReparaturService {
     public Boolean changeStatus(String name, String newStatus) {
         Reparatur repa = loadRepByName(name);
         repa.setStatus(newStatus);
+        if(Objects.equals(newStatus, "archiviert"))
+            repa.setArchived(true);
         rep.save(repa);
         return true;
     }
