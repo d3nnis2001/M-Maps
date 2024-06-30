@@ -92,13 +92,22 @@ public class UserServicesImpl implements UserServices {
         UserModel us = getUserByUsername(username);
         ArrayList<String> oldRoles = us.getRoles();
         ArrayList<String> toDelete = new ArrayList<>();
-        for (String oldRole : oldRoles) {
-            if (!newRoles.contains(oldRole)) {
-                toDelete.add(oldRole);
+        if (oldRoles != null) {
+            if (oldRoles.contains("") && oldRoles.size() == 1) {
+                oldRoles.remove("");
+                newRoles.remove("");
+                us.deleteRole("");
+                userRepo.save(us);
+            } else {
+                for (String oldRole : oldRoles) {
+                    if (!newRoles.contains(oldRole)) {
+                        toDelete.add(oldRole);
+                    }
+                }
+                for(String role : toDelete) {
+                    us.deleteRole(role);
+                }
             }
-        }
-        for(String role : toDelete) {
-            us.deleteRole(role);
         }
         for (String newRole : newRoles) {
             us.addRole(newRole);
