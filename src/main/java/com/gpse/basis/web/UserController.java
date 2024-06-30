@@ -3,6 +3,7 @@ package com.gpse.basis.web;
 import com.gpse.basis.domain.UserModel;
 import com.gpse.basis.services.EmailServices;
 import com.gpse.basis.services.UserServices;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,7 @@ public class UserController {
         this.userService = userService;
         this.emailService = emailService;
     }
+    @Operation(summary = "Authentifizierung", description = "Überprüft die Existenz einer E-Mail-Adresse.")
     @GetMapping ("/authenticate")
     public ResponseEntity<Boolean> authenticate(@RequestParam String email) {
         boolean exists = userService.checkExistanceEmail(email.trim());

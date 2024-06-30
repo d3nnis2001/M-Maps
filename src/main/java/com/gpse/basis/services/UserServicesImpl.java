@@ -3,13 +3,9 @@ package com.gpse.basis.services;
 import com.gpse.basis.domain.UserModel;
 import com.gpse.basis.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Optional;
@@ -28,6 +24,7 @@ public class UserServicesImpl implements UserServices {
         return userRepo.findById(username)
             .orElseThrow(() -> new UsernameNotFoundException("ExampleUser name " + username + " not found."));
     }
+
     @Override
     public boolean checkExistanceEmail(String email) {
         return userRepo.existsById(email);
@@ -38,8 +35,14 @@ public class UserServicesImpl implements UserServices {
         return true;
     }
     @Override
-    public boolean deleteUser(String email) {
-        return true;
+    public boolean deleteUser(String username) {
+        try {
+            Optional<UserModel> user = userRepo.findById(username);
+            user.ifPresent(userRepo::delete);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public boolean checkCredentials(String email, String password) {
@@ -83,5 +86,39 @@ public class UserServicesImpl implements UserServices {
             System.out.println(userModel.getLastname());
         }
         return users;
+    }
+    @Override
+    public boolean updateRoles(String username, ArrayList<String> newRoles) {
+        UserModel us = getUserByUsername(username);
+        ArrayList<String> oldRoles = us.getRoles();
+        ArrayList<String> toDelete = new ArrayList<>();
+        for (String oldRole : oldRoles) {
+            if (!newRoles.contains(oldRole)) {
+                toDelete.add(oldRole);
+            }
+        }
+        for(String role : toDelete) {
+            us.deleteRole(role);
+        }
+        for (String newRole : newRoles) {
+            us.addRole(newRole);
+        }
+        System.out.println(us.getRoles());
+        userRepo.save(us);
+        return true;
+    }
+
+    @Override
+    public UserModel getUserByUsername(final String username) {
+        Optional<UserModel> user = userRepo.findById(username);
+        return user.orElse(null);
+    }
+
+    public boolean unlockUser(final String username) {
+        UserModel us = getUserByUsername(username);
+        us.setUnlocked(true);
+        System.out.println(us.getUnlocked());
+        userRepo.save(us);
+        return true;
     }
 }

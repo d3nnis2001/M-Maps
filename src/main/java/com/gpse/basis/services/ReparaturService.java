@@ -6,9 +6,7 @@ import com.gpse.basis.domain.Reparatur;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public interface ReparaturService {

@@ -4,9 +4,7 @@ import com.gpse.basis.domain.Checklist;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 
 public interface ChecklistService {
     ArrayList<String> getAllNames();

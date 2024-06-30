@@ -3,8 +3,7 @@ package com.gpse.basis.services;
 import com.gpse.basis.domain.DataSet;
 import com.gpse.basis.domain.FileUploadResponse;
 import com.gpse.basis.domain.GeoData;
-import org.apache.avro.util.MapEntry;
-import org.springframework.cglib.core.Local;
+import com.gpse.basis.domain.GleisLageDatenpunkt;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -13,7 +12,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Date;
 
 public interface FileService {
     List<FileUploadResponse> handleImport(List<String> paths, List<String> streckenIds);
@@ -24,4 +22,9 @@ public interface FileService {
     List<List<String>> readFoler(String path);
 
 
+    ArrayList<GleisLageDatenpunkt> getAllTrackData();
+    ArrayList<GleisLageDatenpunkt> getTrackData(int trackId);
+    ArrayList<String> getDataforId(int trackId);
+    ArrayList<GleisLageDatenpunkt> getData(int trackId);
+    ArrayList<GeoData> getPointData(double lat, double lo);
 }

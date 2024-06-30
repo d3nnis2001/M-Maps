@@ -1,31 +1,28 @@
 package com.gpse.basis;
 
-import com.gpse.basis.domain.Checklist;
-import com.gpse.basis.domain.GleisLageRange;
-import com.gpse.basis.domain.UserModel;
-import com.gpse.basis.repositories.ChecklistRepository;
-import com.gpse.basis.repositories.GleisLageRangeRepository;
-import com.gpse.basis.repositories.ReperaturRepository;
-import com.gpse.basis.repositories.UserRepository;
+import com.gpse.basis.domain.*;
+import com.gpse.basis.repositories.*;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 @Service
+@Profile("Name1")
 public class InitializeDatabase implements InitializingBean {
     private final UserRepository usRepo;
+    private final InspectionOrderRepository ioRepo;
     private final ReperaturRepository reRepo;
     private final ChecklistRepository checkRepo;
-
     private final GleisLageRangeRepository glrRepo;
 
     @Autowired
-    public InitializeDatabase(final UserRepository usRepo,
-                              final ReperaturRepository reRepo, final ChecklistRepository checkRepo, final GleisLageRangeRepository r) {
+    public InitializeDatabase(final UserRepository usRepo, final InspectionOrderRepository ioRepo, final ReperaturRepository reRepo,
+        final ChecklistRepository checkRepo, final GleisLageRangeRepository r) {
         this.usRepo = usRepo;
+        this.ioRepo = ioRepo;
         this.reRepo = reRepo;
         this.checkRepo = checkRepo;
         this.glrRepo = r;
@@ -37,15 +34,22 @@ public class InitializeDatabase implements InitializingBean {
         initChecklists();
         initRanges();
     }
-
     public void initUsers() {
         // Test User 1
         UserModel user = new UserModel("d3nnis.s@web.de", "hello", "Georg", "Bauer");
         user.addRole("Prüfer");
-        UserModel user2 = new UserModel("mauricemeise@gmx.net", "asdf", "Jochen", "Bauer");
         user.addRole("Admin");
+        UserModel user2 = new UserModel("mauricemeise@gmx.net", "asdf", "Jochen", "Bauer");
+        user2.addRole("Admin");
+        UserModel user3 = new UserModel("affe@web.de", "affe", "Charlie", "Monkey");
+        user3.addRole("Prüfer");
+        user3.addRole("Datenverwalter");
+        UserModel user4 = new UserModel("test", "abc", "Hi", "Du");
+        user4.addRole("Bearbeiter");
         usRepo.save(user);
         usRepo.save(user2);
+        usRepo.save(user3);
+        usRepo.save(user4);
     }
     public void initChecklists() {
         ArrayList<String> items = new ArrayList<>();
@@ -76,4 +80,6 @@ public class InitializeDatabase implements InitializingBean {
         glrRepo.save(range2);
         glrRepo.save(range3);
     }
+
+
 }
