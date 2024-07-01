@@ -1,7 +1,6 @@
 import {createRouter, createWebHistory} from 'vue-router'
 
 import StartView from '../pages/Start.vue'
-import MapView from '../pages/Map/Map.vue'
 import DataImport from "../pages/DataImport/DataImport.vue";
 import Login from '../pages/Login/Login.vue'
 import Registration from "../pages/Login/Registration.vue";
