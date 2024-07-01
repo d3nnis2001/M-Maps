@@ -20,6 +20,7 @@ const current_wind_direction = ref("")
 const current_windGust_direction = ref("")
 const current_day_min_Temperature = ref("")
 const current_day_max_temperature = ref("")
+const current_temperature = ref("")
 
 const show_day_info = ref(false)
 
@@ -72,6 +73,7 @@ onBeforeMount(async () => {
 
     city.value = current_weather_data.value.sources[0].station_name
     current_condition.value = current_weather_data.value.weather.condition.toUpperCase()
+    current_temperature.value = Math.round(current_weather_data.value.weather.temperature)
     current_humidity.value = current_weather_data.value.weather.relative_humidity
     current_dew_point.value = Math.round(current_weather_data.value.weather.dew_point)
     current_perceptration.value = current_weather_data.value.weather.precipitation_60
@@ -347,7 +349,7 @@ const series = ref( [{
                     </q-card-section>
 
                     <q-card-section class="q-py-none text-center temperature-section">
-                        <div class="temperature">27°</div>
+                        <div class="temperature">{{current_temperature}}°</div>
                         <div class="weather-status">{{current_condition}}</div>
                     </q-card-section>
 
