@@ -12,33 +12,62 @@ export const getUserData = async function getData() {
 
 export const deleteUser = async function deleteUser(username) {
     try {
-        const cred = new URLSearchParams()
-        cred.append("username", username)
-        const response = await axios.delete("api/admin/deleteUser", cred)
-        return response
-    } catch (error) {
-        console.log("Unssen error while deleting User");
-    }
-}
-
-export const getUserById = async function getUserById(id) {
-    try {
-        const response = await axios.get("api/admin/getUserById", {
+        const response = await axios.delete("/api/admin/deleteUser", {
             params: {
-                username: id
+                userName:username
             }
         });
         return response.data;
     } catch (error) {
-        console.error("Unseen error while try to get User data for editing:", error);
+        console.log("Unseen error while deleting User");
+    }
+}
+
+export const getUserByUsername = async function getUserByUsername(username) {
+    try {
+        const response = await axios.get("/api/admin/getUserByUsername", {
+            params: {
+                userName: username
+            }
+        });
+        console.log(response)
+        console.log(response.data)
+        return response.data;
+    } catch (error) {
+        console.error("Unseen error while try to get User data for editing: ", error);
         return false
     }
 }
 
-export const setRolesById = async function setRolesById(id){
+export const updateRoles = async function updateRoles(username, roles){
     try {
-        const cred = new URLSearchParams()
+        console.log("Die Rollen: " + roles);
+        console.log(username)
+        const cred = new URLSearchParams();
+        const rolesString = roles.join(",");
+        console.log(rolesString)
+        cred.append("userName", username);
+        cred.append("roles", rolesString);
+        return await axios.post("/api/admin/updateRoles", cred);
     } catch (error) {
+        console.error("Error making role changes:", error);
+        if (error.response && error.response.status === 404) {
+            console.log("Error making role changes: Resource not found");
+        } else {
+            console.log("Error making role changes:", error.message);
+        }
+        throw new Error(`Error making role changes: ${error.message}`);
+    }
+}
 
+export const unlockUser = async function unlockUser(username) {
+    try {
+        console.log(username)
+        const cred = new URLSearchParams();
+        cred.append("userName", username);
+        return await axios.post("/api/admin/unlockUser", cred);
+    } catch (error) {
+        console.error("Unseen error while try to unlock User: ", error);
+        return false
     }
 }

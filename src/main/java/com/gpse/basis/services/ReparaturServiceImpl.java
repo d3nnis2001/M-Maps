@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
 
 @Service
 
@@ -38,7 +40,8 @@ public class ReparaturServiceImpl implements ReparaturService {
         String uniqueID = util.generateID();
         ArrayList<String> selected = new ArrayList<>();
         ReparaturChecklist check = new ReparaturChecklist(uniqueID, checklist, selected);
-        Reparatur newRep = new Reparatur(uniqueID, track, date1, date2, check, remarks, "beauftragt", authorized, geo);
+        Reparatur newRep = new Reparatur(uniqueID, track, date1, date2, check, remarks, "beauftragt", authorized);
+        newRep.setGeocords(geo);
         rep.save(newRep);
         checkRepo.save(check);
         return true;
@@ -65,5 +68,19 @@ public class ReparaturServiceImpl implements ReparaturService {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    @Override
+    public List<Reparatur> getReparaturForMap() {
+        Iterable it = rep.findAll();
+        ArrayList<Reparatur> repArr = new ArrayList<>();
+        Iterator<Reparatur> iterator = it.iterator();
+        while (iterator.hasNext()) {
+            Reparatur repSolo = iterator.next();
+            if(Objects.equals(repSolo.getStatus(), "beauftragt")){
+                repArr.add(repSolo);
+            }
+        }
+        return repArr;
     }
 }

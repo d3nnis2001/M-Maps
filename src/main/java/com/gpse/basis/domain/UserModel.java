@@ -23,6 +23,7 @@ public class UserModel implements UserDetails {
     private String firstname;
     private String passwordToken;
     private String lastname;
+    private boolean unlocked;
     private ArrayList<String> region;
     private String service;
     private static final boolean accountNonExpired = true;
@@ -32,27 +33,32 @@ public class UserModel implements UserDetails {
 
     @JsonIgnore
     private transient ArrayList<String> roles;
+
     public UserModel(String email, String password, String firstname, String lastname) {
         this.email = email;
         this.password = password;
         this.firstname = firstname;
         this.lastname = lastname;
+        unlocked = false;
     }
+
     public void addRole(String role) {
         if (this.roles == null) {
             this.roles = new ArrayList<>();
             this.roles.add(role);
         } else {
-            this.roles.add(role);
-        }
-    }
-    public void deleteRole(String role) {
-        for(String r : roles) {
-            if (r.equals(role)) {
-                roles.remove(r);
+            if (!this.roles.contains(role)) {
+                this.roles.add(role);
             }
         }
     }
+    public void deleteRole(String role) {
+        roles.removeIf(r -> r.equals(role));
+        if (roles.isEmpty()) {
+            roles = null;
+        }
+    }
+    public ArrayList<String> getRoles() { return roles; }
 
     public void setEmail(String email) {
         this.email = email;
@@ -133,4 +139,13 @@ public class UserModel implements UserDetails {
     public void setService(String service) {
         this.service = service;
     }
+
+    public boolean getUnlocked() {
+        return unlocked;
+    }
+
+    public void setUnlocked(boolean unlocked) {
+        this.unlocked = unlocked;
+    }
+
 }

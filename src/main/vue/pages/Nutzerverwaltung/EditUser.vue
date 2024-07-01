@@ -1,32 +1,65 @@
 <script>
-import { onMounted, ref } from 'vue';
+import {onMounted, ref, watch} from 'vue';
 import { useRoute } from 'vue-router';
 import router from "@/main/vue/router";
-import {getUserById} from "@/main/vue/api/admin";
+import {getUserByUsername, getUserData, updateRoles} from "@/main/vue/api/admin";
+import {useQuasar} from "quasar";
 
 export default {
     setup () {
         const route = useRoute();
-        const username = route.params.username;
+        const currentUser = ref({user: []})
+        const username = route.params.username.toString();
         const firstname = ref('')
         const lastname = ref('')
+        const userRegion = ref({regions:[]})
         const allRoles = ref(['Admin', 'Datenverwalter', 'Bearbeiter', 'Prüfer']);
-        const roles = ref({selected_roles: []})
+        const updatedRoles = ref({selected_roles: []})
+        const {notify} = useQuasar();
 
         onMounted( async  () => {
-            console.log(username)
-            const user = await getUserById(username);
-            firstname.value = user.firstname
-            console.log(firstname.value)
-            lastname.value =user.lastname
+            currentUser.value = await getUserByUsername(username);
+            if (currentUser.value) {
+                firstname.value = currentUser.value.firstname;
+                lastname.value = currentUser.value.lastname;
+                console.log(currentUser.value.region)
+                if (currentUser.value.region !== undefined) {
+                    currentUser.value.region.forEach((region) => {
+                        console.log(region)
+                        userRegion.value.regions.push(region)
+                    })
+                }
+                if (currentUser.value.roles !== null) {
+                    currentUser.value.roles.forEach((role) => {
+                        console.log(role)
+                        updatedRoles.value.selected_roles.push(role)
+                    })
+                }
+            }
         })
 
         const abort = () => {
             router.push(`/admin`);
         };
 
-        const saveRoles = (roles) => {
-
+        async function saveRoles() {
+            console.log(updatedRoles.value.selected_roles)
+            updatedRoles.value.selected_roles.forEach((data) => {
+                console.log(data)
+            })
+            const update = await updateRoles(username, updatedRoles.value.selected_roles)
+            if (update) {
+                router.push(`/admin`);
+                notify({
+                    message: "Die Rollen wurden erfolgreich gespeichert!",
+                    timeout: 5000,
+                })
+            } else {
+                notify({
+                    message: "Es gab ein Problem mit dem Update der Rollen!",
+                    timeout: 5000,
+                });
+            }
         }
 
         return {
@@ -35,19 +68,9 @@ export default {
             firstname,
             lastname,
             allRoles,
-            roles,
+            updatedRoles,
             abort,
             saveRoles,
-            /*
-            group: ref([]),
-            options: [
-                { label: 'Admin', value: 'admin' },
-                { label: 'Datenverwalter', value: 'datenverwalter', },
-                { label: 'Bearbeiter', value: 'bearbeiter', },
-                { label: 'Prüfer', value: 'prüfer', },
-            ]
-
-             */
         }
     }
 }
@@ -79,27 +102,33 @@ export default {
                 </div>
             </div>
 
+            <div class="col">
+                <div class="row" >
+                    <h6 style="margin-right: 10px" >Region: </h6>
+                    <!--
+                    <div class="column" v-for="region in userRegion">
+                        <q-item>
+                            {{ region }}
+                        </q-item>
+                    </div>
+                        -->
+                </div>
+            </div>
+
             <div class="q-pa-lg">
-                <p style="margin-right: 5px">Rollen: </p>
-                <!--
-                <q-option-group
-                    :options="options"
-                    type="checkbox"
-                    v-model="roles.selected_roles"
-                    :val="allRoles"
-                />
-                -->
-                {{roles}}
-                <div v-for="allRoles in allRoles">
+                <div class="checkbox-container" v-for="role in allRoles">
                     <q-checkbox
-                        :label="allRoles"
-                        v-model="roles.selected_roles"
-                        :val="allRoles"
+                        :label="role"
+                        v-model="updatedRoles.selected_roles"
+                        :val="role"
+                        size="lg"
                     />
                 </div>
                 <p></p>
             </div>
         </div>
+
+
 
         <div class="q-gutter-sm row justify-end">
             <q-btn
@@ -108,7 +137,6 @@ export default {
                 size="16px"
                 no-caps rounded label="Abbrechen"
                 color="primary"
-
                 @click=abort >
             </q-btn>
             <q-btn
@@ -125,6 +153,11 @@ export default {
 
 
 <style scoped>
-
+.checkbox-container .q-checkbox {
+    font-size: 20px;
+}
+.extra-mar {
+    margin-right: 20px;
+}
 </style>
 

@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 
 public interface ReparaturService {
     ArrayList<Reparatur> getRepData();
@@ -15,4 +16,6 @@ public interface ReparaturService {
     Boolean changeStatus(String name, String newStatus);
 
     Boolean deleteOrder(String name);
+
+    List<Reparatur> getReparaturForMap();
 }
