@@ -3,32 +3,33 @@ package com.gpse.basis.web;
 import com.gpse.basis.domain.Checklist;
 import com.gpse.basis.domain.GeoCords;
 import com.gpse.basis.domain.Reparatur;
-import com.gpse.basis.domain.Utils;
 import com.gpse.basis.services.ChecklistService;
+import com.gpse.basis.services.EmailServices;
 import com.gpse.basis.services.ReparaturService;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/repair")
 public class ReparaturController {
     private ReparaturService service;
     private ChecklistService checkService;
+    private final EmailServices emailService;
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     @Autowired
-    public ReparaturController(ReparaturService service, ChecklistService checkService) {
+    public ReparaturController(ReparaturService service, ChecklistService checkService, EmailServices emailService) {
         this.service = service;
         this.checkService = checkService;
+        this.emailService = emailService;
     }
 
     @GetMapping("/getdata")
@@ -101,5 +102,14 @@ public class ReparaturController {
         String id = request.getParameter("id");
         LocalDate date1 = LocalDate.parse(request.getParameter("date").replace("/", "-"), formatter);
         return ResponseEntity.ok(checkService.setTerminatedDate(id, date1));
+    }
+
+
+    @PostMapping("/emailTrackBuilder")
+    public ResponseEntity<Boolean> emailTrackBuilder(final WebRequest request) {
+        String trackBuilderEmail = request.getParameter("email");
+        String id = request.getParameter("id");
+        emailService.builtEmailTrackBuilder(trackBuilderEmail, id);
+        return ResponseEntity.ok(true);
     }
 }

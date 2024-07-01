@@ -1,7 +1,6 @@
 package com.gpse.basis.services;
 
 import com.gpse.basis.domain.InspectionOrder;
-import com.gpse.basis.domain.Reparatur;
 import com.gpse.basis.repositories.InspectionOrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -28,14 +27,14 @@ public class InspectionServicesImpl implements InspectionServices {
 
     @Override
     public void createInspectionOrder(ArrayList<String> inspecArray) {
-        String defaultStatus = "unbearbeitet";
+        String defaultStatus = "beauftragt";
         String defaultUserId = " ";
         String inspectionOrderId = generateId();
         boolean defaultArchived = false;
 
         InspectionOrder inspectionOrder = new InspectionOrder(inspectionOrderId, inspecArray.get(0), defaultUserId,
             inspecArray.get(1), inspecArray.get(2), inspecArray.get(3), inspecArray.get(4),
-            inspecArray.get(5), inspecArray.get(6), defaultStatus, inspecArray.get(7), defaultArchived);
+            inspecArray.get(5), inspecArray.get(6), defaultStatus, inspecArray.get(7), defaultArchived, inspecArray.get(8));
         inspec.save(inspectionOrder);
     }
 
@@ -43,7 +42,7 @@ public class InspectionServicesImpl implements InspectionServices {
         long timestamp = System.currentTimeMillis();
         Random random = new Random();
         int randomValue = random.nextInt(1000);
-        return String.valueOf(timestamp + randomValue);
+        return String.valueOf("p-" + timestamp + randomValue);
     }
 
     @Override
@@ -57,6 +56,7 @@ public class InspectionServicesImpl implements InspectionServices {
         inspecOld.setDepartment(inspecNew.getDepartment());
         inspecOld.setInspectionData(inspecNew.getInspectionData());
         inspecOld.setRemarks(inspecNew.getRemarks());
+        inspecOld.setPriority(inspecNew.getPriority());
         inspec.save(inspecOld);
     }
 
@@ -68,15 +68,30 @@ public class InspectionServicesImpl implements InspectionServices {
     @Override
     public Boolean deleteInspectionOrder(String inspectionOrderId) {
         try {
-            System.out.println("TEST: Impl Datei");
             InspectionOrder inspectionOrder = loadInspecById(inspectionOrderId);
-            System.out.println("TEST: " + inspectionOrder.getInspectionOrderId());
             inspec.delete(inspectionOrder);
             return true;
         } catch (Exception e) {
             return false;
         }
+    }
 
+    @Override
+    public void editStatus(String inspectionOrderId, String status) {
+        InspectionOrder inspectionOrder = loadInspecById(inspectionOrderId);
+        if (status.equals("archiviert")) {
+            inspectionOrder.setArchived(true);
+        }
+        inspectionOrder.setStatus(status);
+        inspec.save(inspectionOrder);
+    }
+
+    @Override
+    public void editReview(String inspectionOrderId, String review, String date) {
+        InspectionOrder inspectionOrder = loadInspecById(inspectionOrderId);
+        inspectionOrder.setReview(review);
+        inspectionOrder.setFinishedDate(date);
+        inspec.save(inspectionOrder);
     }
 
     @Override

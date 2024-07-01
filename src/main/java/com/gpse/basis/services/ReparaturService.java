@@ -25,4 +25,6 @@ public interface ReparaturService {
 
     void deleteArchivedRep(String id);
 
+
+    List<Reparatur> getReparaturForMap();
 }

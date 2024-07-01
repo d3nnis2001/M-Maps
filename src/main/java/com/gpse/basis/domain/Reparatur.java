@@ -19,7 +19,7 @@ public class Reparatur {
     private GeoCords geocords;
     private boolean archived = false;
 
-    public Reparatur(String id, int track, LocalDate from, LocalDate till, ReparaturChecklist checklist, String remarks, String status, String freigabeberechtigter, GeoCords geocords) {
+    public Reparatur(String id, int track, LocalDate from, LocalDate till, ReparaturChecklist checklist, String remarks, String status, String freigabeberechtigter) {
         this.id = id;
         this.track = track;
         this.from = from;
@@ -28,7 +28,6 @@ public class Reparatur {
         this.remarks = remarks;
         this.status = status;
         this.freigabeberechtigter = freigabeberechtigter;
-        this.geocords = geocords;
     }
 
     public int getTrack() {

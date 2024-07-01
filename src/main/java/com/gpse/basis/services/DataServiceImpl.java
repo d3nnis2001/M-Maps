@@ -3,6 +3,7 @@ package com.gpse.basis.services;
 import com.gpse.basis.domain.GeoData;
 import com.gpse.basis.domain.GleisLageDatenpunkt;
 import com.gpse.basis.domain.GleisLageRange;
+import com.gpse.basis.repositories.GeoTrackData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
@@ -23,69 +24,22 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 @Service
-public class DataServiceImpl implements DataService{
+public class DataServiceImpl implements DataService {
     private static final Lock lock = new ReentrantLock();
 
     private final MongoTemplate template;
+    private final GeoTrackData geoTrack;
 
     private List<GleisLageRange> grd;
 
     @Autowired
     DataServiceImpl(
-        MongoTemplate tmp
+        MongoTemplate tmp,
+        GeoTrackData geoTrack
     ) {
         template = tmp;
         grd = template.findAll(GleisLageRange.class);
-    }
-    @Override
-    public List<Map.Entry<Colors, String>> getNewestColorsforGeoData(List<GeoData> lst) {
-        List<Map.Entry<Colors, String>> l = new ArrayList<>();
-        int no_threads = 30;
-        int sts = lst.size() / no_threads;
-        List<Thread> workers = new ArrayList<>(no_threads);
-        int index = 0;
-        for(int i = 0; i < no_threads - 1; ++i) {
-            workers.add(i, new Thread(new Worker(lst.subList(index, index + sts), l, null, null)));
-            index += sts;
-            workers.get(i).start();
-        }
-        workers.add(no_threads-1, new Thread(new Worker(lst.subList(index, lst.size()), l, null, null)));
-        workers.getLast().start();
-
-        workers.forEach(w -> {
-            try {
-                w.join();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        });
-
-        return l;
-    }
-
-    private List<Map.Entry<Colors, String>> getColorForDateRange(List<GeoData> lst, LocalDateTime from, LocalDateTime till) {
-        List<Map.Entry<Colors, String>> l = new ArrayList<>();
-        int no_threads = 30;
-        int sts = lst.size() / no_threads;
-        List<Thread> workers = new ArrayList<>(no_threads);
-        int index = 0;
-        for(int i = 0; i < no_threads - 1; ++i) {
-            workers.add(i, new Thread(new Worker(lst.subList(index, index + sts), l, from, till)));
-            index += sts;
-            workers.get(i).start();
-        }
-        workers.add(no_threads-1, new Thread(new Worker(lst.subList(index, lst.size()), l, from, till)));
-        workers.getLast().start();
-
-        workers.forEach(w -> {
-            try {
-                w.join();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        });
-
-        return l;
+        this.geoTrack = geoTrack;
     }
 
     private class Worker implements Runnable {
@@ -235,25 +189,83 @@ public class DataServiceImpl implements DataService{
         }
     }
 
-    /**
-     * Gets the Colours and ids for each existing GeoPoint
-     **/
+    @Override
+    public List<Map.Entry<Colors, String>> getNewestColorsforGeoData(List<GeoData> lst) {
+        List<Map.Entry<Colors, String>> l = new ArrayList<>();
+        int no_threads = 30;
+        int sts = lst.size() / no_threads;
+        List<Thread> workers = new ArrayList<>(no_threads);
+        int index = 0;
+        for(int i = 0; i < no_threads - 1; ++i) {
+            workers.add(i, new Thread(new Worker(lst.subList(index, index + sts), l, null, null)));
+            index += sts;
+            workers.get(i).start();
+        }
+        workers.add(no_threads-1, new Thread(new Worker(lst.subList(index, lst.size()), l, null, null)));
+        workers.getLast().start();
 
-    public List<Map.Entry<Colors, String>> getGeoDatabyTrackId(int track_id) {
-        Query query = new Query();
-        query.addCriteria(Criteria.where("strecken_id").is(track_id));
-        List<GeoData> gd = template.find(query, GeoData.class);
+        workers.forEach(w -> {
+            try {
+                w.join();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        return l;
+    }
+
+    private List<Map.Entry<Colors, String>> getColorForDateRange(List<GeoData> lst, LocalDateTime from, LocalDateTime till) {
+        List<Map.Entry<Colors, String>> l = new ArrayList<>();
+        int no_threads = 30;
+        int sts = lst.size() / no_threads;
+        List<Thread> workers = new ArrayList<>(no_threads);
+        int index = 0;
+        for(int i = 0; i < no_threads - 1; ++i) {
+            workers.add(i, new Thread(new Worker(lst.subList(index, index + sts), l, from, till)));
+            index += sts;
+            workers.get(i).start();
+        }
+        workers.add(no_threads-1, new Thread(new Worker(lst.subList(index, lst.size()), l, from, till)));
+        workers.getLast().start();
+
+        workers.forEach(w -> {
+            try {
+                w.join();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        return l;
+    }
+
+    // ---------------------------- GEODATA ---------------------------
+
+    public List<Map.Entry<Colors, String>> getHeatmap() {
+        List<GeoData> gd = template.findAll(GeoData.class);
         if(gd.isEmpty())
             return null;
         List<Map.Entry<Colors, String>> col = getNewestColorsforGeoData(gd);
         return col;
     }
 
-    /**
-     * Gets the Colours and ids for each existing GeoPoint in a
-     * timeframe.
-     **/
+    @Override
+    public ArrayList<GeoData> getGeoData() {
+        Iterable<GeoData> iterable = geoTrack.findAll();
+        ArrayList<GeoData> geoArr = new ArrayList<>();
+        Iterator<GeoData> iterator = iterable.iterator();
+        while (iterator.hasNext()) {
+            GeoData geo = iterator.next();
+            geoArr.add(geo);
+        }
+        return geoArr;
+    }
+
     public List<Map.Entry<Colors, String>> getGeoDataByDate(int track_id, LocalDateTime from, LocalDateTime till) {
+        if (from.isAfter(till)) {
+            return null;
+        }
         Query query = new Query();
         query.addCriteria(Criteria.where("strecken_id").is(track_id));
         List<GeoData> gd = template.find(query, GeoData.class);
@@ -263,5 +275,19 @@ public class DataServiceImpl implements DataService{
         List<Map.Entry<Colors, String>> col = getColorForDateRange(gd, from, till);
         System.out.println("Wir sind im Dataservice: "+col.size());
         return col;
+    }
+
+    public Double[] getDataForGeoPart(String id) {
+        MatchOperation matchOperation = Aggregation.match(Criteria.where("iDlocation").is(id));
+        Aggregation aggregation = Aggregation.newAggregation(matchOperation);
+        List<GleisLageDatenpunkt> results = template.aggregate(aggregation, "GleisLageDaten", GleisLageDatenpunkt.class).getMappedResults();
+        if(!results.isEmpty()) {
+            double max_left = Math.round(results.parallelStream().mapToDouble(GleisLageDatenpunkt::getZ_links_railab_3p).max().getAsDouble() * 100.0) / 100.0;
+            double max_right = Math.round(results.parallelStream().mapToDouble(GleisLageDatenpunkt::getZ_rechts_railab_3p).max().getAsDouble() * 100.0) / 100.0;
+            double vul_zul = Math.round(results.parallelStream().mapToDouble(GleisLageDatenpunkt::getV_zul).average().getAsDouble() * 100.0) / 100.0;
+            double vul = Math.round(results.parallelStream().mapToDouble(GleisLageDatenpunkt::getGeschwindigkeit).average().getAsDouble() * 100.0) / 100.0;
+            return new Double[] {max_left, max_right, vul_zul, vul};
+        }
+        return null;
     }
 }
