@@ -28,4 +28,12 @@ public class EmailServicesImpl implements EmailServices {
             + link + "\n\nIf you did not request a password reset, please ignore this email.";
         sendEmail(receiver, subject, body);
     }
+
+    public void builtEmailTrackBuilder(String receiver, String id) {
+        String link = "http://localhost:8080/repair-order-trackbuilder?id=" + id;
+        String subject = "Repair Order";
+        String body = "Hello,\n\nYou have a new repair order. "
+            + "Please click on the link below to open the repair order:\n\n" + link;
+        sendEmail(receiver, subject, body);
+    }
 }
