@@ -67,6 +67,7 @@ public class RosBagServiceImpl implements RosBagService{
             try {
                 BagFile f = BagReader.readFile(filename);
                 for (TopicInfo topic : f.getTopics()) {
+                    System.out.println(topic.getName());
                     if (Objects.equals(topic.getName(), "/ColourCam/image_raw")) {
                         long count = topic.getMessageCount();
                         System.out.println("Message-count: " + count);
@@ -150,7 +151,8 @@ public class RosBagServiceImpl implements RosBagService{
         List<List<VelodynePoint>> pointList = new ArrayList<>();
         Query q = new Query();
         q.addCriteria(Criteria.where("streckenId").is(trackId));
-        List<DataSet> data = template.find(q, DataSet.class).stream().filter(dt -> dt.getFileName().contains("velodyne")).toList();
+        var data = template.find(q, DataSet.class);
+        data.stream().filter(dt -> dt.getFileName().contains("velodyne")).toList();
         for(var d : data) {
             try {
                 BagFile f = BagReader.readFile(d.getFileName());

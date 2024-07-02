@@ -52,8 +52,6 @@ const regions = [{label:"BY", value: []},
                 {label:"N", value: []}]
 const dialogMarkerOne = ref(false)
 const slide = ref(1)
-const cameraimages = ref([])
-const velodynPoints = ref([])
 const showLidar = ref(false)
 var tempStreckenID = 0
 
@@ -374,6 +372,7 @@ const onMarkerClicked = async (event) => {
     selectedMarker.value = marker
     dialogVisible.value = true;
     information.value = []
+    tempStreckenID = selectedMarker.value.data.strecken_id
     const informationGeo = await getInformationForGeoPoint(selectedMarker.value.data.id)
     displayInformation(informationGeo)
 };
