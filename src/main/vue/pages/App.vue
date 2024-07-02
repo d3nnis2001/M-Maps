@@ -1,13 +1,13 @@
 <script setup>
 import {ref} from 'vue'
 import {RouterView} from 'vue-router'
-let boolStart = true;
 
 const rightDrawerOpen = ref(false)
 const links = [
     { name: 'map', label: 'Map', to: '/map' },
     { name: 'dataimport', label: 'Datenverwaltung', to: '/dataimport' },
     { name: 'repair', label: 'Reparaturaufträge', to: '/repair' },
+    { name: 'inspectionOrderOverview', label: 'Prüfaufträge', to: '/inspectionOrder'},
     { name: 'admin', label: 'Nutzerverwaltung', to: '/admin' },
     { name: 'dataviewer', label: 'Dataviewer', to: '/dataviewer' }
 ]
@@ -22,9 +22,6 @@ function toggleRightDrawer() {
     rightDrawerOpen.value = !rightDrawerOpen.value
 }
 
-function changeBool() {
-    boolStart=false;
-}
 
 </script>
 <template>
@@ -69,6 +66,15 @@ function changeBool() {
                 </q-toolbar-title>
                 <q-toolbar-title v-if="$route.name === 'dataviewerPoint'" align="middle">
                     Dataviewer für Punkt
+                </q-toolbar-title>
+                <q-toolbar-title v-if="$route.name === 'inspectionOrderOverview'" align="middle">
+                    Prüfaufträge
+                </q-toolbar-title>
+                <q-toolbar-title v-if="$route.name === 'createInspectionOrder'" align="middle">
+                    Prüfauftrag erstellen
+                </q-toolbar-title>
+                <q-toolbar-title v-if="$route.name === 'editInspectionOrder'" align="middle">
+                    Prüfauftrag editieren
                 </q-toolbar-title>
                 <q-btn dense flat round icon="menu" @click="toggleRightDrawer" align="right" />
             </q-toolbar>
