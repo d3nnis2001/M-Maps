@@ -3,8 +3,6 @@ package com.gpse.basis;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -27,7 +25,7 @@ public class WebConfiguration implements WebMvcConfigurer {
         return new WebMvcConfigurer() {
             @Override
             public void addViewControllers(final ViewControllerRegistry registry) {
-                registry.addViewController("{_:^(?!static|index\\.html|manifest\\.webmanifest|registerSW\\.js|sw\\" +
+                registry.addViewController("{_:^(?!v3|swagger-ui|static|index\\.html|manifest\\.webmanifest|registerSW\\.js|sw\\" +
 								".js|workbox-[A-Za-z0-9]+\\.js|.*\\.(?:png|jpg|jpeg|gif|bmp|svg|ico|tiff)$).*$}/**")
                     .setViewName("forward:/");
             }

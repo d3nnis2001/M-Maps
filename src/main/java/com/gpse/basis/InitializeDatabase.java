@@ -4,18 +4,19 @@ import com.gpse.basis.domain.*;
 import com.gpse.basis.repositories.*;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
+@Profile("Name1")
 public class InitializeDatabase implements InitializingBean {
     private final UserRepository usRepo;
     private final InspectionOrderRepository ioRepo;
     private final ReperaturRepository reRepo;
     private final ChecklistRepository checkRepo;
-
     private final GleisLageRangeRepository glrRepo;
 
     private final GeoTrackData geoTrackRepository;
@@ -34,7 +35,6 @@ public class InitializeDatabase implements InitializingBean {
     @Override
     public void afterPropertiesSet() {
         initUsers();
-        initInspectionOrder();
         initChecklists();
         initRanges();
         initGeoTrack();
@@ -43,10 +43,18 @@ public class InitializeDatabase implements InitializingBean {
         // Test User 1
         UserModel user = new UserModel("d3nnis.s@web.de", "hello", "Georg", "Bauer");
         user.addRole("Prüfer");
-        UserModel user2 = new UserModel("mauricemeise@gmx.net", "asdf", "Jochen", "Bauer");
         user.addRole("Admin");
+        UserModel user2 = new UserModel("mauricemeise@gmx.net", "asdf", "Jochen", "Bauer");
+        user2.addRole("Admin");
+        UserModel user3 = new UserModel("affe@web.de", "affe", "Charlie", "Monkey");
+        user3.addRole("Prüfer");
+        user3.addRole("Datenverwalter");
+        UserModel user4 = new UserModel("test", "abc", "Hi", "Du");
+        user4.addRole("Bearbeiter");
         usRepo.save(user);
         usRepo.save(user2);
+        usRepo.save(user3);
+        usRepo.save(user4);
     }
     public void initChecklists() {
         ArrayList<String> items = new ArrayList<>();
@@ -78,12 +86,6 @@ public class InitializeDatabase implements InitializingBean {
         glrRepo.save(range3);
     }
 
-    public void initInspectionOrder() {
-        InspectionOrder inspec = new InspectionOrder("1111","1234", "1000", "Bielefeld",
-            "Hannover", "08-05-2024", "09-05-2024",
-            " ", " ", "archiviert", "hallo :)", true);
-        ioRepo.save(inspec);
-    }
 
     public void initGeoTrack() {
         Iterable<GeoData> lst = geoTrackRepository.findAll();
@@ -96,5 +98,4 @@ public class InitializeDatabase implements InitializingBean {
         if(!found.get())
             geoTrackRepository.save(new GeoData(1, 52.17027,  9.08446,0, "1"));
     }
-
 }

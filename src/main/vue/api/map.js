@@ -3,16 +3,13 @@ import axios from 'axios';
 export const getGeoData = async function getGeoData() {
     try {
         const response = await axios.get("/api/map/gettracks")
-        console.log(response)
         return response.data;
     } catch (error) {
     }
 }
-export const getTrack = async function getTrack(trackID) {
+export const getHeatmap = async function getHeatmap() {
     try {
-        const cred = new URLSearchParams()
-        cred.append("trackid", trackID)
-        const response = await axios.post("/api/map/gettrack", cred)
+        const response = await axios.post("/api/map/getheatmap")
         return response.data
     } catch (error) {
         console.log("Something went wrong when getting the trackID")
@@ -20,26 +17,38 @@ export const getTrack = async function getTrack(trackID) {
     }
 }
 
-export const getPartOfTrack = async function getPartOfTrack(from, till) {
+export const getTimeFromHeatmap = async function getTimeFromHeatmap(strecke, from, till) {
     try {
         const cred = new URLSearchParams()
+        cred.append("strecke", strecke)
         cred.append("from", from)
         cred.append("till", till)
-        const response = await axios.post("/api/map/getparttrack", cred)
+        const response = await axios.post("/api/map/getpartheatmap", cred)
         return response.data
-    } catch (error) {
-        console.log("Something went wront when getting a track part!")
+    }  catch (error) {
+        console.log("Something went wrong when getting the Heatmap data!")
     }
 }
 
-export const getPartOfGleislage = async function getPartOfGleislage(id) {
+export const getInformationForGeoPoint = async function getInformationForGeoPoint(id) {
     try {
         const cred = new URLSearchParams()
         cred.append("id", id)
-        const response = await axios.post("/api/map/fromcolours", cred)
+        const response = await axios.post("/api/map/getDataGeoTrack", cred)
         return response.data
-    } catch (error) {
-        console.log("Something went wrong when getting the Gleislagedaten!")
+    }  catch (error) {
+        console.log("Something went wrong when getting the data for a GeoPoint!")
+    }
+}
+
+export const getReparaturForMap = async function getReparaturForMap() {
+    try {
+
+        const response = await axios.post("/api/map/getReparaturForMap")
+        console.log(response.data)
+        return response.data
+    }  catch (error) {
+        console.log("Something went wrong when getting the reparatur Aufträge")
     }
 }
 
@@ -81,4 +90,4 @@ export const getVelodynPointsForTrackId = async(trackId, index) => {
 }
 
 
-export default {getGeoData, getTrack};
+export default {getGeoData, getHeatmap, getTimeFromHeatmap};

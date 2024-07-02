@@ -4,8 +4,10 @@ import {useQuasar} from "quasar";
 import { useRoute } from 'vue-router';
 import {getDataById, sendDataById, sendInspectionOrder} from "@/main/vue/api/inspection";
 import router from "@/main/vue/router";
+import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";
 
 export default {
+    components: {StandardInput},
     setup () {
         const $q = useQuasar()
         const courseId = ref('')
@@ -14,8 +16,14 @@ export default {
         const startTime = ref('')
         const endTime = ref('')
         const department = ref('')
+        const departmentValues = ref([])
         const inspectionData = ref('')
+        const inspectionDataValues = ref([])
         const remarks = ref('')
+        const priority = ref('')
+        const priorityLow = ref(false)
+        const priorityMiddle = ref(false)
+        const priorityHigh = ref(false)
         const dense = ref(false)
         const route = useRoute();
         let currentInspectionOrderId = route.params.inspectionOrderId
@@ -30,6 +38,19 @@ export default {
             department.value = inspectionOrder.department;
             inspectionData.value = inspectionOrder.inspectionData;
             remarks.value = inspectionOrder.remarks;
+            priority.value = inspectionOrder.priority;
+
+            if (priority.value === 'niedrig') {
+                priorityLow.value = true;
+            } else if (priority.value === 'mittel') {
+                priorityMiddle.value = true;
+            } else if (priority.value === 'hoch') {
+                priorityHigh.value = true;
+            }
+            inspectionDataValues.value.push("Gleislagedaten")
+
+            departmentValues.value.push("DB Regio Schiene Nord-Ost (NO)")
+            departmentValues.value.push("DB Regio Schiene Süd-West (SW)")
 
         });
 
@@ -58,6 +79,9 @@ export default {
                 console.log(errormsg);
                 errormsg.push("Please select a data type");
             }
+            if (endTime.value < startTime.value) {
+                errormsg.push("The second date has to be later than the first!")
+            }
 
             if (errormsg.length > 0) {
                 for (let i = 0; i < errormsg.length; i++) {
@@ -74,13 +98,33 @@ export default {
         function sendData() {
             const inputs = checkInputs()
             console.log(inputs)
+            if (priorityLow.value) {
+                priority.value = 'niedrig';
+            } else if (priorityMiddle.value) {
+                priority.value = 'mittel';
+            } else if (priorityHigh.value) {
+                priority.value = 'hoch';
+            }
             if (inputs) {
                 router.push('/inspectionOrder')
                 return sendDataById(currentInspectionOrderId, courseId.value, startLocation.value, endLocation.value, startTime.value,
-                    endTime.value, department.value, inspectionData.value, remarks.value)
+                    endTime.value, department.value, inspectionData.value, remarks.value, priority.value)
 
             }
         }
+
+        const updateCheckbox = (option) => {
+            if (option === 'niedrig') {
+                priorityMiddle.value = false;
+                priorityHigh.value = false;
+            } else if (option === 'mittel') {
+                priorityLow.value = false;
+                priorityHigh.value = false;
+            } else if (option === 'hoch') {
+                priorityLow.value = false;
+                priorityMiddle.value = false;
+            }
+        };
 
         return {
             currentInspectionOrderId,
@@ -90,9 +134,15 @@ export default {
             startTime,
             endTime,
             department,
+            departmentValues,
             inspectionData,
+            inspectionDataValues,
             remarks,
             sendData,
+            updateCheckbox,
+            priorityLow,
+            priorityMiddle,
+            priorityHigh,
             dense
         }
     }
@@ -100,45 +150,135 @@ export default {
 </script>
 
 <template>
-    <div class="q-pa-md">
-        <div class="q-gutter-y-md column" style="max-width: 300px">
+    <div class="outline">
+        <div class="outer-layer">
+            <div>
+                <div class="row">
+                    <p style="margin-right: 5px">PrüfauftragsId: </p>
+                    <p style="font-weight: bold">{{ currentInspectionOrderId }}</p>
+                </div>
+            </div>
+            <q-separator size="2px" color="primary" style="margin-top: 20px "></q-separator>
 
-            <q-input outlined v-model="courseId" label="StreckenID" :dense="dense" />
+            <p style="font-weight: bold; margin-top: 20px">StreckenId</p>
+            <StandardInput class="extra-mar" v-model="courseId" label="StreckenId" ></StandardInput>
+            <div class="row">
+                <div class="text-with-input mar-right">
+                    <p style="font-weight: bold;">Startort</p>
+                    <StandardInput class="extra-mar" v-model="startLocation" label="Startort" ></StandardInput>
+                </div>
+                <div class="text-with-input">
+                    <p style="font-weight: bold;">Zielort</p>
+                    <StandardInput class="extra-mar" v-model="endLocation" label="Zielort" ></StandardInput>
+                </div>
+            </div>
+            <p style="font-weight: bold;">Zeitraum (von - bis)</p>
+            <div class="text-with-input row extra-mar">
+                <q-input class="input-style mar-right" filled v-model="startTime" mask="date" :rules="['date']">
+                    <template v-slot:append>
+                        <q-icon name="event" class="cursor-pointer">
+                            <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                                <q-date v-model="startTime">
+                                    <div class="row items-center justify-end">
+                                        <q-btn v-close-popup label="Close" color="primary" flat />
+                                    </div>
+                                </q-date>
+                            </q-popup-proxy>
+                        </q-icon>
+                    </template>
+                </q-input>
+                <q-input  class="input-style" filled v-model="endTime" mask="date" :rules="['date']">
+                    <template v-slot:append>
+                        <q-icon name="event" class="cursor-pointer">
+                            <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                                <q-date v-model="endTime">
+                                    <div class="row items-center justify-end">
+                                        <q-btn v-close-popup label="Close" color="primary" flat />
+                                    </div>
+                                </q-date>
+                            </q-popup-proxy>
+                        </q-icon>
+                    </template>
+                </q-input>
+            </div>
 
-            <q-input outlined v-model="startLocation" label="Startort" :dense="dense" />
+        <div class="row extra-mar">
+            <div class="checkListInput">
+                <p style="font-weight: bold;">Fachabteilung</p>
+                <q-select class="" outlined v-model="department" :options="departmentValues" label="Fachabteilung"></q-select>
+            </div>
+            <div class="checkListInput">
+                <p style="font-weight: bold;">Messdaten</p>
+                <q-select class="" outlined v-model="inspectionData" :options="inspectionDataValues" label="Messdaten"></q-select>
+            </div>
+            <div class="">
+                <p style="font-weight: bold;">Priorität</p>
+                <q-checkbox v-model="priorityLow" val="niedrig" label="niedrig" @update:model-value="updateCheckbox('niedrig')"/>
+                <q-checkbox v-model="priorityMiddle" val="mittel" label="mittel" @update:model-value="updateCheckbox('mittel')"/>
+                <q-checkbox v-model="priorityHigh" val="hoch" label="hoch" @update:model-value="updateCheckbox('hoch')"/>
 
-            <q-input outlined v-model="endLocation" label="Endort" :dense="dense" />
+            </div>
+        </div>
+        <div>
+            <p style="font-weight: bold;">Bemerkungen</p>
+            <q-input class="input-bem text-with-input" outlined color="primary" rounded v-model="remarks" label="Bemerkungen" />
+        </div>
+            <q-btn style="width: 100%; max-width: 218px; margin-top: 20px" size="16px" no-caps rounded label="Speichern" color="primary" @click=sendData></q-btn>
 
-            <q-input outlined v-model="startTime" label="Von" :dense="dense">
-                <template v-slot:prepend>
-                    <q-icon name="event" />
-                </template>
-            </q-input>
-
-            <q-input outlined v-model="endTime" label="Bis" :dense="dense">
-                <template v-slot:prepend>
-                    <q-icon name="event" />
-                </template>
-            </q-input>
-
-            <q-input outlined v-model="department" label="Fachabteilung" :dense="dense" />
-
-            <q-input outlined v-model="inspectionData" label="Zu überprüfende Messdaten" :dense="dense" />
-
-            <q-input
-                v-model="remarks" label="Bemerkungen" :dense="dense"
-                filled
-                autogrow
-            />
-
-            <q-btn label="Speichern" @click="sendData" color="primary" class=""></q-btn>
         </div>
     </div>
 
 </template>
 
 
-<style scoped>
+<style lang="scss">
+.outline {
+    border: 2px solid $primary;
+    padding: 20px;
+    margin: 10px;
+    border-radius: 15px;
+    background-color: #F7F7F7;
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
+}
 
+p {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.mar-right {
+    margin-right: 20px;
+}
+
+
+.input-style {
+    width: 100%;
+    max-width: 288px;
+}
+
+.outer-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.button-set {
+    margin-top: 20px;
+    width: 100%;
+    max-width: 288px;
+}
+
+.input-bem {
+    width: 100%;
+}
+
+.extra-mar {
+    margin-bottom: 20px;
+}
+
+.checkListInput {
+    width: 100%;
+    max-width: 288px;
+    margin-bottom: 20px;
+    margin-right: 20px;
+}
 </style>
-

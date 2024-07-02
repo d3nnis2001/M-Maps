@@ -2,26 +2,24 @@ package com.gpse.basis.domain;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
-import org.springframework.validation.beanvalidation.SpringConstraintValidatorFactory;
-import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 
-import java.util.ArrayList;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Document(collection = "Reparaturauftrag")
 public class Reparatur {
     @MongoId
     private String id;
     private int track;
-    private Date from;
-    private Date till;
+    private LocalDate from;
+    private LocalDate till;
     private ReparaturChecklist checklist;
     private String remarks;
     private String status;
     private String freigabeberechtigter;
     private GeoCords geocords;
+    private boolean archived = false;
 
-    public Reparatur(String id, int track, Date from, Date till, ReparaturChecklist checklist, String remarks, String status, String freigabeberechtigter, GeoCords geocords) {
+    public Reparatur(String id, int track, LocalDate from, LocalDate till, ReparaturChecklist checklist, String remarks, String status, String freigabeberechtigter) {
         this.id = id;
         this.track = track;
         this.from = from;
@@ -30,7 +28,6 @@ public class Reparatur {
         this.remarks = remarks;
         this.status = status;
         this.freigabeberechtigter = freigabeberechtigter;
-        this.geocords = geocords;
     }
 
     public int getTrack() {
@@ -41,19 +38,19 @@ public class Reparatur {
         this.track = track;
     }
 
-    public Date getFrom() {
+    public LocalDate getFrom() {
         return from;
     }
 
-    public void setFrom(Date from) {
+    public void setFrom(LocalDate from) {
         this.from = from;
     }
 
-    public Date getTill() {
+    public LocalDate getTill() {
         return till;
     }
 
-    public void setTill(Date till) {
+    public void setTill(LocalDate till) {
         this.till = till;
     }
 
@@ -98,5 +95,13 @@ public class Reparatur {
     }
     public void setGeocords(GeoCords geocords) {
         this.geocords = geocords;
+    }
+
+    public boolean isArchived() {
+        return archived;
+    }
+
+    public void setArchived(boolean archived) {
+        this.archived = archived;
     }
 }
