@@ -1,12 +1,12 @@
 <script setup>
 import {onMounted, onUnmounted, ref} from "vue";
-import {getArchivedRep, undoRep} from "@/main/vue/api/archiv";
+import {deletePruef, deleteRep, getArchivedRep, undoRep} from "@/main/vue/api/archiv";
 
 const smallScreen = ref(false)
 const largeScreen = ref(false)
 const showDialog = ref(false)
 var selectedRow = null
-const rows = ref("")
+const rows = ref([])
 
 onMounted(async () => {
     rows.value = await getArchivedRep()
@@ -35,7 +35,12 @@ const showColumn = (columnName) => {
 }
 
 const undo = async () => {
-    await undoRep(selectedRow.name);
+    await undoRep(selectedRow.id);
+    rows.value = await getArchivedRep()
+}
+
+const del = async () => {
+    await deleteRep(selectedRow.id);
     rows.value = await getArchivedRep()
 }
 
@@ -43,28 +48,20 @@ const visibleColumns = ["ID", "Von", "Bis"]
 
 const columns =  [
     {
-        name: 'ID',
+        name: 'id',
         required: true,
         label: 'Reparaturauftrag',
         align: 'left',
-        field: row => row.name,
+        field: 'name',
         format: val => `${val}`,
         sortable: true
     },
-    { name: 'Von', align: 'center', label: 'Von', field: 'von', sortable: true },
-    { name: 'Bis', label: 'Bis', field: 'bis', sortable: true },
-    { name: 'Freigabeberechtigter', label: 'Freigabeberechtigter', field: 'freigabe' },
-    { name: 'Strecke', label: 'Strecken', field: 'strecke' },
-    { name: 'Status', label: 'Status', field: 'status' },
+    { name: 'from', align: 'center', label: 'Von', field: 'von', sortable: true },
+    { name: 'till', label: 'Bis', field: 'bis', sortable: true },
+    { name: 'freigabeberechtigter', label: 'Freigabeberechtigter', field: 'freigabe', sortable: true},
+    { name: 'track', label: 'Strecke', field: 'strecke', sortable: true},
+    { name: 'status', label: 'Status', field: 'status', sortable: true},
 ]
-/*
-const rows = [
-    { name: 'Reparaturauftrag 1', von: '07-04-2024', bis: '08-04-2024', freigabe: "Klaus Peter", strecke:"6100", status:"done" },
-    { name: 'Reparaturauftrag 2', von: '07-04-2024', bis: '08-04-2024', freigabe: "Klaus Peter", strecke:"6100", status:"done" },
-    { name: 'Reparaturauftrag 3', von: '07-04-2024', bis: '08-04-2024', freigabe: "Klaus Peter", strecke:"6100", status:"done" },
-    { name: 'Reparaturauftrag 4', von: '07-04-2024', bis: '08-04-2024', freigabe: "Klaus Peter", strecke:"6100", status:"done" },
-]
-*/
 </script>
 
 <template>
@@ -72,21 +69,38 @@ const rows = [
         <q-dialog
             v-model="showDialog"
         >
-            <q-card style="width: 300px">
-                <q-card-section>
-                    <div class="centered-section ">
-                        <q-icon name="unarchive" size="xl"></q-icon>
+            <q-card flat square bordered>
+                <div class="row">
+                    Prüfauftrag: {{selectedRow.inspectionOrderId}}
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <q-btn
+                            style="align-items: end; justify-content: end"
+                            flat
+                            no-caps
+                            @click="undo"
+                            label=""
+                            color="primary"
+                            v-close-popup
+                        >
+                            <q-icon name="undo" style="margin-left: 8px;" />
+                        </q-btn>
                     </div>
-                    <div class="text-section">
-                        Archivieren von {{selectedRow.name}}  rückgängig machen?
+                    <div class="col-6">
+                        <q-btn
+                            style="align-items: end; justify-content: end"
+                            flat
+                            no-caps
+                            @click="del"
+                            label=""
+                            color="primary"
+                            v-close-popup
+                        >
+                            <q-icon name="delete" style="margin-left: 8px;" />
+                        </q-btn>
                     </div>
-                </q-card-section>
-
-                <q-separator />
-
-                <q-card-actions vertical>
-                    <q-btn flat @click="undo">Ja</q-btn>
-                </q-card-actions>
+                </div>
             </q-card>
         </q-dialog>
 
@@ -95,28 +109,28 @@ const rows = [
             class="my-sticky-header-table"
             flat bordered
             title="Reparaturaufträge"
-            :rows="rows.value"
+            :rows="rows"
             :columns="columns"
             row-key="ID"
         >
             <template v-slot:body="props">
                 <q-tr :props="props" @click="onRowClick(props.row)">
-                    <q-td key="ID" :props="props">
-                        {{ props.row.name }}
+                    <q-td key="id" :props="props">
+                        {{ props.row.id }}
                     </q-td>
-                    <q-td key="Von" :props="props">
-                        {{ props.row.von }}
+                    <q-td key="from" :props="props">
+                        {{ props.row.from }}
                     </q-td>
-                    <q-td key="Bis" :props="props">
-                        {{ props.row.ziel }}
+                    <q-td key="till" :props="props">
+                        {{ props.row.till }}
                     </q-td>
-                    <q-td key="Freigabeberechtigter" :props="props">
-                        {{ props.row.freigabe }}
+                    <q-td key="freigabeberechtigter" :props="props">
+                        {{ props.row.freigabeberechtigter }}
                     </q-td>
-                    <q-td key="Strecke" :props="props">
-                        {{ props.row.strecke }}
+                    <q-td key="track" :props="props">
+                        {{ props.row.track }}
                     </q-td>
-                    <q-td key="Status" :props="props">
+                    <q-td key="status" :props="props">
                         {{ props.row.status }}
                     </q-td>
                 </q-tr>
@@ -130,7 +144,7 @@ const rows = [
             grid
             grid-header
             title="Reparaturaufträge"
-            :rows="rows.value"
+            :rows="rows"
             :columns="columns"
             row-key="ID"
             hide-header

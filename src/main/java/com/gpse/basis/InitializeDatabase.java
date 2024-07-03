@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
 @Profile("Name1")
@@ -18,34 +19,42 @@ public class InitializeDatabase implements InitializingBean {
     private final ChecklistRepository checkRepo;
     private final GleisLageRangeRepository glrRepo;
 
+    private final GeoTrackData geoTrackRepository;
+
     @Autowired
     public InitializeDatabase(final UserRepository usRepo, final InspectionOrderRepository ioRepo, final ReperaturRepository reRepo,
-        final ChecklistRepository checkRepo, final GleisLageRangeRepository r) {
+        final ChecklistRepository checkRepo, final GleisLageRangeRepository r, final GeoTrackData gTD) {
         this.usRepo = usRepo;
         this.ioRepo = ioRepo;
         this.reRepo = reRepo;
         this.checkRepo = checkRepo;
         this.glrRepo = r;
+        this.geoTrackRepository = gTD;
     }
 
     @Override
     public void afterPropertiesSet() {
         initUsers();
-        initInspectionOrder();
         initChecklists();
         initRanges();
+        initGeoTrack();
     }
     public void initUsers() {
         // Test User 1
         UserModel user = new UserModel("d3nnis.s@web.de", "hello", "Georg", "Bauer");
         user.addRole("Prüfer");
-        UserModel user2 = new UserModel("mauricemeise@gmx.net", "asdf", "Jochen", "Bauer");
         user.addRole("Admin");
+        UserModel user2 = new UserModel("mauricemeise@gmx.net", "asdf", "Jochen", "Bauer");
+        user2.addRole("Admin");
         UserModel user3 = new UserModel("affe@web.de", "affe", "Charlie", "Monkey");
-        user.addRole("Prüfer");
+        user3.addRole("Prüfer");
+        user3.addRole("Datenverwalter");
+        UserModel user4 = new UserModel("test", "abc", "Hi", "Du");
+        user4.addRole("Bearbeiter");
         usRepo.save(user);
         usRepo.save(user2);
         usRepo.save(user3);
+        usRepo.save(user4);
     }
     public void initChecklists() {
         ArrayList<String> items = new ArrayList<>();
@@ -77,12 +86,16 @@ public class InitializeDatabase implements InitializingBean {
         glrRepo.save(range3);
     }
 
-    public void initInspectionOrder() {
-        InspectionOrder inspec = new InspectionOrder("1716728251294","1234", "1000", "Bielefeld",
-            "Hannover", "2024/01/01", "2024/01/02",
-            " ", " ", "archiviert", "", true);
-        ioRepo.save(inspec);
+
+    public void initGeoTrack() {
+        Iterable<GeoData> lst = geoTrackRepository.findAll();
+        AtomicBoolean found = new AtomicBoolean(false);
+        lst.forEach(w -> {
+            if(w.getStrecken_id() == 1) {
+                found.set(true);
+            }
+        });
+        if(!found.get())
+            geoTrackRepository.save(new GeoData(1, 52.17027,  9.08446,0, "1"));
     }
-
-
 }

@@ -11,6 +11,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.parquet.hadoop.ParquetReader;
 import org.apache.parquet.hadoop.util.HadoopInputFile;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
 import org.springframework.data.mongodb.core.BulkOperations;
@@ -30,6 +31,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
@@ -53,16 +55,19 @@ public class FileServiceImpl implements FileService {
 
     private final DataService dService;
 
+    private final RosBagService rosService;
+
     Lock lock = new ReentrantLock();
     @Autowired
     FileServiceImpl(DataSetRepository repro, GeoTrackData gt, GleisLageDatenRepository rpr,
-                    MongoTemplate tmp, GleisVDataRepository rprr, DataService dstr) {
+                    MongoTemplate tmp, GleisVDataRepository rprr, DataService dstr,  RosBagService ros) {
         datasetRepro = repro;
         glDatenRepro = rpr;
         geoTrack = gt;
         template = tmp;
         gleisV = rprr;
         dService = dstr;
+        rosService = ros;
     }
 
     @Override
@@ -85,6 +90,52 @@ public class FileServiceImpl implements FileService {
                     rsp.add(new FileUploadResponse(file.getName(), false, "Fehlerhafte Datei!!"));
                 }
                 rsp.add(new FileUploadResponse(file.getName(), true, ""));
+                continue;
+            }
+
+            if(file.getName().endsWith(".bag")) {
+
+                    if(Objects.equals(streckenId, "missing")) {
+                        rsp.add(new FileUploadResponse(file.getName(), false, "Missing Track_ID"));
+                    }
+                    else {
+                        if(file.getName().contains("camera")) {
+                            var k = rosService.saveCameraImagesForTrack(Integer.parseInt(streckenId), file.getAbsolutePath());
+                            var kk = rosService.saveInfraRedImagesForTrack(Integer.parseInt(streckenId), file.getAbsolutePath());
+
+                            Date uploadDate = new Date();
+                            DataSet st = new DataSet();
+                            st.setFileName(file.getAbsolutePath());
+                            st.setStreckenId(Integer.parseInt(streckenId));
+                            st.setUploadDate(uploadDate);
+                            datasetRepro.save(st);
+
+                            st = template.find(new Query().addCriteria(Criteria.where("fileName").is(file.getAbsolutePath())), DataSet.class).getFirst();
+
+                            if(!k.isEmpty()) {
+                                for(var image : k) {
+                                    image.setDataSetid(st.getId());
+                                    template.save(image);
+                                }
+                            }
+                            if(!kk.isEmpty()) {
+                                for(var image : kk ) {
+                                   image.setDataSetid(st.getId());
+                                    template.save(image);
+                                }
+                            }
+                        }
+                        else {
+                            Date uploadDate = new Date();
+                            DataSet st = new DataSet();
+                            st.setFileName(file.getAbsolutePath());
+                            st.setStreckenId(Integer.parseInt(streckenId));
+                            st.setUploadDate(uploadDate);
+                            datasetRepro.save(st);
+                        }
+                        rsp.add(new FileUploadResponse(file.getName(), true, ""));
+                    }
+
                 continue;
             }
 
@@ -170,7 +221,8 @@ public class FileServiceImpl implements FileService {
                 Double.parseDouble((bis[1].replace(comma, dot))),
                 Integer.parseInt(columns[4]),
                 Integer.parseInt(columns[5]),
-                columns[6]
+                columns[6],
+                ""
             ));
         }
         gleisV.saveAll(lst);
@@ -181,6 +233,10 @@ public class FileServiceImpl implements FileService {
         st.setStreckenId(lst.getFirst().getStr_Nr());
         st.setUploadDate(uploadDate);
         datasetRepro.save(st);
+        st = template.find(new Query().addCriteria(Criteria.where("fileName").is(file.getName())), DataSet.class).getFirst();
+        for(var v : lst)
+            v.setDatasetId(st.getId());
+        gleisV.saveAll(lst);
     }
 
     private int extractStreckeId(String fileName){
@@ -206,7 +262,8 @@ public class FileServiceImpl implements FileService {
             lst.add(new GeoData(Integer.parseInt(parts[0]),
                                 Double.parseDouble(parts[1]),
                                 Double.parseDouble(parts[2]),
-                                Integer.parseInt(parts[4]) / 1000.00));
+                                Integer.parseInt(parts[4]) / 1000.00,
+                ""));
         }
         geoTrack.saveAll(lst);
         Date uploadDate = new Date();
@@ -216,6 +273,10 @@ public class FileServiceImpl implements FileService {
         st.setStreckenId(lst.get(0).getStrecken_id());
         st.setUploadDate(uploadDate);
         datasetRepro.save(st);
+        st = template.find(new Query().addCriteria(Criteria.where("fileName").is(file.getName())), DataSet.class).getFirst();
+        for(var i : lst)
+            i.setDataSetid(st.getId());
+        geoTrack.saveAll(lst);
     }
 
     public String saveFile(File file, int streckenId) throws IOException,IndexOutOfBoundsException,RuntimeException {
@@ -239,6 +300,7 @@ public class FileServiceImpl implements FileService {
                 lst.add(new GleisLageDatenpunkt((Double) values.get(0), (Double) values.get(1), (Double) values.get(2), (Double) values.get(3), (Double) values.get(4), st.getId(), null, -1));
                 row = reader.read();
             }
+            //glDatenRepro.saveAll(lst);
             System.out.println(lst.size());
             int no_threads = 30;
             int sts = lst.size() / no_threads;
@@ -355,98 +417,58 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public void deleteDataSetsById(List<String> ids) {
-        Query query = new Query();
-        query.addCriteria(Criteria.where("_id").in(ids));
-        template.remove(query, "dataSets");
-
-        query = new Query();
-        query.addCriteria(Criteria.where("dataSetid").in(ids));
-        template.remove(query, "GleisLageDaten");
-    }
-    /**
-     * Returns the all available Geodata
-     **/
-    @Override
-    public ArrayList<GeoData> getGeoData() {
-        Iterable<GeoData> iterable = geoTrack.findAll();
-        ArrayList<GeoData> geoArr = new ArrayList<>();
-        Iterator<GeoData> iterator = iterable.iterator();
-        while (iterator.hasNext()) {
-            GeoData geo = iterator.next();
-            geoArr.add(geo);
-        }
-        return geoArr;
-    }
-
-    /**
-     * Returns the all available Geodata from a track
-     **/
-    @Override
-    public ArrayList<GeoData> getTrackGeoData(int trackID) {
-        Iterable<GeoData> iterable = geoTrack.findAll();
-        ArrayList<GeoData> geoArr = new ArrayList<>();
-        Iterator<GeoData> iterator = iterable.iterator();
-        while (iterator.hasNext()) {
-            GeoData geo = iterator.next();
-            if (geo.getStrecken_id() == trackID) {
-                geoArr.add(geo);
+        for(var id : ids) {
+            Query query = new Query();
+            query.addCriteria(Criteria.where("_id").is(new ObjectId(id)));
+            var dts = template.find(query, DataSet.class).getFirst();
+            if(dts.getFileName().endsWith(".parquet")) {
+                Query q = new Query();
+                q.addCriteria(Criteria.where("dataSetid").is(id));
+                template.remove(q, GleisLageDatenpunkt.class);
             }
-        }
-        System.out.println(geoArr.size());
-        return geoArr;
-    }
+            else if(dts.getFileName().endsWith(".csv")) {
+                Query q = new Query();
+                q.addCriteria(Criteria.where("dataSetid").is(id));
+                template.remove(q, GleisVData.class);
+            }
+            else if(dts.getFileName().endsWith(".LLH.dat")) {
+                Query q = new Query();
+                q.addCriteria(Criteria.where("dataSetid").is(id));
+                var lst = template.find(q, GeoData.class);
+                q = new Query();
+                q.addCriteria(Criteria.where("dataSetid").is(id));
+                template.remove(q, GeoData.class);
+                q = new Query();
+                System.out.println("Größe: " + lst.size());
+                q.addCriteria(Criteria.where("iDlocation").in(lst.stream().map(GeoData::getId).toList()));
+                template.remove(q, GleisLageDatenpunkt.class);
+            }
+            else if(dts.getFileName().endsWith(".bag") && dts.getFileName().contains("camera")) {
+                Query q = new Query();
+                q.addCriteria(Criteria.where("dataSetid").is(id));
+                var lst = template.find(q, CameraImage.class);
+                for(var image : lst) {
+                    String str = image.getPath();
+                    Pattern pattern = Pattern.compile(Pattern.quote("rosbagPictures") + ".*");
+                    Matcher matcher = pattern.matcher(str);
+                    String result = matcher.find() ? matcher.group() : "";
+                    String path = "../gp-se-ss-2024-team1-2/" + result;
 
-    @Override
-    public List<Map.Entry<DataService.Colors, String>> getPartGeoData(int from, int till) {
-        Iterable<GeoData> iterable = geoTrack.findAll();
-        boolean isright = true;
-        if (from > till) {
-            isright = false;
-        }
-        ArrayList<GeoData> geoArr = new ArrayList<>();
-        Iterator<GeoData> iterator = iterable.iterator();
-        while (iterator.hasNext()) {
-            GeoData geo = iterator.next();
-            double currKm = geo.getTrack_km();
-            if (isright) {
-                if (currKm >= from && currKm <= till) {
-                    geoArr.add(geo);
+                    File file = new File(path);
+                    if(file.exists())
+                        file.delete();
                 }
-            } else {
-                if (currKm <= from && currKm >= till) {
-                    geoArr.add(geo);
-                }
+                q = new Query();
+                q.addCriteria(Criteria.where("dataSetid").is(id));
+                template.remove(q, CameraImage.class);
             }
+            query = new Query();
+            query.addCriteria(Criteria.where("_id").is(new ObjectId(id)));
+            template.remove(query, DataSet.class);
         }
-        System.out.println(geoArr.size());
-        List<Map.Entry<DataService.Colors, String>> ltg = dService.getNewestColorsforGeoData(geoArr);
-        return ltg;
+
     }
 
-    private List<File> getAllFiles(File folder) {
-        File[] files = folder.listFiles();
-        List<File> fileList = new ArrayList<>();
-        for (File file : files) {
-            if (file.isDirectory()) {
-                fileList.addAll(getAllFiles(file));
-            } else {
-                fileList.add(file);
-            }
-        }
-        return fileList;
-    }
-    @Override
-    public List<List<String>> readFoler(String path) throws NullPointerException {
-        File folder = new File(path);
-        List<List<String>> lst = new ArrayList<>();
-        List<File> files = getAllFiles(folder);
-        files.forEach(f -> lst.add(new ArrayList<String>() {{add(f.getPath()); add(f.getName());}}));
-
-        //todo: löschen
-        dService.getGeoDatabyTrackId(6100);
-
-        return lst;
-    }
 
     //return null, if from > till
     public List<Map.Entry<DataService.Colors, String>> getPartHeatmap(int strecke, LocalDateTime from, LocalDateTime till) {
@@ -498,6 +520,7 @@ public class FileServiceImpl implements FileService {
         }
         return dataPoints;
     }
+
 
     public List<GleisLageDatenpunkt> getDataPointsForTrack(int trackId) {
         MongoTemplate tmpl = new MongoTemplate(new SimpleMongoClientDatabaseFactory("mongodb://localhost:27017/project_12"));
@@ -591,5 +614,48 @@ public class FileServiceImpl implements FileService {
         dataPoints.addAll(nearestPointsByDay.values());
         System.out.println(dataPoints.size());
         return dataPoints;
+    }
+
+    //--------------------------------------------------------------
+    /**
+     * Returns the all available Geodata from a track
+     **/
+    @Override
+    public ArrayList<GeoData> getTrackGeoData(int trackID) {
+        Iterable<GeoData> iterable = geoTrack.findAll();
+        ArrayList<GeoData> geoArr = new ArrayList<>();
+        Iterator<GeoData> iterator = iterable.iterator();
+        while (iterator.hasNext()) {
+            GeoData geo = iterator.next();
+            if (geo.getStrecken_id() == trackID) {
+                geoArr.add(geo);
+            }
+        }
+        System.out.println(geoArr.size());
+        return geoArr;
+    }
+
+
+
+    private List<File> getAllFiles(File folder) {
+        File[] files = folder.listFiles();
+        List<File> fileList = new ArrayList<>();
+        for (File file : files) {
+            if (file.isDirectory()) {
+                fileList.addAll(getAllFiles(file));
+            } else {
+                fileList.add(file);
+            }
+        }
+        return fileList;
+    }
+    @Override
+    public List<List<String>> readFoler(String path) throws NullPointerException {
+        File folder = new File(path);
+        List<List<String>> lst = new ArrayList<>();
+        List<File> files = getAllFiles(folder);
+        files.forEach(f -> lst.add(new ArrayList<String>() {{add(f.getPath()); add(f.getName());}}));
+
+        return lst;
     }
 }
