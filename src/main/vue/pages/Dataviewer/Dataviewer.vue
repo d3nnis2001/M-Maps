@@ -106,7 +106,7 @@ export default {
 <div>
     <div class="q-pa-xs">
         <div class="align-mult">
-            <div v-if="!isRoutePath" class="align-basic">
+            <div v-if="!isPointPath && !isRoutePath" class="align-basic">
                 <p>Point ID</p>
                 <q-input class="q-pa-xs" outlined v-model="pointID"></q-input>
                 <div class="q-pa-xs">
