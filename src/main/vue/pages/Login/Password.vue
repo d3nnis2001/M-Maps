@@ -9,11 +9,13 @@ import Heading from "@/main/vue/pages/Login/Heading.vue";
 import Description from "@/main/vue/pages/Login/Description.vue";
 import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";
 import Impressum from "@/main/vue/pages/Login/Impressum.vue";
+import {useUserStore} from "@/main/vue/stores/UserStore.js";
 
 const $q = useQuasar()
 const router = useRouter()
 const route = useRoute();
 const loginStore = useLoginStore()
+const userStore = useUserStore()
 
 const passwordVar = ref('')
 
@@ -21,7 +23,21 @@ async function password() {
     const email = route.query.email;
     const success = await loginStore.checkPassword(email, passwordVar.value)
     if (success) {
-        await router.push("map")
+        console.log(userStore.authenticated)
+        userStore.requestToken({ // hier kommt der Fehler: TypeError: userStore.requestToken is not a function
+            username: email,
+            password: passwordVar.value
+        }).then(async () => {
+            console.log("success")
+            //await router.push("map")
+        }).catch(() => {
+            $q.notify({
+                type: 'negative',
+                message: 'Token fehlgeschlagen',
+                caption: 'Falsches Passwort oder Benutzername'
+            })
+        })
+        //await router.push("map")
     } else {
         $q.notify({
             type: 'negative',
