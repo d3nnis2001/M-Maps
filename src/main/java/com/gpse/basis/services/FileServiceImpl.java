@@ -588,6 +588,9 @@ public class FileServiceImpl implements FileService {
         GeoData firstGeo = geoArr.getFirst();
         double targetTrackKm = firstGeo.getTrack_km();
         List<GleisLageDatenpunkt> lst = getDataPointsForTrack(trackId);
+        /*MatchOperation matchOperation = Aggregation.match(Criteria.where("iDlocation").is(pointId));
+        Aggregation aggregation = Aggregation.newAggregation(matchOperation);
+        List<GleisLageDatenpunkt> lst = template.aggregate(aggregation, "GleisLageDaten", GleisLageDatenpunkt.class).getMappedResults();*/
         /*
         for (GleisLageDatenpunkt gld : lst) {
             if (Math.ceil(geoArr.getFirst().getTrack_km()) == Math.ceil(gld.getStr_km())) {

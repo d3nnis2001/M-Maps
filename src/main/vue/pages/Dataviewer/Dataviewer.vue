@@ -66,9 +66,9 @@ export default {
           }
       }
 
-      function onClickHome() {
+      /*function onClickHome() {
           router.push(`/dataviewer`)
-      }
+      }*/
 
       /*function onClickRoute() {
           router.push(`/dataviewer/route/0/from/0/to/0`)
@@ -77,8 +77,6 @@ export default {
       /*function onClickPoint() {
           router.push(`/dataviewer/point/null/null`)
       }*/
-
-      function refreshRoute() {}
 
       const isPointPath = computed(() => route.path.includes('/dataviewer/point'))
       const isRoutePath = computed(() => route.path.includes('/dataviewer/route'))
@@ -93,8 +91,7 @@ export default {
           showRoute,
           isPointPath,
           isRoutePath,
-          refreshRoute,
-          onClickHome,
+          //onClickHome,
           //onClickRoute,
           //onClickPoint
       }
@@ -106,13 +103,13 @@ export default {
 <div>
     <div class="q-pa-xs">
         <div class="align-mult">
-            <div v-if="!isPointPath && !isRoutePath" class="align-basic">
+            <!--<div v-if="!isPointPath && !isRoutePath" class="align-basic">
                 <p>Point ID</p>
                 <q-input class="q-pa-xs" outlined v-model="pointID"></q-input>
                 <div class="q-pa-xs">
                     <q-btn label="Daten anzeigen" @click=showData class=""></q-btn>
                 </div>
-            </div>
+            </div>-->
             <div v-if="!isPointPath && !isRoutePath">
                 <div class="align-basic">
                     <p>Strecken ID</p>
@@ -135,7 +132,7 @@ export default {
                 </div>
             </div>
         </div>
-        <q-page-sticky position="bottom-right" :offset="[10, 10]" >
+        <!--<q-page-sticky position="bottom-right" :offset="[10, 10]" >
             <div class="q-mt-lg">
                 <q-fab
                     label="Actions"
@@ -149,7 +146,6 @@ export default {
                         @click="onClickHome"
                         icon="home"
                     />
-                    <!--
                     <q-fab-action
                         v-if="!isRoutePath"
                         color="red"
@@ -161,10 +157,10 @@ export default {
                         color="red"
                         @click="onClickPoint"
                         icon="place"
-                    />-->
+                    />
                 </q-fab>
             </div>
-        </q-page-sticky>
+        </q-page-sticky>-->
     </div>
 </div>
 </template>

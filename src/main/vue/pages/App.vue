@@ -74,7 +74,7 @@ function changeBool() {
             </q-toolbar>
         </q-header>
 
-        <q-drawer show-if-above v-model="rightDrawerOpen" side="left" overlay behavior="mobile" elevated :width="200" :breakpoint="500">
+        <q-drawer show-if-above v-model="rightDrawerOpen" side="right" overlay behavior="mobile" elevated :width="200" :breakpoint="500">
             <q-list>
                 <q-item v-for="link in links" :key="link.name" clickable tag="router-link" :to="link.to">
                     <q-item-section>

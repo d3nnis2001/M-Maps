@@ -4,7 +4,7 @@ import {getTrackLayoutData} from "@/main/vue/api/dataviewer";
 import VueApexCharts from 'vue3-apexcharts';
 
 import { Bar } from 'vue-chartjs'
-import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js'
+//import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js'
 import {ref, onMounted, reactive, nextTick, watch} from "vue";
 import {getUserData} from "@/main/vue/api/admin";
 import {useRoute, useRouter} from "vue-router";
@@ -354,6 +354,11 @@ export default {
             } else {
                 $q.notify(NOTIFY_OPTIONS.fromHigherThanTo)
                 isFail.value = true
+                /*isFail.value = false
+                buildDataset(fromStrKm2, toStrKm2, routeId2)
+                reduceDataSet()
+                router.push(`/dataviewer/route/${routeId2}/from/${toStrKm2}/to/${fromStrKm2}`)
+                isChanging.value = false;*/
             }
             //console.log(vst)
             //vst.push([1,1])
@@ -362,7 +367,7 @@ export default {
             //isChanging.value = true
         }
 
-        //-------------Buttons-------------------------------
+        //-------------Buttons-------------
 
         function switchDataviewer() { isProfile.value = false }
 
@@ -375,7 +380,7 @@ export default {
             })
         }
 
-        //-------------Start---------------------
+        //-------------Start-------------
 
         function findMinAndMax() {
             data.value.forEach(user => {
@@ -428,13 +433,18 @@ export default {
             routeId.value = route.params.id
             from.value = route.params.fromId
             to.value = route.params.toId
-            fromStrKm.value = from.value
-            toStrKm.value = to.value
+            if (from.value > to.value) {
+                toStrKm.value = from.value
+                fromStrKm.value = to.value
+            } else {
+                fromStrKm.value = from.value
+                toStrKm.value = to.value
+            }
             console.log(routeId.value, from.value, to.value)
             const data2 = await getTrackLayoutData(routeId.value)
             data.value = data2
             findMinAndMax()
-            let i = 0
+            //let i = 0
             //const categories = []
             //const seriesData = []
             console.log(data2)
@@ -731,7 +741,7 @@ export default {
 <template>
     <q-page>
         <div class="align-mult q-pa-xs">
-            <Dataviewer/>
+            <!--<Dataviewer/>-->
             <div class="q-pa-xs">
                 <div>
                     <p>Strecken ID: {{routeId}}</p>
