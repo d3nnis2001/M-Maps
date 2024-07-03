@@ -188,10 +188,6 @@
         </module>
         <module name="DefaultComesLast"/>
         <module name="DeclarationOrder"/>
-        <module name="MagicNumber">
-            <property name="ignoreHashCodeMethod" value="true"/>
-            <property name="ignoreAnnotation" value="true"/>
-        </module>
         <module name="AvoidDoubleBraceInitialization"/>
         <module name="AvoidInlineConditionals"/>
         <!-- Checks for class design                         -->

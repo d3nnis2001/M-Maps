@@ -14,6 +14,10 @@ import java.util.Collection;
 
 @Document(collection = "userModel")
 public class UserModel implements UserDetails {
+    private static final boolean accountNonExpired = true;
+    private static final boolean accountNonLocked = true;
+    private static final boolean credentialsNonExpired = true;
+    private static final boolean enabled = true;
     @Serial
     private static final long serialVersionUID = 1L;
     @MongoId
@@ -26,10 +30,6 @@ public class UserModel implements UserDetails {
     private boolean unlocked;
     private ArrayList<String> region;
     private String service;
-    private static final boolean accountNonExpired = true;
-    private static final boolean accountNonLocked = true;
-    private static final boolean credentialsNonExpired = true;
-    private static final boolean enabled = true;
 
     @JsonIgnore
     private transient ArrayList<String> roles;
@@ -58,7 +58,9 @@ public class UserModel implements UserDetails {
             roles = null;
         }
     }
-    public ArrayList<String> getRoles() { return roles; }
+    public ArrayList<String> getRoles() {
+        return roles;
+    }
 
     public void setEmail(String email) {
         this.email = email;

@@ -2,7 +2,6 @@ package com.gpse.basis.services;
 
 import com.gpse.basis.domain.UserModel;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.ArrayList;
 

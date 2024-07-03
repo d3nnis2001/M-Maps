@@ -104,7 +104,7 @@ public class UserServicesImpl implements UserServices {
                         toDelete.add(oldRole);
                     }
                 }
-                for(String role : toDelete) {
+                for (String role : toDelete) {
                     us.deleteRole(role);
                 }
             }

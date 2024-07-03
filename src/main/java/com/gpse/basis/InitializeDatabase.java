@@ -19,8 +19,9 @@ public class InitializeDatabase implements InitializingBean {
     private final GleisLageRangeRepository glrRepo;
 
     @Autowired
-    public InitializeDatabase(final UserRepository usRepo, final InspectionOrderRepository ioRepo, final ReperaturRepository reRepo,
-        final ChecklistRepository checkRepo, final GleisLageRangeRepository r) {
+    public InitializeDatabase(final UserRepository usRepo, final InspectionOrderRepository ioRepo,
+                              final ReperaturRepository reRepo, final ChecklistRepository checkRepo,
+                              final GleisLageRangeRepository r) {
         this.usRepo = usRepo;
         this.ioRepo = ioRepo;
         this.reRepo = reRepo;
@@ -35,14 +36,16 @@ public class InitializeDatabase implements InitializingBean {
         initRanges();
     }
     public void initUsers() {
+        final String pruefer_string = "Prüfer";
+        final String admin_string = "Admin";
         // Test User 1
-        UserModel user = new UserModel("d3nnis.s@web.de", "hello", "Georg", "Bauer");
-        user.addRole("Prüfer");
-        user.addRole("Admin");
+        UserModel user = new UserModel("d3nnis.s@web.de", "hello", "Georg", "Vogi");
+        user.addRole(pruefer_string);
+        user.addRole(admin_string);
         UserModel user2 = new UserModel("mauricemeise@gmx.net", "asdf", "Jochen", "Bauer");
-        user2.addRole("Admin");
+        user2.addRole(admin_string);
         UserModel user3 = new UserModel("affe@web.de", "affe", "Charlie", "Monkey");
-        user3.addRole("Prüfer");
+        user3.addRole(pruefer_string);
         user3.addRole("Datenverwalter");
         UserModel user4 = new UserModel("test", "abc", "Hi", "Du");
         user4.addRole("Bearbeiter");
