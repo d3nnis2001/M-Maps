@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
+import java.util.ArrayList;
+
 @RestController
 @RequestMapping("/api")
 public class UserController {
@@ -89,5 +91,24 @@ public class UserController {
         } else {
             return ResponseEntity.ok(false);
         }
+    }
+
+    @PostMapping("/user/getToken")
+    public String getToken (final WebRequest request) {
+        String password = request.getParameter("password");
+        String email = request.getParameter("email");
+
+        String token = userService.getToken(email, password);
+        System.out.println("TEST-controller: " +token);
+        return token;
+    }
+
+    @PostMapping("/user/getRolesByToken")
+    public ArrayList<String> getRolesByToken (final WebRequest request) {
+        String email = request.getParameter("email");
+        String token = request.getParameter("token");
+
+        ArrayList<String> roles = userService.getRoles(email, token);
+        return roles;
     }
 }

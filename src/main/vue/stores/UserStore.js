@@ -5,6 +5,8 @@ import api from "../api";
 
 export const useUserStore = defineStore('userStore', () => {
     const authenticated = ref(null)
+    const username = ref("")
+    const userRoles = ref([])
 
     function authenticate(token) {
         console.log("TEST: authenticate")
@@ -21,62 +23,63 @@ export const useUserStore = defineStore('userStore', () => {
     function requestToken(credentials) {
         console.log("TEST: requestToken")
         return new Promise((resolve, reject) => {
-            api.auth.login(credentials.username, credentials.password).then(res => {
-                console.log(res.headers.authorization)
-                authenticate(res.headers.authorization)
+            console.log("Test3")
+            username.value = credentials.username
+            api.auth.getToken(credentials.username, credentials.password).then(res => {
+                console.log(" ",res.data)
+                authenticate(res.data)
                 resolve()
             }).catch(() => {
                 authenticate(null)
                 reject()
             })
+
+
         })
     }
     function decodeToken() {
         const token = localStorage.getItem("token")
-        if (token !== null) {
-            let jwtData = token.split('.')[1]
-            let decodedJwtJsonData = window.atob(jwtData)
-            let decodedJwtData = JSON.parse(decodedJwtJsonData)
-            console.log(decodedJwtData)
-            return decodedJwtData
-        }
-        return { rol: [], sub: "", dep: ""}
-    }
-
-
-    function getUserRoles() {
-        return decodeToken().rol
-    }
-
-    function getUsername() {
-        return decodeToken().sub
+        api.auth.getRoleByToken(token, username.value).then(res => {
+            console.log(" ", res.data)
+            console.log("Success")
+            userRoles.value = res.data
+            console.log(userRoles.value)
+        }).catch(() => {
+            console.log("FEHLER")
+        })
     }
 
     function isAdmin() {
-        return getUserRoles().includes('Administrator')
+        decodeToken();
+        return userRoles.includes('Administrator')
     }
 
     function isPruefer() {
-        return getUserRoles().includes('Prüfer')
+        decodeToken();
+        for (let i = 0; i < userRoles.value.length; i++) {
+            if (userRoles.value[i] === 'Prüfer') {
+                return true;
+            }
+        }
+        return false;
     }
 
     function isBearbeiter() {
-        return getUserRoles().includes('Bearbeiter')
+        return decodeToken().includes('Bearbeiter')
     }
 
     function isDatenverwalter() {
-        return getUserRoles().includes('Datenverwalter')
+        return decodeToken().includes('Datenverwalter')
     }
 
     function logout() {
         authenticated.value = false;
+        username.value = null;
     }
     return {authenticated,
         authenticate,
         requestToken,
         logout,
-        getUserRoles,
-        getUsername,
         isAdmin,
         isPruefer,
         isBearbeiter,

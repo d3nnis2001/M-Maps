@@ -130,4 +130,22 @@ public class UserServicesImpl implements UserServices {
         userRepo.save(us);
         return true;
     }
+
+    public String getToken(String email, String password) {
+        UserModel us = getUserByUsername(email);
+        System.out.println("TEST-service-passwort" + us.getPassword());
+        String token = us.setUserToken();
+        userRepo.save(us);
+        System.out.println("TEST-service: " + token);
+        return token;
+    }
+
+    public ArrayList<String> getRoles (String email, String token) {
+        UserModel us = getUserByUsername(email);
+        if (us.getUserToken().equals(token)) {
+            ArrayList<String> roles = us.getRoles();
+            return roles;
+        }
+        return null;
+    }
 }

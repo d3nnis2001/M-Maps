@@ -1,6 +1,7 @@
 <script>
 import {ref} from 'vue'
 import {useLoginStore} from "../../stores/LoginStore"
+import {useUserStore} from "../../stores/UserStore"
 import {useQuasar} from 'quasar'
 import {useRouter} from 'vue-router'
 import Impressum from "@/main/vue/pages/Login/Impressum.vue";
@@ -15,10 +16,11 @@ export default {
         const $q = useQuasar()
         const router = useRouter()
         const loginStore = useLoginStore()
-
+        const userStore = useUserStore()
         const email = ref('')
 
         async function login() {
+            console.log("TEST: login")
             if (!(email.value).includes("@")) {
                 $q.notify({
                     type: 'negative',

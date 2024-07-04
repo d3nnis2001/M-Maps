@@ -26,6 +26,7 @@ public class UserModel implements UserDetails {
     private boolean unlocked;
     private ArrayList<String> region;
     private String service;
+    private String userToken;
     private static final boolean accountNonExpired = true;
     private static final boolean accountNonLocked = true;
     private static final boolean credentialsNonExpired = true;
@@ -131,6 +132,17 @@ public class UserModel implements UserDetails {
     }
     public String getTokenPassword() {
         return passwordToken;
+    }
+
+    public String setUserToken() {
+        SecureRandom random = new SecureRandom();
+        byte[] token = new byte[24];
+        random.nextBytes(token);
+        userToken = Base64  .getUrlEncoder().withoutPadding().encodeToString(token);
+        return userToken;
+    }
+    public String getUserToken() {
+        return this.userToken;
     }
     public String getService() {
         return service;
