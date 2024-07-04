@@ -12,8 +12,17 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
 
+/**
+ * UserModel Class for all User specific information.
+ */
 @Document(collection = "userModel")
 public class UserModel implements UserDetails {
+
+    private static final boolean accountNonExpired = true;
+    private static final boolean accountNonLocked = true;
+    private static final boolean credentialsNonExpired = true;
+    private static final boolean enabled = true;
+
     @Serial
     private static final long serialVersionUID = 1L;
     @MongoId
@@ -26,14 +35,17 @@ public class UserModel implements UserDetails {
     private boolean unlocked;
     private ArrayList<String> region;
     private String service;
-    private static final boolean accountNonExpired = true;
-    private static final boolean accountNonLocked = true;
-    private static final boolean credentialsNonExpired = true;
-    private static final boolean enabled = true;
 
     @JsonIgnore
     private transient ArrayList<String> roles;
 
+    /**
+     * Constructor for UserModel.
+     * @param email Email
+     * @param password Password
+     * @param firstname Firstname
+     * @param lastname Lastname
+     */
     public UserModel(String email, String password, String firstname, String lastname) {
         this.email = email;
         this.password = password;
@@ -42,6 +54,10 @@ public class UserModel implements UserDetails {
         unlocked = false;
     }
 
+    /**
+     * Adds a role to the User.
+     * @param role Role
+     */
     public void addRole(String role) {
         if (this.roles == null) {
             this.roles = new ArrayList<>();
@@ -52,17 +68,26 @@ public class UserModel implements UserDetails {
             }
         }
     }
+
+    /**
+     * Deletes the specific role from the User.
+     * @param role Role
+     */
     public void deleteRole(String role) {
         roles.removeIf(r -> r.equals(role));
         if (roles.isEmpty()) {
             roles = null;
         }
     }
-    public ArrayList<String> getRoles() { return roles; }
+
+    public ArrayList<String> getRoles() {
+        return roles;
+    }
 
     public void setEmail(String email) {
         this.email = email;
     }
+
     public String getPassword() {
         return password;
     }
@@ -86,10 +111,12 @@ public class UserModel implements UserDetails {
     public void setLastname(String lastname) {
         this.lastname = lastname;
     }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return new ArrayList<>();
     }
+
     @Override
     public String getUsername() {
         return this.email;
@@ -109,11 +136,16 @@ public class UserModel implements UserDetails {
     public boolean isCredentialsNonExpired() {
         return this.credentialsNonExpired;
     }
+
     @Override
     public boolean isEnabled() {
         return this.enabled;
     }
 
+    /**
+     * Adds a region to the User.
+     * @param region Region
+     */
     public void addRegion(String region) {
         if (this.region == null) {
             this.region = new ArrayList<>();
@@ -122,16 +154,23 @@ public class UserModel implements UserDetails {
             this.region.add(region);
         }
     }
+
+    /**
+     * Sets the token Password.
+     * @return String
+     */
     public String setTokenPassword() {
         SecureRandom random = new SecureRandom();
         byte[] token = new byte[24];
         random.nextBytes(token);
-        passwordToken = Base64  .getUrlEncoder().withoutPadding().encodeToString(token);
+        passwordToken = Base64.getUrlEncoder().withoutPadding().encodeToString(token);
         return passwordToken;
     }
+
     public String getTokenPassword() {
         return passwordToken;
     }
+
     public String getService() {
         return service;
     }
