@@ -12,5 +12,8 @@ export default {
     },
     getColors() {
         return axios.get('/api/settings/colors')
+    },
+    getLogo() {
+        return axios.get('/api/settings/logo')
     }
 }

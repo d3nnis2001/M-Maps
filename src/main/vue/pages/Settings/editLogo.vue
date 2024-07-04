@@ -5,11 +5,10 @@
 <template>
     <q-uploader
         style="max-width: 300px"
-        url="http://localhost:8088/api/settings/"
-        label="Restricted to images"
-        multiple
-        accept=".jpg, image/*"
-        @rejected="onRejected"
+        url="http://localhost:8080/api/settings/edit/logo"
+        label="Neues Logo hochladen"
+        accept="image/jpeg"
+        field-name="file"
     />
 </template>
 

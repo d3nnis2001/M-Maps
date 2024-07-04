@@ -12,7 +12,6 @@ async function editColors() {
         primary: primary.value,
         secondary: secondary.value
     }
-    console.log(newColors)
     await settingsStore.editColors(newColors)
 }
 </script>

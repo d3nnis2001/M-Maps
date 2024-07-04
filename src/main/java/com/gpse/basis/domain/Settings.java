@@ -12,10 +12,12 @@ public class Settings {
     private String id;
     private String impressum;
     private Colors colors;
+    private byte[] logo;
 
-    public Settings(String impressum, Colors colors) {
+    public Settings(String impressum, Colors colors, byte[] logo) {
         this.impressum = impressum;
         this.colors = colors;
+        this.logo = logo;
     }
 
     public String getId() {
@@ -39,5 +41,13 @@ public class Settings {
 
     public void setColors(Colors colors) {
         this.colors = colors;
+    }
+
+    public byte[] getLogo() {
+        return logo;
+    }
+
+    public void setLogo(byte[] logo) {
+        this.logo = logo;
     }
 }

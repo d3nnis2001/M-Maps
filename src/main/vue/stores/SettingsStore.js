@@ -7,6 +7,7 @@ import {colors} from 'quasar';
 export const useSettingsStore = defineStore('settings', () => {
     const impressum = ref("")
     const success = ref(true)
+    const imageURL = ref("")
     function getImpressum() {
         return new Promise((resolve, reject) => {
             api.settings.getImpressum()
@@ -68,12 +69,28 @@ export const useSettingsStore = defineStore('settings', () => {
                 })
         })
     }
+    function getLogo() {
+        return new Promise((resolve, reject) => {
+            api.settings.getLogo()
+                .then(res => {
+                    let byteArray = new Uint8Array(res.data)
+                    //imageURL.value = URL.createObjectURL(new Blob(byteArray, {type: 'image/jpeg'}))
+                    imageURL.value = res.data
+                    resolve(imageURL.value)
+                })
+                .catch(() => {
+                    reject()
+                })
+        })
+    }
     return {
         impressum,
         success,
+        imageURL,
         getImpressum,
         editImpressum,
         editColors,
-        getColors
+        getColors,
+        getLogo
     }
 })

@@ -5,7 +5,9 @@ import com.gpse.basis.domain.Settings;
 import com.gpse.basis.services.SettingsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -37,5 +39,17 @@ public class SettingsController {
     @GetMapping("/colors")
     public Colors getColors() {
         return settingsService.getColors();
+    }
+    @PostMapping("/edit/logo")
+    public byte[] editLogo(@RequestPart(value = "file") MultipartFile newLogo) {
+        try {
+            return settingsService.editLogo(newLogo);
+        } catch (IOException e) {
+            return new byte[0];
+        }
+    }
+    @GetMapping("/logo")
+    public byte[] getLogo() {
+        return settingsService.getLogo();
     }
 }

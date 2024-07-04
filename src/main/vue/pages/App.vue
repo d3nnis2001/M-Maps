@@ -1,7 +1,21 @@
 <script setup>
-import {ref} from 'vue'
+import {onMounted, ref} from 'vue'
 import {RouterView} from 'vue-router'
+import {useSettingsStore} from "@/main/vue/stores/SettingsStore";
+import {storeToRefs} from "pinia";
+
 let boolStart = true;
+
+const settingsStore = useSettingsStore()
+
+onMounted(() => {
+    //const {imageURL} = storeToRefs(settingsStore)
+    settingsStore.getLogo().then((logo) => {
+        console.log(String.fromCharCode(null, new Uint8Array(logo)))
+        document.getElementById("bla").src = "data:image/jpeg;base64"
+    })
+})
+
 
 const rightDrawerOpen = ref(false)
 const links = [
@@ -25,7 +39,6 @@ function toggleRightDrawer() {
 function changeBool() {
     boolStart=false;
 }
-
 </script>
 <template>
     <q-layout v-if="$route.name === 'start' || $route.name === 'login' || $route.name === 'register'
@@ -39,7 +52,8 @@ function changeBool() {
     <q-layout view="hHh lpR fFf" v-else>
         <q-header bordered class="q-py-xs" elevated>
             <q-toolbar>
-                <q-img :src="'/src/main/resources/db-logo.png'" align="left"></q-img>
+                <q-img :src="settingsStore.imageURL" align="left"></q-img>
+                <img src="" id="bla" />
                 <q-toolbar-title v-if="$route.name === 'map'" align="middle">
                     M-MAPS
                 </q-toolbar-title>
