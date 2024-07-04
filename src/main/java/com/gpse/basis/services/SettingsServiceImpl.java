@@ -1,5 +1,6 @@
 package com.gpse.basis.services;
 
+import com.gpse.basis.domain.Colors;
 import com.gpse.basis.domain.Settings;
 import com.gpse.basis.repositories.SettingsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,7 @@ public class SettingsServiceImpl implements SettingsService {
         List<Settings> items = new LinkedList<>();
         settingsRepository.findAll().forEach(items::add);
         if (items.size() == 0) {
-            return settingsRepository.save(new Settings(""));
+            return settingsRepository.save(new Settings("", new Colors("#AFFE11", "#AFFE22")));
         }
         return items.getFirst();
     }
@@ -37,4 +38,14 @@ public class SettingsServiceImpl implements SettingsService {
         settings.setImpressum(content);
         return settingsRepository.save(settings);
     }
+
+    @Override
+    public Colors editColors(Colors colors) {
+        List<Settings> items = new LinkedList<>();
+        settingsRepository.findAll().forEach(items::add);
+        Settings settings = items.getFirst();
+        settings.setColors(colors);
+        return settingsRepository.save(settings).getColors();
+    }
+
 }

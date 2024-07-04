@@ -15,7 +15,6 @@ onMounted(async () => {
 
 async function editImpressum() {
     await settingsStore.editImpressum(text.value)
-    console.log(success.value)
     if (success.value) {
         $q.notify({
             type: "positive",

@@ -6,5 +6,8 @@ export default {
     },
     getImpressum() {
         return axios.get('/api/settings/impressum')
+    },
+    editColors(colors) {
+        return axios.post('/api/settings/edit/colors', colors)
     }
 }

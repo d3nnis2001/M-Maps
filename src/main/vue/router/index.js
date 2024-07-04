@@ -26,6 +26,7 @@ import changeSettings from "@/main/vue/pages/Settings/ChangeSettings.vue";
 import editImpressum from "@/main/vue/pages/Settings/EditImpressum.vue";
 import editLogo from "@/main/vue/pages/Settings/editLogo.vue";
 import Impressum from "@/main/vue/pages/Impressum.vue";
+import editColors from "@/main/vue/pages/Settings/editColors.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -165,6 +166,11 @@ const router = createRouter({
             path: "/settings/edit/logo",
             name: "editLogo",
             component: editLogo
+        },
+        {
+            path: "/settings/edit/colors",
+            name: "editColors",
+            component: editColors
         }
     ]
 })

@@ -1,5 +1,6 @@
 package com.gpse.basis.web;
 
+import com.gpse.basis.domain.Colors;
 import com.gpse.basis.domain.Settings;
 import com.gpse.basis.services.SettingsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,5 +29,9 @@ public class SettingsController {
     public String editImpressum(@RequestBody Map<String, String> body) {
         String content = body.get("content");
         return settingsService.editImpressum(content).getImpressum();
+    }
+    @PostMapping("/edit/colors")
+    public Colors editColors(@RequestBody Colors colors) {
+        return settingsService.editColors(colors);
     }
 }

@@ -11,9 +11,11 @@ public class Settings {
     @MongoId
     private String id;
     private String impressum;
+    private Colors colors;
 
-    public Settings(String impressum) {
+    public Settings(String impressum, Colors colors) {
         this.impressum = impressum;
+        this.colors = colors;
     }
 
     public String getId() {
@@ -30,5 +32,12 @@ public class Settings {
 
     public void setImpressum(String impressum) {
         this.impressum = impressum;
+    }
+    public Colors getColors() {
+        return colors;
+    }
+
+    public void setColors(Colors colors) {
+        this.colors = colors;
     }
 }

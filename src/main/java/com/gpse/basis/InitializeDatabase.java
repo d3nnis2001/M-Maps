@@ -90,7 +90,7 @@ public class InitializeDatabase implements InitializingBean {
     }
 
     private void initSettings() {
-        Settings settings = new Settings("");
+        Settings settings = new Settings("", new Colors("#AFFE11", "#AFFE22"));
         settingsRepository.save(settings);
     }
 
