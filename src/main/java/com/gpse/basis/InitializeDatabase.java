@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
 @Profile("Name1")
@@ -19,23 +20,26 @@ public class InitializeDatabase implements InitializingBean {
     private final GleisLageRangeRepository glrRepo;
     private final SettingsRepository settingsRepository;
 
+    private final GeoTrackData geoTrackRepository;
+
     @Autowired
     public InitializeDatabase(final UserRepository usRepo, final InspectionOrderRepository ioRepo, final ReperaturRepository reRepo,
-        final ChecklistRepository checkRepo, final GleisLageRangeRepository r, final SettingsRepository settingsRepository) {
+        final ChecklistRepository checkRepo, final GleisLageRangeRepository r, final GeoTrackData gTD, final SettingsRepository settingsRepository) {
         this.usRepo = usRepo;
         this.ioRepo = ioRepo;
         this.reRepo = reRepo;
         this.checkRepo = checkRepo;
         this.glrRepo = r;
+        this.geoTrackRepository = gTD;
         this.settingsRepository = settingsRepository;
     }
 
     @Override
     public void afterPropertiesSet() {
         initUsers();
-        initInspectionOrder();
         initChecklists();
         initRanges();
+        initGeoTrack();
         initSettings();
     }
     public void initUsers() {
@@ -85,17 +89,21 @@ public class InitializeDatabase implements InitializingBean {
         glrRepo.save(range3);
     }
 
-    public void initInspectionOrder() {
-        InspectionOrder inspec = new InspectionOrder("1716728251294","1234", "1000", "Bielefeld",
-            "Hannover", "2024/01/01", "2024/01/02",
-            " ", " ", "archiviert", "", true);
-        ioRepo.save(inspec);
-    }
-
     private void initSettings() {
         Settings settings = new Settings("");
         settingsRepository.save(settings);
     }
 
 
+    public void initGeoTrack() {
+        Iterable<GeoData> lst = geoTrackRepository.findAll();
+        AtomicBoolean found = new AtomicBoolean(false);
+        lst.forEach(w -> {
+            if(w.getStrecken_id() == 1) {
+                found.set(true);
+            }
+        });
+        if(!found.get())
+            geoTrackRepository.save(new GeoData(1, 52.17027,  9.08446,0, "1"));
+    }
 }

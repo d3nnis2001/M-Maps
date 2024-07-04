@@ -1,7 +1,6 @@
-import {createRouter, createWebHistory} from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 
 import StartView from '../pages/Start.vue'
-import MapView from '../pages/Map/Map.vue'
 import DataImport from "../pages/DataImport/DataImport.vue";
 import Login from '../pages/Login/Login.vue'
 import Registration from "../pages/Login/Registration.vue";
@@ -17,6 +16,8 @@ import ReparaturOverview from "@/main/vue/pages/ReparaturAufträge/ReparaturOver
 import ReparaturCreate from "@/main/vue/pages/ReparaturAufträge/ReparaturCreate.vue";
 import ReparaturEdit from "@/main/vue/pages/ReparaturAufträge/ReparaturEdit.vue";
 import AdminMain from "@/main/vue/pages/Nutzerverwaltung/AdminMain.vue";
+import MapView from "../pages/Map/Map.vue"
+import TrackBuilderView from "@/main/vue/pages/TrackBuilder/TrackBuilderView.vue"
 import EditUser from "@/main/vue/pages/Nutzerverwaltung/EditUser.vue";
 import Dataviewer from "@/main/vue/pages/Dataviewer/Dataviewer.vue";
 import DataviewerRoute from "@/main/vue/pages/Dataviewer/DataviewerRoute.vue";
@@ -95,6 +96,11 @@ const router = createRouter({
             component: ReparaturEdit
         },
         {
+            path: "/repair-order-trackbuilder",
+            name: "TrackBuilder",
+            component: TrackBuilderView
+        },
+        {
             path: "/admin",
             name: "adminmain",
             component: AdminMain
@@ -135,7 +141,12 @@ const router = createRouter({
             component: DataviewerRoute
         },
         {
-            path: "/dataviewer/point/:lon/:lat",
+            path: "/dataviewer/route/:id",
+            name: "dataviewerRouteOnly",
+            component: DataviewerRoute
+        },
+        {
+            path: "/dataviewer/point/:pointId",
             name: "dataviewerPoint",
             component: DataviewerPoint
 
@@ -160,7 +171,7 @@ const router = createRouter({
 
 router.beforeEach((to) => {
     document.title = to.name;
-    // Something which should be executed before each routing
+  // Something which should be executed before each routing
 })
 
 export default router

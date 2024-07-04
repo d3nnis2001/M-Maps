@@ -36,7 +36,10 @@ public class DataviewerController {
     public ArrayList<GleisLageDatenpunkt> getAllTrackLayoutData2(@RequestParam int trackId) { return fileService.getData(trackId);}
 
     @GetMapping("/getPointData")
-    public ArrayList<GeoData> getAllPointLayoutData(@RequestParam double lat, double lon) { return fileService.getPointData(lat, lon);}
+    public ArrayList<GleisLageDatenpunkt> getAllPointLayoutData(@RequestParam String pointId) { return fileService.getPointData(pointId);}
+
+    @GetMapping("/getPointInfo")
+    public GeoData getPointInfo(@RequestParam String pointId) { return fileService.getPointInformation(pointId);}
 
     /*
     @GetMapping("/getTrackData")

@@ -14,11 +14,13 @@ public class GleisVData {
     private int laenge;
     private int v_zul;
     private String datum;
+
+    private String datasetId;
     public GleisVData() {
 
     }
 
-    public GleisVData(int str, int r, double v1, double v2, double b1, double b2, int l, int v, String d) {
+    public GleisVData(int str, int r, double v1, double v2, double b1, double b2, int l, int v, String d, String id) {
         Str_Nr = str;
         Ri = r;
         von_km = v1 + v2 / 1000;
@@ -26,6 +28,15 @@ public class GleisVData {
         laenge = l;
         v_zul = v;
         datum = d;
+        datasetId = id;
+    }
+
+    public String getDatasetId() {
+        return datasetId;
+    }
+
+    public void setDatasetId(String datasetId) {
+        this.datasetId = datasetId;
     }
 
     public GleisVData(String id, int str_Nr, int ri, double von_km, double bis_km, int laenge, int v_zul, String datum) {

@@ -7,9 +7,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Optional;
 
+/**
+ * UserServiceImpl for all functions for the UserModel.
+ */
 @Service
 public class UserServicesImpl implements UserServices {
     private final UserRepository userRepo;
@@ -45,12 +47,17 @@ public class UserServicesImpl implements UserServices {
         }
     }
 
+    /**
+     * Credentials.
+     * @param email Email
+     * @param password Password
+     * @return boolean
+     */
     public boolean checkCredentials(String email, String password) {
         Optional<UserModel> userOpt = userRepo.findById(email);
         if (userOpt.isPresent()) {
             UserModel user = userOpt.get();
-            boolean equal = password.equals(user.getPassword());
-            return equal;
+            return password.equals(user.getPassword());
         }
         return false;
     }
@@ -79,9 +86,7 @@ public class UserServicesImpl implements UserServices {
     public ArrayList<UserModel> getAllUsers() {
         Iterable<UserModel> iterable = userRepo.findAll();
         ArrayList<UserModel> users = new ArrayList<>();
-        Iterator<UserModel> iterator = iterable.iterator();
-        while (iterator.hasNext()) {
-            UserModel userModel = iterator.next();
+        for (UserModel userModel : iterable) {
             users.add(userModel);
             System.out.println(userModel.getLastname());
         }
@@ -92,13 +97,22 @@ public class UserServicesImpl implements UserServices {
         UserModel us = getUserByUsername(username);
         ArrayList<String> oldRoles = us.getRoles();
         ArrayList<String> toDelete = new ArrayList<>();
-        for (String oldRole : oldRoles) {
-            if (!newRoles.contains(oldRole)) {
-                toDelete.add(oldRole);
+        if (oldRoles != null) {
+            if (oldRoles.contains("") && oldRoles.size() == 1) {
+                oldRoles.remove("");
+                newRoles.remove("");
+                us.deleteRole("");
+                userRepo.save(us);
+            } else {
+                for (String oldRole : oldRoles) {
+                    if (!newRoles.contains(oldRole)) {
+                        toDelete.add(oldRole);
+                    }
+                }
+                for (String role : toDelete) {
+                    us.deleteRole(role);
+                }
             }
-        }
-        for(String role : toDelete) {
-            us.deleteRole(role);
         }
         for (String newRole : newRoles) {
             us.addRole(newRole);
@@ -114,6 +128,11 @@ public class UserServicesImpl implements UserServices {
         return user.orElse(null);
     }
 
+    /**
+     * Sets the variable "unlocked" to true, so the user can use tha app.
+     * @param username
+     * @return boolean
+     */
     public boolean unlockUser(final String username) {
         UserModel us = getUserByUsername(username);
         us.setUnlocked(true);

@@ -1,12 +1,22 @@
 <script setup>
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import {onMounted, ref} from 'vue';
-import {getGeoData, getTrack, getPartOfTrack, getTimeFromHeatmap} from "@/main/vue/api/map";
+import {onMounted, ref, watch} from 'vue';
+import {
+    getGeoData,
+    getHeatmap,
+    getInformationForGeoPoint,
+    getReparaturForMap,
+    getTimeFromHeatmap,
+    getImagesForTrackId,
+    getIRImagesForTrackId
+} from "@/main/vue/api/map";
 import {useQuasar} from "quasar";
 import DateInput from "@/main/vue/pages/Map/DateInput.vue";
 import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";
 import router from "@/main/vue/router";
+import WeatherComponent from "@/main/vue/pages/Map/WeatherComponent.vue";
+import LidarPlot from "@/main/vue/pages/Map/LidarPlot.vue";
 
 const map = ref(null);
 var markers = [];
@@ -22,18 +32,88 @@ const markerEnd = ref('')
 const kmStart = ref('')
 const kmEnd = ref('')
 const selectedMarker = ref('')
-let data = ref([])
+let heatData = ref([])
+const toggle_value = ref(false)
+const silver_filter = ref(true)
+const green_filter = ref(true)
+const orange_filter = ref(true)
+const red_filter = ref(true)
+const cityName = ref("")
+let information = ref([])
+const geoJsonData = ref([])
+const regions = [{label:"BY", value: []},
+                {label:"BW", value: []},
+                {label:"SW", value: []},
+                {label:"H", value: []},
+                {label:"SO", value: []},
+                {label:"NRW", value: []},
+                {label:"NO", value: []},
+                {label:"NB", value: []},
+                {label:"N", value: []}]
+const dialogMarkerOne = ref(false)
+const slide = ref(1)
+const showLidar = ref(false)
+var tempStreckenID = 0
 
+const BY = ref(false)
+const BW = ref(false)
+const SW = ref(false)
+const H = ref(false)
+const SO = ref(false)
+const NRW = ref(false)
+const NO = ref(false)
+const NB = ref(false)
+const N = ref(false)
+const reparatur = ref([])
+const showWeather = ref(false)
+var weatherLat = 0.0
+var weatherLon = 0.0
 
 onMounted(async () => {
     map.value = L.map('map', {
         center: [51.1657, 10.4515],
-        zoom: 6,
+        zoom: 7,
+        maxZoom: 15,
+        minZoom: 7,
         maxBounds: [
             [55.0583, 5.8662],
             [47.2701, 15.0419]
         ]
     });
+    fetch('https://raw.githubusercontent.com/isellsoap/deutschlandGeoJSON/main/2_bundeslaender/4_niedrig.geo.json')
+        .then(response => response.json())
+        .then(data => {
+            geoJsonData.value = L.geoJSON(data, {
+                style: {
+                    color: 'blue',
+                    weight: 2,
+                    opacity: 0.8,
+                    fillOpacity: 0.0,
+                },
+            })
+            geoJsonData.value.addTo(map.value);
+            data.features.forEach((s) => {
+                switch(s.properties.id) {
+                    case 'DE-BW': regions[1].value.push(s); break;
+                    case 'DE-BY': regions[0].value.push(s); break;
+                    case 'DE-BE': regions[6].value.push(s); break;
+                    case 'DE-BB': regions[6].value.push(s); break;
+                    case 'DE-HB': regions[7].value.push(s); break;
+                    case 'DE-HH': regions[8].value.push(s); break;
+                    case 'DE-HE': regions[3].value.push(s); break;
+                    case 'DE-MV': regions[6].value.push(s); break;
+                    case 'DE-NI': regions[7].value.push(s); break;
+                    case 'DE-NW': regions[5].value.push(s); break;
+                    case 'DE-RP': regions[2].value.push(s); break;
+                    case 'DE-SL': regions[2].value.push(s); break;
+                    case 'DE-ST': regions[4].value.push(s); break;
+                    case 'DE-SN': regions[4].value.push(s); break;
+                    case 'DE-SH': regions[8].value.push(s); break;
+                    case 'DE-TH': regions[4].value.push(s); break;
+
+                }
+            })
+        });
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
@@ -43,11 +123,180 @@ onMounted(async () => {
     new L.TileLayer('http://{s}.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png',
         {
             attribution: '<a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors</a>, Style: <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA 2.0</a> <a href="http://www.openrailwaymap.org/">OpenRailwayMap</a> and OpenStreetMap',
-            minZoom: 6,
-            maxZoom: 19,
             tileSize: 256
         }).addTo(map.value);
-    data = await getGeoData();
+
+    var Icon = L.icon({
+        iconUrl: 'src/main/resources/construction.png',
+        iconSize: [45, 45],
+        iconAnchor: [0, 30]
+    });
+    const reparaturData = await getReparaturForMap()
+    reparaturData.forEach((rep) => { reparatur.value.push( {
+        marker: L.marker([rep.geocords.longitude,rep.geocords.latitude], {icon: Icon} ),
+        reparaturAuftrag: rep
+    }
+    )
+       reparatur.value[reparatur.value.length - 1].marker.addTo(map.value)
+        reparatur.value[reparatur.value.length - 1].marker.on('click', onReparaturClicked);
+    })
+
+    map.value.on('dblclick', doubleClickOnMap);
+
+
+    const data = await getGeoData();
+    await setGeoData(data)
+});
+
+//-------------------------- Wetter ---------------------------
+function doubleClickOnMap(e) {
+    const { lat, lng } = e.latlng;
+    console.log(`Double click: lat: ${lat}, longitude: ${lng}`);
+    weatherLat = lat
+    weatherLon = lng
+    showWeather.value = true
+}
+
+
+// -------------------------- REGIONS --------------------------
+
+/**
+ * Region Nord (N): Schleswigwig Holstein und Hamburg
+ * Region Niedersachsen (NB): Bremen, Niedersachsen
+ * Region Nordost (NO): Berlin, Brandenburg, Mecklenburg Vorpommern
+ * Region NRW: NRW
+ * Region Südost (SO) : Sachsenanhalt, Sachsen, Thüringen
+ * Region Hessen(H) : Hessen
+ * Region Südwest(SW): Saarland, Rheinland -Pfalz
+ * Region Badenwüttenberg(BW): Badenwüttenberg
+ * Region Bayern (BY): Bayern **/
+
+/**
+ * Sets map up and gets all GeoData for standard view
+ **/
+
+watch(BY, onRegionChange)
+watch(BW, onRegionChange)
+watch(SW, onRegionChange)
+watch(H, onRegionChange)
+watch(SO, onRegionChange)
+watch(NRW, onRegionChange)
+watch(NO, onRegionChange)
+watch(NB, onRegionChange)
+watch(N, onRegionChange)
+
+function datapointsFromRegion(region) {
+    for (let i = 0; i < markers.length; i++) {
+        var result = false;
+        for (let j = region.length - 1; j >= 0; j--) {
+            if (!result) {
+                result = isMarkerInsidePolygon(markers[i], region[j]);
+                if (!result)
+                    result = isMarkerInsidePolygon2(markers[i], region[j])
+            } else break;
+        }
+        if (result) {
+            markers[i].marker.setStyle({opacity: 1, fillOpacity: 1});
+        } else {
+            markers[i].marker.setStyle({opacity: 0, fillOpacity: 0});
+        }
+    }
+}
+
+function onRegionChange() {
+
+    map.value.removeLayer(geoJsonData.value)
+    var temp = []
+    if(BY.value === true) {
+        temp = temp.concat(regions[0].value)
+    }
+    if(BW.value === true) {
+        temp = temp.concat(regions[1].value)
+    }
+    if(SW.value === true) {
+        temp = temp.concat(regions[2].value)
+    }
+    if(H.value === true) {
+        temp = temp.concat(regions[3].value)
+    }
+    if(SO.value === true) {
+        temp = temp.concat(regions[4].value)
+    }
+    if(NRW.value === true) {
+        temp = temp.concat(regions[5].value)
+    }
+    if(NO.value === true) {
+        temp = temp.concat(regions[6].value)
+    }
+
+    if(NB.value === true) {
+        temp = temp.concat(regions[7].value)
+    }
+    if(N.value === true) {
+        temp = temp.concat(regions[8].value)
+    }
+    geoJsonData.value = L.geoJSON(temp, {
+        style: {
+            color: 'blue',
+            weight: 2,
+            opacity: 0.5,
+            fillOpacity: 0.0,
+        },
+    })
+    geoJsonData.value.addTo(map.value);
+    datapointsFromRegion(temp)
+}
+
+
+// Von https://stackoverflow.com/questions/31790344/determine-if-a-point-reside-inside-a-leaflet-polygon
+
+function isMarkerInsidePolygon(marker, poly) {
+    var polyPoints = [];
+    for (var i = 0; i < poly.geometry.coordinates.length; i++) {
+        polyPoints = polyPoints.concat(poly.geometry.coordinates[i][0]);
+    }
+
+    var x = marker.marker.getLatLng().lat, y = marker.marker.getLatLng().lng;
+    var inside = false;
+    for (var i = 0, j = polyPoints.length - 1; i < polyPoints.length; j = i++) {
+        var xi = polyPoints[i][1], yi = polyPoints[i][0];
+        var xj = polyPoints[j][1], yj = polyPoints[j][0];
+
+        var intersect = ((yi > y) != (yj > y))
+            && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+        if (intersect) inside = !inside;
+    }
+    return inside;
+}
+
+function isMarkerInsidePolygon2(marker, poly) {
+    var polyPoints = [];
+    for (var i = 0; i < poly.geometry.coordinates.length; i++) {
+        for (var j = 0; j < poly.geometry.coordinates[i].length; j++) {
+            polyPoints.push(L.latLng(poly.geometry.coordinates[i][j][1], poly.geometry.coordinates[i][j][0]));
+        }
+    }
+    var x = marker.marker.getLatLng().lat;
+    var y = marker.marker.getLatLng().lng;
+
+    var inside = false;
+    for (var i = 0, j = polyPoints.length - 1; i < polyPoints.length; j = i++) {
+        var xi = polyPoints[i].lat, yi = polyPoints[i].lng;
+        var xj = polyPoints[j].lat, yj = polyPoints[j].lng;
+
+        var intersect = ((yi > y) != (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+        if (intersect) inside = !inside;
+    }
+
+    return inside;
+}
+
+
+
+// --------------------- SET DATA ----------------------
+
+async function setGeoData(data) {
+    markers.forEach((m) => map.value.removeLayer(m.marker));
     data.forEach((m) => markers.push({
         marker : L.circle([m.longitude, m.latitude], {color: "black", radius: 50}),
         data: m,
@@ -56,65 +305,121 @@ onMounted(async () => {
         m.marker.addTo(map.value);
         m.marker.on('click', onMarkerClicked);
     });
-    map.value.on('locationfound', onLocationFound);
-    map.value.locate({setView: false});
-});
+}
 
-const onMarkerClicked = (event) => {
+async function addAllDatapoints() {
+    markers.forEach((m) => {
+        m.marker.setStyle({opacity: 1, fillOpacity: 1, color: "#000000", fillColor: "#000000"})
+    });
+}
+
+async function setPartGeoData(trackID) {
+    var minlat = 180, maxlat = -180, minlong = 180, maxlong = -180, counter = 0
+    markers.forEach((m) => {
+        if (String(m.data.strecken_id) === String(trackID)) {
+            counter++
+            if(m.data.latitude < minlat)
+                minlat = m.data.latitude
+            if(m.data.latitude > maxlat)
+                maxlat = m.data.latitude
+            if(m.data.longitude < minlong)
+                minlong = m.data.longitude
+            if(m.data.longitude > maxlong)
+                maxlong = m.data.longitude
+            m.marker.setStyle({opacity: 1, fillOpacity: 1})
+        }
+        else {
+            m.marker.setStyle({opacity: 0, fillOpacity: 0})
+        }
+    });
+    if(counter > 0) {
+        var lat = L.latLng(minlong, minlat)
+        var lon = L.latLng(maxlong, maxlat)
+        var bounds = L.latLngBounds(lat, lon);
+        map.value.fitBounds(bounds)
+    }
+}
+
+async function setPartGeoDataKm(km_start, km_end) {
+    if (km_start > km_end) {
+        let temp = km_start
+        km_start = km_end
+        km_end = temp
+    }
+    markers.forEach((m) => {
+        if (!(m.data.track_km >= km_start && m.data.track_km <= km_end)) {
+            m.marker.setStyle({opacity: 0, fillOpacity: 0})
+        }
+    });
+}
+
+const onReparaturClicked = async (event) => {
+    const marker = event.target
+    const lat = marker.getLatLng().lat
+    const lng = marker.getLatLng().lng
+    const rep = reparatur.value.find((r) => {
+        return (lat == r.reparaturAuftrag.geocords.longitude && lng == r.reparaturAuftrag.geocords.latitude)
+    })
+    router.push(`/repair/${rep.reparaturAuftrag.id}/edit`)
+}
+
+const onMarkerClicked = async (event) => {
     const circle = event.target;
     const marker = markers.find((m) => {
+
         return m.data.longitude === circle.getLatLng().lat && m.data.latitude === circle.getLatLng().lng;
     });
     selectedMarker.value = marker
     dialogVisible.value = true;
-    console.log(selectedMarker.value.data)
+    information.value = []
+    tempStreckenID = selectedMarker.value.data.strecken_id
+    const informationGeo = await getInformationForGeoPoint(selectedMarker.value.data.id)
+    displayInformation(informationGeo)
 };
 
-const deleteStart = () => {
-    markerStart.value = null;
-    kmStart.value = '';
-};
-
-const deleteEnd = () => {
-    markerEnd.value = null;
-    kmEnd.value = '';
-};
-
-const addStart = () => {
-    markerStart.value = selectedMarker;
-
-    kmStart.value = selectedMarker.value.data.track_km;
-};
-const addEnd = () => {
-    markerEnd.value = selectedMarker;
-    kmEnd.value = selectedMarker.value.data.track_km;
-};
-
-function getLetLng(geopoint) {
-    for (let i = 0;i<data.length;i++) {
-        if (data[i].id === geopoint) {
-            return [data[i].longitude, data[i].latitude]
-        }
-    }
-}
-
-function getAllGeoPointsWithColor(dataPoint) {
+async function displayInformation(info) {
     let output = []
-    for(let i = 0;i < dataPoint.length;i++) {
-        if(dataPoint[i].NORMAL !== undefined) {
-            output.push([getLetLng(dataPoint[i].NORMAL), "black"])
-        } else if (dataPoint[i].LOW !== undefined) {
-            output.push([getLetLng(dataPoint[i].LOW), "green"])
-        } else if (dataPoint[i].MEDIUM !== undefined) {
-            output.push([getLetLng(dataPoint[i].MEDIUM), "orange"])
-        } else if (dataPoint[i].HIGH !== undefined) {
-            output.push([getLetLng(dataPoint[i].HIGH), "red"])
+    output.push("Strecken-ID: " + selectedMarker.value.data.strecken_id);
+    for (let i = 0;i < info.length;i++) {
+        switch(i) {
+            case 0:
+                output.push("Maximale Linksabweichung: "+info[i].toString())
+                break;
+            case 1:
+                output.push("Maximale Rechtsabweichung: "+info[i].toString())
+                break;
+            case 2:
+                output.push("Zugelassene Maximal Geschwindigkeit: "+info[i].toString())
+                break;
+            case 3:
+                output.push("Durchschnittliche Geschwindigkeit: "+info[i].toString())
+                break;
         }
     }
-    return output
+    information.value = output
+ }
+const loadCameraPictures = async () => {
+    cameraimages.value = await getImagesForTrackId(selectedMarker.value.data.strecken_id)
+    if(cameraimages.value.length !== 0) {
+        dialogMarkerOne.value = true
+    }
+};
+
+const loadIRCameraPictures = async () => {
+    console.log(selectedMarker.value.data.strecken_id)
+    cameraimages.value = await getIRImagesForTrackId(selectedMarker.value.data.strecken_id)
+    if(cameraimages.value.length !== 0) {
+        dialogMarkerOne.value = true
+    }
 }
 
-const refreshMarkers = async () => {
+const loadLidarData = async () => {
+    showLidar.value = true
+}
+
+// ---------------------------- Filter -----------------------------------
+
+const setValueStreckenID = async () => {
     if (streckenID.value === "") {
         $q.notify({
             type: 'negative',
@@ -122,32 +427,187 @@ const refreshMarkers = async () => {
             caption: 'Choose please'
         });
     } else {
-        const data = await getTrack(streckenID.value);
-        const newData = getAllGeoPointsWithColor(data)
-        if (data.length === 0) {
+        setPartGeoData(streckenID.value)
+        if (markers.length === 0) {
             $q.notify({
                 type: 'negative',
                 message: "Track ID doesn't exist",
                 caption: 'Please choose a different Track ID'
             });
         }
-        markers.forEach((m) => map.value.removeLayer(m.marker));
-        for (let i = 0; i < newData.length; i++) {
-            markers.push({
-                marker: L.circle([newData[i][0][0], newData[i][0][1]], {color: newData[i][1], radius: 50}),
-                data: newData[i],
-            });
-        }
-        markers.forEach((m) => {
-            m.marker.addTo(map.value);
-            m.marker.on('click', onMarkerClicked);
-        });
-        checkForChanges()
     }
 };
 
+async function zoomToCity(cityName) {
+    try {
+        var url = `https://nominatim.openstreetmap.org/search?format=json&q=${cityName}`;
+
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.length > 0) {
+            var city = data[0];
+            var lat = city.lat;
+            var lon = city.lon;
+            map.value.setView([lat, lon], 10);
+        } else {
+            console.log('City not found');
+            if (window.cityBoundaryLayer) {
+                map.value.removeLayer(window.cityBoundaryLayer);
+            }
+            return;
+        }
+
+        const boundaryResponse = await fetch(`https://nominatim.openstreetmap.org/search.php?q=${cityName}&polygon_geojson=1&format=json`);
+        const boundaryData = await boundaryResponse.json();
+
+        if (boundaryData.length > 0) {
+            const cityBoundaries = boundaryData[0].geojson;
+
+            if (window.cityBoundaryLayer) {
+                map.value.removeLayer(window.cityBoundaryLayer);
+            }
+
+            window.cityBoundaryLayer = L.geoJSON(cityBoundaries).addTo(map.value);
+        } else {
+            console.log('City boundaries not found');
+        }
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        console.log('Error fetching data');
+    }
+}
+
+// ---------------------------- HEATMAP ----------------------------------
+
+
+const onChange = (newValue, oldValue) => {
+    if (newValue === true) {
+        getAllHeatmapData()
+    } else {
+        addAllDatapoints()
+    }
+};
+
+// ---------------------------- Heatmap Filter ----------------------------------
+
+const onChangeSilver = (newValue, oldValue) => {
+    if (newValue === true) {
+        setMarkerByColor("silver", true)
+    } else {
+        setMarkerByColor("silver", false)
+    }
+};
+
+const onChangeGreen = (newValue, oldValue) => {
+    if (newValue === true) {
+        setMarkerByColor("green", true)
+    } else {
+        setMarkerByColor("green", false)
+    }
+};
+
+const onChangeOrange = (newValue, oldValue) => {
+    if (newValue === true) {
+        setMarkerByColor("orange", true)
+    } else {
+        setMarkerByColor("orange", false)
+    }
+};
+
+const onChangeRed = (newValue, oldValue) => {
+    if (newValue === true) {
+        setMarkerByColor("red", true)
+    } else {
+        setMarkerByColor("red", false)
+    }
+};
+
+function setMarkerByColor(color, enable) {
+    for (let i = 0;i < markers.length;i++) {
+        if (markers[i].marker.options.color === color) {
+            if (enable === false) {
+                markers[i].marker.setStyle({opacity: 0, fillOpacity: 0})
+            } else {
+                markers[i].marker.setStyle({opacity: 1, fillOpacity: 1})
+            }
+        }
+    }
+}
+
+
+watch(toggle_value, onChange);
+watch(silver_filter, onChangeSilver);
+watch(green_filter, onChangeGreen);
+watch(orange_filter, onChangeOrange);
+watch(red_filter, onChangeRed);
+
+
+// --------------------------------------------------------------
+
+function changeColorGeopoint(geopoint, color) {
+    for (let i = 0;i<markers.length;i++) {
+        if (markers[i].data.id === geopoint) {
+            markers[i].marker.setStyle({color: color, fillColor: color, opacity: 1, fillOpacity: 1})
+        }
+    }
+}
+
+
+function getAllGeoPointsWithColor(dataPoint) {
+    for(let i = 0;i < dataPoint.length;i++) {
+        if(dataPoint[i].NORMAL !== undefined) {
+            changeColorGeopoint(dataPoint[i].NORMAL, "silver")
+        } else if (dataPoint[i].LOW !== undefined) {
+            changeColorGeopoint(dataPoint[i].LOW, "green")
+        } else if (dataPoint[i].MEDIUM !== undefined) {
+            changeColorGeopoint(dataPoint[i].MEDIUM, "orange")
+        } else if (dataPoint[i].HIGH !== undefined) {
+            changeColorGeopoint(dataPoint[i].HIGH, "red")
+        }
+    }
+}
+
+
+async function getAllHeatmapData() {
+    heatData = await getHeatmap()
+    markers.forEach((m) => {
+        m.marker.setStyle({opacity: 0, fillOpacity: 0})
+    });
+    getAllGeoPointsWithColor(heatData)
+}
+
+
+async function getHeatmapWithTime() {
+    console.log(streckenID)
+    console.log(date._value)
+    const timeData = await getTimeFromHeatmap(streckenID._value, date._value, date2._value)
+    console.log(timeData)
+}
+
+// ------------------------ LOCATION ZOOM ---------------------------
+
+const onLocationFound = (e) => {
+    const userLocation = e.latlng;
+    L.circle(userLocation, {color: 'blue', radius: 100}).addTo(map.value);
+    map.value.setView(userLocation, 12);
+}
+
+const onLocationError = (e) => {
+    $q.notify({
+        type: 'negative',
+        message: `Location error: ${e.message}`,
+        caption: 'Could not determine your location'
+    });
+}
+
+const centerToUserLocation = async () => {
+    map.value.locate().on('locationfound', onLocationFound).on("locationerror", onLocationError)
+};
+
+// -------------------- REPAIR ORDER ------------------------
+
 const createRepairOrder = async () => {
-    console.log(selectedMarker.value)
     const longitude = selectedMarker.value.data.longitude
     const latitude = selectedMarker.value.data.latitude
     const streckenID = selectedMarker.value.data.strecken_id
@@ -161,48 +621,37 @@ const createRepairOrder = async () => {
     });
 }
 
-async function getHeatmapWithTime() {
-    const timeData = await getTimeFromHeatmap(streckenID, date._value, date2._value)
-    console.log(timeData)
+// ------------------------- HANDLING FOR PART OF MAP -------------------------
+
+const getPartOfGeoData = async () => {
+    if (kmStart.value !== '' && kmEnd.value !== '') {
+        setPartGeoDataKm(kmStart.value, kmEnd.value)
+    }
 }
 
-const onLocationFound = (e) => {
-    const radius = e.accuracy;
-    const userLocation = e.latlng;
-    L.circle(userLocation, {color: 'blue', radius: 200}).addTo(map.value);
-}
-const centerToUserLocation = async () => {
-    const options = {
-        setView: true,
-        maxZoom: 12,
-        animate: true
-    }
-    map.value.locate(options).on('locationfound', onLocationFound);
-    const gleis = await getPartOfGleislage(streckenID.value)
-    console.log(gleis)
+const deleteStart = () => {
+    markerStart.value = null;
+    kmStart.value = '';
+    addAllDatapoints()
 };
 
-const checkForChanges = async () => {
-    if (kmStart.value !== '' && kmEnd.value !== '' && streckenID.value !== "") {
-        console.log(kmStart.value)
-        const data = await getPartOfTrack(kmStart.value, kmEnd.value)
-        console.log(data)
-        markers.forEach((m) => map.value.removeLayer(m.marker));
-        markers = []
-        for (let i = 0; i < data.length; i++) {
-            markers.push({
-                marker: L.circle([data[i].longitude, data[i].latitude], {color: "black", radius: 50}),
-                data: data[i],
-            });
-        }
-        markers.forEach((m) => {
-            m.marker.addTo(map.value);
-            m.marker.on('click', onMarkerClicked);
-        });
-    } else {
-    }
-}
+const deleteEnd = () => {
+    markerEnd.value = null;
+    kmEnd.value = '';
+    addAllDatapoints()
+};
 
+const addStart = () => {
+    markerStart.value = selectedMarker;
+
+    kmStart.value = selectedMarker.value.data.track_km;
+};
+const addEnd = () => {
+    markerEnd.value = selectedMarker;
+    kmEnd.value = selectedMarker.value.data.track_km;
+};
+
+// ---------------------------------------------------------------------------
 
 </script>
 
@@ -217,9 +666,9 @@ const checkForChanges = async () => {
                 class="expansion_settings"
             >
                 <q-list>
-                    <q-item clickable v-ripple>
+                    <q-item v-ripple :disable="streckenID === ''">
                         <q-item-section>
-                            <div class="expan_items" @click="alert2=true">
+                            <div class="expan_items" @click="streckenID !== '' && (alert2=true)">
                                 Zeitraum
                             </div>
                         </q-item-section>
@@ -230,6 +679,56 @@ const checkForChanges = async () => {
                                 Strecken-ID auswählen
                             </div>
                         </q-item-section>
+                    </q-item>
+                    <q-item clickable v-ripple>
+                        <q-item-section>
+                            <q-toggle
+                                v-model="toggle_value"
+                                color="red"
+                                keep-color
+                                readonly
+                                label="Geodata / Heatmap"
+                            />
+                        </q-item-section>
+                    </q-item>
+                    <q-item>
+                        <div class="q-gutter-sm">
+                            <q-checkbox v-model="silver_filter"  val="Silver" label="Silver" color="silver" :disable="!toggle_value"/>
+                            <q-checkbox v-model="green_filter" val="Green" label="Green" color="green" :disable="!toggle_value"/>
+                            <q-checkbox v-model="orange_filter" val="Orange" label="Orange" color="orange" :disable="!toggle_value"/>
+                            <q-checkbox v-model="red_filter" val="Red" label="Red" color="red" :disable="!toggle_value"/>
+                        </div>
+                    </q-item>
+                    <q-item>
+                        <StandardInput v-model="cityName">
+
+                        </StandardInput>
+                        <q-btn
+                            class=""
+                            icon="search"
+                            round
+                            flat
+                            @click="zoomToCity(cityName)"
+                            aria-label="Center to City"
+                        />
+                    </q-item>
+                    <q-item>
+                        <div class="col">
+                            <p>Regionen</p>
+                            <div class="q-gutter-sm">
+                                <q-checkbox v-model="BY"  val="BY" label="BY" color="black"/>
+                                <q-checkbox v-model="BW"  val="BW" label="BW" color="black"/>
+                                <q-checkbox v-model="SW"  val="SW" label="SW" color="black"/>
+                                <q-checkbox v-model="H"  val="H" label="H" color="black"/>
+                                <q-checkbox v-model="SO"  val="SO" label="SO" color="black"/>
+                            </div>
+                            <div class="q-gutter-sm">
+                                <q-checkbox v-model="NRW"  val="NRW" label="NRW" color="black"/>
+                                <q-checkbox v-model="NO"  val="NO" label="NO" color="black"/>
+                                <q-checkbox v-model="NB"  val="NB" label="NB" color="black"/>
+                                <q-checkbox v-model="N"  val="N" label="N" color="black"/>
+                            </div>
+                        </div>
                     </q-item>
                 </q-list>
             </q-expansion-item>
@@ -246,8 +745,8 @@ const checkForChanges = async () => {
         </div>
         <div id="map"></div>
         <div class="flexbox_map">
-            <q-dialog v-model="alert2">
-                <q-card>
+            <q-dialog v-model="alert2" >
+                <q-card :disable="!toggle_value">
                     <q-card-section>
                         <div class="text-h6">Wähle einen Zeitraum</div>
                     </q-card-section>
@@ -274,7 +773,7 @@ const checkForChanges = async () => {
                     </q-card-section>
                     <StandardInput v-model="streckenID" label="Strecken-ID Eingabe"></StandardInput>
                     <q-card-actions align="center">
-                        <q-btn @click="refreshMarkers" flat label="Filter anwenden" color="primary" v-close-popup/>
+                        <q-btn @click="setValueStreckenID" flat label="Filter anwenden" color="primary" v-close-popup/>
                         <q-btn flat label="Abbrechen" color="primary" v-close-popup/>
                     </q-card-actions>
                 </q-card>
@@ -344,16 +843,91 @@ const checkForChanges = async () => {
                         <q-btn
                             flat
                             no-caps
-                            @click="checkForChanges"
+                            @click="getPartOfGeoData"
                             label="Speichern"
                             color="primary"
                             v-close-popup
                         />
                     </q-card-actions>
                 </q-card>
-
+                <q-card flat square bordered>
+                    <div class="row">
+                        <div class="col-4">
+                            <q-btn
+                                style="align-items: end; justify-content: end"
+                                flat
+                                no-caps
+                                @click="loadCameraPictures"
+                                label="Bilder"
+                                color="primary"
+                                v-close-popup
+                            >
+                                <q-icon name="photo_camera" style="margin-left: 8px;" />
+                            </q-btn>
+                        </div>
+                        <div class="col-4">
+                            <q-btn
+                                style="align-items: end; justify-content: end"
+                                flat
+                                no-caps
+                                @click="loadIRCameraPictures"
+                                label="IR-Bilder"
+                                color="primary"
+                                v-close-popup
+                            >
+                                <q-icon name="sensors" style="margin-left: 8px;" />
+                            </q-btn>
+                        </div>
+                        <div class="col-4">
+                            <q-btn
+                                style="align-items: end; justify-content: end"
+                                flat
+                                no-caps
+                                @click="loadLidarData"
+                                label="LIDAR-Daten"
+                                color="primary"
+                                v-close-popup
+                            >
+                                <q-icon name="flare" style="margin-left: 8px;" />
+                            </q-btn>
+                        </div>
+                    </div>
+                </q-card>
+                <q-card>
+                    <q-card-actions>
+                        <q-icon name="info" style="margin-left: 8px;">
+                            <q-tooltip anchor="top middle">
+                                <p v-for="info in information" :key="info">{{info}}</p>
+                            </q-tooltip>
+                        </q-icon>
+                    </q-card-actions>
+                </q-card>
             </div>
         </div>
+    </q-dialog>
+    <q-dialog v-model="dialogMarkerOne" full-width>
+        <div class="q-pa-md">
+                <q-carousel
+                    v-model="slide"
+                    swipeable
+                    animated
+                    arrows
+                >
+                    <q-carousel-slide
+                        v-for="(img, id) in cameraimages"
+                        :key="id"
+                        :name="id+1"
+                        :img-src="img"
+                    />
+                </q-carousel>
+            </div>
+
+    </q-dialog>
+    <q-dialog v-model="showLidar" full-width>
+        <LidarPlot :streckenid="tempStreckenID"/>
+    </q-dialog>
+    <q-dialog v-model="showWeather" class="fixed-dialog">
+        <WeatherComponent :lat="weatherLat" :lon="weatherLon"/>
     </q-dialog>
 </template>
 
@@ -432,6 +1006,11 @@ const checkForChanges = async () => {
     justify-content: flex-end;
     width: 100%;
     margin-right: 5vw;
+}
+
+.fixed-dialog .q-dialog__inner {
+    width: 390px;
+    height: 800px;
 }
 
 </style>

@@ -12,7 +12,7 @@ export const getInspectionOrder = async function getInspectionOrder() {
 }
 
 export const sendInspectionOrder = async function sendInspectionOrder(courseId, startLocation, endLocation, startTime,
-                                                                      endTime, department, dataInspec, remarks) {
+                                                                      endTime, department, dataInspec, remarks, priority) {
     try {
         const derc = new URLSearchParams();
         derc.append("courseId", courseId);
@@ -23,6 +23,7 @@ export const sendInspectionOrder = async function sendInspectionOrder(courseId, 
         derc.append("department", department);
         derc.append("inspectionData", dataInspec);
         derc.append("remarks", remarks);
+        derc.append("priority", priority);
         const response = await axios.post("/api/inspection/senddata", derc)
         return response;
 
@@ -35,7 +36,6 @@ export const sendInspectionOrder = async function sendInspectionOrder(courseId, 
 
 export const getDataById = async function getDataById(id) {
     try {
-        console.log("TEST-GETDATABYID");
         const response = await axios.get("/api/inspection/getById", {
             params: {
                 inspectionOrderId: id
@@ -49,7 +49,7 @@ export const getDataById = async function getDataById(id) {
 }
 
 export const sendDataById = async function sendDataById(id, courseId, startLocation, endLocation, startTime,
-                                                        endTime, department, dataInspec, remarks) {
+                                                        endTime, department, dataInspec, remarks, priority) {
     try {
         const derc = new URLSearchParams();
         derc.append("inspectionOrderId", id);
@@ -61,6 +61,7 @@ export const sendDataById = async function sendDataById(id, courseId, startLocat
         derc.append("department", department);
         derc.append("inspectionData", dataInspec);
         derc.append("remarks", remarks);
+        derc.append("priority", priority);
         const response = await axios.post("/api/inspection/sendById", derc)
         return response;
 
@@ -80,5 +81,36 @@ export const deleteInspectionOrder = async function deleteInspectionOrder(inspec
         console.log("Unseen error when changing the status")
     }
 }
+
+export const sendNewStatus = async function sendNewStatus(inspectionOrderId, status) {
+    try {
+        const derc = new URLSearchParams();
+        derc.append("inspectionOrderId", inspectionOrderId);
+        derc.append("status", status);
+        const response = await axios.post("/api/inspection/sendNewStatus", derc)
+        return response;
+
+    } catch (error) {
+        console.error("Unseen error: ", error);
+        return false;
+    }
+}
+
+export const sendReview = async function sendReview(inspectionOrderId, review, date) {
+    try {
+        const derc = new URLSearchParams();
+        derc.append("inspectionOrderId", inspectionOrderId);
+        derc.append("review", review);
+        derc.append("date", date);
+        console.log(review)
+        const response = await axios.post("/api/inspection/sendReview", derc)
+        return response;
+
+    } catch (error) {
+        console.error("Unseen error: ", error);
+        return false;
+    }
+}
+
 
 

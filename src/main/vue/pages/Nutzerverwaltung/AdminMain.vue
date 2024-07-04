@@ -1,11 +1,8 @@
 <script setup>
 import {onMounted, onUnmounted, reactive, ref} from "vue";
-import axios, {all} from "axios";
-import EditUser from "@/main/vue/pages/Nutzerverwaltung/EditUser.vue";
+import {getUserData, deleteUser, unlockUser} from "@/main/vue/api/admin";
 import {useQuasar} from "quasar";
 import {useRouter} from "vue-router";
-import {useLoginStore} from "@/main/vue/stores/LoginStore";
-import {getUserData, deleteUser, unlockUser} from "@/main/vue/api/admin";
 
 
 const table = reactive( {
@@ -28,7 +25,6 @@ const table = reactive( {
     rows: []
 });
 
-const router = useRouter()
 const smallScreen = ref(false);
 const largeScreen = ref(true);
 const showDialog = ref(false);
@@ -36,7 +32,7 @@ const showConfirmDialog = ref(false);
 const currentRow = reactive({});
 const rowToDelete = ref(null);
 const {notify} = useQuasar();
-const allRoles = ['Admin', 'Datenverwalter', 'Bearbeiter', 'Prüfer'];
+const router = useRouter()
 
 async function getData() {
     const data = await getUserData()
@@ -123,9 +119,7 @@ async function editUser() {
 }
 
 const rowClick = (evt, rowData) => {
-    console.log(typeof rowData)
-    console.log(rowData)
-    console.log(currentRow)
+    console.log(evt)
     Object.assign(currentRow, rowData);
     showDialog.value = true;
 }
@@ -270,11 +264,6 @@ const removeRow = (selectedUser) => {
 
 .option-button:hover {
     background-color: #e6e4e4;
-}
-
-.handleButton {
-    margin-top: 20px;
-
 }
 
 .disabled-button {

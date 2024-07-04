@@ -16,8 +16,14 @@ export default {
         const startTime = ref('')
         const endTime = ref('')
         const department = ref('')
+        const departmentValues = ref([])
         const inspectionData = ref('')
+        const inspectionDataValues = ref([])
         const remarks = ref('')
+        const priority = ref('')
+        const priorityLow = ref(false)
+        const priorityMiddle = ref(false)
+        const priorityHigh = ref(false)
         const dense = ref(false)
         const route = useRoute();
         let currentInspectionOrderId = route.params.inspectionOrderId
@@ -32,6 +38,19 @@ export default {
             department.value = inspectionOrder.department;
             inspectionData.value = inspectionOrder.inspectionData;
             remarks.value = inspectionOrder.remarks;
+            priority.value = inspectionOrder.priority;
+
+            if (priority.value === 'niedrig') {
+                priorityLow.value = true;
+            } else if (priority.value === 'mittel') {
+                priorityMiddle.value = true;
+            } else if (priority.value === 'hoch') {
+                priorityHigh.value = true;
+            }
+            inspectionDataValues.value.push("Gleislagedaten")
+
+            departmentValues.value.push("DB Regio Schiene Nord-Ost (NO)")
+            departmentValues.value.push("DB Regio Schiene Süd-West (SW)")
 
         });
 
@@ -60,6 +79,9 @@ export default {
                 console.log(errormsg);
                 errormsg.push("Please select a data type");
             }
+            if (endTime.value < startTime.value) {
+                errormsg.push("The second date has to be later than the first!")
+            }
 
             if (errormsg.length > 0) {
                 for (let i = 0; i < errormsg.length; i++) {
@@ -76,13 +98,33 @@ export default {
         function sendData() {
             const inputs = checkInputs()
             console.log(inputs)
+            if (priorityLow.value) {
+                priority.value = 'niedrig';
+            } else if (priorityMiddle.value) {
+                priority.value = 'mittel';
+            } else if (priorityHigh.value) {
+                priority.value = 'hoch';
+            }
             if (inputs) {
                 router.push('/inspectionOrder')
                 return sendDataById(currentInspectionOrderId, courseId.value, startLocation.value, endLocation.value, startTime.value,
-                    endTime.value, department.value, inspectionData.value, remarks.value)
+                    endTime.value, department.value, inspectionData.value, remarks.value, priority.value)
 
             }
         }
+
+        const updateCheckbox = (option) => {
+            if (option === 'niedrig') {
+                priorityMiddle.value = false;
+                priorityHigh.value = false;
+            } else if (option === 'mittel') {
+                priorityLow.value = false;
+                priorityHigh.value = false;
+            } else if (option === 'hoch') {
+                priorityLow.value = false;
+                priorityMiddle.value = false;
+            }
+        };
 
         return {
             currentInspectionOrderId,
@@ -92,9 +134,15 @@ export default {
             startTime,
             endTime,
             department,
+            departmentValues,
             inspectionData,
+            inspectionDataValues,
             remarks,
             sendData,
+            updateCheckbox,
+            priorityLow,
+            priorityMiddle,
+            priorityHigh,
             dense
         }
     }
@@ -155,13 +203,20 @@ export default {
             </div>
 
         <div class="row extra-mar">
-            <div class="mar-right">
+            <div class="checkListInput">
                 <p style="font-weight: bold;">Fachabteilung</p>
-                <StandardInput class="" v-model="department" label="Fachabteilung" ></StandardInput>
+                <q-select class="" outlined v-model="department" :options="departmentValues" label="Fachabteilung"></q-select>
             </div>
-            <div class="row extra-mar">
+            <div class="checkListInput">
                 <p style="font-weight: bold;">Messdaten</p>
-                <StandardInput class="" v-model="inspectionData" label="Messdaten"></StandardInput>
+                <q-select class="" outlined v-model="inspectionData" :options="inspectionDataValues" label="Messdaten"></q-select>
+            </div>
+            <div class="">
+                <p style="font-weight: bold;">Priorität</p>
+                <q-checkbox v-model="priorityLow" val="niedrig" label="niedrig" @update:model-value="updateCheckbox('niedrig')"/>
+                <q-checkbox v-model="priorityMiddle" val="mittel" label="mittel" @update:model-value="updateCheckbox('mittel')"/>
+                <q-checkbox v-model="priorityHigh" val="hoch" label="hoch" @update:model-value="updateCheckbox('hoch')"/>
+
             </div>
         </div>
         <div>
@@ -172,48 +227,6 @@ export default {
 
         </div>
     </div>
-
-
-
-
-
-
-    <!-- ###########################################################################
-    <div class="q-pa-md">
-        <div class="q-gutter-y-md column" style="max-width: 300px">
-
-            <q-input outlined v-model="courseId" label="StreckenID" :dense="dense" />
-
-            <q-input outlined v-model="startLocation" label="Startort" :dense="dense" />
-
-            <q-input outlined v-model="endLocation" label="Endort" :dense="dense" />
-
-            <q-input outlined v-model="startTime" label="Von" :dense="dense">
-                <template v-slot:prepend>
-                    <q-icon name="event" />
-                </template>
-            </q-input>
-
-            <q-input outlined v-model="endTime" label="Bis" :dense="dense">
-                <template v-slot:prepend>
-                    <q-icon name="event" />
-                </template>
-            </q-input>
-
-            <q-input outlined v-model="department" label="Fachabteilung" :dense="dense" />
-
-            <q-input outlined v-model="inspectionData" label="Zu überprüfende Messdaten" :dense="dense" />
-
-            <q-input
-                v-model="remarks" label="Bemerkungen" :dense="dense"
-                filled
-                autogrow
-            />
-
-            <q-btn label="Speichern" @click="sendData" color="primary" class=""></q-btn>
-        </div>
-    </div>
-    -->
 
 </template>
 
@@ -260,5 +273,12 @@ p {
 
 .extra-mar {
     margin-bottom: 20px;
+}
+
+.checkListInput {
+    width: 100%;
+    max-width: 288px;
+    margin-bottom: 20px;
+    margin-right: 20px;
 }
 </style>

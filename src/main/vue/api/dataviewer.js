@@ -14,11 +14,9 @@ export const getTrackLayoutData = async function getData(trackId) {
     }
 }
 
-export const getPointData = async function getPointData(lon, lat) {
+export const getPointData = async function getPointData(pointId) {
     try {
-        //const response = await axios.get("/api/dataviewer/getTrackData")
-        const response = await axios.get("/api/dataviewer/getPointData", {params: {lat, lon}})
-        //console.log(response2.data)
+        const response = await axios.get("/api/dataviewer/getPointData", {params: {pointId}})
         console.log(response.data)
         return response.data
     } catch (error) {
@@ -26,6 +24,17 @@ export const getPointData = async function getPointData(lon, lat) {
         return false
     }
     //const response = await axios.get("/api/dataviewer/getPointData", {params: {lon, lat}})
+}
+
+export const getPointInfo = async function getPointInfo(pointId) {
+    try {
+        const response = await axios.get("/api/dataviewer/getPointInfo", {params: {pointId}})
+        console.log(response.data)
+        return response.data
+    } catch (error) {
+        console.error("Something went wrong when getting the data:", error)
+        return false
+    }
 }
 
 export default {getTrackLayoutData}

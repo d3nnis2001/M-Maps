@@ -134,6 +134,9 @@ replay_pid*
 .history
 .ionide
 
+rosbagPictures/*
+!rosbagPictures/.gitkeep
+
 ### Vue ###
 # gitignore template for Vue.js projects
 #

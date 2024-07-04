@@ -6,8 +6,7 @@ import {useRouter, useRoute} from "vue-router";
 export default {
   setup(){
       const datapoint = ref('')
-      const dpLon = ref('')
-      const dpLat = ref('')
+      const pointID = ref('')
       const routeID = ref('')
       const fromStrKm = ref('')
       const toStrKm = ref('')
@@ -32,25 +31,30 @@ export default {
       };
 
       function showData() {
-          if (dpLon.value === '' || dpLat.value === '') {
+          if (pointID.value === '') {
               console.log(false)
               $q.notify(NOTIFY_OPTIONS.noDatapoint)
               datapoint.value = ''
           } else {
               console.log(true)
-              const lon = dpLon.value
-              const lat = dpLat.value
-              router.push(`/dataviewer/point/${lon}/${lat}`)
+              const pointId = pointID.value
+              router.push(`/dataviewer/point/${pointId}`)
           }
       }
 
       function showRoute() {
-          if (routeID.value === '6100') {
+          if (routeID.value !== '') {
               console.log(true)
               const routeId2 = routeID.value
               const fromStrKm2 = fromStrKm.value
               const toStrKm2 = toStrKm.value
-              router.push(`/dataviewer/route/${routeId2}/from/${fromStrKm2}/to/${toStrKm2}`)
+              if (fromStrKm2 === '' || toStrKm2 === '') {
+                  //router.push(`/dataviewer/route/${routeId2}`)
+                  router.push(`/dataviewer/route/${routeId2}/from/${null}/to/${null}`)
+              } else {
+                  router.push(`/dataviewer/route/${routeId2}/from/${fromStrKm2}/to/${toStrKm2}`)
+              }
+
           } else if (routeID.value === '') {
               console.log(false)
               $q.notify(NOTIFY_OPTIONS.noRoute)
@@ -62,6 +66,18 @@ export default {
           }
       }
 
+      function onClickHome() {
+          router.push(`/dataviewer`)
+      }
+
+      /*function onClickRoute() {
+          router.push(`/dataviewer/route/0/from/0/to/0`)
+      }*/
+
+      /*function onClickPoint() {
+          router.push(`/dataviewer/point/null/null`)
+      }*/
+
       function refreshRoute() {}
 
       const isPointPath = computed(() => route.path.includes('/dataviewer/point'))
@@ -69,8 +85,7 @@ export default {
 
       return {
           site,
-          dpLon,
-          dpLat,
+          pointID,
           routeID,
           fromStrKm,
           toStrKm,
@@ -78,7 +93,10 @@ export default {
           showRoute,
           isPointPath,
           isRoutePath,
-          refreshRoute
+          refreshRoute,
+          onClickHome,
+          //onClickRoute,
+          //onClickPoint
       }
   }
 };
@@ -88,17 +106,15 @@ export default {
 <div>
     <div class="q-pa-xs">
         <div class="align-mult">
-            <div class="align-basic">
-                <p>Longitude</p>
-                <q-input class="q-pa-xs" outlined v-model="dpLon"></q-input>
-                <p>Lattitude</p>
-                <q-input class="q-pa-xs" outlined v-model="dpLat"></q-input>
+            <div v-if="!isRoutePath" class="align-basic">
+                <p>Point ID</p>
+                <q-input class="q-pa-xs" outlined v-model="pointID"></q-input>
                 <div class="q-pa-xs">
                     <q-btn label="Daten anzeigen" @click=showData class=""></q-btn>
                 </div>
             </div>
-            <div v-if="!isRoutePath">
-                <div v-if="!isRoutePath" class="align-basic">
+            <div v-if="!isPointPath && !isRoutePath">
+                <div class="align-basic">
                     <p>Strecken ID</p>
                     <q-input class="q-pa-xs" outlined v-model="routeID" ></q-input>
                 </div>
@@ -116,12 +132,39 @@ export default {
                     <div v-if="!isRoutePath" class="q-pa-xs">
                         <q-btn label="Strecke visualisieren" @click=showRoute class=""></q-btn>
                     </div>
-                    <div v-if="isRoutePath" class="q-pa-xs">
-                        <q-btn label="Strecken km aktualisieren" @click=refreshRoute class=""></q-btn>
-                    </div>
                 </div>
             </div>
         </div>
+        <q-page-sticky position="bottom-right" :offset="[10, 10]" >
+            <div class="q-mt-lg">
+                <q-fab
+                    label="Actions"
+                    vertical-actions-align="left"
+                    color="red"
+                    icon="keyboard_arrow_left"
+                    direction="left"
+                >
+                    <q-fab-action
+                        color="red"
+                        @click="onClickHome"
+                        icon="home"
+                    />
+                    <!--
+                    <q-fab-action
+                        v-if="!isRoutePath"
+                        color="red"
+                        @click="onClickRoute"
+                        icon="analytics"
+                    />
+                    <q-fab-action
+                        v-if="!isPointPath"
+                        color="red"
+                        @click="onClickPoint"
+                        icon="place"
+                    />-->
+                </q-fab>
+            </div>
+        </q-page-sticky>
     </div>
 </div>
 </template>
