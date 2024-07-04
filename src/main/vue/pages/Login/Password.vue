@@ -9,11 +9,13 @@ import Heading from "@/main/vue/pages/Login/Heading.vue";
 import Description from "@/main/vue/pages/Login/Description.vue";
 import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";
 import Impressum from "@/main/vue/pages/Login/Impressum.vue";
+import {useUserStore} from "../../stores/UserStore";
 
 const $q = useQuasar()
 const router = useRouter()
 const route = useRoute();
 const loginStore = useLoginStore()
+const userStore = useUserStore()
 
 const passwordVar = ref('')
 
@@ -21,7 +23,19 @@ async function password() {
     const email = route.query.email;
     const success = await loginStore.checkPassword(email, passwordVar.value)
     if (success) {
-        await router.push("map")
+        userStore.requestToken( {
+            username: email,
+            password: passwordVar.value
+        }).then( () => {
+            console.log("Success")
+        }).catch( () => {
+            $q.notify({
+                type: 'negative',
+                message: 'Something went wrong with the token',
+                caption: 'Password does not match email'
+            });
+        })
+        //await router.push("map")
     } else {
         $q.notify({
             type: 'negative',

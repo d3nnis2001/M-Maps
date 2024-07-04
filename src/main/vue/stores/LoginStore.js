@@ -1,5 +1,6 @@
 import {defineStore} from 'pinia'
 import {emailChecker, checkAccountDetails} from '../api/auth.js';
+import api from "../api";
 
 export const useLoginStore = defineStore('users', {
     actions: {
