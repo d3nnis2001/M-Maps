@@ -10,4 +10,5 @@ public interface SettingsService {
     Settings getImpressum();
     Settings editImpressum(String content);
     Colors editColors(Colors colors);
+    Colors getColors();
 }

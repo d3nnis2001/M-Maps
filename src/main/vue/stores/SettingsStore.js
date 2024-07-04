@@ -56,11 +56,24 @@ export const useSettingsStore = defineStore('settings', () => {
                 })
         })
     }
+    function getColors() {
+        return new Promise((resolve, reject) => {
+            api.settings.getColors()
+                .then(res => {
+                    changeColors(res.data)
+                    resolve()
+                })
+                .catch(() => {
+                    reject()
+                })
+        })
+    }
     return {
         impressum,
         success,
         getImpressum,
         editImpressum,
-        editColors
+        editColors,
+        getColors
     }
 })

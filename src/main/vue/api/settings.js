@@ -9,5 +9,8 @@ export default {
     },
     editColors(colors) {
         return axios.post('/api/settings/edit/colors', colors)
+    },
+    getColors() {
+        return axios.get('/api/settings/colors')
     }
 }

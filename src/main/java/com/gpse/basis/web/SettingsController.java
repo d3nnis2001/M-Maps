@@ -34,4 +34,8 @@ public class SettingsController {
     public Colors editColors(@RequestBody Colors colors) {
         return settingsService.editColors(colors);
     }
+    @GetMapping("/colors")
+    public Colors getColors() {
+        return settingsService.getColors();
+    }
 }

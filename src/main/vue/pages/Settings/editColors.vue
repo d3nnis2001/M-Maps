@@ -12,6 +12,7 @@ async function editColors() {
         primary: primary.value,
         secondary: secondary.value
     }
+    console.log(newColors)
     await settingsStore.editColors(newColors)
 }
 </script>
@@ -21,8 +22,8 @@ async function editColors() {
         <div>
             <h1 class="text-h4 text-black">Impressum ändern</h1>
             <div>
-                <q-color format-model="hex" v-model="primary"/>
-                <q-color format-model="hex" v-model="secondary"/>
+                <input type="color" v-model="primary" />
+                <input type="color" v-model="secondary" />
                 <q-btn label="Speichern" color="primary" @click="editColors"/>
             </div>
         </div>

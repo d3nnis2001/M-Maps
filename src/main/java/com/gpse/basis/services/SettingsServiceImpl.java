@@ -47,5 +47,12 @@ public class SettingsServiceImpl implements SettingsService {
         settings.setColors(colors);
         return settingsRepository.save(settings).getColors();
     }
+    @Override
+    public Colors getColors() {
+        List<Settings> items = new LinkedList<>();
+        settingsRepository.findAll().forEach(items::add);
+        Settings settings = items.getFirst();
+        return settings.getColors();
+    }
 
 }

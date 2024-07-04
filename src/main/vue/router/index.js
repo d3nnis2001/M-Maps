@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useSettingsStore } from "@/main/vue/stores/SettingsStore";
 
 import StartView from '../pages/Start.vue'
 import DataImport from "../pages/DataImport/DataImport.vue";
@@ -175,8 +176,9 @@ const router = createRouter({
     ]
 })
 
-router.beforeEach((to) => {
+router.beforeEach(async (to) => {
     document.title = to.name;
+    await useSettingsStore().getColors()
   // Something which should be executed before each routing
 })
 
