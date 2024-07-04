@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-import StartView from '../pages/Start.vue'
 import DataImport from "../pages/DataImport/DataImport.vue";
 import Login from '../pages/Login/Login.vue'
 import Registration from "../pages/Login/Registration.vue";
@@ -29,128 +28,172 @@ const router = createRouter({
         {
             path: '/',
             name: 'start',
-            component: Start
+            component: Start,
+            meta: {showLogin: false, authorized: false}
         },
         {
             path: '/map',
             name: 'map',
-            component: MapView
+            component: MapView,
+            meta: {showLogin: false, authorized: true}
         },
         {
             path: '/dataimport',
             name: 'dataimport',
-            component: DataImport
+            component: DataImport,
+            meta: {showLogin: false, authorized: true}
         },
         {
             path: '/archiv',
             name: 'archiv',
-            component: Archiv
-        },
-        {
-            path: "/",
-            name: "home",
-            component: StartView
+            component: Archiv,
+            meta: {showLogin: false, authorized: true}
         },
         {
             path: "/login",
             name: "login",
-            component: Login
+            component: Login,
+            meta: {showLogin: true, authorized: false}
         },
         {
             path: "/register",
             name: "register",
-            component: Registration
+            component: Registration,
+            meta: {showLogin: false, authorized: false}
         },
         {
             path: "/password",
             name: "password",
-            component: Password
+            component: Password,
+            meta: {showLogin: false, authorized: false}
         },
         {
             path: "/forgotPassword",
             name: "forgotPassword",
-            component: ForgotPassword
+            component: ForgotPassword,
+            meta: {showLogin: false, authorized: false}
         },
         {
             path: "/reset-password",
             name: "setNewPassword",
-            component: ResetPassword
+            component: ResetPassword,
+            meta: {showLogin: false, authorized: false}
         },
         {
             path: "/repair",
             name: "Repair",
-            component: ReparaturOverview
+            component: ReparaturOverview,
+            meta: {showLogin: false, authorized: true}
         },
         {
             path: "/repair/create",
             name: "RepairCreate",
-            component: ReparaturCreate
+            component: ReparaturCreate,
+            meta: {showLogin: false, authorized: true}
         },
         {
             path: "/repair/:name/edit",
             name: "RepairEdit",
-            component: ReparaturEdit
+            component: ReparaturEdit,
+            meta: {showLogin: false, authorized: true}
         },
         {
             path: "/repair-order-trackbuilder",
             name: "TrackBuilder",
-            component: TrackBuilderView
+            component: TrackBuilderView,
+            meta: {showLogin: false, authorized: true}
         },
         {
             path: "/admin",
             name: "adminmain",
-            component: AdminMain
+            component: AdminMain,
+            meta: {showLogin: false, authorized: true}
         },
         {
             path: "/admin/:username/editUser",
             name: "editUser",
-            component: EditUser
+            component: EditUser,
+            meta: {showLogin: false, authorized: true}
         },
         {
             path: "/inspectionOrder",
             name: "inspectionOrderOverview",
-            component: InspectionOrderOverview
+            component: InspectionOrderOverview,
+            meta: {showLogin: false, authorized: true}
         },
         {
             path: "/inspectionOrder/create",
             name: "createInspectionOrder",
-            component: CreateInspectionOrder
+            component: CreateInspectionOrder,
+            meta: {showLogin: false, authorized: true}
         },
         {
             path: "/inspectionOrder/:inspectionOrderId/edit",
             name: "editInspectionOrder",
-            component: EditInspectionOrder
+            component: EditInspectionOrder,
+            meta: {showLogin: false, authorized: true}
         },
         {
             path: "/impressum",
             name: "impressum",
+            meta: {showLogin: false, authorized: false}
         },
         {
             path: "/dataviewer",
             name: "dataviewer",
-            component: Dataviewer
+            component: Dataviewer,
+            meta: {showLogin: false, authorized: true}
         },
         {
             path: "/dataviewer/route/:id/from/:fromId/to/:toId",
             name: "dataviewerRoute",
-            component: DataviewerRoute
+            component: DataviewerRoute,
+            meta: {showLogin: false, authorized: true}
         },
         {
             path: "/dataviewer/route/:id",
             name: "dataviewerRouteOnly",
-            component: DataviewerRoute
+            component: DataviewerRoute,
+            meta: {showLogin: false, authorized: true}
         },
         {
             path: "/dataviewer/point/:pointId",
             name: "dataviewerPoint",
-            component: DataviewerPoint
+            component: DataviewerPoint,
+            meta: {showLogin: false, authorized: true}
         }
     ]
 })
 
 router.beforeEach((to) => {
     document.title = to.name;
-  // Something which should be executed before each routing
+
+
+
+    /*
+    const authenticated = axios.defaults.headers['Authorization'] != null;
+
+    if (to.name === 'forgotPassword') {
+        next()
+    }
+    if (to.name === 'map' && !authenticated) {
+        next({name: 'start'})
+    }
+
+
+    if (to.requiresAuth && !authenticated) {
+        next({name: 'start'})
+    } else if (to.requiresAuth && authenticated) {
+        next({name: 'start'});
+    } else if (!to.requiresAuth && to.name !== 'impressum' && authenticated) {
+        next({name: ''})
+    } else if (!to.requiresAuth && to.name === 'impressum' && authenticated) {
+        next()
+    } else if (!to.requiresAuth && to.name !== 'impressum' && to.name !== 'link' && authenticated) {
+        next({name: 'map'})
+    }
+
+     */
 })
 
 export default router

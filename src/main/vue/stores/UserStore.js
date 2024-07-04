@@ -48,42 +48,26 @@ export const useUserStore = defineStore('userStore', () => {
             console.log("FEHLER")
         })
     }
-
-    function isAdmin() {
-        decodeToken();
-        return userRoles.includes('Administrator')
-    }
-
-    function isPruefer() {
-        decodeToken();
+    function hasRole(role) {
+        console.log(userRoles.value)
         for (let i = 0; i < userRoles.value.length; i++) {
-            if (userRoles.value[i] === 'Prüfer') {
+            if (userRoles.value[i] === role) {
                 return true;
             }
         }
         return false;
     }
 
-    function isBearbeiter() {
-        return decodeToken().includes('Bearbeiter')
-    }
-
-    function isDatenverwalter() {
-        return decodeToken().includes('Datenverwalter')
-    }
-
     function logout() {
         authenticated.value = false;
         username.value = null;
+        localStorage.removeItem('token')
     }
     return {authenticated,
         authenticate,
         requestToken,
         logout,
-        isAdmin,
-        isPruefer,
-        isBearbeiter,
-        isDatenverwalter,
+        hasRole,
         decodeToken}
 })
 

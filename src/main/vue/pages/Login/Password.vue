@@ -21,10 +21,7 @@ const passwordVar = ref('')
 
 async function password() {
     const email = route.query.email;
-    console.log("TEST-checkPassword")
     const success = await loginStore.checkPassword(email, passwordVar.value)
-    console.log("email: ", email)
-    console.log("password: ", passwordVar.value)
     if (success) {
         userStore.requestToken( {
             username: email,
@@ -32,6 +29,7 @@ async function password() {
         }).then( () => {
             console.log("Success")
             userStore.decodeToken();
+            console.log("Test")
             router.push("map")
         }).catch( () => {
             $q.notify({

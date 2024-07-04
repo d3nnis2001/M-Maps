@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,7 @@ public class InspectionServicesImpl implements InspectionServices {
     }
 
     @Override
+    @PreAuthorize("hasRole('PRUEFER')")
     public void createInspectionOrder(ArrayList<String> inspecArray) {
         String defaultStatus = "beauftragt";
         String defaultUserId = " ";
