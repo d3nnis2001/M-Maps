@@ -33,18 +33,22 @@ async function editImpressum() {
 </script>
 
 <template>
-    <div class="align">
+    <div>
         <div>
-            <h1 class="text-h4">Aktuelles Impressum</h1>
-            <div>
-                {{impressum}}
+            <h1 class="text-h4 align">Aktuelles Impressum</h1>
+            <div class="margin">
+                <q-card flat bordered>
+                    <q-card-section v-html="impressum" />
+                </q-card>
             </div>
         </div>
         <div>
-            <h2 class="text-h4">Impressum ändern</h2>
+            <h2 class="text-h4 align">Impressum ändern</h2>
             <div>
-                <q-input type="textarea" v-model="text" filled class="padding"/>
-                <q-btn label="Speichern" color="primary" @click="editImpressum"/>
+                <q-editor class="margin" color="dark" v-model="text" min-height="5rem" />
+                <div class="align">
+                    <q-btn label="Speichern" color="primary" @click="editImpressum"/>
+                </div>
             </div>
         </div>
     </div>
@@ -52,10 +56,8 @@ async function editImpressum() {
 </template>
 
 <style scoped>
-.padding {
-    padding-left: 32px;
-    padding-right: 32px;
-    padding-bottom: 16px
+.margin {
+    margin: 32px;
 }
 .align {
     text-align: center
