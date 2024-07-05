@@ -1,8 +1,12 @@
 <script setup>
 import {ref} from "vue";
 import {useSettingsStore} from "@/main/vue/stores/SettingsStore";
+import {storeToRefs} from "pinia";
+import {useQuasar} from "quasar";
 
+const $q = useQuasar();
 const settingsStore = useSettingsStore()
+const {success} = storeToRefs(settingsStore)
 
 const primary = ref("")
 const accent = ref("")
@@ -23,6 +27,19 @@ async function editColors() {
         info: info.value
     }
     await settingsStore.editColors(newColors)
+    if (success.value) {
+        $q.notify({
+            type: "positive",
+            message: "Erfolg",
+            caption: "Die Farben-Konfiguration wurde erfolgreich aktualisiert"
+        })
+    } else {
+        $q.notify({
+            type: "negative",
+            message: "Fehler",
+            caption: "Die Farben-Konfiguration konnte nicht aktualisiert werden"
+        })
+    }
 }
 </script>
 
