@@ -20,19 +20,19 @@ const onClickReparaturauftraege = () => {
             <div class="q-mt-md">
                 <q-fab
                     vertical-actions-align="left"
-                    color="red"
+                    color="accent"
                     icon="keyboard_arrow_right"
                     direction="right"
                     :z-index="9999"
                 >
                     <q-fab-action
                         v-model="route"
-                        color="red"
+                        color="accent"
                         @click="onClickPruefauftraege"
                         icon="fact_check"
                     />
                     <q-fab-action
-                        color="red"
+                        color="accent"
                         @click="onClickReparaturauftraege"
                         icon="construction"
                     />

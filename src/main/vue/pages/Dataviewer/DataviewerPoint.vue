@@ -146,7 +146,7 @@ export default {
                         <q-tab-panels v-model="tab" animated>
                             <q-tab-panel name="mails">
                                 <div class="outline">
-                                    <q-linear-progress indeterminate color="black" v-if="!loaded" class="q-mt-sm">Loading</q-linear-progress>
+                                    <q-linear-progress indeterminate color="dark" v-if="!loaded" class="q-mt-sm">Loading</q-linear-progress>
                                     <apexchart v-else type="bar" height="350" :options="chartOptions" :series="series"></apexchart>
                                 </div>
                             </q-tab-panel>

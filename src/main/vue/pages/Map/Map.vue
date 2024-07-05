@@ -684,7 +684,7 @@ const addEnd = () => {
                         <q-item-section>
                             <q-toggle
                                 v-model="toggle_value"
-                                color="red"
+                                color="accent"
                                 keep-color
                                 readonly
                                 label="Geodata / Heatmap"
@@ -716,17 +716,17 @@ const addEnd = () => {
                         <div class="col">
                             <p>Regionen</p>
                             <div class="q-gutter-sm">
-                                <q-checkbox v-model="BY"  val="BY" label="BY" color="black"/>
-                                <q-checkbox v-model="BW"  val="BW" label="BW" color="black"/>
-                                <q-checkbox v-model="SW"  val="SW" label="SW" color="black"/>
+                                <q-checkbox v-model="BY"  val="BY" label="BY" color="dark"/>
+                                <q-checkbox v-model="BW"  val="BW" label="BW" color="dark"/>
+                                <q-checkbox v-model="SW"  val="SW" label="SW" color="dark"/>
                                 <q-checkbox v-model="H"  val="H" label="H" color="black"/>
-                                <q-checkbox v-model="SO"  val="SO" label="SO" color="black"/>
+                                <q-checkbox v-model="SO"  val="SO" label="SO" color="dark"/>
                             </div>
                             <div class="q-gutter-sm">
-                                <q-checkbox v-model="NRW"  val="NRW" label="NRW" color="black"/>
-                                <q-checkbox v-model="NO"  val="NO" label="NO" color="black"/>
-                                <q-checkbox v-model="NB"  val="NB" label="NB" color="black"/>
-                                <q-checkbox v-model="N"  val="N" label="N" color="black"/>
+                                <q-checkbox v-model="NRW"  val="NRW" label="NRW" color="dark"/>
+                                <q-checkbox v-model="NO"  val="NO" label="NO" color="dark"/>
+                                <q-checkbox v-model="NB"  val="NB" label="NB" color="dark"/>
+                                <q-checkbox v-model="N"  val="N" label="N" color="dark"/>
                             </div>
                         </div>
                     </q-item>

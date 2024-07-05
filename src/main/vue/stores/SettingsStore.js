@@ -1,7 +1,6 @@
 import {defineStore} from "pinia";
 import api from "../api";
 import {ref} from "vue";
-import {colors} from 'quasar';
 
 
 export const useSettingsStore = defineStore('settings', () => {

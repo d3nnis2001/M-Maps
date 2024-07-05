@@ -23,7 +23,8 @@ const links = [
     { name: 'dataimport', label: 'Datenverwaltung', to: '/dataimport' },
     { name: 'repair', label: 'Reparaturaufträge', to: '/repair' },
     { name: 'admin', label: 'Nutzerverwaltung', to: '/admin' },
-    { name: 'dataviewer', label: 'Dataviewer', to: '/dataviewer' }
+    { name: 'dataviewer', label: 'Dataviewer', to: '/dataviewer' },
+    { name: 'settings', label: 'Design anpassen', to: '/settings'}
 ]
 const links2 = [
     { name: 'home', label: 'Abmelden', to: '/' },
@@ -83,6 +84,18 @@ function changeBool() {
                 </q-toolbar-title>
                 <q-toolbar-title v-if="$route.name === 'dataviewerPoint'" align="middle">
                     Dataviewer für Punkt
+                </q-toolbar-title>
+                <q-toolbar-title v-if="$route.name === 'settings'" align="middle">
+                    Design anpassen
+                </q-toolbar-title>
+                <q-toolbar-title v-if="$route.name === 'editImpressum'" align="middle">
+                    Impressum
+                </q-toolbar-title>
+                <q-toolbar-title v-if="$route.name === 'editLogo'" align="middle">
+                    Logo
+                </q-toolbar-title>
+                <q-toolbar-title v-if="$route.name === 'editColors'" align="middle">
+                    Farben
                 </q-toolbar-title>
                 <q-btn dense flat round icon="menu" @click="toggleRightDrawer" align="right" />
             </q-toolbar>
