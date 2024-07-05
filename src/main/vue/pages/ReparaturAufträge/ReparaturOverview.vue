@@ -30,7 +30,9 @@ const state = reactive({
 
 const fetchData = async () => {
     const response = await repair();
-    state.rows = response.map(item => ({
+    state.rows = response
+        .filter(row => row.status !== 'archiviert')
+        .map(item => ({
         name: item.id,
         von: item.from,
         bis: item.till,

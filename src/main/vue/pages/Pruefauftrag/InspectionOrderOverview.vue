@@ -11,6 +11,8 @@ import {
 import {useQuasar} from "quasar";
 import axios from "axios";
 import {sendImage} from "@/main/vue/api/image";
+import {getUserByToken} from "../../api/admin";
+import {sendUsername} from "../../api/inspection";
 
 
 export default {
@@ -111,9 +113,15 @@ export default {
         }
 
         async function acceptInspectionOrder() {
-            // TODO: UserId Änderung!!!!
-            showDialog.value = false;
+            const token = localStorage.getItem('token')
             const id = currentRow.value.inspectionOrderId;
+            console.log(token)
+            if (token != null) {
+                const userId = await getUserByToken(token)
+                console.log(userId)
+                await sendUsername(id, userId.data)
+            }
+            showDialog.value = false;
             await sendNewStatus(id, "in Bearbeitung");
             updateRowStatus(id, "in Bearbeitung");
 
@@ -128,7 +136,6 @@ export default {
         }
 
         async function markFinished() {
-
             showPictureUploadDialog.value = false;
             showDialog.value = false;
             const id = currentRow.value.inspectionOrderId;
@@ -367,7 +374,7 @@ export default {
                     <q-separator />
                     <div class="option-button" v-if="currentRow.status !== 'abgeschlossen'" @click="showPictureUploadDialog = true">Auftrag abschließen</div>
                     <q-separator />
-                    <div class="option-button"  @click="acceptInspectionOrder">Auftrag annehmen </div>
+                    <div class="option-button" v-if="currentRow.status !== 'in Bearbeitung'" @click="acceptInspectionOrder">Auftrag annehmen </div>
                     <q-separator />
                     <div class="option-button" v-if="currentRow.status === 'beauftragt' && currentRow.status !== 'storniert'" @click="markCancelled">Stornieren</div>
                     <q-separator />

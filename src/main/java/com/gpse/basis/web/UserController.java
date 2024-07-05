@@ -111,4 +111,10 @@ public class UserController {
         ArrayList<String> roles = userService.getRoles(email, token);
         return roles;
     }
+    @PostMapping("/user/getUserByToken")
+    public String getUserByToken(final WebRequest request) {
+        String token = request.getParameter("token");
+        String username = userService.getUserByToken(token);
+        return username;
+    }
 }

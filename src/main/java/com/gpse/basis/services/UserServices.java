@@ -2,7 +2,6 @@ package com.gpse.basis.services;
 
 import com.gpse.basis.domain.UserModel;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.ArrayList;
 
@@ -20,4 +19,5 @@ public interface UserServices extends UserDetailsService {
     boolean unlockUser(String username);
     String getToken(String email, String password);
     ArrayList<String> getRoles(String email, String token);
+    String getUserByToken(String token);
 }

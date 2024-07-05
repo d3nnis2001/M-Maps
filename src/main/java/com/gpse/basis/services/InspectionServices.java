@@ -26,4 +26,6 @@ public interface InspectionServices {
     void unarchiveInspectionOrder(String id);
 
     void deleteArchivedInspectionOrder(String id);
+
+    void editUsername(String inspectionOrderId, String username);
 }

@@ -1,5 +1,5 @@
 <script>
-import { onMounted, ref } from 'vue';
+import {onMounted, onUnmounted, ref} from 'vue';
 import { useRoute } from 'vue-router';
 import {useQuasar} from "quasar";
 import {sendImage} from "../../api/image";
@@ -23,8 +23,13 @@ export default {
         const base64Strings = ref([]);
         const errormsg = ref([])
         const imagemsg = ref([])
+        const smallScreen = ref(false);
+        const largeScreen = ref(true);
 
         onMounted(async () => {
+            checkScreenSize();
+            window.addEventListener('resize', checkScreenSize);
+
             id.value = route.query.id;
             console.log(route.query.id);
             repairDetails.value = await getDetailsByID(id.value)
@@ -42,6 +47,16 @@ export default {
             console.log(terminationDate)
             console.log(terminationDate.value)
         });
+
+        onUnmounted(() => {
+            window.removeEventListener('resize', checkScreenSize);
+        });
+
+        const checkScreenSize = () => {
+            const screenSize = window.innerWidth;
+            smallScreen.value = screenSize <= 500;
+            largeScreen.value = screenSize > 500;
+        };
 
         function getDate() {
             const today = new Date();
@@ -214,7 +229,10 @@ export default {
 .outline {
     border: 2px solid $primary;
     padding: 20px;
+    margin: 10px;
     border-radius: 15px;
+    background-color: #F7F7F7;
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
 }
 
 .checklist {

@@ -139,5 +139,11 @@ public class InspectionServicesImpl implements InspectionServices {
         template.remove(q, InspectionOrder.class);
     }
 
+    public void editUsername(String inspectionOrderId, String username) {
+        InspectionOrder inspec2 = loadInspecById(inspectionOrderId);
+        inspec2.setUserId(username);
+        System.out.println("Success: " + username);
+        inspec.save(inspec2);
+    }
 
 }

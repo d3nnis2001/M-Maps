@@ -71,3 +71,16 @@ export const unlockUser = async function unlockUser(username) {
         return false
     }
 }
+
+export const getUserByToken = async function getUserByToken(token) {
+    try {
+        const cred = new URLSearchParams();
+        cred.append("token", token);
+        const response = await axios.post("/api/user/getUserByToken", cred);
+        console.log(response)
+        return response
+    } catch (error) {
+        console.error("Unseen error while try to unlock User: ", error);
+        return false
+    }
+}

@@ -148,4 +148,18 @@ public class UserServicesImpl implements UserServices {
         }
         return null;
     }
+
+    public String getUserByToken (String token) {
+        Iterable<UserModel> al = userRepo.findAll();
+        ArrayList<UserModel> user = new ArrayList<>();
+        for (UserModel userModel : al) {
+            user.add(userModel);
+        }
+        for (int i = 0; i < user.size(); i++) {
+            if (user.get(i).getUserToken().equals(token)) {
+                return user.get(i).getUsername();
+            }
+        }
+        return null;
+    }
 }
