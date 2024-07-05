@@ -12,4 +12,6 @@ public interface ChecklistService {
     Boolean changeRepChecklist(final String id, String[] ticked);
     ArrayList<String> getTickedwithId(String id);
     Boolean setTerminatedDate(String id, LocalDate term);
+
+    LocalDate getTerminationDate(String id);
 }

@@ -31,7 +31,7 @@ const router = createRouter({
             path: '/',
             name: 'start',
             component: Start,
-            meta: {showLogin: false, showHeader: true, authorized: false}
+            meta: {showLogin: false, showHeader: false, authorized: false}
         },
         {
             path: '/map',
@@ -103,7 +103,7 @@ const router = createRouter({
             path: "/repair-order-trackbuilder",
             name: "TrackBuilder",
             component: TrackBuilderView,
-            meta: {showLogin: false, showHeader: true, authorized: true}
+            meta: {showLogin: false, showHeader: false, authorized: false}
         },
         {
             path: "/admin",

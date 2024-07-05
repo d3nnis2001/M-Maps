@@ -91,7 +91,7 @@ public class ReparaturController {
         return ResponseEntity.ok(service.deleteOrder(name));
     }
 
-    @PostMapping("/getticked")
+    @GetMapping("/getticked")
     public ResponseEntity<ArrayList<String>> getTickedList(final WebRequest request) {
         String id = request.getParameter("id");
         return ResponseEntity.ok(checkService.getTickedwithId(id));
@@ -112,4 +112,11 @@ public class ReparaturController {
         emailService.builtEmailTrackBuilder(trackBuilderEmail, id);
         return ResponseEntity.ok(true);
     }
+    @PostMapping("/getTerminationDate")
+    public String getTerminationDate(final WebRequest request) {
+        String id = request.getParameter("id");
+        String date = checkService.getTerminationDate(id).toString();
+        return date;
+    }
+
 }

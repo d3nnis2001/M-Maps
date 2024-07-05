@@ -81,7 +81,7 @@ function toggleRightDrawer() {
                 </q-item-section>
             </q-item>
             <q-separator />
-            <q-item v-for="link in links2" :key="link.name" clickable tag="router-link" :to="link.to">
+            <q-item v-for="link in links2" :key="link.name" :click="userStore.logout()" clickable tag="router-link" :to="link.to">
                 <q-item-section>
                     <q-item-label class="text-center">{{ link.label }}</q-item-label>
                 </q-item-section>

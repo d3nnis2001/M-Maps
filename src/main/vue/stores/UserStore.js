@@ -57,10 +57,12 @@ export const useUserStore = defineStore('userStore', () => {
     }
 
     function logout() {
+        console.log("logout")
         authenticated.value = false;
         username.value = null;
         localStorage.removeItem('token')
     }
+
     return {authenticated,
         authenticate,
         requestToken,
