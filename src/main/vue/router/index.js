@@ -31,7 +31,7 @@ const router = createRouter({
             path: '/',
             name: 'start',
             component: Start,
-            meta: {showLogin: false, showHeader: false, authorized: false}
+            meta: {showLogin: false, showHeader: true, authorized: false}
         },
         {
             path: '/map',

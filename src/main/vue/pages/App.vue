@@ -1,17 +1,17 @@
 <script setup>
-import Header from "@/main/vue/pages/Header.vue";
-import Login from "@/main/vue/pages/Login/Login.vue";
+import Header from "@/main/vue/pages/Header.vue"
+import Login from "@/main/vue/pages/Login/Login.vue"
 </script>
 
 <template>
-    <Header v-if="$route.meta.showHeader">
-        <router-view/>
-    </Header>
-    <Login v-else-if="$route.meta.showLogin">
-        <router-view/>
-    </Login>
-    <router-view v-else/>
+    <q-layout view="hHh lpR fFf">
+        <Header v-if="$route.meta.showHeader"/>
+        <Login v-if="$route.meta.showLogin"/>
+        <q-page-container>
+            <router-view/>
+        </q-page-container>
+    </q-layout>
 </template>
 
-
-
+<style>
+</style>
