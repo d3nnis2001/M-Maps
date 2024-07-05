@@ -40,7 +40,12 @@ export const useSettingsStore = defineStore('settings', () => {
     }
     function changeColors(newColors) {
         document.body.style.setProperty("--q-primary", newColors.primary)
-        document.body.style.setProperty("--q-secondary", newColors.secondary)
+        document.body.style.setProperty("--q-accent", newColors.accent)
+        document.body.style.setProperty("--q-positive", newColors.positive)
+        document.body.style.setProperty("--q-negative", newColors.negative)
+        document.body.style.setProperty("--q-warning", newColors.warning)
+        document.body.style.setProperty("--q-info", newColors.info)
+        document.body.style.setProperty("--q-dark", newColors.dark)
     }
     function editColors(newColors) {
         return new Promise((resolve, reject) => {
