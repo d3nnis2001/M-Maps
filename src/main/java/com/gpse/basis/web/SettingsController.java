@@ -40,6 +40,12 @@ public class SettingsController {
     public Colors getColors() {
         return settingsService.getColors();
     }
+
+    /**
+     * This Method changes the Logo to the newly uploaded file.
+     * @param newLogo file of the uploaded picture
+     * @return the byte array which represents the uploaded logo
+     */
     @PostMapping("/edit/logo")
     public byte[] editLogo(@RequestPart(value = "file") MultipartFile newLogo) {
         try {

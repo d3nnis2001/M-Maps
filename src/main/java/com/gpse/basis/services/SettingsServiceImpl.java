@@ -16,6 +16,7 @@ import java.util.List;
  */
 @Service
 public class SettingsServiceImpl implements SettingsService {
+    private static final String PRIMARY_AND_DARK_COLOR  = "#282D37";
     private final SettingsRepository settingsRepository;
     @Autowired
     SettingsServiceImpl(SettingsRepository settingsRepository) {
@@ -27,7 +28,7 @@ public class SettingsServiceImpl implements SettingsService {
         List<Settings> items = new LinkedList<>();
         settingsRepository.findAll().forEach(items::add);
         if (items.size() == 0) {
-            return settingsRepository.save(new Settings("", new Colors("#AFFE11", "#AFFE22"), new byte[0]));
+            return settingsRepository.save(initializeSettings());
         }
         return items.getFirst();
     }
@@ -54,7 +55,7 @@ public class SettingsServiceImpl implements SettingsService {
         List<Settings> items = new LinkedList<>();
         settingsRepository.findAll().forEach(items::add);
         if (items.size() == 0) {
-            return settingsRepository.save(new Settings("", new Colors("#AFFE11", "#AFFE22"), new byte[0])).getColors();
+            return settingsRepository.save(initializeSettings()).getColors();
         }
         Settings settings = items.getFirst();
         return settings.getColors();
@@ -74,10 +75,16 @@ public class SettingsServiceImpl implements SettingsService {
         List<Settings> items = new LinkedList<>();
         settingsRepository.findAll().forEach(items::add);
         if (items.size() == 0) {
-            return settingsRepository.save(new Settings("", new Colors("#AFFE11", "#AFFE22"), new byte[0])).getLogo();
+            return settingsRepository.save(initializeSettings()).getLogo();
         }
         Settings settings = items.getFirst();
         return settings.getLogo();
+    }
+
+    @Override
+    public Settings initializeSettings() {
+        return new Settings("", new Colors(PRIMARY_AND_DARK_COLOR, "#ec0016", "#1e7f5e",
+            "#e21437", "#fec705", PRIMARY_AND_DARK_COLOR, "#31CCEC"), new byte[0]);
     }
 
 }

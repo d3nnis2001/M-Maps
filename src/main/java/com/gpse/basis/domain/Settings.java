@@ -14,6 +14,12 @@ public class Settings {
     private Colors colors;
     private byte[] logo;
 
+    /**
+     * This is the Constructor to first initialize the settings of the application.
+     * @param impressum text of the impressum
+     * @param colors colors of the application
+     * @param logo the picture to be displayed as the logo
+     */
     public Settings(String impressum, Colors colors, byte[] logo) {
         this.impressum = impressum;
         this.colors = colors;

@@ -16,4 +16,5 @@ public interface SettingsService {
     Colors getColors();
     byte[] editLogo(MultipartFile newLogo) throws IOException;
     byte[] getLogo();
+    Settings initializeSettings();
 }
