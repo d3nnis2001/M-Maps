@@ -33,15 +33,13 @@ export const useUserStore = defineStore('userStore', () => {
                 authenticate(null)
                 reject()
             })
-
-
         })
     }
     function decodeToken() {
         const token = localStorage.getItem("token")
         api.auth.getRoleByToken(token, username.value).then(res => {
             console.log(" ", res.data)
-            console.log("Success")
+            console.log("Success-UserStore")
             userRoles.value = res.data
             console.log(userRoles.value)
         }).catch(() => {

@@ -1,5 +1,7 @@
 <script setup>
+import axios from "axios";
 
+axios.defaults.headers['Authorization'] = null;
 </script>
 
 <template>

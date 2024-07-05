@@ -12,7 +12,7 @@ const links = [
     { name: 'repair', label: 'Reparaturaufträge', to: '/repair', roles: ['Prüfer', 'Bearbeiter'] },
     { name: 'inspectionOrderOverview', label: 'Prüfaufträge', to: '/inspectionOrder', roles: ['Prüfer', 'Bearbeiter']},
     { name: 'admin', label: 'Nutzerverwaltung', to: '/admin', roles: ['Admin'] },
-    { name: 'dataviewer', label: 'Dataviewer', to: '/dataviewer', roles: ['Prüfer', 'Bearbeiter', 'Admin', 'Datenverwalter'] }
+    { name: 'dataviewer', label: 'Dataviewer', to: '/dataviewer'}
 ]
 const links2 = [
     { name: 'home', label: 'Abmelden', to: '/' },
@@ -24,7 +24,6 @@ const links3 = [
 function toggleRightDrawer() {
     rightDrawerOpen.value = !rightDrawerOpen.value
 }
-
 
 </script>
 <template>
@@ -46,6 +45,15 @@ function toggleRightDrawer() {
                 </q-toolbar-title>
                 <q-toolbar-title v-if="$route.name === 'RepairEdit'" align="middle">
                     Reparaturauftrag bearbeiten
+                </q-toolbar-title>
+                <q-toolbar-title v-if="$route.name === 'inspectionOrderOverview'" align="middle">
+                    Prüfaufträge
+                </q-toolbar-title>
+                <q-toolbar-title v-if="$route.name === 'createInspectionOrder'" align="middle">
+                    Prüfauftrag erstellen
+                </q-toolbar-title>
+                <q-toolbar-title v-if="$route.name === 'editInspectionOrder'" align="middle">
+                    Prüfauftrag bearbeiten
                 </q-toolbar-title>
                 <q-toolbar-title v-if="$route.name === 'adminmain'" align="middle">
                     Nutzerverwaltung

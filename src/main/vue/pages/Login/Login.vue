@@ -9,6 +9,7 @@ import Heading from "@/main/vue/pages/Login/Heading.vue";
 import Description from "@/main/vue/pages/Login/Description.vue";
 import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";
 import StandardCard from "@/main/vue/pages/Login/StandardCard.vue";
+import axios from "axios";
 
 export default {
     components: {StandardCard, StandardInput, Description, Heading, Impressum},
@@ -19,6 +20,7 @@ export default {
         const userStore = useUserStore()
         const email = ref('')
 
+        axios.defaults.headers['Authorization'] = null;
         async function login() {
             console.log("TEST: login")
             if (!(email.value).includes("@")) {

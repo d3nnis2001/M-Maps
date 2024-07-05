@@ -7,7 +7,7 @@ import VueApexCharts from "vue3-apexcharts";
 import App from './pages/App.vue'
 import router from './router'
 
-//import store from "./stores";
+// import store from "./stores";
 
 import 'quasar/src/css/index.sass'
 import '@quasar/extras/material-icons/material-icons.css'

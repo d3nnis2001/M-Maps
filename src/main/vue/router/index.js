@@ -21,6 +21,8 @@ import EditUser from "@/main/vue/pages/Nutzerverwaltung/EditUser.vue";
 import Dataviewer from "@/main/vue/pages/Dataviewer/Dataviewer.vue";
 import DataviewerRoute from "@/main/vue/pages/Dataviewer/DataviewerRoute.vue";
 import DataviewerPoint from "@/main/vue/pages/Dataviewer/DataviewerPoint.vue";
+import axios from "axios";
+import Impressum from "@/main/vue/pages/Login/Impressum.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -29,145 +31,158 @@ const router = createRouter({
             path: '/',
             name: 'start',
             component: Start,
-            meta: {showLogin: false, authorized: false}
+            meta: {showLogin: false, showHeader: false, authorized: false}
         },
         {
             path: '/map',
             name: 'map',
             component: MapView,
-            meta: {showLogin: false, authorized: true}
+            meta: {showLogin: false, showHeader: true, authorized: true}
         },
         {
             path: '/dataimport',
             name: 'dataimport',
             component: DataImport,
-            meta: {showLogin: false, authorized: true}
+            meta: {showLogin: false, showHeader: true, authorized: true}
         },
         {
             path: '/archiv',
             name: 'archiv',
             component: Archiv,
-            meta: {showLogin: false, authorized: true}
+            meta: {showLogin: false, showHeader: true, authorized: true}
         },
         {
             path: "/login",
             name: "login",
             component: Login,
-            meta: {showLogin: true, authorized: false}
+            meta: {showLogin: true, showHeader: false, authorized: false}
         },
         {
             path: "/register",
             name: "register",
             component: Registration,
-            meta: {showLogin: false, authorized: false}
+            meta: {showLogin: false, showHeader: false, authorized: false}
         },
         {
             path: "/password",
             name: "password",
             component: Password,
-            meta: {showLogin: false, authorized: false}
+            meta: {showLogin: false, showHeader: false, authorized: false}
         },
         {
             path: "/forgotPassword",
             name: "forgotPassword",
             component: ForgotPassword,
-            meta: {showLogin: false, authorized: false}
+            meta: {showLogin: false, showHeader: false, authorized: false}
         },
         {
             path: "/reset-password",
             name: "setNewPassword",
             component: ResetPassword,
-            meta: {showLogin: false, authorized: false}
+            meta: {showLogin: false, showHeader: false, authorized: false}
         },
         {
             path: "/repair",
             name: "Repair",
             component: ReparaturOverview,
-            meta: {showLogin: false, authorized: true}
+            meta: {showLogin: false, showHeader: true, authorized: true}
         },
         {
             path: "/repair/create",
             name: "RepairCreate",
             component: ReparaturCreate,
-            meta: {showLogin: false, authorized: true}
+            meta: {showLogin: false, showHeader: true, authorized: true}
         },
         {
             path: "/repair/:name/edit",
             name: "RepairEdit",
             component: ReparaturEdit,
-            meta: {showLogin: false, authorized: true}
+            meta: {showLogin: false, showHeader: true, authorized: true}
         },
         {
             path: "/repair-order-trackbuilder",
             name: "TrackBuilder",
             component: TrackBuilderView,
-            meta: {showLogin: false, authorized: true}
+            meta: {showLogin: false, showHeader: true, authorized: true}
         },
         {
             path: "/admin",
             name: "adminmain",
             component: AdminMain,
-            meta: {showLogin: false, authorized: true}
+            meta: {showLogin: false, showHeader: true, authorized: true}
         },
         {
             path: "/admin/:username/editUser",
             name: "editUser",
             component: EditUser,
-            meta: {showLogin: false, authorized: true}
+            meta: {showLogin: false, showHeader: true, authorized: true}
         },
         {
             path: "/inspectionOrder",
             name: "inspectionOrderOverview",
             component: InspectionOrderOverview,
-            meta: {showLogin: false, authorized: true}
+            meta: {showLogin: false, showHeader: true, authorized: true}
         },
         {
             path: "/inspectionOrder/create",
             name: "createInspectionOrder",
             component: CreateInspectionOrder,
-            meta: {showLogin: false, authorized: true}
+            meta: {showLogin: false, showHeader: true, authorized: true}
         },
         {
             path: "/inspectionOrder/:inspectionOrderId/edit",
             name: "editInspectionOrder",
             component: EditInspectionOrder,
-            meta: {showLogin: false, authorized: true}
+            meta: {showLogin: false, showHeader: true, authorized: true}
         },
         {
             path: "/impressum",
             name: "impressum",
-            meta: {showLogin: false, authorized: false}
+            component: Impressum,
+            meta: {showLogin: false, showHeader: true, authorized: false}
         },
         {
             path: "/dataviewer",
             name: "dataviewer",
             component: Dataviewer,
-            meta: {showLogin: false, authorized: true}
+            meta: {showLogin: false, showHeader: true, authorized: true}
         },
         {
             path: "/dataviewer/route/:id/from/:fromId/to/:toId",
             name: "dataviewerRoute",
             component: DataviewerRoute,
-            meta: {showLogin: false, authorized: true}
+            meta: {showLogin: false, showHeader: true, authorized: true}
         },
         {
             path: "/dataviewer/route/:id",
             name: "dataviewerRouteOnly",
             component: DataviewerRoute,
-            meta: {showLogin: false, authorized: true}
+            meta: {showLogin: false, showHeader: true, authorized: true}
         },
         {
             path: "/dataviewer/point/:pointId",
             name: "dataviewerPoint",
             component: DataviewerPoint,
-            meta: {showLogin: false, authorized: true}
+            meta: {showLogin: false, showHeader: true, authorized: true}
         }
     ]
 })
 
-router.beforeEach((to) => {
+router.beforeEach((to, from, next) => {
+    const authenticated = axios.defaults.headers['Authorization'] !== null;
     document.title = to.name;
+    console.log(to.meta.authorized)
+    console.log(authenticated)
 
+    if (to.meta.authorized && authenticated) {
+        console.log("1")
+        next();
+    } else if (to.meta.authorized && !authenticated) {
+        console.log("2")
+        next({name: 'start'});
+    } else {
+        next();
+    }
 
 
     /*
@@ -179,8 +194,6 @@ router.beforeEach((to) => {
     if (to.name === 'map' && !authenticated) {
         next({name: 'start'})
     }
-
-
     if (to.requiresAuth && !authenticated) {
         next({name: 'start'})
     } else if (to.requiresAuth && authenticated) {
@@ -192,7 +205,6 @@ router.beforeEach((to) => {
     } else if (!to.requiresAuth && to.name !== 'impressum' && to.name !== 'link' && authenticated) {
         next({name: 'map'})
     }
-
      */
 })
 

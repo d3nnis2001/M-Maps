@@ -27,7 +27,7 @@ public class InspectionServicesImpl implements InspectionServices {
     }
 
     @Override
-    @PreAuthorize("hasRole('PRUEFER')")
+    @PreAuthorize("hasRole('Prüfer')")
     public void createInspectionOrder(ArrayList<String> inspecArray) {
         String defaultStatus = "beauftragt";
         String defaultUserId = " ";

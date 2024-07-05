@@ -10,6 +10,7 @@ import Description from "@/main/vue/pages/Login/Description.vue";
 import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";
 import Impressum from "@/main/vue/pages/Login/Impressum.vue";
 import {useUserStore} from "../../stores/UserStore";
+import axios from "axios";
 
 const $q = useQuasar()
 const router = useRouter()
@@ -18,6 +19,8 @@ const loginStore = useLoginStore()
 const userStore = useUserStore()
 
 const passwordVar = ref('')
+
+axios.defaults.headers['Authorization'] = null;
 
 async function password() {
     const email = route.query.email;
@@ -30,7 +33,7 @@ async function password() {
             console.log("Success")
             userStore.decodeToken();
             console.log("Test")
-            router.push("map")
+            router.push("/map")
         }).catch( () => {
             $q.notify({
                 type: 'negative',
