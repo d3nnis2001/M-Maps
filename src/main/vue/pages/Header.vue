@@ -2,6 +2,7 @@
 import {ref} from 'vue'
 import {RouterView} from 'vue-router'
 import {useUserStore} from "@/main/vue/stores/UserStore";
+import router from "../router";
 
 const rightDrawerOpen = ref(false)
 const userStore = useUserStore()
@@ -23,6 +24,13 @@ const links3 = [
 
 function toggleRightDrawer() {
     rightDrawerOpen.value = !rightDrawerOpen.value
+}
+
+function handleLinkClick(link) {
+    if (link.name === 'home') {
+        userStore.logout()
+        router.push("/")
+    }
 }
 
 </script>
@@ -81,7 +89,7 @@ function toggleRightDrawer() {
                 </q-item-section>
             </q-item>
             <q-separator />
-            <q-item v-for="link in links2" :key="link.name"  clickable tag="router-link" :to="link.to">
+            <q-item v-for="link in links2" @click="handleLinkClick(link)" :key="link.name"  clickable tag="router-link" :to="link.to">
                 <q-item-section>
                     <q-item-label class="text-center">{{ link.label }}</q-item-label>
                 </q-item-section>

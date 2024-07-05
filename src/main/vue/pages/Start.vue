@@ -27,8 +27,8 @@ const checkScreenSize = () => {
 <template>
 
     <div class="row extra-mar">
-        <q-btn flat color="white" text-color="black" @click="$router.push('/impressum')"  label="Impressum" />
-        <q-btn flat color="white" text-color="black" @click="$router.push('/login')" label="Login"/>
+        <q-btn style="margin-left: 20px" flat color="white" text-color="black" @click="$router.push('/impressum')"  label="Impressum" />
+        <q-btn style="margin-right: 20px" flat color="white" text-color="black" @click="$router.push('/login')" label="Login"/>
 
     </div>
     <div style="text-align: center;" v-if="!smallScreen && largeScreen">
@@ -56,5 +56,4 @@ const checkScreenSize = () => {
 </template>
 
 <style scoped>
-
 </style>
