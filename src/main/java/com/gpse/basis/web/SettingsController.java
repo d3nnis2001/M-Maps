@@ -5,6 +5,7 @@ import com.gpse.basis.domain.Settings;
 import com.gpse.basis.services.SettingsService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -63,7 +64,7 @@ public class SettingsController {
         }
     }
     @Operation(summary = "Lädt das Logo", description = "Funktion, um das aktuelle Logo zu laden.")
-    @GetMapping("/logo")
+    @GetMapping(value = "/logo", produces = MediaType.IMAGE_JPEG_VALUE)
     public byte[] getLogo() {
         return settingsService.getLogo();
     }

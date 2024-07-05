@@ -7,13 +7,10 @@ import {storeToRefs} from "pinia";
 let boolStart = true;
 
 const settingsStore = useSettingsStore()
+const {imageNotEmpty} = storeToRefs(settingsStore)
 
 onMounted(() => {
-    //const {imageURL} = storeToRefs(settingsStore)
-    settingsStore.getLogo().then((logo) => {
-        console.log(String.fromCharCode(null, new Uint8Array(logo)))
-        document.getElementById("bla").src = "data:image/jpeg;base64"
-    })
+    settingsStore.checkLogo()
 })
 
 
@@ -53,8 +50,8 @@ function changeBool() {
     <q-layout view="hHh lpR fFf" v-else>
         <q-header bordered class="q-py-xs" elevated>
             <q-toolbar>
-                <q-img :src="settingsStore.imageURL" align="left"></q-img>
-                <img src="" id="bla" />
+                <q-img v-if="imageNotEmpty" src="/api/settings/logo" align="left"></q-img>
+                <q-img v-else :src="`/src/main/resources/db-logo.png`" align="left"></q-img>
                 <q-toolbar-title v-if="$route.name === 'map'" align="middle">
                     M-MAPS
                 </q-toolbar-title>
