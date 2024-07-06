@@ -5,6 +5,9 @@ import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.util.List;
 
+/**
+ * Klasse für die Checkliste.
+ */
 @Document(collection = "Checklist")
 public class Checklist {
     @MongoId

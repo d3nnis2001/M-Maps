@@ -9,9 +9,13 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * ReparaturService.
+ */
 public interface ReparaturService {
     ArrayList<Reparatur> getRepData();
-    boolean addRepairOrder(int track, LocalDate date1, LocalDate date2, String authorized, Checklist checklist, String remarks, GeoCords geo);
+    boolean addRepairOrder(int track, LocalDate date1, LocalDate date2, String authorized, Checklist checklist,
+                           String remarks, GeoCords geo);
     Reparatur loadRepByName(final String repname) throws UsernameNotFoundException;
     Boolean changeStatus(String name, String newStatus);
 

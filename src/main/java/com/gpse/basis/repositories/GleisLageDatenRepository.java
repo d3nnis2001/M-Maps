@@ -4,6 +4,9 @@ import com.gpse.basis.domain.GleisLageDatenpunkt;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+/**
+ * GleisLageDatenRepository.
+ */
 @Repository
 public interface GleisLageDatenRepository extends CrudRepository<GleisLageDatenpunkt, String> {
 }
