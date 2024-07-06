@@ -80,6 +80,7 @@ export default {
                     freigabe.value, checkliste.value["label"], bem.value, vorLongitude.value, vorLatitude.value)
                 router.push({ path: "/repair" });
             }
+
         }
 
         return {

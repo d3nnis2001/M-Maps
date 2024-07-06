@@ -52,8 +52,8 @@ export default {
                 { name: 'endLocation', label: 'Zielort', align: 'left', field: 'endLocation', sortable: true },
                 { name: 'startTime', label: 'von', align: 'left', field: 'startTime' },
                 { name: 'endTime', label: 'bis', align: 'left', field: 'endTime' },
-                { name: 'inspectionData', label: 'Messdaten', align: 'left', field: 'inspectionData' },
-                { name: 'department', label: 'Fachabteilung', align: 'left', field: 'department' },
+                { name: 'inspectionData', label: 'Messdaten', align: 'left', field: 'inspectionData', sortable: true },
+                { name: 'department', label: 'Fachabteilung', align: 'left', field: 'department', sortable: true},
                 { name: 'status', label: 'Status', align: 'left', field: 'status' },
                 { name: 'priority', label: 'Priorität', align: 'left', field: 'priority', sortable: true }
             ],
@@ -462,9 +462,9 @@ export default {
                     </div>
                 </div>
                 <div>
-                    <div class="row">
+                    <div class="row info-row">
                         <p style="margin-left: 5px; font-weight: bold; margin-right: 5px"> Bemerkungen: </p>
-                        <p style="">{{ remarks }}</p>
+                        <p style="margin-left: 5px">{{ remarks }}</p>
                     </div>
                 </div>
                 <q-card-section>
@@ -507,4 +507,6 @@ export default {
 
 .q-uploader
     margin-left: 20px
+
+
 </style>

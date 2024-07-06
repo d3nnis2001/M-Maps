@@ -13,7 +13,7 @@ export default {
         const firstname = ref('')
         const lastname = ref('')
         const userRegion = ref({regions:[]})
-        const allRoles = ref(['Administrator', 'Datenverwalter', 'Bearbeiter', 'Prüfer']);
+        const allRoles = ref(['Administrator', 'Datenverwalter', 'Bearbeiter', 'Prüfer', 'Freigabeberechtigter']);
         const updatedRoles = ref({selected_roles: []})
         const {notify} = useQuasar();
 

@@ -183,7 +183,7 @@ router.beforeEach((to, from, next) => {
         if (!userStore.hasRole('Administrator') && to.name === 'adminmain' && to.name === 'EditUser') { // es fehlt: (|| to.name=== 'checkliste')
             console.log("TEST1")
             next({name: from.name})
-        } else if (!userStore.hasRole('Prüfer') && to.name === 'Repair' && to.name === 'RepairCreate' && to.name === 'RepairEdit') {
+        } else if ((!userStore.hasRole('Prüfer') || !userStore.hasRole('Freigabeberechtigter')) && to.name === 'Repair' && to.name === 'RepairCreate' && to.name === 'RepairEdit') {
             console.log("TEST2")
             next({name: from.name})
         } else if ((!userStore.hasRole('Prüfer') || !userStore.hasRole('Bearbeiter')) && to.name === 'inspectionOrderOverview' && to.name === 'createInspectionOrder' && to.name === 'editInspectionOrder') {
@@ -199,29 +199,6 @@ router.beforeEach((to, from, next) => {
     } else {
         next()
     }
-
-
-    /*
-    const authenticated = axios.defaults.headers['Authorization'] != null;
-
-    if (to.name === 'forgotPassword') {
-        next()
-    }
-    if (to.name === 'map' && !authenticated) {
-        next({name: 'start'})
-    }
-    if (to.requiresAuth && !authenticated) {
-        next({name: 'start'})
-    } else if (to.requiresAuth && authenticated) {
-        next({name: 'start'});
-    } else if (!to.requiresAuth && to.name !== 'impressum' && authenticated) {
-        next({name: ''})
-    } else if (!to.requiresAuth && to.name === 'impressum' && authenticated) {
-        next()
-    } else if (!to.requiresAuth && to.name !== 'impressum' && to.name !== 'link' && authenticated) {
-        next({name: 'map'})
-    }
-     */
 })
 
 export default router

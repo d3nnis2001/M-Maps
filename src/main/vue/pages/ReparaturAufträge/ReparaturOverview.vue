@@ -3,6 +3,7 @@ import { ref, reactive, onMounted, onUnmounted } from 'vue';
 import {deleteRepairOrder, repair, trackBuilderPathAxios, updateStatus} from "@/main/vue/api/reparatur";
 import router from "@/main/vue/router";
 import {useQuasar} from "quasar";
+import {useUserStore} from "../../stores/UserStore";
 
 const smallScreen = ref(false);
 const largeScreen = ref(true);
@@ -47,10 +48,15 @@ const checkScreenSize = () => {
     smallScreen.value = screenSize <= 500;
     largeScreen.value = screenSize > 500;
 };
+const userStore = useUserStore()
+const freigabeberechtigter = ref(false)
+const currentFreigabeberechtigter = ref('')
 
 onMounted(async () => {
     checkScreenSize();
     window.addEventListener('resize', checkScreenSize);
+    freigabeberechtigter.value = userStore.hasRole('Freigabeberechtigter')
+    currentFreigabeberechtigter.value = userStore.username;
     await fetchData();
 });
 
@@ -263,8 +269,8 @@ const finishRepairOrder = async (name) => {
                     <div class="option-button" v-if="currentRow.status === 'storniert'" @click="reapplyOrder">Neu beantragen</div>
                     <q-separator v-if="currentRow.status === 'terminiert'" />
                     <div class="option-button" v-if="currentRow.status === 'terminiert'" @click="showConfirmDialogtwo = true">Link an Gleisbauer</div>
-                    <q-separator v-if="currentRow.status === 'abgeschlossen'" />
-                    <div class="option-button" v-if="currentRow.status === 'abgeschlossen'" @click="finishRepairOrder(currentRow.name)">Bestätigen</div>
+                    <q-separator v-if="currentRow.status === 'abgeschlossen' && freigabeberechtigter" />
+                    <div class="option-button" v-if="currentRow.status === 'abgeschlossen' && freigabeberechtigter" @click="finishRepairOrder(currentRow.name)">Bestätigen</div>
                 </q-card-section>
                 <q-card-section>
                     <q-btn flat label="Schließen" color="primary" @click="showDialog = false"></q-btn>
