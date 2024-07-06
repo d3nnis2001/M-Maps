@@ -19,6 +19,8 @@ import java.util.Objects;
 @Service
 
 public class ReparaturServiceImpl implements ReparaturService {
+    private final String id_string = "_id";
+    private final String beauftragt_string = "beauftragt";
     private ReperaturRepository rep;
     private final RepChecklistRepository checkRepo;
 
@@ -36,8 +38,9 @@ public class ReparaturServiceImpl implements ReparaturService {
         Iterator<Reparatur> iterator = it.iterator();
         while (iterator.hasNext()) {
             Reparatur repSolo = iterator.next();
-            if(!repSolo.isArchived())
+            if (!repSolo.isArchived()) {
                 repArr.add(repSolo);
+            }
         }
         return repArr;
     }
@@ -47,7 +50,7 @@ public class ReparaturServiceImpl implements ReparaturService {
         String uniqueID = util.generateID();
         ArrayList<String> selected = new ArrayList<>();
         ReparaturChecklist check = new ReparaturChecklist(uniqueID, checklist, selected);
-        Reparatur newRep = new Reparatur(uniqueID, track, date1, date2, check, remarks, "beauftragt", authorized);
+        Reparatur newRep = new Reparatur(uniqueID, track, date1, date2, check, remarks, beauftragt_string, authorized);
         newRep.setGeocords(geo);
         rep.save(newRep);
         checkRepo.save(check);
@@ -63,8 +66,9 @@ public class ReparaturServiceImpl implements ReparaturService {
     public Boolean changeStatus(String name, String newStatus) {
         Reparatur repa = loadRepByName(name);
         repa.setStatus(newStatus);
-        if(Objects.equals(newStatus, "archiviert"))
+        if (Objects.equals(newStatus, "archiviert")) {
             repa.setArchived(true);
+        }
         rep.save(repa);
         return true;
     }
@@ -89,10 +93,10 @@ public class ReparaturServiceImpl implements ReparaturService {
     @Override
     public void unarchiveRep(String id) {
         var rep = template.findById(id, Reparatur.class);
-        if(rep != null) {
+        if (rep != null) {
             rep.setArchived(false);
             Query q = new Query();
-            q.addCriteria(Criteria.where("_id").is(id));
+            q.addCriteria(Criteria.where(id_string).is(id));
             template.replace(q, rep);
         }
     }
@@ -100,7 +104,7 @@ public class ReparaturServiceImpl implements ReparaturService {
     @Override
     public void deleteArchivedRep(String id) {
         Query q = new Query();
-        q.addCriteria(Criteria.where("_id").is(id));
+        q.addCriteria(Criteria.where(id_string).is(id));
         template.remove(q, Reparatur.class);
     }
 
@@ -112,7 +116,7 @@ public class ReparaturServiceImpl implements ReparaturService {
         Iterator<Reparatur> iterator = it.iterator();
         while (iterator.hasNext()) {
             Reparatur repSolo = iterator.next();
-            if(Objects.equals(repSolo.getStatus(), "beauftragt")){
+            if (Objects.equals(repSolo.getStatus(), beauftragt_string)) {
                 repArr.add(repSolo);
             }
         }

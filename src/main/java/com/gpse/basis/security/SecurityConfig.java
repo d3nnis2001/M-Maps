@@ -33,7 +33,8 @@ public class SecurityConfig {
     private final AuthenticationConfiguration configuration;
 
     @Autowired
-    public SecurityConfig(final UserDetailsService userDetailsService, final SecurityConstants securityConstants, final AuthenticationConfiguration configuration) {
+    public SecurityConfig(final UserDetailsService userDetailsService, final SecurityConstants securityConstants,
+                          final AuthenticationConfiguration configuration) {
         super();
         this.userDetailsService = userDetailsService;
         this.securityConstants = securityConstants;
