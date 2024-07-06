@@ -255,7 +255,7 @@ const removeRow = (selectedUser) => {
     </div>
 </template>
 
-<style scoped>
+<style>
 .option-button {
     cursor: pointer;
     padding: 8px;

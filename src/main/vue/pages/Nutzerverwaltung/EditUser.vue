@@ -152,7 +152,7 @@ export default {
 </template>
 
 
-<style scoped>
+<style>
 .checkbox-container .q-checkbox {
     font-size: 20px;
 }
