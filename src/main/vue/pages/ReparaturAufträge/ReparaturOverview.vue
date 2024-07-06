@@ -96,9 +96,9 @@ const archiveOrder = async () => {
 
 const reapplyOrder = async () => {
     const name = currentRow.name;
-    await updateStatus(name, "neu beauftragt");
-    currentRow.status = "neu beauftragt";
-    updateRowStatus(name, "neu beauftragt");
+    await updateStatus(name, "beauftragt");
+    currentRow.status = "beauftragt";
+    updateRowStatus(name, "beauftragt");
     showDialog.value = false;
 };
 
@@ -250,14 +250,14 @@ const finishRepairOrder = async (name) => {
         <q-dialog v-model="showDialog">
             <q-card>
                 <q-card-section>
-                    <div class="option-button" @click="editOrder">Bearbeiten</div>
-                    <q-separator v-if="currentRow.status !== 'abgeschlossen'" />
+                    <div class="option-button"  v-if="currentRow.status !== 'terminiert' && currentRow.status !== 'abgeschlossen' && currentRow.status !== 'storniert'" @click="editOrder">Bearbeiten</div>
+                    <q-separator v-if="currentRow.status !== 'terminiert' && currentRow.status !== 'abgeschlossen' && currentRow.status !== 'storniert'" />
                     <div class="option-button" v-if="currentRow.status === 'storniert'" @click="confirmDeleteOrder(currentRow)">Löschen</div>
-                    <q-separator v-if="currentRow.status === 'bestätigt'" />
-                    <div class="option-button" v-if="currentRow.status === 'bestätigt'" @click="archiveOrder">Archivieren</div>
-                    <q-separator v-if="currentRow.status !== 'abgeschlossen'" />
-                    <div class="option-button" v-if="currentRow.status !== 'storniert'" @click="cancelOrder">Stornieren</div>
                     <q-separator v-if="currentRow.status === 'abgeschlossen'" />
+                    <div class="option-button" v-if="currentRow.status === 'abgeschlossen'" @click="archiveOrder">Archivieren</div>
+                    <q-separator v-if="currentRow.status !== 'storniert' && currentRow.status !== 'terminiert'" />
+                    <div class="option-button" v-if="currentRow.status !== 'storniert' && currentRow.status !== 'terminiert'" @click="cancelOrder">Stornieren</div>
+                    <q-separator v-if="currentRow.status === 'storniert'" />
                     <div class="option-button" v-if="currentRow.status === 'storniert'" @click="reapplyOrder">Neu beantragen</div>
                     <q-separator v-if="currentRow.status === 'terminiert'" />
                     <div class="option-button" v-if="currentRow.status === 'terminiert'" @click="showConfirmDialogtwo = true">Link an Gleisbauer</div>

@@ -16,7 +16,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public final class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter { //<1>
+public final class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private static final int TEN_DAYS_IN_MILLIS = 864_000_000;
 
@@ -24,24 +24,25 @@ public final class JwtAuthenticationFilter extends UsernamePasswordAuthenticatio
 
     private final SecurityConstants securityConstants;
 
-    public JwtAuthenticationFilter(AuthenticationManager authenticationManager, SecurityConstants securityConstants) { //<2>
+    public JwtAuthenticationFilter(AuthenticationManager authenticationManager, SecurityConstants securityConstants) {
         this.authenticationManager = authenticationManager;
         this.securityConstants = securityConstants;
         setFilterProcessesUrl(this.securityConstants.getAuthLoginUrl());
     }
 
     @Override
-    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) { //<3>
+    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
+        UsernamePasswordAuthenticationToken authenticationToken =
+            new UsernamePasswordAuthenticationToken(username, password);
 
         return authenticationManager.authenticate(authenticationToken);
     }
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
-                                            FilterChain filterChain, Authentication authentication) { //<4>
+                                            FilterChain filterChain, Authentication authentication) {
         UserDetails user = (UserDetails) authentication.getPrincipal();
 
         List<String> roles = user.getAuthorities()
@@ -58,7 +59,7 @@ public final class JwtAuthenticationFilter extends UsernamePasswordAuthenticatio
             .audience().add(securityConstants.getTokenAudience())
             .and()
             .subject(user.getUsername())
-            .expiration(new Date(System.currentTimeMillis() + TEN_DAYS_IN_MILLIS)) // + 10 Tage
+            .expiration(new Date(System.currentTimeMillis() + TEN_DAYS_IN_MILLIS))
             .claim("rol", roles)
             .compact();
 
