@@ -15,14 +15,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class InitializeDatabase implements InitializingBean {
     private final UserRepository usRepo;
     private final InspectionOrderRepository ioRepo;
-    private final ReperaturRepository reRepo;
+    private final ReparaturRepository reRepo;
     private final ChecklistRepository checkRepo;
     private final GleisLageRangeRepository glrRepo;
 
     private final GeoTrackData geoTrackRepository;
 
     @Autowired
-    public InitializeDatabase(final UserRepository usRepo, final InspectionOrderRepository ioRepo, final ReperaturRepository reRepo,
+    public InitializeDatabase(final UserRepository usRepo, final InspectionOrderRepository ioRepo, final ReparaturRepository reRepo,
         final ChecklistRepository checkRepo, final GleisLageRangeRepository r, final GeoTrackData gTD) {
         this.usRepo = usRepo;
         this.ioRepo = ioRepo;
@@ -88,8 +88,14 @@ public class InitializeDatabase implements InitializingBean {
     }
 
     public void initInspectionOrder() {
-        InspectionOrder inspec1 = new InspectionOrder("p-1717767131183662", "1010", "", "Bielefeld Hbf", "Berlin Ostbahnhof", "2024/07/12", "2024/07/17", "DB Regio Schiene Nord-Ost (NO)", "Gleislagedaten", "in Bearbeitung", "Dringend!", false, "hoch");
-        InspectionOrder inspec2 = new InspectionOrder("p-1718015853290597", "1020", "", "Hamburg Hbf", "Berlin Ostbahnhof", "2024/09/12", "2024/09/17", "DB Regio Schiene Nord-Ost (NO)", "Gleislagedaten", "beauftrage", "", false, "hoch");
+        InspectionOrder inspec1 = new InspectionOrder("p-1717767131183662", "1010", "",
+            "Bielefeld Hbf", "Berlin Ostbahnhof", "2024/07/12", "2024/07/17",
+            "DB Regio Schiene Nord-Ost (NO)", "Gleislagedaten", "in Bearbeitung",
+            "Dringend!", false, "hoch");
+        InspectionOrder inspec2 = new InspectionOrder("p-1718015853290597", "1020", "",
+            "Hamburg Hbf", "Berlin Ostbahnhof", "2024/09/12", "2024/09/17",
+            "DB Regio Schiene Nord-Ost (NO)", "Gleislagedaten", "beauftrage", "",
+            false, "hoch");
         ioRepo.save(inspec1);
         ioRepo.save(inspec2);
     }

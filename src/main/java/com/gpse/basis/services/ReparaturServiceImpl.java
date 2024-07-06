@@ -2,7 +2,7 @@ package com.gpse.basis.services;
 
 import com.gpse.basis.domain.*;
 import com.gpse.basis.repositories.RepChecklistRepository;
-import com.gpse.basis.repositories.ReperaturRepository;
+import com.gpse.basis.repositories.ReparaturRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -11,7 +11,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -20,12 +19,12 @@ import java.util.Objects;
 @Service
 
 public class ReparaturServiceImpl implements ReparaturService {
-    private ReperaturRepository rep;
+    private ReparaturRepository rep;
     private RepChecklistRepository checkRepo;
 
     private MongoTemplate template;
     @Autowired
-    public ReparaturServiceImpl(ReperaturRepository rep, RepChecklistRepository checkRepo, MongoTemplate template) {
+    public ReparaturServiceImpl(ReparaturRepository rep, RepChecklistRepository checkRepo, MongoTemplate template) {
         this.rep = rep;
         this.checkRepo = checkRepo;
         this.template = template;

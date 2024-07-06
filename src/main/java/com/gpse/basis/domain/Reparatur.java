@@ -5,6 +5,9 @@ import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.time.LocalDate;
 
+/**
+ * Klasse für den Reparaturauftrag.
+ */
 @Document(collection = "Reparaturauftrag")
 public class Reparatur {
     @MongoId
@@ -19,7 +22,19 @@ public class Reparatur {
     private GeoCords geocords;
     private boolean archived = false;
 
-    public Reparatur(String id, int track, LocalDate from, LocalDate till, ReparaturChecklist checklist, String remarks, String status, String freigabeberechtigter) {
+    /**
+     * Reparatur Konstruktor.
+     * @param id -ID
+     * @param track - Strecke
+     * @param from - von
+     * @param till - bis
+     * @param checklist - Checkliste
+     * @param remarks - Bewertung
+     * @param status - Status
+     * @param freigabeberechtigter - Freigabeberechtigter
+     */
+    public Reparatur(String id, int track, LocalDate from, LocalDate till, ReparaturChecklist checklist,
+                     String remarks, String status, String freigabeberechtigter) {
         this.id = id;
         this.track = track;
         this.from = from;

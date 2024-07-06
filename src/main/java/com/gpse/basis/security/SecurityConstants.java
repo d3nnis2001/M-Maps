@@ -2,6 +2,9 @@ package com.gpse.basis.security;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+/**
+ * SecurityConstants.
+ */
 @ConfigurationProperties("security")
 public final class SecurityConstants {
     private String authLoginUrl;
