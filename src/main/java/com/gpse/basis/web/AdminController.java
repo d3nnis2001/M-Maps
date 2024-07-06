@@ -17,10 +17,10 @@ import java.util.Collections;
 public class AdminController {
     private final UserServices userService;
     private final String userName = "userName";
-
     public AdminController(UserServices userService) {
         this.userService = userService;
     }
+
     @Operation(summary = "Lädt Nutzerdaten",
         description = "Funktion um alle Nutzerdaten beim mounten der Seite in die Tabelle zu laden")
     @GetMapping("/getUserData")
