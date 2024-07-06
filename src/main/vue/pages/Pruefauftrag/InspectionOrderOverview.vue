@@ -13,6 +13,7 @@ import axios from "axios";
 import {sendImage} from "@/main/vue/api/image";
 import {getUserByToken} from "../../api/admin";
 import {sendUsername} from "../../api/inspection";
+import {useUserStore} from "@/main/vue/stores/UserStore";
 
 
 export default {
@@ -38,6 +39,10 @@ export default {
         const review = ref('');
         const finishedDate = ref('')
 
+        const userStore = useUserStore();
+        const bearbeiter = ref(false);
+        const pruefer = ref(false);
+
         const state = reactive ({
             filter: '',
             columns: [
@@ -62,6 +67,10 @@ export default {
         onMounted(async () => {
             checkScreenSize();
             window.addEventListener('resize', checkScreenSize);
+            bearbeiter.value = userStore.hasRole('Bearbeiter')
+            console.log("Bearbeiter: ", bearbeiter.value);
+            pruefer.value = userStore.hasRole('Prüfer');
+            console.log("Prüfer: ", pruefer.value)
             await fetchData();
 
         })
@@ -222,8 +231,6 @@ export default {
             };
         };
 
-
-
         async function uploadImage(imageString, name) {
             const res = await sendImage(currentRow.value.inspectionOrderId, imageString, name);
             if (res === false) {
@@ -320,7 +327,9 @@ export default {
             base64String,
             uploadImages,
             upload,
-            finishedDate
+            finishedDate,
+            bearbeiter,
+            pruefer
         }
     },
 }
@@ -366,19 +375,19 @@ export default {
         <q-dialog v-model="showDialog">
             <q-card>
                 <q-card-section>
-                    <div class="option-button" @click="editInspectionOrder">Bearbeiten</div>
-                    <q-separator  />
-                    <div class="option-button" v-if="currentRow.status === 'storniert'" @click="confirmDeleteOrder(currentRow)">Löschen</div>
-                    <q-separator />
-                    <div class="option-button" v-if="currentRow.status === 'abgeschlossen' && currentRow.status !== 'archiviert'" @click="archiveOrder">Archivieren</div>
-                    <q-separator />
-                    <div class="option-button" v-if="currentRow.status !== 'abgeschlossen'" @click="showPictureUploadDialog = true">Auftrag abschließen</div>
-                    <q-separator />
-                    <div class="option-button" v-if="currentRow.status !== 'in Bearbeitung'" @click="acceptInspectionOrder">Auftrag annehmen </div>
-                    <q-separator />
-                    <div class="option-button" v-if="currentRow.status === 'beauftragt' && currentRow.status !== 'storniert'" @click="markCancelled">Stornieren</div>
-                    <q-separator />
-                    <div class="option-button" v-if="currentRow.status === 'storniert' && currentRow.status !== 'beauftragt'" @click="markOrdered">Beauftragen</div>
+                    <div class="option-button" v-if="bearbeiter" @click="editInspectionOrder">Bearbeiten</div>
+                    <q-separator  v-if="currentRow.status === 'storniert' && bearbeiter"/>
+                    <div class="option-button" v-if="currentRow.status === 'storniert' && bearbeiter" @click="confirmDeleteOrder(currentRow)">Löschen</div>
+                    <q-separator v-if="currentRow.status === 'abgeschlossen' && currentRow.status !== 'archiviert' && bearbeiter"/>
+                    <div class="option-button" v-if="currentRow.status === 'abgeschlossen' && currentRow.status !== 'archiviert' && bearbeiter" @click="archiveOrder">Archivieren</div>
+                    <q-separator v-if="currentRow.status !== 'abgeschlossen' && pruefer"/>
+                    <div class="option-button" v-if="currentRow.status !== 'abgeschlossen' && pruefer" @click="showPictureUploadDialog = true">Auftrag abschließen</div>
+                    <q-separator v-if="currentRow.status !== 'in Bearbeitung' && pruefer"/>
+                    <div class="option-button" v-if="currentRow.status !== 'in Bearbeitung' && pruefer" @click="acceptInspectionOrder">Auftrag annehmen </div>
+                    <q-separator v-if="currentRow.status === 'beauftragt' && currentRow.status !== 'storniert' && bearbeiter"/>
+                    <div class="option-button" v-if="currentRow.status === 'beauftragt' && currentRow.status !== 'storniert' && bearbeiter" @click="markCancelled">Stornieren</div>
+                    <q-separator v-if="currentRow.status === 'storniert' && currentRow.status !== 'beauftragt' && bearbeiter" />
+                    <div class="option-button" v-if="currentRow.status === 'storniert' && currentRow.status !== 'beauftragt' && bearbeiter" @click="markOrdered">Beauftragen</div>
                     <q-separator />
                     <div class="option-button"  @click="showFurtherInformation">Weitere Informationen </div>
                 </q-card-section>

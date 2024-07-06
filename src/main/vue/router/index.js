@@ -23,6 +23,7 @@ import DataviewerRoute from "@/main/vue/pages/Dataviewer/DataviewerRoute.vue";
 import DataviewerPoint from "@/main/vue/pages/Dataviewer/DataviewerPoint.vue";
 import axios from "axios";
 import Impressum from "@/main/vue/pages/Login/Impressum.vue";
+import {useUserStore} from "@/main/vue/stores/UserStore";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -173,15 +174,30 @@ router.beforeEach((to, from, next) => {
     document.title = to.name;
     console.log(to.meta.authorized)
     console.log(authenticated)
+    const userStore = useUserStore();
 
-    if (to.meta.authorized && authenticated) {
-        console.log("1")
-        next();
-    } else if (to.meta.authorized && !authenticated) {
+    if (to.meta.authorized && !authenticated) {
         console.log("2")
         next({name: 'start'});
+    } else if (authenticated && !from.name === 'start') {
+        if (!userStore.hasRole('Administrator') && to.name === 'adminmain' && to.name === 'EditUser') { // es fehlt: (|| to.name=== 'checkliste')
+            console.log("TEST1")
+            next({name: from.name})
+        } else if (!userStore.hasRole('Prüfer') && to.name === 'Repair' && to.name === 'RepairCreate' && to.name === 'RepairEdit') {
+            console.log("TEST2")
+            next({name: from.name})
+        } else if ((!userStore.hasRole('Prüfer') || !userStore.hasRole('Bearbeiter')) && to.name === 'inspectionOrderOverview' && to.name === 'createInspectionOrder' && to.name === 'editInspectionOrder') {
+            console.log("TEST3")
+            next({name: from.name})
+        } else if ((!userStore.hasRole('Prüfer') || !userStore.hasRole('Datenverwalter')) && to.name === 'dataimport' ) {
+            console.log("TEST4")
+            next({name: from.name})
+        } else if ((!userStore.hasRole('Prüfer') || !userStore.hasRole('Bearbeiter'))  && to.name === 'archiv' ) {
+            console.log("TEST5")
+            next({name: from.name})
+        }
     } else {
-        next();
+        next()
     }
 
 

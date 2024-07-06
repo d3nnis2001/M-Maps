@@ -45,7 +45,8 @@ public class InitializeDatabase implements InitializingBean {
         user.addRole("Prüfer");
         user.addRole("Administrator");
         UserModel user2 = new UserModel("mauricemeise@gmx.net", "asdf", "Jochen", "Bauer");
-        user2.addRole("Administrator");
+        user2.addRole("Bearbeiter");
+        user2.addRole("Datenverwalter");
         UserModel user3 = new UserModel("affe@web.de", "affe", "Charlie", "Monkey");
         user3.addRole("Prüfer");
         user3.addRole("Datenverwalter");

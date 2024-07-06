@@ -36,7 +36,7 @@ const showConfirmDialog = ref(false);
 const currentRow = reactive({});
 const rowToDelete = ref(null);
 const {notify} = useQuasar();
-const allRoles = ['Admin', 'Datenverwalter', 'Bearbeiter', 'Prüfer'];
+const allRoles = ['Administrator', 'Datenverwalter', 'Bearbeiter', 'Prüfer'];
 
 async function getData() {
     const data = await getUserData()

@@ -37,7 +37,7 @@ function handleLinkClick(link) {
 <template>
     <q-header bordered class="q-py-xs" elevated>
         <q-toolbar>
-            <q-img :src="'/src/main/resources/db-logo.png'" align="left"></q-img>
+            <q-btn dense flat round icon="menu" @click="toggleRightDrawer" align="right" />
             <q-toolbar-title v-if="$route.name === 'map'" align="middle">
                 M-MAPS
             </q-toolbar-title>
@@ -77,7 +77,7 @@ function handleLinkClick(link) {
             <q-toolbar-title v-if="$route.name === 'dataviewerPoint'" align="middle">
                 Dataviewer für Punkt
             </q-toolbar-title>
-            <q-btn dense flat round icon="menu" @click="toggleRightDrawer" align="right" />
+            <q-img :src="'/src/main/resources/db-logo.png'" align="left"></q-img>
         </q-toolbar>
     </q-header>
 
