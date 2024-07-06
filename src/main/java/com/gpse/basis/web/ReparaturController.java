@@ -25,8 +25,6 @@ public class ReparaturController {
     private final String name_string = "name";
     private final String slash = "/";
     private final String id_string = "id";
-    private ReparaturService service;
-    private ChecklistService checkService;
     private final ReparaturService service;
     private final ChecklistService checkService;
     private final EmailServices emailService;
