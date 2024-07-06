@@ -3,14 +3,13 @@ import axios from 'axios';
 export const repair = async function getRepairs() {
     try {
         const response = await axios.get("/api/repair/getdata")
-        console.log(response.data)
         return response.data
     } catch (error) {
         console.error("Unseen error while registering:", error);
         return false
     }
 }
-export const sendRepair = async function sendRepair(track, from, till, authorized, checklist, remarks) {
+export const sendRepair = async function sendRepair(track, from, till, authorized, checklist, remarks, long, lat) {
     try {
         const cred = new URLSearchParams()
         cred.append("track", track)
@@ -19,6 +18,8 @@ export const sendRepair = async function sendRepair(track, from, till, authorize
         cred.append("authorized", authorized)
         cred.append("checklist", checklist)
         cred.append("remarks", remarks)
+        cred.append("longitude", long)
+        cred.append("latitude", lat)
         const response = await axios.post("/api/repair/senddata", cred)
         return response
     } catch (error) {
@@ -51,15 +52,78 @@ export const getDetailsByID = async function getDetailsByID(name) {
     }
 }
 
-export const updateValuesById = async function updateValuesById(values, id) {
+export const updateRepChecklist = async function updateRepChecklist(id, ticked) {
+    try {
+        console.log("Die angetikten: "+ticked)
+        const tickedString = ticked.join(',');
+        const cred = new URLSearchParams()
+        cred.append("id", id)
+        cred.append("ticked", tickedString)
+        const response = await axios.post("/api/repair/changeById", cred)
+        return response
+    } catch (error) {
+        console.log("Unseen error when making changes on a repair order")
+        return false
+    }
+}
+
+export const updateStatus = async function updateStatus(name, status) {
     try {
         const cred = new URLSearchParams()
-        cred.append("checkVals", values)
-        cred.append("id", id)
-        const response = await axios.post("/api/repair/changebyid", cred)
-        return response.data
+        cred.append("status", status)
+        cred.append("name", name)
+        const response = await axios.post("/api/repair/changestatus", cred)
+        return response
     } catch (error) {
-        console.error("Unseen error while trying to update Checklist in Backend:", error);
-        return false
+        console.log("Unseen error when changing the status")
+    }
+}
+
+export const deleteRepairOrder = async function deleteRepairOrder(name) {
+    try {
+        const cred = new URLSearchParams()
+        cred.append("name", name)
+        const response = await axios.post("/api/repair/deleterepairorder", cred)
+        return response
+    } catch (error) {
+        console.log("Unseen error when changing the status")
+    }
+}
+
+export const getTickedItems = async function getTickedItems(id) {
+    try {
+        const cred = new URLSearchParams()
+        cred.append("id", id)
+        const response = await axios.post("/api/repair/getticked", cred)
+        console.log(response)
+        return response
+    } catch (error) {
+        console.log("Unseen error when getting ticked items")
+    }
+}
+
+export const setTerminated = async function setTerminated(id, date) {
+    try {
+        const cred = new URLSearchParams()
+        cred.append("id", id)
+        cred.append("date", date)
+        const response = await axios.post("/api/repair/setterminated", cred)
+        return response
+    } catch (error) {
+        console.log("Unseen error when getting ticked items")
+    }
+}
+
+export const trackBuilderPathAxios = async function (email, id) {
+    try {
+        const cred = new URLSearchParams()
+        cred.append("email", email)
+        cred.append("id", id)
+        console.log(id)
+        console.log(email)
+        const response = await axios.post("api/repair/emailTrackBuilder",cred)
+        return response
+    } catch (error) {
+        console.log("Unseen error when sending the e-mail.")
     }
 }

@@ -1,32 +1,39 @@
 package com.gpse.basis;
 
-import com.gpse.basis.domain.Checklist;
-import com.gpse.basis.domain.ChecklistTemplate;
-import com.gpse.basis.domain.Reparatur;
-import com.gpse.basis.domain.UserModel;
-import com.gpse.basis.repositories.ChecklistRepository;
-import com.gpse.basis.repositories.ChecklistTemplateRepository;
-import com.gpse.basis.repositories.ReperaturRepository;
-import com.gpse.basis.repositories.UserRepository;
+import com.gpse.basis.domain.*;
+import com.gpse.basis.repositories.*;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
+@Profile("Name1")
 public class InitializeDatabase implements InitializingBean {
     private final UserRepository usRepo;
+    private final InspectionOrderRepository ioRepo;
     private final ReperaturRepository reRepo;
+    private final ChecklistRepository checkRepo;
+    private final GleisLageRangeRepository glrRepo;
     private final ChecklistTemplateRepository checklistTemplateRepository;
     private final ChecklistRepository checklistRepository;
+    private final GeoTrackData geoTrackRepository;
 
     @Autowired
-    public InitializeDatabase(final UserRepository usRepo,
-                              final ReperaturRepository reRepo, final ChecklistTemplateRepository checkRepo,
-                              final ChecklistRepository checklistRepository) {
+    public InitializeDatabase(final UserRepository usRepo, final InspectionOrderRepository ioRepo, final ReperaturRepository reRepo,
+                              final ChecklistRepository checkRepo, final GleisLageRangeRepository r, final GeoTrackData gTD,
+                              final ChecklistTemplateRepository checkRepo, final ChecklistRepository checklistRepository) {
         this.usRepo = usRepo;
+        this.ioRepo = ioRepo;
         this.reRepo = reRepo;
+        this.checkRepo = checkRepo;
+        this.glrRepo = r;
+        this.geoTrackRepository = gTD;
         this.checklistTemplateRepository = checkRepo;
         this.checklistRepository = checklistRepository;
     }
@@ -34,19 +41,77 @@ public class InitializeDatabase implements InitializingBean {
     @Override
     public void afterPropertiesSet() {
         initUsers();
-        initRepair();
+        initChecklists();
+        initRanges();
+        initGeoTrack();
+        initInspectionOrder();;
         initChecklistTemplates();
-        initRepair();
     }
-
     public void initUsers() {
         // Test User 1
         UserModel user = new UserModel("d3nnis.s@web.de", "hello", "Georg", "Bauer");
         user.addRole("Prüfer");
-        UserModel user2 = new UserModel("mauricemeise@gmx.net", "asdf", "Jochen", "Bauer");
         user.addRole("Admin");
+        UserModel user2 = new UserModel("mauricemeise@gmx.net", "asdf", "Jochen", "Bauer");
+        user2.addRole("Admin");
+        UserModel user3 = new UserModel("affe@web.de", "affe", "Charlie", "Monkey");
+        user3.addRole("Prüfer");
+        user3.addRole("Datenverwalter");
+        UserModel user4 = new UserModel("test", "abc", "Hi", "Du");
+        user4.addRole("Bearbeiter");
         usRepo.save(user);
         usRepo.save(user2);
+        usRepo.save(user3);
+        usRepo.save(user4);
+    }
+    public void initChecklists() {
+        ArrayList<String> items = new ArrayList<>();
+        items.add("Checker 1");
+        items.add("Checker 2");
+        items.add("Checker 3");
+        items.add("Checker 4");
+        items.add("Checker 5");
+        items.add("Checker 6");
+        items.add("Checker 7");
+        items.add("Checker 8");
+        items.add("Checker 9");
+        items.add("Checker 10");
+
+        Checklist check1 = new Checklist("Abarbeitung1", items);
+        Checklist check2 = new Checklist("Abarbeitung2", items);
+
+        checkRepo.save(check2);
+        checkRepo.save(check1);
+    }
+
+    public void initRanges() {
+        glrRepo.deleteAll();
+        GleisLageRange range1 = new GleisLageRange(GleisLageRange.Level.SRA, 12, 10, 8, 6, 5);
+        GleisLageRange range2 = new GleisLageRange(GleisLageRange.Level.SR100, 15, 13, 11, 9, 7);
+        GleisLageRange range3 = new GleisLageRange(GleisLageRange.Level.SRLIM, 21, 17, 14, 11, 9);
+        glrRepo.save(range1);
+        glrRepo.save(range2);
+        glrRepo.save(range3);
+    }
+
+    public void initInspectionOrder() {
+        InspectionOrder inspec1 = new InspectionOrder("p-1717767131183662", "1010", "", "Bielefeld Hbf", "Berlin Ostbahnhof", "2024/07/12", "2024/07/17", "DB Regio Schiene Nord-Ost (NO)", "Gleislagedaten", "in Bearbeitung", "Dringend!", false, "hoch");
+        InspectionOrder inspec2 = new InspectionOrder("p-1718015853290597", "1020", "", "Hamburg Hbf", "Berlin Ostbahnhof", "2024/09/12", "2024/09/17", "DB Regio Schiene Nord-Ost (NO)", "Gleislagedaten", "beauftrage", "", false, "hoch");
+        ioRepo.save(inspec1);
+        ioRepo.save(inspec2);
+    }
+
+
+    public void initGeoTrack() {
+        Iterable<GeoData> lst = geoTrackRepository.findAll();
+        AtomicBoolean found = new AtomicBoolean(false);
+        lst.forEach(w -> {
+            if(w.getStrecken_id() == 1) {
+                found.set(true);
+            }
+        });
+        if(!found.get())
+            geoTrackRepository.save(new GeoData(1, 52.17027,  9.08446,0, "1"));
     }
     public void initChecklistTemplates() {
         // Test Checklist Template 1
@@ -54,32 +119,5 @@ public class InitializeDatabase implements InitializingBean {
         LinkedList<String> material = new LinkedList<>(Arrays.asList("Material 1", "Material 2", "Material 3"));
         ChecklistTemplate example = new ChecklistTemplate("Template 1", tasks, material);
         checklistTemplateRepository.save(example);
-    }
-
-    public void initRepair() {
-        // Reparaturauftrag 1
-        Date datefrom = new Date(2024, 02, 10, 10, 10, 10);
-        Date datetill = new Date(2024, 03, 10, 10, 10, 10);
-        ArrayList<String> items = new ArrayList<>();
-        items.add("Checker 1");
-        items.add("Checker 2");
-        Checklist check1 = new Checklist("Abarbeitung1", items, items);
-        Reparatur rep = new Reparatur("1", 6200, datefrom, datetill, check1,
-            "Alles gut hier", "storniert", "Müller");
-
-        // Reparaturauftrag 2
-        Date datefrom2 = new Date(2023, 02, 10, 10, 10, 10);
-        Date datetill2 = new Date(2023, 03, 10, 10, 10, 10);
-        ArrayList<String> items2 = new ArrayList<>();
-        items2.add("Checker 1");
-        items2.add("Checker 2");
-
-        Checklist check2 = new Checklist("Abarbeitung2", items, items2);
-        checklistRepository.save(check2);
-        checklistRepository.save(check1);
-        Reparatur rep2 = new Reparatur("2", 6300, datefrom2, datetill2, check2,
-            "Auch alles gut hier", "neu beauftragt", "Heinz");
-        reRepo.save(rep);
-        reRepo.save(rep2);
     }
 }

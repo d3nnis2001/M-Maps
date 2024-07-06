@@ -3,18 +3,30 @@ package com.gpse.basis.services;
 import com.gpse.basis.domain.DataSet;
 import com.gpse.basis.domain.FileUploadResponse;
 import com.gpse.basis.domain.GeoData;
+import com.gpse.basis.domain.GleisLageDatenpunkt;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public interface FileService {
-    List<FileUploadResponse> handleImport(List<MultipartFile> files, List<String> streckenIds);
+    List<FileUploadResponse> handleImport(List<String> paths, List<String> streckenIds);
     List<DataSet> getDataSets(String searchString);
 
     void deleteDataSetsById(List<String> ids);
-    void saveLHHFile(MultipartFile file) throws IOException, IndexOutOfBoundsException;
-    ArrayList<GeoData> getGeoData();
+    void saveLHHFile(File file) throws IOException, IndexOutOfBoundsException;
+    List<List<String>> readFoler(String path);
 
+
+    ArrayList<GeoData> getTrackGeoData(int trackId);
+    ArrayList<GleisLageDatenpunkt> getAllTrackData();
+    ArrayList<GleisLageDatenpunkt> getTrackData(int trackId);
+    ArrayList<String> getDataforId(int trackId);
+    ArrayList<GleisLageDatenpunkt> getData(int trackId);
+    GeoData getPointInformation(String pointId);
+    ArrayList<GleisLageDatenpunkt> getPointData(String pointId);
 }

@@ -1,44 +1,43 @@
 <template>
     <q-page>
-            <q-page-sticky position="bottom-left" :offset="[10, 10]">
-                <div class="q-mt-md">
+        <importComponent v-if="route === 0" />
+        <deleteComponent v-if="route === 1" />
+        <configureComponent v-if="route === 2"/>
+            <q-page-sticky position="bottom-right" :offset="[10, 10]" >
+                <div class="q-mt-lg">
                     <q-fab
                         label="Actions"
                         vertical-actions-align="left"
                         color="red"
-                        icon="keyboard_arrow_up"
-                        direction="up"
+                        icon="keyboard_arrow_left"
+                        direction="left"
                     >
                         <q-fab-action
                             v-model="route"
                             color="red"
                             @click="onClickAdd"
                             icon="add"
-                            label="add"
                         />
                         <q-fab-action
                             color="red"
                             @click="onClickDelete"
                             icon="delete"
-                            label="delete"
                         />
                         <q-fab-action
                             color="red"
-                            @click="onClickAnalytics"
+                            @click="onClickConfigure"
                             icon="analytics"
-                            label="configure"
                         />
                     </q-fab>
                 </div>
             </q-page-sticky>
-            <importComponent v-if="route == 0" />
-            <deleteComponent v-if="route == 1" />
     </q-page>
 </template>
 
 <script>
 import importComponent from "./importComponent.vue";
 import deleteComponent from "./deleteComponent.vue";
+import ConfigureComponent from "@/main/vue/pages/DataImport/ConfigureComponent.vue";
 
 export default {
     name: "DataImport",
@@ -54,8 +53,11 @@ export default {
         onClickDelete() {
             this.route = 1;
         },
+        onClickConfigure() {
+            this.route = 2;
+        }
     },
-    components: { deleteComponent, importComponent },
+    components: {ConfigureComponent, deleteComponent, importComponent },
     setup() {},
 };
 </script>

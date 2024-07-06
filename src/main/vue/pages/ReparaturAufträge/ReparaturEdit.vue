@@ -1,49 +1,98 @@
 <script>
-
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import { getDetailsByID } from "@/main/vue/api/reparatur";
+import {
+    getDetailsByID,
+    getTickedItems,
+    setTerminated,
+    updateRepChecklist,
+    updateStatus
+} from "@/main/vue/api/reparatur";
+import router from "@/main/vue/router";
 
 export default {
     setup() {
         const route = useRoute();
         const repairDetails = ref({});
-        const ticked = ref([])
-        const options = ref([])
+        const ticked = ref([]);
+        const date = ref(getDate())
+        const options = ref([]);
+        const terminationDate = ref('');
 
         onMounted(async () => {
             const name = route.params.name;
             repairDetails.value = await getDetailsByID(name);
-            for (let i = 0;i<repairDetails.value.checklist.items.length;i++) {
-                options.value.push({label: repairDetails.value.checklist.items[i], value: i})
+
+            if (repairDetails.value && repairDetails.value.checklist) {
+                for (let i = 0; i < repairDetails.value.checklist.checkSel.length; i++) {
+                    ticked.value.push({label: repairDetails.value.checklist.checkSel.get(i), value: i});
+                }
+                for (let i = 0; i < repairDetails.value.checklist.checkPoints.items.length; i++) {
+                    options.value.push({label: repairDetails.value.checklist.checkPoints.items[i], value: i});
+                }
             }
+            const tickedData = await getTickedItems(repairDetails.value.id);
+            ticked.value = tickedData.data.map(item => parseInt(item, 10));
         });
 
-        function saveData() {
-            console.log(ticked.value)
-            const response = updateValuesById()
+        function allChecked() {
+            if (repairDetails.value && repairDetails.value.checklist && repairDetails.value.checklist.checkPoints) {
+                return ticked.value.length === repairDetails.value.checklist.checkPoints.items.length;
+            }
+            return false;
         }
+        function getDate() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            return `${year}/${month}/${day}`;
+        }
+        async function saveChanges() {
+            if (allChecked()) {
+                await updateStatus(repairDetails.value.id, "terminiert");
+                await setTerminated(repairDetails.value.id, date.value);
+            }
+            await updateRepChecklist(repairDetails.value.id, ticked.value);
+            await router.push({ path: "/repair" });
+        }
+
         return {
             repairDetails,
             ticked,
             options,
-            saveData
+            saveChanges,
+            terminationDate,
+            allChecked,
+            date
         };
     }
 }
-
 </script>
 
 <template>
     <div class="outline">
         <div class="outer-layer">
             <div>
-                <p>ID: {{ repairDetails.id }}</p>
-                <p>Zeitraum: {{ repairDetails.from }}</p>
-                <p>Freigabeberechtigter: {{ repairDetails.freigabeberechtigter }}</p>
-                <p>Status: {{ repairDetails.status }}</p>
+                <div class="row">
+                    <p style="margin-right: 5px">ID: </p>
+                    <p style="font-weight: bold">{{ repairDetails.id }}</p>
+                </div>
+                <div class="row">
+                    <p style="margin-right: 5px">Zeitraum: </p>
+                    <p style="font-weight: bold">{{ repairDetails.from }}</p>
+                </div>
+                <div class="row">
+                    <p style="margin-right: 5px">Freigabeberechtigter: </p>
+                    <p style="font-weight: bold">{{ repairDetails.freigabeberechtigter}}</p>
+                </div>
+                <div class="row">
+                    <p style="margin-right: 5px">Status: </p>
+                    <p style="font-weight: bold">{{ repairDetails.status }}</p>
+                </div>
             </div>
-            <h5>Checkliste</h5>
+            <q-separator size="2px" color="primary" style="margin-top: 30px"></q-separator>
+            <p class="checklist">Checkliste</p>
             <div class="outline-nomar">
                 <div class="q-pa-md">
                     <q-option-group
@@ -53,24 +102,59 @@ export default {
                     />
                 </div>
             </div>
-            <q-btn label="Speichern" color="grey" @click="saveData" class=""></q-btn>
+            <q-btn v-if="allChecked() === false" style="width: 100%; max-width: 218px" size="16px" no-caps rounded label="Speichern" color="primary" @click=saveChanges></q-btn>
+            <div v-if="allChecked()">
+                <div class="column">
+                    <q-input filled style="width: 218px" v-model="date" mask="date" :rules="['date']">
+                        <template v-slot:append>
+                            <q-icon name="event" class="cursor-pointer">
+                                <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                                    <q-date v-model="date">
+                                        <div class="row items-center justify-end">
+                                            <q-btn v-close-popup label="Close" color="primary" flat />
+                                        </div>
+                                    </q-date>
+                                </q-popup-proxy>
+                            </q-icon>
+                        </template>
+                    </q-input>
+                    <q-btn style="width: 100%; max-width: 218px" size="16px" no-caps rounded label="Terminieren" color="primary" @click=saveChanges></q-btn>
+                </div>
+            </div>
         </div>
     </div>
 </template>
 
-<style scoped>
-
+<style lang="scss">
 .outer-layer {
     margin: 20px;
 }
 .outline {
-    border: 1px solid black;
-    padding: 10px;
-    margin: 20px;
+    border: 2px solid $primary;
+    padding: 20px;
+    border-radius: 15px;
 }
+
+.checklist {
+    font-weight: bold;
+    font-size: 30px;
+    margin-top: 30px;
+}
+
+.q-option-group {
+    max-height: 175px;
+    overflow-y: auto;
+}
+
+
+p {
+    font-weight: normal;
+}
+
 .outline-nomar {
-    border: 1px solid black;
+    border: 2px solid $primary;
     padding: 10px;
     margin-bottom: 20px;
+    border-radius: 15px;
 }
 </style>

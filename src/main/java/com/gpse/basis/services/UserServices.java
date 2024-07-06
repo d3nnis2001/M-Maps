@@ -1,12 +1,13 @@
 package com.gpse.basis.services;
 
 import com.gpse.basis.domain.UserModel;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.web.context.request.WebRequest;
 
 import java.util.ArrayList;
 
+/**
+ * UserService with the extention UserDetailsService.
+ */
 public interface UserServices extends UserDetailsService {
     boolean checkExistanceEmail(String email);
     boolean addUser(UserModel us);
@@ -15,4 +16,10 @@ public interface UserServices extends UserDetailsService {
     String getToken(String email);
     boolean setPasswordNew(String email, String password, String token);
     ArrayList<UserModel> getAllUsers();
+    UserModel loadUserByUsername(String email);
+    boolean updateRoles(String email, ArrayList<String> roles);
+
+    UserModel getUserByUsername(String username);
+
+    boolean unlockUser(String username);
 }

@@ -3,17 +3,15 @@ package com.gpse.basis.services;
 import com.gpse.basis.domain.UserModel;
 import com.gpse.basis.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Optional;
 
+/**
+ * UserServiceImpl for all functions for the UserModel.
+ */
 @Service
 public class UserServicesImpl implements UserServices {
     private final UserRepository userRepo;
@@ -28,6 +26,7 @@ public class UserServicesImpl implements UserServices {
         return userRepo.findById(username)
             .orElseThrow(() -> new UsernameNotFoundException("ExampleUser name " + username + " not found."));
     }
+
     @Override
     public boolean checkExistanceEmail(String email) {
         return userRepo.existsById(email);
@@ -38,16 +37,27 @@ public class UserServicesImpl implements UserServices {
         return true;
     }
     @Override
-    public boolean deleteUser(String email) {
-        return true;
+    public boolean deleteUser(String username) {
+        try {
+            Optional<UserModel> user = userRepo.findById(username);
+            user.ifPresent(userRepo::delete);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
+    /**
+     * Credentials.
+     * @param email Email
+     * @param password Password
+     * @return boolean
+     */
     public boolean checkCredentials(String email, String password) {
         Optional<UserModel> userOpt = userRepo.findById(email);
         if (userOpt.isPresent()) {
             UserModel user = userOpt.get();
-            boolean equal = password.equals(user.getPassword());
-            return equal;
+            return password.equals(user.getPassword());
         }
         return false;
     }
@@ -76,12 +86,58 @@ public class UserServicesImpl implements UserServices {
     public ArrayList<UserModel> getAllUsers() {
         Iterable<UserModel> iterable = userRepo.findAll();
         ArrayList<UserModel> users = new ArrayList<>();
-        Iterator<UserModel> iterator = iterable.iterator();
-        while (iterator.hasNext()) {
-            UserModel userModel = iterator.next();
+        for (UserModel userModel : iterable) {
             users.add(userModel);
             System.out.println(userModel.getLastname());
         }
         return users;
+    }
+    @Override
+    public boolean updateRoles(String username, ArrayList<String> newRoles) {
+        UserModel us = getUserByUsername(username);
+        ArrayList<String> oldRoles = us.getRoles();
+        ArrayList<String> toDelete = new ArrayList<>();
+        if (oldRoles != null) {
+            if (oldRoles.contains("") && oldRoles.size() == 1) {
+                oldRoles.remove("");
+                newRoles.remove("");
+                us.deleteRole("");
+                userRepo.save(us);
+            } else {
+                for (String oldRole : oldRoles) {
+                    if (!newRoles.contains(oldRole)) {
+                        toDelete.add(oldRole);
+                    }
+                }
+                for (String role : toDelete) {
+                    us.deleteRole(role);
+                }
+            }
+        }
+        for (String newRole : newRoles) {
+            us.addRole(newRole);
+        }
+        System.out.println(us.getRoles());
+        userRepo.save(us);
+        return true;
+    }
+
+    @Override
+    public UserModel getUserByUsername(final String username) {
+        Optional<UserModel> user = userRepo.findById(username);
+        return user.orElse(null);
+    }
+
+    /**
+     * Sets the variable "unlocked" to true, so the user can use tha app.
+     * @param username
+     * @return boolean
+     */
+    public boolean unlockUser(final String username) {
+        UserModel us = getUserByUsername(username);
+        us.setUnlocked(true);
+        System.out.println(us.getUnlocked());
+        userRepo.save(us);
+        return true;
     }
 }
