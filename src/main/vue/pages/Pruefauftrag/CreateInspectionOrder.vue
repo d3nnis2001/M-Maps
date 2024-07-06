@@ -248,14 +248,15 @@ p {
 
 .checkListInput {
     width: 100%;
-    max-width: 288px;
+    max-width: 50px;
     margin-bottom: 20px;
     margin-right: 20px;
 }
 
 .extra-mar {
-    margin-bottom: 20px;
+    margin-bottom: 20px
 }
+
 </style>
 
 

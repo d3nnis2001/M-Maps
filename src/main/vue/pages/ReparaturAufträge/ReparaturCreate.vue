@@ -19,6 +19,7 @@ export default {
         const router = useRouter()
         let vorLatitude = ref('')
         let vorLongitude = ref('')
+        const freigabeValues = ref([])
 
         const route = useRoute();
 
@@ -36,6 +37,8 @@ export default {
                 vorLatitude.value = route.query.latitude
                 vorLongitude.value = route.query.longitude
             }
+            freigabeValues.value.push("Regina S.");
+            freigabeValues.value.push("Manfred D.");
         })
 
 
@@ -82,6 +85,7 @@ export default {
         return {
             streckenabschnitt,
             freigabe,
+            freigabeValues,
             checkliste,
             date,
             date2,
@@ -144,9 +148,9 @@ export default {
                 </div>
             </div>
             <div class="row extra-mar">
-                    <div class="mar-right">
+                    <div class="checkListInput">
                         <p style="font-weight: bold;">Freigabeberechtigter</p>
-                        <StandardInput class="" v-model="freigabe" label="Freigabeberechtigter" ></StandardInput>
+                        <q-select class="" outlined v-model="freigabe" :options="freigabeValues" label="Freigabeberechtigter" />
                     </div>
                     <div class="checkListInput">
                         <p style="font-weight: bold;">Checkliste</p>
