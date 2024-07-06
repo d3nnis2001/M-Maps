@@ -47,7 +47,6 @@ export const useUserStore = defineStore('userStore', () => {
         })
     }
     function hasRole(role) {
-        console.log(userRoles.value)
         for (let i = 0; i < userRoles.value.length; i++) {
             if (userRoles.value[i] === role) {
                 return true;

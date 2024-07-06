@@ -1,5 +1,5 @@
 <script setup>
-import {ref} from 'vue'
+import {computed, ref} from 'vue'
 import {RouterView} from 'vue-router'
 import {useUserStore} from "@/main/vue/stores/UserStore";
 import router from "../router";
@@ -8,12 +8,12 @@ const rightDrawerOpen = ref(false)
 const userStore = useUserStore()
 
 const links = [
-    { name: 'map', label: 'Map', to: '/map'},
-    { name: 'dataimport', label: 'Datenverwaltung', to: '/dataimport', roles: ['Datenverwalter'] },
-    { name: 'repair', label: 'Reparaturaufträge', to: '/repair', roles: ['Prüfer', 'Bearbeiter'] },
+    { name: 'map', label: 'Map', to: '/map', roles: ['Administrator', 'Bearbeiter', 'Prüfer', 'Datenverwalter']},
+    { name: 'repair', label: 'Reparaturaufträge', to: '/repair', roles: ['Prüfer'] },
     { name: 'inspectionOrderOverview', label: 'Prüfaufträge', to: '/inspectionOrder', roles: ['Prüfer', 'Bearbeiter']},
-    { name: 'admin', label: 'Nutzerverwaltung', to: '/admin', roles: ['Admin'] },
-    { name: 'dataviewer', label: 'Dataviewer', to: '/dataviewer'}
+    { name: 'admin', label: 'Nutzerverwaltung', to: '/admin', roles: ['Administrator'] },
+    { name: 'dataimport', label: 'Datenverwaltung', to: '/dataimport', roles: ['Datenverwalter'] },
+    { name: 'dataviewer', label: 'Dataviewer', to: '/dataviewer', roles: ['Administrator', 'Bearbeiter', 'Prüfer', 'Datenverwalter']}
 ]
 const links2 = [
     { name: 'home', label: 'Abmelden', to: '/' },
@@ -32,6 +32,15 @@ function handleLinkClick(link) {
         router.push("/")
     }
 }
+
+const filteredLinks = computed(() => {
+    return links.filter(link => {
+        if (!link.roles) {
+            return true
+        }
+        return link.roles.some(role => userStore.hasRole(role))
+    })
+})
 
 </script>
 <template>
@@ -83,7 +92,7 @@ function handleLinkClick(link) {
 
     <q-drawer show-if-above v-model="rightDrawerOpen" side="left" overlay behavior="mobile" elevated :width="200" :breakpoint="500">
         <q-list>
-            <q-item v-for="link in links" :key="link.name" clickable tag="router-link" :to="link.to">
+            <q-item v-for="link in filteredLinks" :key="link.name" clickable tag="router-link" :to="link.to">
                 <q-item-section>
                     <q-item-label class="text-center">{{ link.label }}</q-item-label>
                 </q-item-section>
