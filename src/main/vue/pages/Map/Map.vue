@@ -132,14 +132,18 @@ onMounted(async () => {
         iconAnchor: [0, 30]
     });
     const reparaturData = await getReparaturForMap()
-    reparaturData.forEach((rep) => { reparatur.value.push( {
-        marker: L.marker([rep.geocords.longitude,rep.geocords.latitude], {icon: Icon} ),
-        reparaturAuftrag: rep
+    if (reparaturData != undefined) {
+        reparaturData.forEach((rep) => {
+            if (rep.geocords != null) {
+                reparatur.value.push({
+                        marker: L.marker([rep.geocords.longitude,rep.geocords.latitude], {icon: Icon} ),
+                        reparaturAuftrag: rep
+                })
+                reparatur.value[reparatur.value.length - 1].marker.addTo(map.value)
+                reparatur.value[reparatur.value.length - 1].marker.on('click', onReparaturClicked);
+            }
+        })
     }
-    )
-       reparatur.value[reparatur.value.length - 1].marker.addTo(map.value)
-        reparatur.value[reparatur.value.length - 1].marker.on('click', onReparaturClicked);
-    })
 
     map.value.on('dblclick', doubleClickOnMap);
 

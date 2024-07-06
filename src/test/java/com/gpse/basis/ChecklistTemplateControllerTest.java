@@ -1,16 +1,5 @@
 package com.gpse.basis;
 
-import com.gpse.basis.domain.ChecklistTemplate;
-import com.gpse.basis.services.ChecklistTemplateService;
-import com.gpse.basis.web.ChecklistTemplateController;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 /*
 class ChecklistTemplateControllerTest {

@@ -11,7 +11,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -21,9 +20,9 @@ import java.util.Objects;
 
 public class ReparaturServiceImpl implements ReparaturService {
     private ReperaturRepository rep;
-    private RepChecklistRepository checkRepo;
+    private final RepChecklistRepository checkRepo;
 
-    private MongoTemplate template;
+    private final MongoTemplate template;
     @Autowired
     public ReparaturServiceImpl(ReperaturRepository rep, RepChecklistRepository checkRepo, MongoTemplate template) {
         this.rep = rep;

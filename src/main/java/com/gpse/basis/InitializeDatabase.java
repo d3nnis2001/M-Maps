@@ -20,21 +20,19 @@ public class InitializeDatabase implements InitializingBean {
     private final ReperaturRepository reRepo;
     private final ChecklistRepository checkRepo;
     private final GleisLageRangeRepository glrRepo;
-    private final ChecklistTemplateRepository checklistTemplateRepository;
     private final ChecklistRepository checklistRepository;
     private final GeoTrackData geoTrackRepository;
 
     @Autowired
     public InitializeDatabase(final UserRepository usRepo, final InspectionOrderRepository ioRepo, final ReperaturRepository reRepo,
                               final ChecklistRepository checkRepo, final GleisLageRangeRepository r, final GeoTrackData gTD,
-                              final ChecklistTemplateRepository checkRepo, final ChecklistRepository checklistRepository) {
+                              final ChecklistRepository checklistRepository) {
         this.usRepo = usRepo;
         this.ioRepo = ioRepo;
         this.reRepo = reRepo;
         this.checkRepo = checkRepo;
         this.glrRepo = r;
         this.geoTrackRepository = gTD;
-        this.checklistTemplateRepository = checkRepo;
         this.checklistRepository = checklistRepository;
     }
 
@@ -117,7 +115,8 @@ public class InitializeDatabase implements InitializingBean {
         // Test Checklist Template 1
         LinkedList<String> tasks = new LinkedList<>(Arrays.asList("Punkt 1", "Punkt 2", "Punkt 3"));
         LinkedList<String> material = new LinkedList<>(Arrays.asList("Material 1", "Material 2", "Material 3"));
-        ChecklistTemplate example = new ChecklistTemplate("Template 1", tasks, material);
-        checklistTemplateRepository.save(example);
+        Checklist example = new Checklist("Template 1", tasks);
+        example.setMaterial(material);
+        checklistRepository.save(example);
     }
 }

@@ -5,7 +5,7 @@ import { storeToRefs } from "pinia";
 import {onMounted} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {useQuasar} from "quasar";
-import CheckPointList from "@/main/vue/pages/checklists/CheckPointList.vue";
+import CheckPointList from "@/main/vue/pages/Checklists/CheckPointList.vue";
 
 const checklistTemplateStore = useChecklistTemplateStore()
 const $q = useQuasar()

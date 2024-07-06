@@ -22,10 +22,10 @@ import EditUser from "@/main/vue/pages/Nutzerverwaltung/EditUser.vue";
 import Dataviewer from "@/main/vue/pages/Dataviewer/Dataviewer.vue";
 import DataviewerRoute from "@/main/vue/pages/Dataviewer/DataviewerRoute.vue";
 import DataviewerPoint from "@/main/vue/pages/Dataviewer/DataviewerPoint.vue";
-import checklistOverview from "@/main/vue/pages/checklists/ChecklistList.vue";
-import checklistCreate from "@/main/vue/pages/checklists/ChecklistCreate.vue";
-import checklistSingle from "@/main/vue/pages/checklists/ChecklistSingle.vue";
-import checklistEdit from "@/main/vue/pages/checklists/ChecklistEdit.vue";
+import checklistOverview from "@/main/vue/pages/Checklists/ChecklistList.vue";
+import checklistCreate from "@/main/vue/pages/Checklists/ChecklistCreate.vue";
+import checklistSingle from "@/main/vue/pages/Checklists/ChecklistSingle.vue";
+import checklistEdit from "@/main/vue/pages/Checklists/ChecklistEdit.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),

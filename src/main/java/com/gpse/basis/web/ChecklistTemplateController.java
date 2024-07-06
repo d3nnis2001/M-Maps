@@ -1,7 +1,7 @@
 package com.gpse.basis.web;
 
-import com.gpse.basis.domain.ChecklistTemplate;
-import com.gpse.basis.services.ChecklistTemplateService;
+import com.gpse.basis.domain.Checklist;
+import com.gpse.basis.services.ChecklistService;
 import com.gpse.basis.web.errors.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -13,9 +13,9 @@ import java.util.Optional;
 @CrossOrigin
 @RequestMapping("/api/templates")
 public class ChecklistTemplateController {
-    ChecklistTemplateService checklistTemplateService;
+    ChecklistService checklistTemplateService;
     @Autowired
-    public ChecklistTemplateController(ChecklistTemplateService checklistTemplateService) {
+    public ChecklistTemplateController(ChecklistService checklistTemplateService) {
         this.checklistTemplateService = checklistTemplateService;
     }
     @GetMapping("/all/names")
@@ -24,18 +24,18 @@ public class ChecklistTemplateController {
     }
 
     @GetMapping("/all")
-    public List<ChecklistTemplate> getAllTemplates() {
+    public List<Checklist> getAllTemplates() {
         return checklistTemplateService.getALlTemplates();
     }
 
     @PostMapping("/create")
-    public boolean addChecklist(@RequestBody ChecklistTemplate template) {
+    public boolean addChecklist(@RequestBody Checklist template) {
         return checklistTemplateService.addChecklist(template.getName(), template.getTasks(), template.getMaterial());
     }
 
     @GetMapping("/{name}")
-    public ChecklistTemplate getTemplate(@PathVariable("name") final String name) {
-        Optional<ChecklistTemplate> template = checklistTemplateService.getTemplate(name);
+    public Checklist getTemplate(@PathVariable("name") final String name) {
+        Optional<Checklist> template = checklistTemplateService.getTemplate(name);
         if (template.isEmpty()) {
             throw new NotFoundException();
         }
@@ -49,12 +49,12 @@ public class ChecklistTemplateController {
     }
 
     @PostMapping("/duplicate")
-    public String addDuplicate(@RequestBody ChecklistTemplate template) {
+    public String addDuplicate(@RequestBody Checklist template) {
         return checklistTemplateService.duplicateTemplate(template);
     }
 
     @PostMapping("/edit")
-    public boolean editChecklist(@RequestBody ChecklistTemplate templateEdit) {
+    public boolean editChecklist(@RequestBody Checklist templateEdit) {
         return checklistTemplateService.editChecklist(templateEdit);
     }
 }

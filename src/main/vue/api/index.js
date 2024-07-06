@@ -1,7 +1,7 @@
 import auth from "./auth";
 import map from "./map";
 import register from "./register";
-import checklistTemplate from "./checklistTemplate";
+import checklistTemplate from "./checklist";
 
 export default {
     auth,

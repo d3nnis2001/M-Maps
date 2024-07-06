@@ -1,6 +1,6 @@
 <script setup>
 
-import CheckPointEdit from "@/main/vue/pages/checklists/CheckPointEdit.vue";
+import CheckPointEdit from "@/main/vue/pages/Checklists/CheckPointEdit.vue";
 import {ref} from "vue";
 import {useChecklistTemplateStore} from "@/main/vue/stores/checklistTemplateStore";
 import {storeToRefs} from "pinia";

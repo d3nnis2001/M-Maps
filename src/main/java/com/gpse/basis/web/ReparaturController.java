@@ -21,10 +21,10 @@ import java.util.ArrayList;
 @RestController
 @RequestMapping("/api/repair")
 public class ReparaturController {
-    private ReparaturService service;
-    private ChecklistService checkService;
+    private final ReparaturService service;
+    private final ChecklistService checkService;
     private final EmailServices emailService;
-    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     @Autowired
     public ReparaturController(ReparaturService service, ChecklistService checkService, EmailServices emailService) {
         this.service = service;

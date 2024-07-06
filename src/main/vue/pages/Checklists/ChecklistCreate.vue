@@ -4,7 +4,7 @@ import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";
 import {ref} from "vue";
 import {storeToRefs} from "pinia";
 import {useQuasar} from "quasar";
-import CheckPointList from "@/main/vue/pages/checklists/CheckPointEdit.vue";
+import CheckPointList from "@/main/vue/pages/Checklists/CheckPointEdit.vue";
 import {useRouter} from "vue-router";
 
 const checklistTemplateStore = useChecklistTemplateStore()

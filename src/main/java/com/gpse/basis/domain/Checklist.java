@@ -3,38 +3,18 @@ package com.gpse.basis.domain;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Document(collection = "Checklist")
 public class Checklist {
     @MongoId
-    private String id;
     private String name;
-    private List<CheckPoint>  tasks;
-    private List<CheckPoint> material;
+    private List<String> tasks;
+    private List<String> material;
 
-    public Checklist(String name, List<String> tasks, List<String> material) {
+    public Checklist(String name, List<String> tasks) {
         this.name = name;
-        this.tasks = createCheckPoints(tasks);
-        this.material = createCheckPoints(material);
-    }
-
-    public Checklist(ChecklistTemplate template) {
-        List<CheckPoint> taskCheckPoints = createCheckPoints(template.getTasks());
-        List<CheckPoint> materialCheckPoints = createCheckPoints(template.getMaterial());
-
-        this.name = template.getName();
-        this.tasks = taskCheckPoints;
-        this.material = materialCheckPoints;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
+        this.tasks = tasks;
     }
 
     public String getName() {
@@ -45,27 +25,19 @@ public class Checklist {
         this.name = name;
     }
 
-    public List<CheckPoint> getTasks() {
+    public List<String> getTasks() {
         return tasks;
     }
 
     public void setTasks(List<String> tasks) {
-        this.tasks = createCheckPoints(tasks);
+        this.tasks = tasks;
     }
 
-    public List<CheckPoint> getMaterial() {
+    public List<String> getMaterial() {
         return material;
     }
 
     public void setMaterial(List<String> material) {
-        this.material = createCheckPoints(material);
-    }
-
-    public List<CheckPoint> createCheckPoints(List<String> points) {
-        List<CheckPoint> result = new ArrayList<>();
-        for (String point: points) {
-            result.add(new CheckPoint(point));
-        }
-        return result;
+        this.material = material;
     }
 }
