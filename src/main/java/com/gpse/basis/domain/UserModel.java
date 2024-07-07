@@ -172,6 +172,10 @@ public class UserModel implements UserDetails {
         return passwordToken;
     }
 
+    /**
+     * UserToken setzen.
+     * @return - return
+     */
     public String setUserToken() {
         SecureRandom random = new SecureRandom();
         byte[] token = new byte[24];

@@ -141,6 +141,12 @@ public class UserServicesImpl implements UserServices {
         return true;
     }
 
+    /**
+     * getToken.
+     * @param email - email
+     * @param password - password
+     * @return - token
+     */
     public String getToken(String email, String password) {
         UserModel us = getUserByUsername(email);
         System.out.println("TEST-service-passwort" + us.getPassword());
@@ -150,7 +156,13 @@ public class UserServicesImpl implements UserServices {
         return token;
     }
 
-    public ArrayList<String> getRoles (String email, String token) {
+    /**
+     * getRoles.
+     * @param email - email
+     * @param token - token
+     * @return - roles
+     */
+    public ArrayList<String> getRoles(String email, String token) {
         UserModel us = getUserByUsername(email);
         if (us.getUserToken().equals(token)) {
             ArrayList<String> roles = us.getRoles();
@@ -159,7 +171,12 @@ public class UserServicesImpl implements UserServices {
         return null;
     }
 
-    public String getUserByToken (String token) {
+    /**
+     * getUserByToken.
+     * @param token - token
+     * @return - null
+     */
+    public String getUserByToken(String token) {
         Iterable<UserModel> al = userRepo.findAll();
         ArrayList<UserModel> user = new ArrayList<>();
         for (UserModel userModel : al) {
@@ -173,7 +190,12 @@ public class UserServicesImpl implements UserServices {
         return null;
     }
 
-    public String compareFreigabe (String freigabe) {
+    /**
+     * compareFreigabeberechtigter.
+     * @param freigabe - freigabe
+     * @return - null
+     */
+    public String compareFreigabe(String freigabe) {
         Iterable<UserModel> al = userRepo.findAll();
         ArrayList<UserModel> user = new ArrayList<>();
         for (UserModel userModel : al) {

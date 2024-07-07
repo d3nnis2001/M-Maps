@@ -11,11 +11,15 @@ import org.springframework.web.context.request.WebRequest;
 
 import java.util.ArrayList;
 
+/**
+ * UserController.
+ */
 @RestController
 @RequestMapping("/api")
 public class UserController {
     private String email_string = "email";
     private String passwort_string = "password";
+    private String token_string = "token";
     private final UserServices userService;
     private final EmailServices emailService;
     @Autowired
@@ -29,6 +33,12 @@ public class UserController {
         boolean exists = userService.checkExistanceEmail(email.trim());
         return ResponseEntity.ok(exists);
     }
+
+    /**
+     * register.
+     * @param request - Anfrage
+     * @return - Response
+     */
     @PostMapping("/register")
     public ResponseEntity<Boolean> register(final WebRequest request) {
         String email = request.getParameter(email_string);
@@ -63,6 +73,11 @@ public class UserController {
         return ResponseEntity.ok(false);
     }
 
+    /**
+     * login.
+     * @param request - Anfrage
+     * @return - response
+     */
     @PostMapping("/login")
     public ResponseEntity<Boolean> login(final WebRequest request) {
         String email = request.getParameter(email_string);
@@ -72,6 +87,12 @@ public class UserController {
         }
         return ResponseEntity.ok(false);
     }
+
+    /**
+     * resetPasswort.
+     * @param request - Anfrage
+     * @return - response
+     */
     @PostMapping("/user/resetPassword")
     public ResponseEntity<Boolean> changePassword(final WebRequest request) {
         String email = request.getParameter(email_string);
@@ -82,10 +103,16 @@ public class UserController {
         }
         return ResponseEntity.ok(false);
     }
+
+    /**
+     * setPassword.
+     * @param request - Anfrage
+     * @return response
+     */
     @PostMapping("/user/setPassword")
     public ResponseEntity<Boolean> resetPassword(final WebRequest request) {
         String password = request.getParameter(passwort_string);
-        String token = request.getParameter("token");
+        String token = request.getParameter(token_string);
         String email = request.getParameter(email_string);
         boolean response = userService.setPasswordNew(email, password, token);
         if (response) {
@@ -95,33 +122,54 @@ public class UserController {
         }
     }
 
+    /**
+     * getToken.
+     * @param request - Anfrage
+     * @return - token
+     */
     @PostMapping("/user/getToken")
-    public String getToken (final WebRequest request) {
-        String password = request.getParameter("password");
-        String email = request.getParameter("email");
+    public String getToken(final WebRequest request) {
+        String password = request.getParameter(passwort_string);
+        String email = request.getParameter(email_string);
 
         String token = userService.getToken(email, password);
-        System.out.println("TEST-controller: " +token);
+        System.out.println("TEST-controller: " + token);
         return token;
     }
 
+    /**
+     * getRolesByToken.
+     * @param request - Anfrage
+     * @return - roles
+     */
     @PostMapping("/user/getRolesByToken")
-    public ArrayList<String> getRolesByToken (final WebRequest request) {
-        String email = request.getParameter("email");
-        String token = request.getParameter("token");
+    public ArrayList<String> getRolesByToken(final WebRequest request) {
+        String email = request.getParameter(email_string);
+        String token = request.getParameter(token_string);
 
         ArrayList<String> roles = userService.getRoles(email, token);
         return roles;
     }
+
+    /**
+     * getUserByToken.
+     * @param request - Anfrage
+     * @return - username
+     */
     @PostMapping("/user/getUserByToken")
     public String getUserByToken(final WebRequest request) {
-        String token = request.getParameter("token");
+        String token = request.getParameter(token_string);
         String username = userService.getUserByToken(token);
         return username;
     }
 
+    /**
+     * compareFreigabe.
+     * @param request - Anfrage
+     * @return - username
+     */
     @PostMapping("/user/freigabe")
-    public String compareFreigabe (final WebRequest request) {
+    public String compareFreigabe(final WebRequest request) {
         String freigabe = request.getParameter("freigabe");
         String username = userService.compareFreigabe(freigabe);
         return username;
