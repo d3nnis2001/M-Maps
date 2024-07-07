@@ -33,54 +33,57 @@ function removeItem(id) {
 </script>
 
 <template>
-    <div class="padding-md">
-        <div class="text-black text-align items-center padding-sm text-bold text-h6">
-            <slot></slot>
+    <div class="center-it outline">
+        <slot></slot>
+        <div class="input-container">
+            <StandardInput v-model="newItem" :label="label" />
+            <q-btn class="mar-left" @click="addItem" icon="add" outline color="primary" />
         </div>
-        <div class="items-center text-align padding-sm">
-            <span class="padding-right">
-                <StandardInput v-model="newItem" :label="label"/>
-            </span>
-            <q-btn label="hinzufügen" @click="addItem" color="primary"/>
-        </div>
-        <div v-for="item in list" :key="item.id" class="items-center text-align width margin padding-xs">
-            <span class="margin padding-xs">
-                <span class="padding-right">
-                    <q-checkbox v-model="checked" :label="item.text" disable/>
-                </span>
-                <q-btn @click="removeItem(item.id)" label="entfernen" outline color="primary"/>
-            </span>
+        <div class="list-container">
+            <div v-for="item in list" :key="item.id" class="list-item">
+                <q-checkbox v-model="checked" :label="item.text" disable />
+                <q-btn class="mar-left" @click="removeItem(item.id)" icon="delete" outline color="primary" />
+            </div>
         </div>
     </div>
 </template>
 
-<style scoped>
-.text-align {
-    text-align: center;
+<style lang="scss">
+
+.center-it {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
 }
 
-.padding-xs {
-    padding-bottom: 8px;
+.input-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 20px;
+    justify-content: center;
 }
 
-.padding-sm {
-    padding-bottom: 16px;
+.mar-left {
+    margin-left: 20px;
 }
 
-.padding-md {
-    padding-bottom: 32px;
+.list-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
 }
 
-.padding-right {
-    padding-right: 16px;
+.list-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 10px;
 }
 
-.margin {
-    margin: 0 auto;
+.outline {
+    border: 1px solid var(--q-primary);
+    padding: 20px;
+    border-radius: 15px;
 }
-
-.width {
-    width: 384px;
-}
-
 </style>

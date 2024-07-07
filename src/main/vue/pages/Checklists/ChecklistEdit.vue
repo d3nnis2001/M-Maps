@@ -1,4 +1,4 @@
-<script setup>
+    <script setup>
 
 import CheckPointEdit from "@/main/vue/pages/Checklists/CheckPointEdit.vue";
 import {ref} from "vue";
@@ -59,20 +59,44 @@ async function editChecklist() {
 </script>
 
 <template>
-    <h1 class="text-align items-center text-h4">{{template.name}} bearbeiten</h1>
-    <div class="text-align items-center">
-        <CheckPointEdit :list="taskList" label="Aufgaben">Aufgabenliste bearbeiten</CheckPointEdit>
-        {{taskList}}
-        <CheckPointEdit :list="materialList" label="Material">Materialliste bearbeiten</CheckPointEdit>
-        <span>
-            <router-link to="/checklists">
-                <q-btn label="Abbrechen" flat color="primary"/>
-            </router-link>
+    <div class="centered-content">
+        <h1 class="text-h4"><b>{{template.name}} bearbeiten</b></h1>
+        <div class="outline">
+            <h2 class="text-h6" style="display: flex; flex-direction: row; justify-content: flex-start; margin: 0; margin-left: 1vw"><b>Aufgabenliste bearbeiten</b></h2>
+            <CheckPointEdit :list="taskList" label="Aufgaben"></CheckPointEdit>
+            <h2 class="text-h6" style="display: flex; flex-direction: row; justify-content: flex-start; margin: 0; margin-left: 1vw"><b>Materialliste bearbeiten</b></h2>
+            <CheckPointEdit :list="materialList" label="Material"></CheckPointEdit>
+        </div>
+        <div style="display: flex; flex-direction: row; justify-content: flex-start; margin-left: 1vw; margin-top: 30px">
             <q-btn label="Änderungen speichern" @click="editChecklist" color="primary"/>
-        </span>
+            <router-link to="/checklists">
+                <q-btn style="margin-left: 1.5vw" label="Abbrechen" color="primary"/>
+            </router-link>
+        </div>
     </div>
 </template>
 
-<style scoped>
+<style lang="scss">
+
+.centered-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    margin-right: 5vw;
+    margin-left: 5vw;
+}
+
+.outline2 {
+    border: 2px solid var(--q-primary);
+    padding: 20px;
+    border-radius: 15px;
+}
+
+.outline {
+    border: 1px solid var(--q-primary);
+    padding: 20px;
+    border-radius: 15px;
+}
 
 </style>
