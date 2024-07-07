@@ -4,6 +4,9 @@ import com.gpse.basis.domain.InspectionOrder;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+/**
+ * Repository fpr Prüfaufträge.
+ */
 @Repository
 public interface InspectionOrderRepository extends CrudRepository<InspectionOrder, String> {
 }

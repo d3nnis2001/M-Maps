@@ -105,21 +105,21 @@ export default {
         <div class="outer-container">
             <div class="text-with-input">
                 <p style="font-weight: bold;">Prüfkoordinaten/Streckenabschnitt</p>
-                <StandardInput class="extra-mar" v-model="streckenabschnitt" label="Streckenabschnitt"></StandardInput>
+                <StandardInput class="extra-mar2" v-model="streckenabschnitt" label="Streckenabschnitt"></StandardInput>
                 <div class="row">
                     <div class="text-with-input mar-right">
                         <p style="font-weight: bold;">Latitude</p>
-                        <StandardInput class="extra-mar" v-model="vorLatitude" label="Latitude" ></StandardInput>
+                        <StandardInput class="extra-mar2" v-model="vorLatitude" label="Latitude" ></StandardInput>
                     </div>
                     <div class="text-with-input">
                         <p style="font-weight: bold;">Longitude</p>
-                        <StandardInput class="extra-mar" v-model="vorLongitude" label="Longitude" ></StandardInput>
+                        <StandardInput class="extra-mar2" v-model="vorLongitude" label="Longitude" ></StandardInput>
                     </div>
                 </div>
                 <div>
             </div>
             <p style="font-weight: bold;">Zeitraum (von - bis)</p>
-            <div class="text-with-input row extra-mar">
+            <div class="text-with-input row extra-mar2">
                 <q-input class="input-style mar-right" filled v-model="date" mask="date" :rules="['date']">
                     <template v-slot:append>
                         <q-icon name="event" class="cursor-pointer">
@@ -148,7 +148,7 @@ export default {
                 </q-input>
                 </div>
             </div>
-            <div class="row extra-mar">
+            <div class="row extra-mar2">
                     <div class="checkListInput">
                         <p style="font-weight: bold;">Freigabeberechtigter</p>
                         <q-select class="" outlined v-model="freigabe" :options="freigabeValues" label="Freigabeberechtigter" />
@@ -213,7 +213,7 @@ p {
     margin-bottom: 20px;
 }
 
-.extra-mar {
+.extra-mar2 {
     margin-bottom: 20px;
 }
 </style>

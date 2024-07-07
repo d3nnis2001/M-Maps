@@ -6,6 +6,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Interface für den InspectionService.
+ */
 public interface InspectionServices {
 
     void createInspectionOrder(ArrayList<String> inspecArray);
@@ -14,7 +17,7 @@ public interface InspectionServices {
 
     void acceptInspectionOrder(InspectionOrder inspectionOrder);
 
-    Boolean deleteInspectionOrder( String id);
+    Boolean deleteInspectionOrder(String id);
     void editStatus(String inspectionOrderId, String status);
 
     void editReview(String inspectionOrderId, String review, String date);

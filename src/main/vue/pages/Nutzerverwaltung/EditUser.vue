@@ -137,7 +137,7 @@ export default {
 </template>
 
 
-<style scoped>
+<style>
 .checkbox-container {
     font-size: 20px;
 }

@@ -3,12 +3,13 @@ import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import {
     getDetailsByID,
-    getTickedItems,
+    getTickedItems, repair,
     setTerminated,
     updateRepChecklist,
     updateStatus
 } from "@/main/vue/api/reparatur";
 import router from "@/main/vue/router";
+import {createPinia} from "pinia";
 
 export default {
     setup() {
@@ -22,13 +23,18 @@ export default {
         onMounted(async () => {
             const name = route.params.name;
             repairDetails.value = await getDetailsByID(name);
-
-            if (repairDetails.value && repairDetails.value.checklist) {
+            console.log("Hier" + repairDetails.value.checklist.checkPoints.tasks[0]);
+            if (repairDetails.value && repairDetails.value.checklist && repairDetails.value.checklist.checkSel !== undefined) {
                 for (let i = 0; i < repairDetails.value.checklist.checkSel.length; i++) {
                     ticked.value.push({label: repairDetails.value.checklist.checkSel.get(i), value: i});
                 }
-                for (let i = 0; i < repairDetails.value.checklist.checkPoints.items.length; i++) {
-                    options.value.push({label: repairDetails.value.checklist.checkPoints.items[i], value: i});
+                let i = 0;
+                for (i; i < repairDetails.value.checklist.checkPoints.tasks.length; i++) {
+                    options.value.push({label: repairDetails.value.checklist.checkPoints.tasks[i], value: i});
+                }
+                console.log(i)
+                for (let j = i; j < repairDetails.value.checklist.checkPoints.material.length + i; j++) {
+                    options.value.push({label: repairDetails.value.checklist.checkPoints.material[j - i], value: j});
                 }
             }
             const tickedData = await getTickedItems(repairDetails.value.id);
@@ -36,8 +42,9 @@ export default {
         });
 
         function allChecked() {
-            if (repairDetails.value && repairDetails.value.checklist && repairDetails.value.checklist.checkPoints) {
-                return ticked.value.length === repairDetails.value.checklist.checkPoints.items.length;
+            if (ticked.value.length > 0 ) {
+                return ticked.value.length === (repairDetails.value.checklist.checkPoints.tasks.length +
+                    repairDetails.value.checklist.checkPoints.material.length);
             }
             return false;
         }

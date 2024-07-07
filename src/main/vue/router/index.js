@@ -21,6 +21,10 @@ import EditUser from "@/main/vue/pages/Nutzerverwaltung/EditUser.vue";
 import Dataviewer from "@/main/vue/pages/Dataviewer/Dataviewer.vue";
 import DataviewerRoute from "@/main/vue/pages/Dataviewer/DataviewerRoute.vue";
 import DataviewerPoint from "@/main/vue/pages/Dataviewer/DataviewerPoint.vue";
+import checklistOverview from "@/main/vue/pages/Checklists/ChecklistList.vue";
+import checklistCreate from "@/main/vue/pages/Checklists/ChecklistCreate.vue";
+import checklistSingle from "@/main/vue/pages/Checklists/ChecklistSingle.vue";
+import checklistEdit from "@/main/vue/pages/Checklists/ChecklistEdit.vue";
 import axios from "axios";
 import Impressum from "@/main/vue/pages/Login/Impressum.vue";
 import {useUserStore} from "@/main/vue/stores/UserStore";
@@ -163,6 +167,27 @@ const router = createRouter({
         {
             path: "/dataviewer/point/:pointId",
             name: "dataviewerPoint",
+            component: DataviewerPoint
+        },
+        {
+            path: "/checklists",
+            name: "checklistOverview",
+            component: checklistOverview,
+        },
+        {
+            path: "/checklists/create",
+            name: "checklistCreate",
+            component: checklistCreate,
+        },
+        {
+            path: "/checklists/:name",
+            name: "checklistSingle",
+            component: checklistSingle,
+        },
+        {
+            path: "/checklists/edit/:name",
+            name: "checklistEdit",
+            component: checklistEdit,
             component: DataviewerPoint,
             meta: {showLogin: false, showHeader: true, authorized: true}
         }
