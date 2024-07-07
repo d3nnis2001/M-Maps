@@ -1,8 +1,8 @@
 <script>
-import {onMounted, ref, watch} from 'vue';
+import {onMounted, ref} from 'vue';
 import { useRoute } from 'vue-router';
 import router from "@/main/vue/router";
-import {getUserByUsername, getUserData, updateRoles} from "@/main/vue/api/admin";
+import {getUserByUsername, updateRoles} from "@/main/vue/api/admin";
 import {useQuasar} from "quasar";
 
 export default {
@@ -49,7 +49,7 @@ export default {
             })
             const update = await updateRoles(username, updatedRoles.value.selected_roles)
             if (update) {
-                router.push(`/admin`);
+                await router.push(`/admin`);
                 notify({
                     message: "Die Rollen wurden erfolgreich gespeichert!",
                     timeout: 5000,
@@ -84,39 +84,26 @@ export default {
             </div>
         </div>
 
-        <q-separator size="2px" color="primary" style="margin-top: 20px "></q-separator>
+        <q-separator size="2px" color="primary" style="margin-top: 35px "></q-separator>
 
         <div class="row">
             <div class="col">
                 <div class="row" >
-                    <h6 style="margin-right: 10px" >Nutzer ID: </h6>
+                    <h6 style="margin-right: 40px" >Nutzer ID: </h6>
                     <h6 style="font-weight: bold">{{ username }}</h6>
                 </div>
                 <div class="row">
-                    <h6 style="margin-right: 10px">Vorname: </h6>
+                    <h6 style="margin-right: 40px">Vorname: </h6>
                     <h6 style="font-weight: bold">{{ firstname }}</h6>
                 </div>
                 <div class="row">
-                    <h6 style="margin-right: 10px">Nachname: </h6>
+                    <h6 style="margin-right: 25px">Nachname: </h6>
                     <h6 style="font-weight: bold">{{ lastname }}</h6>
                 </div>
             </div>
 
-            <div class="col">
-                <div class="row" >
-                    <h6 style="margin-right: 10px" >Region: </h6>
-                    <!--
-                    <div class="column" v-for="region in userRegion">
-                        <q-item>
-                            {{ region }}
-                        </q-item>
-                    </div>
-                        -->
-                </div>
-            </div>
-
             <div class="q-pa-lg">
-                <div class="checkbox-container" v-for="role in allRoles">
+                <div class="checkbox-container" style="margin-right: 50px" v-for="role in allRoles">
                     <q-checkbox
                         :label="role"
                         v-model="updatedRoles.selected_roles"
@@ -127,8 +114,6 @@ export default {
                 <p></p>
             </div>
         </div>
-
-
 
         <div class="q-gutter-sm row justify-end">
             <q-btn
@@ -153,11 +138,8 @@ export default {
 
 
 <style scoped>
-.checkbox-container .q-checkbox {
+.checkbox-container {
     font-size: 20px;
-}
-.extra-mar {
-    margin-right: 20px;
 }
 </style>
 

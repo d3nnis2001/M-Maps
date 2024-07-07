@@ -5,6 +5,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.util.ArrayList;
 
+/**
+ * UserService with the extention UserDetailsService.
+ */
 public interface UserServices extends UserDetailsService {
     boolean checkExistanceEmail(String email);
     boolean addUser(UserModel us);

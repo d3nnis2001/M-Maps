@@ -20,6 +20,7 @@ export const useUserStore = defineStore('userStore', () => {
         }
     }
 
+
     function requestToken(credentials) {
         console.log("TEST: requestToken")
         return new Promise((resolve, reject) => {
@@ -54,6 +55,7 @@ export const useUserStore = defineStore('userStore', () => {
         }
         return false;
     }
+
 
     function logout() {
         console.log("logout")

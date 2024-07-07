@@ -38,6 +38,7 @@ public class InitializeDatabase implements InitializingBean {
         initChecklists();
         initRanges();
         initGeoTrack();
+        initInspectionOrder();;
     }
     public void initUsers() {
         // Test User 1
@@ -85,6 +86,13 @@ public class InitializeDatabase implements InitializingBean {
         glrRepo.save(range1);
         glrRepo.save(range2);
         glrRepo.save(range3);
+    }
+
+    public void initInspectionOrder() {
+        InspectionOrder inspec1 = new InspectionOrder("p-1717767131183662", "1010", "", "Bielefeld Hbf", "Berlin Ostbahnhof", "2024/07/12", "2024/07/17", "DB Regio Schiene Nord-Ost (NO)", "Gleislagedaten", "in Bearbeitung", "Dringend!", false, "hoch");
+        InspectionOrder inspec2 = new InspectionOrder("p-1718015853290597", "1020", "", "Hamburg Hbf", "Berlin Ostbahnhof", "2024/09/12", "2024/09/17", "DB Regio Schiene Nord-Ost (NO)", "Gleislagedaten", "beauftrage", "", false, "hoch");
+        ioRepo.save(inspec1);
+        ioRepo.save(inspec2);
     }
 
 
