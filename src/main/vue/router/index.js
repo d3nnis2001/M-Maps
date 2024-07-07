@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useSettingsStore } from "@/main/vue/stores/SettingsStore";
 
 import StartView from '../pages/Start.vue'
 import DataImport from "../pages/DataImport/DataImport.vue";
@@ -28,6 +27,10 @@ import editImpressum from "@/main/vue/pages/Settings/EditImpressum.vue";
 import editLogo from "@/main/vue/pages/Settings/editLogo.vue";
 import Impressum from "@/main/vue/pages/Impressum.vue";
 import editColors from "@/main/vue/pages/Settings/editColors.vue";
+import checklistOverview from "@/main/vue/pages/Checklists/ChecklistList.vue";
+import checklistCreate from "@/main/vue/pages/Checklists/ChecklistCreate.vue";
+import checklistSingle from "@/main/vue/pages/Checklists/ChecklistSingle.vue";
+import checklistEdit from "@/main/vue/pages/Checklists/ChecklistEdit.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -172,6 +175,26 @@ const router = createRouter({
             path: "/settings/edit/colors",
             name: "editColors",
             component: editColors
+        },
+        {
+            path: "/checklists",
+            name: "checklistOverview",
+            component: checklistOverview,
+        },
+        {
+            path: "/checklists/create",
+            name: "checklistCreate",
+            component: checklistCreate,
+        },
+        {
+            path: "/checklists/:name",
+            name: "checklistSingle",
+            component: checklistSingle,
+        },
+        {
+            path: "/checklists/edit/:name",
+            name: "checklistEdit",
+            component: checklistEdit,
         }
     ]
 })

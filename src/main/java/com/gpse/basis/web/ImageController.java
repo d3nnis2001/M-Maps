@@ -5,6 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
+/**
+ * Controller Fpr Images.
+ */
 @RestController
 @CrossOrigin(origins = "http://localhost:8080")
 @RequestMapping("/api/images")
@@ -15,6 +18,11 @@ public class ImageController {
     public ImageController(final ImageService imageService) {
         this.imageService = imageService;
     }
+
+    /**
+     * Foto hochladen.
+     * @param request - Anfrage
+     */
     @PostMapping("/upload")
     public void uploadPhoto(final WebRequest request) {
         String orderId = request.getParameter("orderId");

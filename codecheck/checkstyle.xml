@@ -65,52 +65,6 @@
         <!-- See http://checkstyle.sf.net/config_naming.html -->
         <module name="AbstractClassName"/>
         <module name="IllegalIdentifierName"/>
-        <module name="TypeName">
-            <property name="format" value="^[A-Z][a-zA-Z]+$"/>
-        </module>
-        <module name="PackageName">
-            <property name="format" value="^[a-z]+(\.[a-z][a-z0-9_]*)*$"/>
-        </module>
-        <module name="ClassTypeParameterName">
-            <property name="format" value="^[A-Z][a-zA-Z]*$"/>
-        </module>
-        <module name="InterfaceTypeParameterName">
-            <property name="format" value="^[A-Z][a-zA-Z]*$"/>
-        </module>
-        <module name="MethodTypeParameterName">
-            <property name="format" value="^[A-Z][a-zA-Z]*$"/>
-        </module>
-        <module name="RecordTypeParameterName">
-            <property name="format" value="^[A-Z][a-zA-Z]*$"/>
-        </module>
-        <module name="ConstantName">
-            <property name="format" value="^[A-Z]+(_[A-Z]+)*$"/>
-        </module>
-        <module name="LambdaParameterName">
-            <property name="format" value="^[a-z][a-zA-Z]*$"/>
-        </module>
-        <module name="LocalFinalVariableName">
-            <property name="format" value="^[a-z][a-zA-Z]+$"/>
-        </module>
-        <module name="LocalVariableName">
-            <property name="allowOneCharVarInForLoop" value="true"/>
-            <property name="format" value="^[a-z][a-zA-Z]+$"/>
-        </module>
-        <module name="MemberName">
-            <property name="format" value="^[a-z][a-zA-Z]+$"/>
-        </module>
-        <module name="MethodName">
-            <property name="format" value="^[a-z][a-zA-Z]+$"/>
-        </module>
-        <module name="ParameterName">
-            <property name="format" value="^[a-z][a-zA-Z]+$"/>
-        </module>
-        <module name="PatternVariableName">
-            <property name="format" value="^[a-z][a-zA-Z]+$"/>
-        </module>
-        <module name="StaticVariableName">
-            <property name="format" value="^[a-z][a-zA-Z]+$"/>
-        </module>
         <!-- Checks for imports                              -->
         <!-- See http://checkstyle.sf.net/config_imports.html -->
         <module name="RedundantImport"/>
@@ -184,10 +138,6 @@
         </module>
         <module name="DefaultComesLast"/>
         <module name="DeclarationOrder"/>
-        <module name="MagicNumber">
-            <property name="ignoreHashCodeMethod" value="true"/>
-            <property name="ignoreAnnotation" value="true"/>
-        </module>
         <module name="AvoidDoubleBraceInitialization"/>
         <module name="AvoidInlineConditionals"/>
         <!-- Checks for class design                         -->

@@ -1,5 +1,5 @@
 <script setup>
-import {onMounted, ref} from 'vue'
+import {ref} from 'vue'
 import {RouterView} from 'vue-router'
 import {useSettingsStore} from "@/main/vue/stores/SettingsStore";
 import {storeToRefs} from "pinia";
@@ -19,6 +19,7 @@ const links = [
     { name: 'map', label: 'Map', to: '/map' },
     { name: 'dataimport', label: 'Datenverwaltung', to: '/dataimport' },
     { name: 'repair', label: 'Reparaturaufträge', to: '/repair' },
+    { name: 'inspectionOrderOverview', label: 'Prüfaufträge', to: '/inspectionOrder'},
     { name: 'admin', label: 'Nutzerverwaltung', to: '/admin' },
     { name: 'dataviewer', label: 'Dataviewer', to: '/dataviewer' },
     { name: 'settings', label: 'Design anpassen', to: '/settings'}
@@ -93,6 +94,15 @@ function changeBool() {
                 </q-toolbar-title>
                 <q-toolbar-title v-if="$route.name === 'editColors'" align="middle">
                     Farben
+                </q-toolbar-title>
+                <q-toolbar-title v-if="$route.name === 'inspectionOrderOverview'" align="middle">
+                    Prüfaufträge
+                </q-toolbar-title>
+                <q-toolbar-title v-if="$route.name === 'createInspectionOrder'" align="middle">
+                    Prüfauftrag erstellen
+                </q-toolbar-title>
+                <q-toolbar-title v-if="$route.name === 'editInspectionOrder'" align="middle">
+                    Prüfauftrag editieren
                 </q-toolbar-title>
                 <q-btn dense flat round icon="menu" @click="toggleRightDrawer" align="right" />
             </q-toolbar>
