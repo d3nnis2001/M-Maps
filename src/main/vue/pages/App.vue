@@ -1,31 +1,32 @@
 <script setup>
 import {ref} from 'vue'
 import {RouterView} from 'vue-router'
-let boolStart = true;
 
-const rightDrawerOpen = ref(false)
+// -------------- LINKS --------------
+
 const links = [
     { name: 'map', label: 'Map', to: '/map' },
     { name: 'dataimport', label: 'Datenverwaltung', to: '/dataimport' },
     { name: 'repair', label: 'Reparaturaufträge', to: '/repair' },
     { name: 'admin', label: 'Nutzerverwaltung', to: '/admin' },
-    { name: 'dataviewer', label: 'Dataviewer', to: '/dataviewer' }
+    //{ name: 'dataviewer', label: 'Dataviewer', to: '/dataviewer' }
 ]
+
 const links2 = [
     { name: 'home', label: 'Abmelden', to: '/' },
 ]
+
 const links3 = [
     { name: 'impressum', label: 'Impressum', to: '/impressum' },
 ]
 
+// -------------- DRAWER --------------
+
+const rightDrawerOpen = ref(false)
+
 function toggleRightDrawer() {
     rightDrawerOpen.value = !rightDrawerOpen.value
 }
-
-function changeBool() {
-    boolStart=false;
-}
-
 </script>
 <template>
     <q-layout v-if="$route.name === 'start' || $route.name === 'login' || $route.name === 'register'
@@ -61,9 +62,9 @@ function changeBool() {
                 <q-toolbar-title v-if="$route.name === 'impressum'" align="middle">
                     Impressum
                 </q-toolbar-title>
-                <q-toolbar-title v-if="$route.name === 'dataviewer'" align="middle">
+                <!--<q-toolbar-title v-if="$route.name === 'dataviewer'" align="middle">
                     Dataviewer
-                </q-toolbar-title>
+                </q-toolbar-title>-->
                 <q-toolbar-title v-if="$route.name === 'dataviewerRoute'" align="middle">
                     Dataviewer für Route
                 </q-toolbar-title>

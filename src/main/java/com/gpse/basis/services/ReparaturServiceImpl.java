@@ -24,6 +24,7 @@ public class ReparaturServiceImpl implements ReparaturService {
     private RepChecklistRepository checkRepo;
 
     private MongoTemplate template;
+
     @Autowired
     public ReparaturServiceImpl(ReperaturRepository rep, RepChecklistRepository checkRepo, MongoTemplate template) {
         this.rep = rep;
@@ -37,13 +38,14 @@ public class ReparaturServiceImpl implements ReparaturService {
         Iterator<Reparatur> iterator = it.iterator();
         while (iterator.hasNext()) {
             Reparatur repSolo = iterator.next();
-            if(!repSolo.isArchived())
+            if (!repSolo.isArchived())
                 repArr.add(repSolo);
         }
         return repArr;
     }
+
     public boolean addRepairOrder(int track, LocalDate date1,
-                           LocalDate date2, String authorized, Checklist checklist, String remarks, GeoCords geo) {
+                                  LocalDate date2, String authorized, Checklist checklist, String remarks, GeoCords geo) {
         Utils util = new Utils();
         String uniqueID = util.generateID();
         ArrayList<String> selected = new ArrayList<>();
@@ -64,7 +66,7 @@ public class ReparaturServiceImpl implements ReparaturService {
     public Boolean changeStatus(String name, String newStatus) {
         Reparatur repa = loadRepByName(name);
         repa.setStatus(newStatus);
-        if(Objects.equals(newStatus, "archiviert"))
+        if (Objects.equals(newStatus, "archiviert"))
             repa.setArchived(true);
         rep.save(repa);
         return true;
@@ -90,7 +92,7 @@ public class ReparaturServiceImpl implements ReparaturService {
     @Override
     public void unarchiveRep(String id) {
         var rep = template.findById(id, Reparatur.class);
-        if(rep != null) {
+        if (rep != null) {
             rep.setArchived(false);
             Query q = new Query();
             q.addCriteria(Criteria.where("_id").is(id));
@@ -113,10 +115,24 @@ public class ReparaturServiceImpl implements ReparaturService {
         Iterator<Reparatur> iterator = it.iterator();
         while (iterator.hasNext()) {
             Reparatur repSolo = iterator.next();
-            if(Objects.equals(repSolo.getStatus(), "beauftragt")){
+            if (Objects.equals(repSolo.getStatus(), "beauftragt")) {
                 repArr.add(repSolo);
             }
         }
         return repArr;
+    }
+
+    @Override
+    public List<Reparatur> getReparaturForPoint(Double latitude, Double longitude) {
+        Iterable it = rep.findAll();
+        List<Reparatur> reparaturs = new ArrayList<>();
+        Iterator<Reparatur> iterator = it.iterator();
+        while (iterator.hasNext()) {
+            Reparatur repSolo = iterator.next();
+            if (repSolo.getGeocords().getLatitude().equals(latitude.toString()) && repSolo.getGeocords().getLongitude().equals(longitude.toString())) {
+                reparaturs.add(repSolo);
+            }
+        }
+        return reparaturs;
     }
 }

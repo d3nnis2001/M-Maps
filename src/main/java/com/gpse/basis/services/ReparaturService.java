@@ -27,4 +27,6 @@ public interface ReparaturService {
 
 
     List<Reparatur> getReparaturForMap();
+
+    List<Reparatur> getReparaturForPoint(Double latitude, Double longitude);
 }

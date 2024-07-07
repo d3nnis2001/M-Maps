@@ -37,4 +37,26 @@ export const getPointInfo = async function getPointInfo(pointId) {
     }
 }
 
+export const getPointRep = async function getPointRep(lat, lon) {
+    try {
+        const response = await axios.get("/api/dataviewer/getPointRep", {params: {lat, lon}})
+        console.log(response.data)
+        return response.data
+    } catch (error) {
+        console.error("Something went wrong when getting the data:", error)
+        return false
+    }
+}
+
+export const getPointPic = async function getPointPic(repId) {
+    try {
+        const response = await axios.get("/api/dataviewer/getPointPic", {params: {repId}})
+        console.log(response.data)
+        return response.data
+    } catch (error) {
+        console.error("Something went wrong when getting the data:", error)
+        return false
+    }
+}
+
 export default {getTrackLayoutData}

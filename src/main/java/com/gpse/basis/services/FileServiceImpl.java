@@ -569,10 +569,10 @@ public class FileServiceImpl implements FileService {
     }
 
     public ArrayList<GleisLageDatenpunkt> getPointData(String pointId) {
-        Iterable<GeoData> iterable = geoTrack.findAll();
-        ArrayList<GeoData> geoArr = new ArrayList<>();
+        //Iterable<GeoData> iterable = geoTrack.findAll();
+        //ArrayList<GeoData> geoArr = new ArrayList<>();
         ArrayList<GleisLageDatenpunkt> dataPoints = new ArrayList<>();
-        int trackId = 0;
+        /*int trackId = 0;
         Iterator<GeoData> iterator = iterable.iterator();
         while (iterator.hasNext()) {
             GeoData geo = iterator.next();
@@ -586,11 +586,14 @@ public class FileServiceImpl implements FileService {
             return dataPoints;
         }
         GeoData firstGeo = geoArr.getFirst();
-        double targetTrackKm = firstGeo.getTrack_km();
-        List<GleisLageDatenpunkt> lst = getDataPointsForTrack(trackId);
-        /*MatchOperation matchOperation = Aggregation.match(Criteria.where("iDlocation").is(pointId));
+        double targetTrackKm = firstGeo.getTrack_km();*/
+        //List<GleisLageDatenpunkt> lst = getDataPointsForTrack(trackId);
+        MongoTemplate template1 = new MongoTemplate(new SimpleMongoClientDatabaseFactory("mongodb://localhost:27017/project_12"));
+        MatchOperation matchOperation = Aggregation.match(Criteria.where("iDlocation").is(pointId));
         Aggregation aggregation = Aggregation.newAggregation(matchOperation);
-        List<GleisLageDatenpunkt> lst = template.aggregate(aggregation, "GleisLageDaten", GleisLageDatenpunkt.class).getMappedResults();*/
+        List<GleisLageDatenpunkt> lst = template1.aggregate(aggregation, "GleisLageDaten", GleisLageDatenpunkt.class).getMappedResults();
+        dataPoints.addAll(lst);
+        return dataPoints;
         /*
         for (GleisLageDatenpunkt gld : lst) {
             if (Math.ceil(geoArr.getFirst().getTrack_km()) == Math.ceil(gld.getStr_km())) {
@@ -598,7 +601,7 @@ public class FileServiceImpl implements FileService {
             }
         }
         System.out.println(dataPoints.size());
-        return dataPoints;*/
+        return dataPoints;
         Map<LocalDate, GleisLageDatenpunkt> nearestPointsByDay = new HashMap<>();
 
         for (GleisLageDatenpunkt gld : lst) {
@@ -616,7 +619,7 @@ public class FileServiceImpl implements FileService {
 
         dataPoints.addAll(nearestPointsByDay.values());
         System.out.println(dataPoints.size());
-        return dataPoints;
+        return dataPoints;*/
     }
 
     //--------------------------------------------------------------
