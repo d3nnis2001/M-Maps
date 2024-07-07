@@ -207,7 +207,7 @@ const router = createRouter({
 
 router.beforeEach(async (to) => {
     document.title = to.name;
-    await useSettingsStore().getColors()
+    //await useSettingsStore().getColors()
   // Something which should be executed before each routing
 })
 
