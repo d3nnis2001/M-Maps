@@ -22,6 +22,14 @@ import EditUser from "@/main/vue/pages/Nutzerverwaltung/EditUser.vue";
 import Dataviewer from "@/main/vue/pages/Dataviewer/Dataviewer.vue";
 import DataviewerRoute from "@/main/vue/pages/Dataviewer/DataviewerRoute.vue";
 import DataviewerPoint from "@/main/vue/pages/Dataviewer/DataviewerPoint.vue";
+/*
+import changeSettings from "@/main/vue/pages/Settings/ChangeSettings.vue";
+import editImpressum from "@/main/vue/pages/Settings/EditImpressum.vue";
+import editLogo from "@/main/vue/pages/Settings/editLogo.vue";
+import Impressum from "@/main/vue/pages/Impressum.vue";
+import editColors from "@/main/vue/pages/Settings/editColors.vue";
+
+ */
 import checklistOverview from "@/main/vue/pages/Checklists/ChecklistList.vue";
 import checklistCreate from "@/main/vue/pages/Checklists/ChecklistCreate.vue";
 import checklistSingle from "@/main/vue/pages/Checklists/ChecklistSingle.vue";
@@ -129,6 +137,7 @@ const router = createRouter({
         {
             path: "/impressum",
             name: "impressum",
+            //component: Impressum
         },
         {
             path: "/dataviewer",
@@ -150,6 +159,29 @@ const router = createRouter({
             name: "dataviewerPoint",
             component: DataviewerPoint
         },
+        /*
+        {
+            path: "/settings",
+            name: "settings",
+            component: changeSettings,
+        },
+        {
+            path: "/settings/edit/impressum",
+            name: "editImpressum",
+            component: editImpressum,
+        },
+        {
+            path: "/settings/edit/logo",
+            name: "editLogo",
+            component: editLogo
+        },
+        {
+            path: "/settings/edit/colors",
+            name: "editColors",
+            component: editColors
+        },
+
+         */
         {
             path: "/checklists",
             name: "checklistOverview",
@@ -178,9 +210,10 @@ const router = createRouter({
     ]
 })
 
-router.beforeEach((to) => {
+router.beforeEach(async (to) => {
     document.title = to.name;
-    // Something which should be executed before each routing
+    //await useSettingsStore().getColors()
+  // Something which should be executed before each routing
 })
 
 export default router

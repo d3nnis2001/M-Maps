@@ -1,5 +1,5 @@
 <script setup>
-import {ref} from 'vue'
+import {onMounted, ref} from 'vue'
 import {RouterView} from 'vue-router'
 
 const rightDrawerOpen = ref(false)
