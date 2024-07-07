@@ -3,9 +3,11 @@
 
 <template>
     <div class="bg-grey-4">
-        <div class="padding-all">
-            <div class="text-black text-align justify-center">Impressum</div>
-        </div>
+        <RouterLink to="/impressum">
+            <div class="padding-all">
+                <div class="text-black text-align justify-center">Impressum</div>
+            </div>
+        </RouterLink>
         <div class="divider bg-grey-6"></div>
         <div class="padding-all">
             <div class="text-black text-align justify-center">DB Systemtechnik GmbH</div>

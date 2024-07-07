@@ -8,23 +8,23 @@
                     <q-fab
                         label="Actions"
                         vertical-actions-align="left"
-                        color="red"
+                        color="accent"
                         icon="keyboard_arrow_left"
                         direction="left"
                     >
                         <q-fab-action
                             v-model="route"
-                            color="red"
+                            color="accent"
                             @click="onClickAdd"
                             icon="add"
                         />
                         <q-fab-action
-                            color="red"
+                            color="accent"
                             @click="onClickDelete"
                             icon="delete"
                         />
                         <q-fab-action
-                            color="red"
+                            color="accent"
                             @click="onClickConfigure"
                             icon="analytics"
                         />

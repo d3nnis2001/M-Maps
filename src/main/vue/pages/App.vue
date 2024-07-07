@@ -1,6 +1,18 @@
 <script setup>
 import {ref} from 'vue'
 import {RouterView} from 'vue-router'
+import {useSettingsStore} from "@/main/vue/stores/SettingsStore";
+import {storeToRefs} from "pinia";
+
+let boolStart = true;
+
+const settingsStore = useSettingsStore()
+const {imageNotEmpty} = storeToRefs(settingsStore)
+
+onMounted(() => {
+    settingsStore.checkLogo()
+})
+
 
 const rightDrawerOpen = ref(false)
 const links = [
@@ -9,7 +21,8 @@ const links = [
     { name: 'repair', label: 'Reparaturaufträge', to: '/repair' },
     { name: 'inspectionOrderOverview', label: 'Prüfaufträge', to: '/inspectionOrder'},
     { name: 'admin', label: 'Nutzerverwaltung', to: '/admin' },
-    { name: 'dataviewer', label: 'Dataviewer', to: '/dataviewer' }
+    { name: 'dataviewer', label: 'Dataviewer', to: '/dataviewer' },
+    { name: 'settings', label: 'Design anpassen', to: '/settings'}
 ]
 const links2 = [
     { name: 'home', label: 'Abmelden', to: '/' },
@@ -22,7 +35,9 @@ function toggleRightDrawer() {
     rightDrawerOpen.value = !rightDrawerOpen.value
 }
 
-
+function changeBool() {
+    boolStart=false;
+}
 </script>
 <template>
     <q-layout v-if="$route.name === 'start' || $route.name === 'login' || $route.name === 'register'
@@ -36,7 +51,8 @@ function toggleRightDrawer() {
     <q-layout view="hHh lpR fFf" v-else>
         <q-header bordered class="q-py-xs" elevated>
             <q-toolbar>
-                <q-img :src="'/src/main/resources/db-logo.png'" align="left"></q-img>
+                <q-img v-if="imageNotEmpty" src="/api/settings/logo" align="left"></q-img>
+                <q-img v-else :src="`/src/main/resources/db-logo.png`" align="left"></q-img>
                 <q-toolbar-title v-if="$route.name === 'map'" align="middle">
                     M-MAPS
                 </q-toolbar-title>
@@ -66,6 +82,18 @@ function toggleRightDrawer() {
                 </q-toolbar-title>
                 <q-toolbar-title v-if="$route.name === 'dataviewerPoint'" align="middle">
                     Dataviewer für Punkt
+                </q-toolbar-title>
+                <q-toolbar-title v-if="$route.name === 'settings'" align="middle">
+                    Design anpassen
+                </q-toolbar-title>
+                <q-toolbar-title v-if="$route.name === 'editImpressum'" align="middle">
+                    Impressum
+                </q-toolbar-title>
+                <q-toolbar-title v-if="$route.name === 'editLogo'" align="middle">
+                    Logo
+                </q-toolbar-title>
+                <q-toolbar-title v-if="$route.name === 'editColors'" align="middle">
+                    Farben
                 </q-toolbar-title>
                 <q-toolbar-title v-if="$route.name === 'inspectionOrderOverview'" align="middle">
                     Prüfaufträge
