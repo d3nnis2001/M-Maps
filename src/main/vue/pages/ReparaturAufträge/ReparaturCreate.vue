@@ -4,6 +4,7 @@ import {getChecklists, sendRepair} from "@/main/vue/api/reparatur";
 import {useQuasar} from "quasar";
 import {useRoute, useRouter} from "vue-router";
 import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";
+import {compareFreigabeberechtigter} from "../../api/admin";
 
 export default {
     components: {StandardInput},
@@ -72,7 +73,7 @@ export default {
             }
             return true;
         }
-        function sendData() {
+        async function sendData() {
             const err = checkInputs()
             console.log(err)
             if (err) {

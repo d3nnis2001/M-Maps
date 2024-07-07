@@ -23,4 +23,5 @@ public interface UserServices extends UserDetailsService {
     String getToken(String email, String password);
     ArrayList<String> getRoles(String email, String token);
     String getUserByToken(String token);
+    String compareFreigabe(String freigabe);
 }

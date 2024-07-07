@@ -172,4 +172,20 @@ public class UserServicesImpl implements UserServices {
         }
         return null;
     }
+
+    public String compareFreigabe (String freigabe) {
+        Iterable<UserModel> al = userRepo.findAll();
+        ArrayList<UserModel> user = new ArrayList<>();
+        for (UserModel userModel : al) {
+            user.add(userModel);
+        }
+        for (int i = 0; i < user.size(); i++) {
+            String name = user.get(i).getFirstname() + " " + user.get(i).getLastname();
+            System.out.println("TEST: " + name);
+            if (name.equals(freigabe)) {
+                return user.get(i).getUsername();
+            }
+        }
+        return null;
+    }
 }

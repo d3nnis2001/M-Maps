@@ -167,28 +167,31 @@ const router = createRouter({
         {
             path: "/dataviewer/point/:pointId",
             name: "dataviewerPoint",
-            component: DataviewerPoint
+            component: DataviewerPoint,
+            meta: {showLogin: false, showHeader: true, authorized: true}
         },
         {
             path: "/checklists",
             name: "checklistOverview",
             component: checklistOverview,
+            meta: {showLogin: false, showHeader: true, authorized: true}
         },
         {
             path: "/checklists/create",
             name: "checklistCreate",
             component: checklistCreate,
+            meta: {showLogin: false, showHeader: true, authorized: true}
         },
         {
             path: "/checklists/:name",
             name: "checklistSingle",
             component: checklistSingle,
+            meta: {showLogin: false, showHeader: true, authorized: true}
         },
         {
             path: "/checklists/edit/:name",
             name: "checklistEdit",
             component: checklistEdit,
-            component: DataviewerPoint,
             meta: {showLogin: false, showHeader: true, authorized: true}
         }
     ]
@@ -204,22 +207,24 @@ router.beforeEach((to, from, next) => {
     if (to.meta.authorized && !authenticated) {
         console.log("2")
         next({name: 'start'});
-    } else if (authenticated && !from.name === 'start') {
-        if (!userStore.hasRole('Administrator') && to.name === 'adminmain' && to.name === 'EditUser') { // es fehlt: (|| to.name=== 'checkliste')
+    } else if (authenticated && to.name !== 'start') {
+        if (!userStore.hasRole('Administrator') && (to.name === 'adminmain' || to.name === 'EditUser' || to.name === 'checklistOverview' || to.name === 'checklistCreate' || to.name === 'checklistEdit' || to.name === 'checklistSingle')) {
             console.log("TEST1")
             next({name: from.name})
-        } else if ((!userStore.hasRole('Prüfer') || !userStore.hasRole('Freigabeberechtigter')) && to.name === 'Repair' && to.name === 'RepairCreate' && to.name === 'RepairEdit') {
+        } else if (!userStore.hasRole('Prüfer') && (to.name === 'Repair' || to.name === 'RepairCreate' || to.name === 'RepairEdit')) {
             console.log("TEST2")
             next({name: from.name})
-        } else if ((!userStore.hasRole('Prüfer') || !userStore.hasRole('Bearbeiter')) && to.name === 'inspectionOrderOverview' && to.name === 'createInspectionOrder' && to.name === 'editInspectionOrder') {
+        } else if ((!userStore.hasRole('Prüfer') && !userStore.hasRole('Bearbeiter')) && (to.name === 'inspectionOrderOverview' || to.name === 'createInspectionOrder' || to.name === 'editInspectionOrder')) {
             console.log("TEST3")
             next({name: from.name})
-        } else if ((!userStore.hasRole('Prüfer') || !userStore.hasRole('Datenverwalter')) && to.name === 'dataimport' ) {
+        } else if ((!userStore.hasRole('Prüfer') && !userStore.hasRole('Datenverwalter')) && to.name === 'dataimport' ) {
             console.log("TEST4")
             next({name: from.name})
-        } else if ((!userStore.hasRole('Prüfer') || !userStore.hasRole('Bearbeiter'))  && to.name === 'archiv' ) {
+        } else if ((!userStore.hasRole('Prüfer') && !userStore.hasRole('Bearbeiter'))  && to.name === 'archiv' ) {
             console.log("TEST5")
             next({name: from.name})
+        } else {
+            next();
         }
     } else {
         next()

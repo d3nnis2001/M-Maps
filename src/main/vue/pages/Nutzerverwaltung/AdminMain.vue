@@ -32,7 +32,7 @@ const showConfirmDialog = ref(false);
 const currentRow = reactive({});
 const rowToDelete = ref(null);
 const {notify} = useQuasar();
-const allRoles = ['Administrator', 'Datenverwalter', 'Bearbeiter', 'Prüfer', 'Freigabeberechtigter'];
+const allRoles = ['Administrator', 'Datenverwalter', 'Bearbeiter', 'Prüfer'];
 const router = useRouter()
 
 async function getData() {

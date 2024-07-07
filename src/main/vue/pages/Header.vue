@@ -8,12 +8,12 @@ const rightDrawerOpen = ref(false)
 const userStore = useUserStore()
 
 const links = [
-    { name: 'map', label: 'Map', to: '/map', roles: ['Administrator', 'Bearbeiter', 'Prüfer', 'Datenverwalter', 'Freigabeberechtigter']},
+    { name: 'map', label: 'Map', to: '/map', roles: ['Administrator', 'Bearbeiter', 'Prüfer', 'Datenverwalter']},
     { name: 'repair', label: 'Reparaturaufträge', to: '/repair', roles: ['Prüfer', 'Freigabeberechtigter'] },
     { name: 'inspectionOrderOverview', label: 'Prüfaufträge', to: '/inspectionOrder', roles: ['Prüfer', 'Bearbeiter']},
     { name: 'admin', label: 'Nutzerverwaltung', to: '/admin', roles: ['Administrator'] },
-    { name: 'dataimport', label: 'Datenverwaltung', to: '/dataimport', roles: ['Datenverwalter'] },
-    { name: 'dataviewer', label: 'Dataviewer', to: '/dataviewer', roles: ['Administrator', 'Bearbeiter', 'Prüfer', 'Datenverwalter', 'Freigabeberechtigter']}
+    { name: 'dataimport', label: 'Datenverwaltung', to: '/dataimport', roles: ['Datenverwalter', 'Prüfer'] },
+    { name: 'dataviewer', label: 'Dataviewer', to: '/dataviewer', roles: ['Administrator', 'Bearbeiter', 'Prüfer', 'Datenverwalter']}
 ]
 const links2 = [
     { name: 'home', label: 'Abmelden', to: '/' },

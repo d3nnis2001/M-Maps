@@ -119,4 +119,11 @@ public class UserController {
         String username = userService.getUserByToken(token);
         return username;
     }
+
+    @PostMapping("/user/freigabe")
+    public String compareFreigabe (final WebRequest request) {
+        String freigabe = request.getParameter("freigabe");
+        String username = userService.compareFreigabe(freigabe);
+        return username;
+    }
 }
