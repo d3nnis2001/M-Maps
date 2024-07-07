@@ -27,7 +27,7 @@ public class InitializeDatabase implements InitializingBean {
     private final GeoTrackData geoTrackRepository;
 
     @Autowired
-    public InitializeDatabase(final UserRepository usRepo, final InspectionOrderRepository ioRepo, final ReperaturRepository reRepo,
+    public InitializeDatabase(final UserRepository usRepo, final InspectionOrderRepository ioRepo, final ReparaturRepository reRepo,
                               final ChecklistRepository checkRepo, final GleisLageRangeRepository r, final GeoTrackData gTD, final SettingsRepository settingsRepository,
                               final ChecklistRepository checklistRepository) {
         this.usRepo = usRepo;
@@ -47,7 +47,7 @@ public class InitializeDatabase implements InitializingBean {
         initRanges();
         initGeoTrack();
         initSettings();
-        initInspectionOrder();;
+        initInspectionOrder();
         initChecklistTemplates();
     }
     public void initUsers() {
