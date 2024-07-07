@@ -4,15 +4,15 @@ import com.gpse.basis.domain.DataSet;
 import com.gpse.basis.domain.FileUploadResponse;
 import com.gpse.basis.domain.GeoData;
 import com.gpse.basis.domain.GleisLageDatenpunkt;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
+/**
+ * The interface File service.
+ */
 public interface FileService {
     List<FileUploadResponse> handleImport(List<String> paths, List<String> streckenIds);
     List<DataSet> getDataSets(String searchString);

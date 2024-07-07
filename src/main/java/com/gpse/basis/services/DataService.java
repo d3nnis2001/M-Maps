@@ -1,18 +1,35 @@
 package com.gpse.basis.services;
 
 import com.gpse.basis.domain.GeoData;
-import com.gpse.basis.domain.GleisLageDatenpunkt;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The interface Data service.
+ */
 public interface DataService {
-    public enum Colors{
+    /**
+     * The enum Colors.
+     */
+    public enum Colors {
+        /**
+         * Normal colors.
+         */
         NORMAL,
+        /**
+         * Low colors.
+         */
         LOW,
+        /**
+         * Medium colors.
+         */
         MEDIUM,
+        /**
+         * High colors.
+         */
         HIGH,
 
 
