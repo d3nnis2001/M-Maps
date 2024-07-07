@@ -31,6 +31,7 @@ import checklistOverview from "@/main/vue/pages/Checklists/ChecklistList.vue";
 import checklistCreate from "@/main/vue/pages/Checklists/ChecklistCreate.vue";
 import checklistSingle from "@/main/vue/pages/Checklists/ChecklistSingle.vue";
 import checklistEdit from "@/main/vue/pages/Checklists/ChecklistEdit.vue";
+import UserProfile from "@/main/vue/pages/Nutzerprofil/UserProfile.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -195,6 +196,11 @@ const router = createRouter({
             path: "/checklists/edit/:name",
             name: "checklistEdit",
             component: checklistEdit,
+        },
+        {
+            path: "/userprofile/:username",
+            name: "userprofile",
+            component: UserProfile,
         }
     ]
 })
