@@ -93,9 +93,10 @@ export default {
 </script>
 
 <template>
-    <q-page padding
-            v-show="!smallScreen && largeScreen"
-            flat bordered
+    <q-page
+        padding
+        v-show="!smallScreen && largeScreen"
+        flat bordered
     >
 
         <div class="outline">

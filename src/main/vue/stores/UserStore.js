@@ -71,6 +71,7 @@ export const useUserStore = defineStore('userStore', () => {
         logout,
         hasRole,
         decodeToken,
+        username
     }
 })
 
