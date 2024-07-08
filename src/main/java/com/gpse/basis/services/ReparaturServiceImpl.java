@@ -129,7 +129,8 @@ public class ReparaturServiceImpl implements ReparaturService {
         Iterator<Reparatur> iterator = it.iterator();
         while (iterator.hasNext()) {
             Reparatur repSolo = iterator.next();
-            if (repSolo.getGeocords().getLatitude().equals(latitude.toString()) && repSolo.getGeocords().getLongitude().equals(longitude.toString())) {
+            if (repSolo.getGeocords().getLatitude().equals(latitude.toString())
+                && repSolo.getGeocords().getLongitude().equals(longitude.toString())) {
                 reparaturs.add(repSolo);
             }
         }
