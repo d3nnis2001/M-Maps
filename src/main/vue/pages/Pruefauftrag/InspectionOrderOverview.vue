@@ -71,6 +71,7 @@ export default {
             console.log("Bearbeiter: ", bearbeiter.value);
             pruefer.value = userStore.hasRole('Prüfer');
             console.log("Prüfer: ", pruefer.value)
+
             await fetchData();
 
         })

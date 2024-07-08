@@ -127,13 +127,14 @@ public class UserController {
      * @param request - Anfrage
      * @return - token
      */
+    @Operation(summary = "Token wird erstellt",
+        description = "Der Token wird im Backend erstellt und als String zurückgegeben")
     @PostMapping("/user/getToken")
     public String getToken(final WebRequest request) {
         String password = request.getParameter(passwort_string);
         String email = request.getParameter(email_string);
 
         String token = userService.getToken(email, password);
-        System.out.println("TEST-controller: " + token);
         return token;
     }
 
@@ -142,6 +143,8 @@ public class UserController {
      * @param request - Anfrage
      * @return - roles
      */
+    @Operation(summary = "Rollen zurückgeben per Token",
+        description = "alle Rollen des Users mit dem zugehörigen Token werden in einer ArrayList zurückgegeben")
     @PostMapping("/user/getRolesByToken")
     public ArrayList<String> getRolesByToken(final WebRequest request) {
         String email = request.getParameter(email_string);
@@ -156,6 +159,8 @@ public class UserController {
      * @param request - Anfrage
      * @return - username
      */
+    @Operation(summary = "Username per Token aus der Datenbank holen",
+        description = "Der Username wird mit dem zugehörigen Token zurückgegeben")
     @PostMapping("/user/getUserByToken")
     public String getUserByToken(final WebRequest request) {
         String token = request.getParameter(token_string);
@@ -168,6 +173,8 @@ public class UserController {
      * @param request - Anfrage
      * @return - username
      */
+    @Operation(summary = "Vergleich des Freigabeberechtigten",
+        description = "Der Name des Freigabeberechtigten wird mit dem Username in der Datenbank verglichen")
     @PostMapping("/user/freigabe")
     public String compareFreigabe(final WebRequest request) {
         String freigabe = request.getParameter("freigabe");
