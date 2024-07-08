@@ -44,194 +44,194 @@ const router = createRouter({
             path: '/',
             name: 'start',
             component: Start,
-            meta: {showLogin: false, showHeader: false, authorized: false}
+            meta: {showHeader: false, authorized: false}
         },
         {
             path: '/map',
             name: 'map',
             component: MapView,
-            meta: {showLogin: false, showHeader: true, authorized: true}
+            meta: {showHeader: true, authorized: true}
         },
         {
             path: '/dataimport',
             name: 'dataimport',
             component: DataImport,
-            meta: {showLogin: false, showHeader: true, authorized: true}
+            meta: {showHeader: true, authorized: true}
         },
         {
             path: '/archiv',
             name: 'archiv',
             component: Archiv,
-            meta: {showLogin: false, showHeader: true, authorized: true}
+            meta: {showHeader: true, authorized: true}
         },
         {
             path: "/login",
             name: "login",
             component: Login,
-            meta: {showLogin: true, showHeader: false, authorized: false}
+            meta: {showHeader: false, authorized: false}
         },
         {
             path: "/register",
             name: "register",
             component: Registration,
-            meta: {showLogin: false, showHeader: false, authorized: false}
+            meta: {showHeader: false, authorized: false}
         },
         {
             path: "/password",
             name: "password",
             component: Password,
-            meta: {showLogin: false, showHeader: false, authorized: false}
+            meta: {showHeader: false, authorized: false}
         },
         {
             path: "/forgotPassword",
             name: "forgotPassword",
             component: ForgotPassword,
-            meta: {showLogin: false, showHeader: false, authorized: false}
+            meta: {showHeader: false, authorized: false}
         },
         {
             path: "/reset-password",
             name: "setNewPassword",
             component: ResetPassword,
-            meta: {showLogin: false, showHeader: false, authorized: false}
+            meta: {showHeader: false, authorized: false}
         },
         {
             path: "/repair",
             name: "Repair",
             component: ReparaturOverview,
-            meta: {showLogin: false, showHeader: true, authorized: true}
+            meta: {showHeader: true, authorized: true}
         },
         {
             path: "/repair/create",
             name: "RepairCreate",
             component: ReparaturCreate,
-            meta: {showLogin: false, showHeader: true, authorized: true}
+            meta: {showHeader: true, authorized: true}
         },
         {
             path: "/repair/:name/edit",
             name: "RepairEdit",
             component: ReparaturEdit,
-            meta: {showLogin: false, showHeader: true, authorized: true}
+            meta: {showHeader: true, authorized: true}
         },
         {
             path: "/repair-order-trackbuilder",
             name: "TrackBuilder",
             component: TrackBuilderView,
-            meta: {showLogin: false, showHeader: false, authorized: false}
+            meta: {showHeader: false, authorized: false}
         },
         {
             path: "/admin",
             name: "adminmain",
             component: AdminMain,
-            meta: {showLogin: false, showHeader: true, authorized: true}
+            meta: {showHeader: true, authorized: true}
         },
         {
             path: "/admin/:username/editUser",
             name: "editUser",
             component: EditUser,
-            meta: {showLogin: false, showHeader: true, authorized: true}
+            meta: {showHeader: true, authorized: true}
         },
         {
             path: "/inspectionOrder",
             name: "inspectionOrderOverview",
             component: InspectionOrderOverview,
-            meta: {showLogin: false, showHeader: true, authorized: true}
+            meta: {showHeader: true, authorized: true}
         },
         {
             path: "/inspectionOrder/create",
             name: "createInspectionOrder",
             component: CreateInspectionOrder,
-            meta: {showLogin: false, showHeader: true, authorized: true}
+            meta: {showHeader: true, authorized: true}
         },
         {
             path: "/inspectionOrder/:inspectionOrderId/edit",
             name: "editInspectionOrder",
             component: EditInspectionOrder,
-            meta: {showLogin: false, showHeader: true, authorized: true}
+            meta: {showHeader: true, authorized: true}
         },
         {
             path: "/impressum",
             name: "impressum",
             component: Impressum,
-            meta: {showLogin: false, showHeader: true, authorized: false}
+            meta: {showHeader: true, authorized: false}
         },
         {
             path: "/dataviewer",
             name: "dataviewer",
             component: Dataviewer,
-            meta: {showLogin: false, showHeader: true, authorized: true}
+            meta: {showHeader: true, authorized: true}
         },
         {
             path: "/dataviewer/route/:id/from/:fromId/to/:toId",
             name: "dataviewerRoute",
             component: DataviewerRoute,
-            meta: {showLogin: false, showHeader: true, authorized: true}
+            meta: {showHeader: true, authorized: true}
         },
         {
             path: "/dataviewer/route/:id",
             name: "dataviewerRouteOnly",
             component: DataviewerRoute,
-            meta: {showLogin: false, showHeader: true, authorized: true}
+            meta: {showHeader: true, authorized: true}
         },
         {
             path: "/dataviewer/point/:pointId",
             name: "dataviewerPoint",
             component: DataviewerPoint,
-            meta: {showLogin: false, showHeader: true, authorized: true}
+            meta: {showHeader: true, authorized: true}
         },
         {
             path: "/checklists",
             name: "checklistOverview",
             component: checklistOverview,
-            meta: {showLogin: false, showHeader: true, authorized: true}
+            meta: {showHeader: true, authorized: true}
         },
         {
             path: "/checklists/create",
             name: "checklistCreate",
             component: checklistCreate,
-            meta: {showLogin: false, showHeader: true, authorized: true}
+            meta: {showHeader: true, authorized: true}
         },
         {
             path: "/checklists/:name",
             name: "checklistSingle",
             component: checklistSingle,
-            meta: {showLogin: false, showHeader: true, authorized: true}
+            meta: {showHeader: true, authorized: true}
         },
         {
             path: "/checklists/edit/:name",
             name: "checklistEdit",
             component: checklistEdit,
-            meta: {showLogin: false, showHeader: true, authorized: true}
+            meta: {showHeader: true, authorized: true}
 
         },
         {
             path: "/settings",
             name: "settings",
             component: changeSettings,
-            meta: {showLogin: false, showHeader: true, authorized: true}
+            meta: {showHeader: true, authorized: true}
         },
         {
             path: "/settings/edit/impressum",
             name: "editImpressum",
             component: editImpressum,
-            meta: {showLogin: false, showHeader: true, authorized: true}
+            meta: {showHeader: true, authorized: true}
         },
         {
             path: "/settings/edit/logo",
             name: "editLogo",
             component: editLogo,
-            meta: {showLogin: false, showHeader: true, authorized: true}
+            meta: {showHeader: true, authorized: true}
         },
         {
             path: "/settings/edit/colors",
             name: "editColors",
             component: editColors,
-            meta: {showLogin: false, showHeader: true, authorized: true}
+            meta: {showHeader: true, authorized: true}
         },
         {
             path: "/userprofile/:username",
             name: "userprofile",
             component: UserProfile,
-            meta: {showLogin: false, showHeader: true, authorized: true}
+            meta: {showHeader: true, authorized: true}
         }
     ]
 })

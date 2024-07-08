@@ -102,7 +102,12 @@ async function unlockCurrentUser(selectedUser) {
     console.log(selectedUser)
     const unlockSuccessful = await unlockUser(selectedUser);
     if (unlockSuccessful) {
-        router.go(0);
+        const row = table.rows.find(row => row.username === selectedUser);
+        if (row) {
+            row.unlocked = "";
+            console.log(row.unlocked)
+        }
+        showDialog.value = false;
     } else {
         showDialog.value = false;
         console.log("Problem")

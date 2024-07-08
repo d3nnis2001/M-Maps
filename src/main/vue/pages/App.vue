@@ -6,7 +6,6 @@ import Login from "@/main/vue/pages/Login/Login.vue"
 <template>
     <q-layout view="hHh lpR fFf">
         <Header v-if="$route.meta.showHeader"/>
-        <Login v-if="$route.meta.showLogin"/>
         <q-page-container>
             <router-view/>
         </q-page-container>

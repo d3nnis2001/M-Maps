@@ -90,7 +90,7 @@ function register() {
                 message: 'Registration was successful!',
                 caption: 'Your account will be activated once an admin unlocks your account'
             })
-            router.push('start')
+            router.push('/login')
         } else {
             $q.notify({
                 type: 'negative',
