@@ -9,6 +9,7 @@ import com.gpse.basis.services.DataService;
 import com.gpse.basis.services.ReparaturService;
 import com.gpse.basis.services.ReparaturService;
 import com.gpse.basis.services.RosBagService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
@@ -38,13 +39,13 @@ public class MapController {
         this.dataService = dataService;
         this.repService = rps;
     }
-
+    @Operation(summary = "Geodata", description = "Holt alle Geodaten die existieren aus der Datenbank.")
     @GetMapping("/gettracks")
     public ArrayList<GeoData> getAllGeoData() {
         return dataService.getGeoData();
     }
 
-
+    @Operation(summary = "Heatmap Part", description = "Holt einen Teil der Heatmap Daten.")
     @PostMapping("/getpartheatmap")
     public List<ResponseColor> getPartOfHeatmap(final WebRequest request) {
         String strecke = request.getParameter("strecke");
@@ -65,6 +66,7 @@ public class MapController {
         return kolor;
     }
 
+    @Operation(summary = "Heatmap", description = "Holt Heatmap Daten mit zugehöriger Farbe.")
     @PostMapping("/getheatmap")
     public List<Map.Entry<DataService.Colors, String>> getHeatmap() {
         return dataService.getHeatmap();
@@ -88,7 +90,7 @@ public class MapController {
         }
     }
 
-
+    @Operation(summary = "Geodata nach Strecke", description = "Holt Geodata von einer Strecke.")
     @PostMapping("/getDataGeoTrack")
     public Double[] getDatatoGeoTrack(final WebRequest request) {
         String strecke = request.getParameter("id");
@@ -97,11 +99,13 @@ public class MapController {
         return dataService.getDataForGeoPart(strecke);
     }
 
+    @Operation(summary = "Hol alle Reparaturaufträge", description = "Holt Repaufräge aus der Datenbank.")
     @PostMapping("/getReparaturForMap")
     public List<Reparatur> getReparaturforMap() {
         return repService.getReparaturForMap();
     }
 
+    @Operation(summary = "Images", description = "Holt images von einer Strecke.")
     @PostMapping("/getCameraImageforTrack")
     public List<String> getCameraImageForTrackRequest(final WebRequest request) {
         int trackId = Integer.parseInt(request.getParameter("trackid"));

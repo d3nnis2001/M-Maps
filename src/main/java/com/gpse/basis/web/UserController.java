@@ -39,6 +39,7 @@ public class UserController {
      * @param request - Anfrage
      * @return - Response
      */
+    @Operation(summary = "Registrierung", description = "Registriert ein Nutzer.")
     @PostMapping("/register")
     public ResponseEntity<Boolean> register(final WebRequest request) {
         String email = request.getParameter(email_string);
@@ -78,6 +79,7 @@ public class UserController {
      * @param request - Anfrage
      * @return - response
      */
+    @Operation(summary = "Login", description = "Prüft die Daten mit den Daten in der Datenbank.")
     @PostMapping("/login")
     public ResponseEntity<Boolean> login(final WebRequest request) {
         String email = request.getParameter(email_string);
@@ -93,6 +95,7 @@ public class UserController {
      * @param request - Anfrage
      * @return - response
      */
+    @Operation(summary = "Passwort Reset", description = "Schickt ein Link per Email-Service für die Passwort Zurücksetzung.")
     @PostMapping("/user/resetPassword")
     public ResponseEntity<Boolean> changePassword(final WebRequest request) {
         String email = request.getParameter(email_string);
@@ -109,6 +112,7 @@ public class UserController {
      * @param request - Anfrage
      * @return response
      */
+    @Operation(summary = "Passwort", description = "Setzt das Passwort zurück auf ein neues.")
     @PostMapping("/user/setPassword")
     public ResponseEntity<Boolean> resetPassword(final WebRequest request) {
         String password = request.getParameter(passwort_string);

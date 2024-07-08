@@ -177,6 +177,6 @@ onUnmounted(() => {
     </q-page>
 </template>
 
-<style scoped>
+<style>
 
 </style>
