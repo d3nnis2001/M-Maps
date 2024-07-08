@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useSettingsStore } from "@/main/vue/stores/SettingsStore";
 
 import DataImport from "../pages/DataImport/DataImport.vue";
 import Login from '../pages/Login/Login.vue'
@@ -28,6 +29,11 @@ import checklistEdit from "@/main/vue/pages/Checklists/ChecklistEdit.vue";
 import axios from "axios";
 import Impressum from "@/main/vue/pages/Login/Impressum.vue";
 import {useUserStore} from "@/main/vue/stores/UserStore";
+import changeSettings from "@/main/vue/pages/Settings/ChangeSettings.vue";
+import editImpressum from "@/main/vue/pages/Settings/EditImpressum.vue";
+import editLogo from "@/main/vue/pages/Settings/editLogo.vue";
+import Impressum from "@/main/vue/pages/Impressum.vue";
+import editColors from "@/main/vue/pages/Settings/editColors.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -193,13 +199,36 @@ const router = createRouter({
             name: "checklistEdit",
             component: checklistEdit,
             meta: {showLogin: false, showHeader: true, authorized: true}
+
+        },
+        {
+            path: "/settings",
+            name: "settings",
+            component: changeSettings,
+        },
+        {
+            path: "/settings/edit/impressum",
+            name: "editImpressum",
+            component: editImpressum,
+        },
+        {
+            path: "/settings/edit/logo",
+            name: "editLogo",
+            component: editLogo
+        },
+        {
+            path: "/settings/edit/colors",
+            name: "editColors",
+            component: editColors
         }
     ]
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async(to, from, next) => {
     const authenticated = axios.defaults.headers['Authorization'] !== null;
     document.title = to.name;
+    await useSettingsStore().getColors()
+  // Something which should be executed before each routing
     console.log(to.meta.authorized)
     console.log(authenticated)
     const userStore = useUserStore();

@@ -707,7 +707,7 @@ export default {
             <div class="q-pa-xs">
                 <div>
                     <p>Strecken ID: {{routeId}}</p>
-                    <q-badge color="secondary">
+                    <q-badge color="accent">
                         von {{ rangeValues.min }} bis {{ rangeValues.max }}
                     </q-badge>
                     <!--<q-input class="q-pa-xs" outlined v-model="routeId" ></q-input>

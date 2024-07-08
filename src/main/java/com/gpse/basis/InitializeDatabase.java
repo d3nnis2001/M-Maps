@@ -15,18 +15,20 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Service
 @Profile("Name1")
 public class InitializeDatabase implements InitializingBean {
+    private static final String PRIMARY_AND_DARK_COLOR = "#282D37";
     private final UserRepository usRepo;
     private final InspectionOrderRepository ioRepo;
     private final ReparaturRepository reRepo;
     private final ChecklistRepository checkRepo;
     private final GleisLageRangeRepository glrRepo;
     private final ChecklistRepository checklistRepository;
+    private final SettingsRepository settingsRepository;
+
     private final GeoTrackData geoTrackRepository;
 
     @Autowired
-    public InitializeDatabase(final UserRepository usRepo, final InspectionOrderRepository ioRepo, final ReparaturRepository reRepo,
-                              final ChecklistRepository checkRepo, final GleisLageRangeRepository r, final GeoTrackData gTD,
-                              final ChecklistRepository checklistRepository) {
+    public InitializeDatabase(final UserRepository usRepo, final InspectionOrderRepository ioRepo, final ReperaturRepository reRepo,
+                              final ChecklistRepository checkRepo, final GleisLageRangeRepository r, final GeoTrackData gTD, final SettingsRepository settingsRepository) {
         this.usRepo = usRepo;
         this.ioRepo = ioRepo;
         this.reRepo = reRepo;
@@ -34,6 +36,7 @@ public class InitializeDatabase implements InitializingBean {
         this.glrRepo = r;
         this.geoTrackRepository = gTD;
         this.checklistRepository = checklistRepository;
+        this.settingsRepository = settingsRepository;
     }
 
     @Override
@@ -42,9 +45,11 @@ public class InitializeDatabase implements InitializingBean {
         initChecklists();
         initRanges();
         initGeoTrack();
-        initInspectionOrder();;
+        initInspectionOrder();
         initChecklistTemplates();
+        initSettings();
     }
+
     public void initUsers() {
         // Test User 1
         UserModel user = new UserModel("d3nnis.s@web.de", "hello", "Georg", "Bauer");
@@ -63,6 +68,7 @@ public class InitializeDatabase implements InitializingBean {
         usRepo.save(user3);
         usRepo.save(user4);
     }
+
     public void initChecklists() {
         ArrayList<String> items = new ArrayList<>();
         items.add("Checker 1");
@@ -106,17 +112,24 @@ public class InitializeDatabase implements InitializingBean {
         ioRepo.save(inspec2);
     }
 
+    private void initSettings() {
+        Settings settings = new Settings("", new Colors(PRIMARY_AND_DARK_COLOR, "#ec0016",
+            "#1e7f5e", "#e21437", "#fec705", PRIMARY_AND_DARK_COLOR, "#31CCEC"),
+            new byte[0]);
+        settingsRepository.save(settings);
+    }
+
 
     public void initGeoTrack() {
         Iterable<GeoData> lst = geoTrackRepository.findAll();
         AtomicBoolean found = new AtomicBoolean(false);
         lst.forEach(w -> {
-            if(w.getStrecken_id() == 1) {
+            if (w.getStrecken_id() == 1) {
                 found.set(true);
             }
         });
-        if(!found.get())
-            geoTrackRepository.save(new GeoData(1, 52.17027,  9.08446,0, "1"));
+        if (!found.get())
+            geoTrackRepository.save(new GeoData(1, 52.17027, 9.08446, 0, "1"));
     }
     public void initChecklistTemplates() {
         // Test Checklist Template 1

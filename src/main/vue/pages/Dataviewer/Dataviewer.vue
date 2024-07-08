@@ -140,12 +140,12 @@ export default {
                 <q-fab
                     label="Actions"
                     vertical-actions-align="left"
-                    color="red"
+                    color="accent"
                     icon="keyboard_arrow_left"
                     direction="left"
                 >
                     <q-fab-action
-                        color="red"
+                        color="accent"
                         @click="onClickHome"
                         icon="home"
                     />
