@@ -64,12 +64,14 @@ export const useUserStore = defineStore('userStore', () => {
         localStorage.removeItem('token')
     }
 
-    return {authenticated,
+    return {
+        authenticated,
         authenticate,
         requestToken,
         logout,
         hasRole,
-        decodeToken}
+        decodeToken,
+    }
 })
 
 axios.defaults.headers['Authorization'] = localStorage.getItem('token')

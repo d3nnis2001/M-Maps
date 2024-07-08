@@ -2,18 +2,20 @@
 import {onMounted, onUnmounted, ref} from 'vue';
 import { useRoute } from 'vue-router';
 import {getUserByUsername} from "@/main/vue/api/userprofile";
-import router from "@/main/vue/router";
-import {useQuasar} from "quasar";
+import {useUserStore} from "@/main/vue/stores/UserStore";
 
+const userStore = useUserStore()
 const smallScreen = ref(false);
 const largeScreen = ref(true);
 const route = useRoute();
 const currentUser = ref({user: []})
-const username = route.params.username.toString();
+//const username = userStore;
+const username = "mauricemeise@gmx.net"
 const firstname = ref('')
 const lastname = ref('')
 const userRegion = ref({regions:[]})
 const regions = [''];
+const roles = ref({selected_roles: []})
 
 const checkScreenSize = () => {
     const screenSize = window.innerWidth;
@@ -26,10 +28,11 @@ onMounted(async () => {
     checkScreenSize();
     window.addEventListener('resize', checkScreenSize);
     currentUser.value = await getUserByUsername(username);
-    console.log(currentUser.value)
+    console.log(currentUser)
     if (currentUser.value) {
         firstname.value = currentUser.value.firstname;
         lastname.value = currentUser.value.lastname;
+        console.log("Region: " + currentUser.value.region)
         if (currentUser.value.region !== undefined) {
             currentUser.value.region.forEach((region) => {
                 console.log(region)
@@ -39,7 +42,7 @@ onMounted(async () => {
         if (currentUser.value.roles !== null && currentUser.value.roles !== undefined) {
             currentUser.value.roles.forEach((role) => {
                 console.log(role)
-                updatedRoles.value.selected_roles.push(role)
+                roles.value.selected_roles.push(role)
             })
         }
     }
@@ -89,7 +92,7 @@ onUnmounted(() => {
                                     <q-item-label>Roles</q-item-label>
                                 </q-item-section>
                                 <q-item-section side>
-                                    <q-item-label>{{ roles }}</q-item-label>
+                                    <q-item-label>{{ roles.selected_roles }}</q-item-label>
                                 </q-item-section>
                             </q-item>
                             <q-item>
