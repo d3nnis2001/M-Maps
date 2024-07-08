@@ -230,6 +230,7 @@ const router = createRouter({
             path: "/userprofile/:username",
             name: "userprofile",
             component: UserProfile,
+            meta: {showLogin: false, showHeader: true, authorized: true}
         }
     ]
 })
