@@ -13,7 +13,8 @@ const links = [
     { name: 'inspectionOrderOverview', label: 'Prüfaufträge', to: '/inspectionOrder', roles: ['Prüfer', 'Bearbeiter']},
     { name: 'admin', label: 'Nutzerverwaltung', to: '/admin', roles: ['Administrator'] },
     { name: 'dataimport', label: 'Datenverwaltung', to: '/dataimport', roles: ['Datenverwalter', 'Prüfer'] },
-    { name: 'dataviewer', label: 'Dataviewer', to: '/dataviewer', roles: ['Administrator', 'Bearbeiter', 'Prüfer', 'Datenverwalter']}
+    { name: 'dataviewer', label: 'Dataviewer', to: '/dataviewer', roles: ['Administrator', 'Bearbeiter', 'Prüfer', 'Datenverwalter']},
+    { name: 'settings', label: 'Design anpassen', to: '/settings', roles: ['Administrator']}
 ]
 const links2 = [
     { name: 'home', label: 'Abmelden', to: '/' },
@@ -85,6 +86,18 @@ const filteredLinks = computed(() => {
             </q-toolbar-title>
             <q-toolbar-title v-if="$route.name === 'dataviewerPoint'" align="middle">
                 Dataviewer für Punkt
+            </q-toolbar-title>
+            <q-toolbar-title v-if="$route.name === 'settings'" align="middle">
+                Design anpassen
+            </q-toolbar-title>
+            <q-toolbar-title v-if="$route.name === 'editImpressum'" align="middle">
+                Impressum
+            </q-toolbar-title>
+            <q-toolbar-title v-if="$route.name === 'editLogo'" align="middle">
+                Logo
+            </q-toolbar-title>
+            <q-toolbar-title v-if="$route.name === 'editColors'" align="middle">
+                Farben
             </q-toolbar-title>
             <q-img :src="'/src/main/resources/db-logo.png'" align="left"></q-img>
         </q-toolbar>

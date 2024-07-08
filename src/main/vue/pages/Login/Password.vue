@@ -8,7 +8,7 @@ import StandardCard from "@/main/vue/pages/Login/StandardCard.vue";
 import Heading from "@/main/vue/pages/Login/Heading.vue";
 import Description from "@/main/vue/pages/Login/Description.vue";
 import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";
-import Impressum from "@/main/vue/pages/Login/Impressum.vue";
+import Impressum from "@/main/vue/pages/Login/ImpressumTemplate.vue";
 import {useUserStore} from "../../stores/UserStore";
 import axios from "axios";
 

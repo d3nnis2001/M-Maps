@@ -3,7 +3,7 @@ import {ref} from 'vue'
 import {useQuasar} from 'quasar'
 import {resetPassword} from "@/main/vue/api/auth";
 import Heading from "@/main/vue/pages/Login/Heading.vue";
-import Impressum from "@/main/vue/pages/Login/Impressum.vue";
+import Impressum from "@/main/vue/pages/Login/ImpressumTemplate.vue";
 import Description from "@/main/vue/pages/Login/Description.vue";
 import StandardCard from "@/main/vue/pages/Login/StandardCard.vue";
 import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";

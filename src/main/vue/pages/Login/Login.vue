@@ -4,7 +4,7 @@ import {useLoginStore} from "../../stores/LoginStore"
 import {useUserStore} from "../../stores/UserStore"
 import {useQuasar} from 'quasar'
 import {useRouter} from 'vue-router'
-import Impressum from "@/main/vue/pages/Login/Impressum.vue";
+import Impressum from "@/main/vue/pages/Login/ImpressumTemplate.vue";
 import Heading from "@/main/vue/pages/Login/Heading.vue";
 import Description from "@/main/vue/pages/Login/Description.vue";
 import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";

@@ -27,7 +27,6 @@ import checklistCreate from "@/main/vue/pages/Checklists/ChecklistCreate.vue";
 import checklistSingle from "@/main/vue/pages/Checklists/ChecklistSingle.vue";
 import checklistEdit from "@/main/vue/pages/Checklists/ChecklistEdit.vue";
 import axios from "axios";
-import Impressum from "@/main/vue/pages/Login/Impressum.vue";
 import {useUserStore} from "@/main/vue/stores/UserStore";
 import changeSettings from "@/main/vue/pages/Settings/ChangeSettings.vue";
 import editImpressum from "@/main/vue/pages/Settings/EditImpressum.vue";
@@ -205,21 +204,25 @@ const router = createRouter({
             path: "/settings",
             name: "settings",
             component: changeSettings,
+            meta: {showLogin: false, showHeader: true, authorized: true}
         },
         {
             path: "/settings/edit/impressum",
             name: "editImpressum",
             component: editImpressum,
+            meta: {showLogin: false, showHeader: true, authorized: true}
         },
         {
             path: "/settings/edit/logo",
             name: "editLogo",
-            component: editLogo
+            component: editLogo,
+            meta: {showLogin: false, showHeader: true, authorized: true}
         },
         {
             path: "/settings/edit/colors",
             name: "editColors",
-            component: editColors
+            component: editColors,
+            meta: {showLogin: false, showHeader: true, authorized: true}
         }
     ]
 })
@@ -237,7 +240,8 @@ router.beforeEach(async(to, from, next) => {
         console.log("2")
         next({name: 'start'});
     } else if (authenticated && to.name !== 'start') {
-        if (!userStore.hasRole('Administrator') && (to.name === 'adminmain' || to.name === 'EditUser' || to.name === 'checklistOverview' || to.name === 'checklistCreate' || to.name === 'checklistEdit' || to.name === 'checklistSingle')) {
+        if (!userStore.hasRole('Administrator') && (to.name === 'adminmain' || to.name === 'EditUser' || to.name === 'checklistOverview' || to.name === 'checklistCreate' || to.name === 'checklistEdit' ||
+            to.name === 'checklistSingle' || to.name === 'settings' || to.name === 'editImpressum' || to.name === 'editLogo' || to.name === 'editColors')) {
             console.log("TEST1")
             next({name: from.name})
         } else if (!userStore.hasRole('Prüfer') && (to.name === 'Repair' || to.name === 'RepairCreate' || to.name === 'RepairEdit')) {
