@@ -34,6 +34,24 @@ export default {
             console.log(route.query.id);
             repairDetails.value = await getDetailsByID(id.value)
 
+            terminationDate.value = await getTerminationDate(id.value);
+            console.log(terminationDate)
+            console.log(terminationDate.value)
+
+            if (repairDetails.value && repairDetails.value.checklist && repairDetails.value.checklist.checkSel !== undefined) {
+                for (let i = 0; i < repairDetails.value.checklist.checkSel.length; i++) {
+                    ticked.value.push({label: repairDetails.value.checklist.checkSel.get(i), value: i});
+                }
+                let i = 0;
+                for (i; i < repairDetails.value.checklist.checkPoints.tasks.length; i++) {
+                    options.value.push({label: repairDetails.value.checklist.checkPoints.tasks[i], value: i});
+                }
+                console.log(i)
+                for (let j = i; j < repairDetails.value.checklist.checkPoints.material.length + i; j++) {
+                    options.value.push({label: repairDetails.value.checklist.checkPoints.material[j - i], value: j});
+                }
+            }
+            /*
             if (repairDetails.value && repairDetails.value.checklist) {
                 for (let i = 0; i < repairDetails.value.checklist.checkSel.length; i++) {
                     ticked.value.push({label: repairDetails.value.checklist.checkSel.get(i), value: i});
@@ -43,9 +61,8 @@ export default {
                 }
             }
 
-            terminationDate.value = await getTerminationDate(id.value);
-            console.log(terminationDate)
-            console.log(terminationDate.value)
+             */
+
         });
 
         onUnmounted(() => {
