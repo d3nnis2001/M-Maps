@@ -8,8 +8,9 @@ import StandardCard from "@/main/vue/pages/Login/StandardCard.vue";
 import Heading from "@/main/vue/pages/Login/Heading.vue";
 import Description from "@/main/vue/pages/Login/Description.vue";
 import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";
-import Impressum from "@/main/vue/pages/Login/Impressum.vue";
-import {useUserStore} from "@/main/vue/stores/UserStore.js";
+import Impressum from "@/main/vue/pages/Login/ImpressumTemplate.vue";
+import {useUserStore} from "../../stores/UserStore";
+import axios from "axios";
 
 const $q = useQuasar()
 const router = useRouter()
@@ -19,25 +20,28 @@ const userStore = useUserStore()
 
 const passwordVar = ref('')
 
+axios.defaults.headers['Authorization'] = null;
+
 async function password() {
     const email = route.query.email;
     const success = await loginStore.checkPassword(email, passwordVar.value)
     if (success) {
-        console.log(userStore.authenticated)
-        userStore.requestToken({ // hier kommt der Fehler: TypeError: userStore.requestToken is not a function
+        userStore.requestToken( {
             username: email,
             password: passwordVar.value
-        }).then(async () => {
-            console.log("success")
-            //await router.push("map")
-        }).catch(() => {
+        }).then( () => {
+            console.log("Success")
+            userStore.decodeToken();
+            console.log("Test")
+            router.push("/map")
+        }).catch( () => {
             $q.notify({
                 type: 'negative',
-                message: 'Token fehlgeschlagen',
-                caption: 'Falsches Passwort oder Benutzername'
-            })
+                message: 'Something went wrong with the token',
+                caption: 'Password does not match email'
+            });
         })
-        //await router.push("map")
+
     } else {
         $q.notify({
             type: 'negative',

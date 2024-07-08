@@ -18,8 +18,10 @@ public interface UserServices extends UserDetailsService {
     ArrayList<UserModel> getAllUsers();
     UserModel loadUserByUsername(String email);
     boolean updateRoles(String email, ArrayList<String> roles);
-
     UserModel getUserByUsername(String username);
-
     boolean unlockUser(String username);
+    String getToken(String email, String password);
+    ArrayList<String> getRoles(String email, String token);
+    String getUserByToken(String token);
+    String compareFreigabe(String freigabe);
 }

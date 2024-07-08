@@ -5,7 +5,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * GleisVDataRepository.
+ * The interface Gleis v data repository.
  */
 @Repository
 public interface GleisVDataRepository extends CrudRepository<GleisVData, String> {

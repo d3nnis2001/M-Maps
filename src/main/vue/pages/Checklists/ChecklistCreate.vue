@@ -51,27 +51,31 @@ async function addChecklist() {
 </script>
 
 <template>
-    <h1 class="text-align items-center text-h4">neue Checkliste erstellen</h1>
-    <div class="text-align items-center">
-        <StandardInput v-model="name" label="Name der Checkliste" class="padding-md"/>
-        <CheckPointList :list="taskList" label="neue Aufgabe">Aufgabenliste</CheckPointList>
-        <CheckPointList :list="materialList" label="neues Material">Materialliste</CheckPointList>
-        <span>
-            <router-link to="/checklists">
-                <q-btn label="Abbrechen" flat color="primary"/>
-            </router-link>
-            <q-btn label="Checkliste erstellen" @click="addChecklist" color="primary"/>
-        </span>
+    <h1 class="text-align items-center text-h4"><b>Neue Checkliste erstellen</b></h1>
+    <div class="centered-content" style="margin-bottom: 20px">
+        <StandardInput style="margin-left: 1vw; margin-bottom: 20px" v-model="name" label="Name der Checkliste" class="padding-md"/>
+        <h2 class="text-h6" style="display: flex; flex-direction: row; justify-content: flex-start; margin: 0; margin-left: 1vw"><b>Aufgabenliste</b></h2>
+        <CheckPointList :list="taskList" label="neue Aufgabe"></CheckPointList>
+        <h2 class="text-h6" style="display: flex; flex-direction: row; justify-content: flex-start; margin: 0; margin-left: 1vw"><b>Materialliste</b></h2>
+        <CheckPointList :list="materialList" label="neues Material"></CheckPointList>
+    </div>
+    <div style="margin-left: 6vw">
+        <q-btn label="Checkliste erstellen" @click="addChecklist" color="primary"/>
+        <router-link to="/checklists">
+            <q-btn style="margin-left: 2vw" label="Abbrechen" color="primary"/>
+        </router-link>
     </div>
 </template>
 
-<style scoped>
-.text-align {
-    text-align: center;
-}
+<style>
 
-.padding-md {
-    padding-bottom: 32px;
+.centered-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    margin-right: 5vw;
+    margin-left: 5vw;
 }
 
 </style>

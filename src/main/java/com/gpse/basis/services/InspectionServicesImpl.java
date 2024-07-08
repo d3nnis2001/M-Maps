@@ -70,11 +70,6 @@ public class InspectionServicesImpl implements InspectionServices {
     }
 
     @Override
-    public void acceptInspectionOrder(InspectionOrder inspectionOrder) {
-
-    }
-
-    @Override
     public Boolean deleteInspectionOrder(String inspectionOrderId) {
         try {
             InspectionOrder inspectionOrder = loadInspecById(inspectionOrderId);
@@ -145,6 +140,12 @@ public class InspectionServicesImpl implements InspectionServices {
         qu.addCriteria(Criteria.where(inspectionOrderId).is(id));
         template.remove(qu, InspectionOrder.class);
     }
-
+    @Override
+    public void editUsername(String inspectionOrderId, String username) {
+        InspectionOrder inspec2 = loadInspecById(inspectionOrderId);
+        inspec2.setUserId(username);
+        System.out.println("Success: " + username);
+        inspec.save(inspec2);
+    }
 
 }

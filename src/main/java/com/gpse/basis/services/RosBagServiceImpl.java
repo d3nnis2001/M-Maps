@@ -2,12 +2,10 @@ package com.gpse.basis.services;
 
 import com.github.swrirobotics.bags.reader.BagFile;
 import com.github.swrirobotics.bags.reader.BagReader;
-import com.github.swrirobotics.bags.reader.MessageHandler;
 import com.github.swrirobotics.bags.reader.TopicInfo;
 import com.github.swrirobotics.bags.reader.exceptions.BagReaderException;
 import com.github.swrirobotics.bags.reader.exceptions.UninitializedFieldException;
 import com.github.swrirobotics.bags.reader.messages.serialization.*;
-import com.github.swrirobotics.bags.reader.records.Connection;
 import com.gpse.basis.domain.CameraImage;
 import com.gpse.basis.domain.DataSet;
 import com.gpse.basis.domain.VelodynePoint;
@@ -24,9 +22,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -38,19 +33,37 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
 
 
+/**
+ * The type Ros bag service.
+ */
 @Service
-public class RosBagServiceImpl implements RosBagService{
-
+public class RosBagServiceImpl implements RosBagService {
+    private static final String IMAGE_DIRECTORY = "../gp-se-ss-2024-team1-2/rosbagPictures";
+    private static final String directory_name = "/rosbagPictures";
+    /**
+     * The constant COLOUR_CAM_IMAGE_RAW.
+     */
+    private static final String COLOUR_CAM_IMAGE_RAW = "/ColourCam/image_raw";
+    /**
+     * The constant WIDTH.
+     */
+    private static final String WIDTH = "width";
+    private static final String HEIGHT = "height";
+    private static final String DATA = "data";
+    /**
+     * The constant PNG.
+     */
+    public static final String PNG = ".png";
+    /**
+     * The constant PNG1.
+     */
+    private static final String PNG1 = "png";
+    private static final String URL = "http://localhost:8080";
 
     private final MongoTemplate template;
-
-    private static final String IMAGE_DIRECTORY = "../gp-se-ss-2024-team1-2/rosbagPictures";
-
-    private static final String directory_name = "/rosbagPictures";
-
+    private String url;
 
 
     @Autowired
@@ -68,11 +81,11 @@ public class RosBagServiceImpl implements RosBagService{
                 BagFile f = BagReader.readFile(filename);
                 for (TopicInfo topic : f.getTopics()) {
                     System.out.println(topic.getName());
-                    if (Objects.equals(topic.getName(), "/ColourCam/image_raw")) {
+                    if (Objects.equals(topic.getName(), COLOUR_CAM_IMAGE_RAW)) {
                         long count = topic.getMessageCount();
                         System.out.println("Message-count: " + count);
 
-                        for(int i = 0; i < count; ++i) {
+                        for (int i = 0; i < count; ++i) {
                             workers.add(new Worker(filename, cameraImagelst, lock, i, trackId));
                             executorService.submit(workers.getLast());
                         }
@@ -110,12 +123,13 @@ public class RosBagServiceImpl implements RosBagService{
                             System.out.println();
                              */
                             try {
-                                long width = message.<UInt32Type>getField("width").getValue();
-                                long height = message.<UInt32Type>getField("height").getValue();
-                                var lst = message.<ArrayType>getField("data");
+                                long width = message.<UInt32Type>getField(WIDTH).getValue();
+                                long height = message.<UInt32Type>getField(HEIGHT).getValue();
+                                var lst = message.<ArrayType>getField(DATA);
                                 var a = lst.getAsBytes();
                                 int index = 0;
-                                BufferedImage irImage = new BufferedImage((int) width, (int) height, BufferedImage.TYPE_INT_RGB);
+                                BufferedImage irImage = new BufferedImage((int) width,
+                                    (int) height, BufferedImage.TYPE_INT_RGB);
                                 for (int i = 0; i < height; ++i) {
                                     for (int j = 0; j < width; ++j) {
                                         int value = ((int) a[index++]) & 0xff;
@@ -123,12 +137,14 @@ public class RosBagServiceImpl implements RosBagService{
                                     }
                                 }
                                 long unixTimestamp = Instant.now().getEpochSecond();
-                                String name = "/IRCameraImage" + "-" + unixTimestamp + xyz + ".png";
+                                String name = "/IRCameraImage" + "-" + unixTimestamp + xyz + PNG;
                                 File outputfile = new File(IMAGE_DIRECTORY + name);
                                 xyz.getAndIncrement();
                                 try {
-                                    ImageIO.write(irImage, "png", outputfile);
-                                    imageList.add(new CameraImage(trackId, "http://localhost:8080" + directory_name + name , 1, "", xyz.get()));
+                                    ImageIO.write(irImage, PNG1, outputfile);
+                                    url = URL;
+                                    imageList.add(new CameraImage(trackId, url + directory_name + name,
+                                        1, "", xyz.get()));
                                 } catch (IOException e) {
                                     throw new RuntimeException(e);
                                 }
@@ -153,7 +169,7 @@ public class RosBagServiceImpl implements RosBagService{
         q.addCriteria(Criteria.where("streckenId").is(trackId));
         var data = template.find(q, DataSet.class);
         data.stream().filter(dt -> dt.getFileName().contains("velodyne")).toList();
-        for(var d : data) {
+        for (var d : data) {
             try {
                 BagFile f = BagReader.readFile(d.getFileName());
                 for (TopicInfo topic : f.getTopics()) {
@@ -170,36 +186,40 @@ public class RosBagServiceImpl implements RosBagService{
                                 int offset_x = 0, offset_y = 0, offset_z = 0, offset_intensity = 0, offset_time = 0;
                                 for (Field pointField : fld) {
                                     MessageType pointMsg = (MessageType) pointField;
-                                    if(Objects.equals(pointMsg.<StringType>getField("name").getValue(), "x")) {
+                                    if (Objects.equals(pointMsg.<StringType>getField("name").getValue(), "x")) {
                                         offset_x = Math.toIntExact(pointMsg.<UInt32Type>getField("offset").getValue());
                                        // System.out.println("Offset_x: " + offset_x);
-                                    }
-                                    else if(Objects.equals(pointMsg.<StringType>getField("name").getValue(), "y")) {
+                                    } else if (Objects.equals(pointMsg.<StringType>getField("name").getValue(), "y")) {
                                         offset_y = Math.toIntExact(pointMsg.<UInt32Type>getField("offset").getValue());
                                        // System.out.println("Offset_y: " + offset_y);
-                                    }
-                                    else if(Objects.equals(pointMsg.<StringType>getField("name").getValue(), "z")) {
+                                    } else if (Objects.equals(pointMsg.<StringType>getField("name").getValue(), "z")) {
                                         offset_z = Math.toIntExact(pointMsg.<UInt32Type>getField("offset").getValue());
                                        // System.out.println("Offset_z: " + offset_z);
-                                    }
-                                    else if(Objects.equals(pointMsg.<StringType>getField("name").getValue(), "intensity")) {
-                                        offset_intensity = Math.toIntExact(pointMsg.<UInt32Type>getField("offset").getValue());
+                                    } else if (Objects.equals(pointMsg.<StringType>getField("name")
+                                        .getValue(), "intensity")) {
+                                        offset_intensity = Math
+                                            .toIntExact(pointMsg.<UInt32Type>getField("offset").getValue());
                                        // System.out.println("Offset_z: " + offset_intensity);
-                                    }
-                                    else if(Objects.equals(pointMsg.<StringType>getField("name").getValue(), "time")) {
-                                        offset_time = Math.toIntExact(pointMsg.<UInt32Type>getField("offset").getValue());
-                                        //System.out.println("Offset_time: " + offset_time);
+                                    } else if (Objects.equals(pointMsg.<StringType>getField("name")
+                                        .getValue(), "time")) {
+                                        offset_time = Math
+                                            .toIntExact(pointMsg.<UInt32Type>getField("offset").getValue());
                                     }
                                 }
-                                var lst = message.<ArrayType>getField("data");
+                                var lst = message.<ArrayType>getField(DATA);
                                 byte[] a = lst.getAsBytes();
                                 int size = 0;
-                                    for(int i = 0; i < a.length; i+=22){
-                                        byte[] x_value = new byte[] {a[i+offset_x], a[i+offset_x+1], a[i+offset_x+2], a[i+offset_x+3]};
-                                        byte[] y_value = new byte[] {a[i+offset_y], a[i+offset_y+1], a[i+offset_y+2], a[i+offset_y+3]};
-                                        byte[] z_value = new byte[] {a[i+offset_z], a[i+offset_z+1], a[i+offset_z+2], a[i+offset_z+3]};
-                                        byte[] i_value = new byte[] {a[i+offset_intensity], a[i+offset_intensity+1], a[i+offset_intensity+2], a[i+offset_intensity+3]};
-                                        byte[] t_value = new byte[] {a[i+offset_time], a[i+offset_time+1], a[i+offset_time+2], a[i+offset_time+3]};
+                                    for (int i = 0; i < a.length; i += 22) {
+                                        byte[] x_value = new byte[] {a[i+offset_x], a[i+offset_x+1],
+                                            a[i+offset_x+2], a[i+offset_x+3]};
+                                        byte[] y_value = new byte[] {a[i+offset_y], a[i+offset_y+1],
+                                            a[i+offset_y+2], a[i+offset_y+3]};
+                                        byte[] z_value = new byte[] {a[i+offset_z], a[i+offset_z+1],
+                                            a[i+offset_z+2], a[i+offset_z+3]};
+                                        byte[] i_value = new byte[] {a[i+offset_intensity], a[i+offset_intensity+1],
+                                            a[i+offset_intensity+2], a[i+offset_intensity+3]};
+                                        byte[] t_value = new byte[] {a[i+offset_time], a[i+offset_time+1],
+                                            a[i+offset_time+2], a[i+offset_time+3]};
 
                                         float x = byteArrayToFloat(x_value, ByteOrder.LITTLE_ENDIAN);
                                         float y = byteArrayToFloat(y_value, ByteOrder.LITTLE_ENDIAN);
@@ -250,8 +270,8 @@ public class RosBagServiceImpl implements RosBagService{
     }
 
 
-    private boolean inRange(int x, int y) {
-        return x >= 0 && x < 3008 && y >= 0 && y < 4112;
+    private boolean inRange(int x, int y, int width, int height) {
+        return x >= 0 && x < width && y >= 0 && y < height;
     }
 
     private class Worker implements Runnable {
@@ -274,19 +294,19 @@ public class RosBagServiceImpl implements RosBagService{
         public void run() {
             try {
                 BagFile f = BagReader.readFile(filename);
-                MessageType message = f.getMessageOnTopicAtIndex("/ColourCam/image_raw", xyz);
-                long width = message.<UInt32Type>getField("width").getValue();
-                long height = message.<UInt32Type>getField("height").getValue();
-                var lst = message.<ArrayType>getField("data");
+                MessageType message = f.getMessageOnTopicAtIndex(COLOUR_CAM_IMAGE_RAW, xyz);
+                long width = message.<UInt32Type>getField(WIDTH).getValue();
+                long height = message.<UInt32Type>getField(HEIGHT).getValue();
+                var lst = message.<ArrayType>getField(DATA);
                 var a = lst.getAsBytes();
                 BufferedImage image = demosaic(a, (int) width, (int) height);
                 long unixTimestamp = Instant.now().getEpochSecond();
-                String name = "/BagCameraImage" + "-" + unixTimestamp + xyz + ".png";
+                String name = "/BagCameraImage" + "-" + unixTimestamp + xyz + PNG;
                 File outputfile = new File(IMAGE_DIRECTORY + name);
                 try {
-                    ImageIO.write(image, "png", outputfile);
+                    ImageIO.write(image, PNG1, outputfile);
                     lock.lock();
-                    cameraImagesList.add(new CameraImage(trackId, "http://localhost:8080" + directory_name + name , 0, "", xyz));
+                    cameraImagesList.add(new CameraImage(trackId, URL + directory_name + name , 0, "", xyz));
                     lock.unlock();
                 } catch (IOException e) {
                     System.out.println(e.getMessage());
@@ -327,23 +347,23 @@ public class RosBagServiceImpl implements RosBagService{
                     //red tile
                     if (j % 2 == 0) {
                         double green = 0.5 * pic[i][j] +
-                            0.25 * (inRange(i, j - 1) ? pic[i][j - 1] : 0.0) +
-                            0.25 * (inRange(i, j + 1) ? pic[i][j + 1] : 0.0) +
-                            0.25 * (inRange(i - 1, j) ? pic[i - 1][j] : 0.0) +
-                            0.25 * (inRange(i + 1, j) ? pic[i + 1][j] : 0.0) -
-                            0.125 * (inRange(i, j - 2) ? pic[i][j - 2] : 0.0) -
-                            0.125 * (inRange(i, j + 2) ? pic[i][j + 2] : 0.0) -
-                            0.125 * (inRange(i - 2, j) ? pic[i - 2][j] : 0.0) -
-                            0.125 * (inRange(i + 2, j) ? pic[i + 2][j] : 0.0);
+                            0.25 * (inRange(i, j - 1, width, height) ? pic[i][j - 1] : 0.0) +
+                            0.25 * (inRange(i, j + 1, width, height) ? pic[i][j + 1] : 0.0) +
+                            0.25 * (inRange(i - 1, j, width, height) ? pic[i - 1][j] : 0.0) +
+                            0.25 * (inRange(i + 1, j, width, height) ? pic[i + 1][j] : 0.0) -
+                            0.125 * (inRange(i, j - 2, width, height) ? pic[i][j - 2] : 0.0) -
+                            0.125 * (inRange(i, j + 2, width, height) ? pic[i][j + 2] : 0.0) -
+                            0.125 * (inRange(i - 2, j, width, height) ? pic[i - 2][j] : 0.0) -
+                            0.125 * (inRange(i + 2, j, width, height) ? pic[i + 2][j] : 0.0);
                         double blue = 0.75 * pic[i][j] +
-                            0.25 * (inRange(i - 1, j - 1) ? pic[i - 1][j - 1] : 0.0) +
-                            0.25 * (inRange(i + 1, j - 1) ? pic[i + 1][j - 1] : 0.0) +
-                            0.25 * (inRange(i - 1, j + 1) ? pic[i - 1][j + 1] : 0.0) +
-                            0.25 * (inRange(i + 1, j + 1) ? pic[i + 1][j + 1] : 0.0) -
-                            (3.0 / 16.0) * (inRange(i, j - 2) ? pic[i][j - 2] : 0.0) -
-                            (3.0 / 16.0) * (inRange(i, j + 2) ? pic[i][j + 2] : 0.0) -
-                            (3.0 / 16.0) * (inRange(i - 2, j) ? pic[i - 2][j] : 0.0) -
-                            (3.0 / 16.0) * (inRange(i + 2, j) ? pic[i + 2][j] : 0.0);
+                            0.25 * (inRange(i - 1, j - 1, width, height) ? pic[i - 1][j - 1] : 0.0) +
+                            0.25 * (inRange(i + 1, j - 1, width, height) ? pic[i + 1][j - 1] : 0.0) +
+                            0.25 * (inRange(i - 1, j + 1, width, height) ? pic[i - 1][j + 1] : 0.0) +
+                            0.25 * (inRange(i + 1, j + 1, width, height) ? pic[i + 1][j + 1] : 0.0) -
+                            (3.0 / 16.0) * (inRange(i, j - 2, width, height) ? pic[i][j - 2] : 0.0) -
+                            (3.0 / 16.0) * (inRange(i, j + 2, width, height) ? pic[i][j + 2] : 0.0) -
+                            (3.0 / 16.0) * (inRange(i - 2, j, width, height) ? pic[i - 2][j] : 0.0) -
+                            (3.0 / 16.0) * (inRange(i + 2, j, width, height) ? pic[i + 2][j] : 0.0);
                         int grn = Math.max(0, Math.min((int) Math.round(green), 255));
                         int blu = Math.max(0, Math.min((int) Math.round(blue), 255));
                         rgbImage.setRGB(j, i, new Color(pic[i][j], grn, blu).getRGB());
@@ -352,20 +372,20 @@ public class RosBagServiceImpl implements RosBagService{
                     //green tile
                     else {
                         double red = 5.0 / 8.0 * pic[i][j] +
-                            0.5 * (inRange(i, j - 1) ? pic[i][j - 1] : 0.0) +
-                            0.5 * (inRange(i, j + 1) ? pic[i][j + 1] : 0.0) -
-                            5.0 / 32.0 * (inRange(i - 1, j - 1) ? pic[i - 1][j - 1] : 0.0) -
-                            5.0 / 32.0 * (inRange(i + 1, j - 1) ? pic[i + 1][j - 1] : 0.0) -
-                            5.0 / 32.0 * (inRange(i - 1, j + 1) ? pic[i - 1][j + 1] : 0.0) -
-                            5.0 / 32.0 * (inRange(i + 1, j + 1) ? pic[i + 1][j + 1] : 0.0);
+                            0.5 * (inRange(i, j - 1, width, height) ? pic[i][j - 1] : 0.0) +
+                            0.5 * (inRange(i, j + 1, width, height) ? pic[i][j + 1] : 0.0) -
+                            5.0 / 32.0 * (inRange(i - 1, j - 1, width, height) ? pic[i - 1][j - 1] : 0.0) -
+                            5.0 / 32.0 * (inRange(i + 1, j - 1, width, height) ? pic[i + 1][j - 1] : 0.0) -
+                            5.0 / 32.0 * (inRange(i - 1, j + 1, width, height) ? pic[i - 1][j + 1] : 0.0) -
+                            5.0 / 32.0 * (inRange(i + 1, j + 1, width, height) ? pic[i + 1][j + 1] : 0.0);
 
                         double blue = 5.0 / 8.0 * pic[i][j] +
-                            0.5 * (inRange(i - 1, j) ? pic[i - 1][j] : 0.0) +
-                            0.5 * (inRange(i + 1, j) ? pic[i + 1][j] : 0.0) -
-                            5.0 / 32.0 * (inRange(i - 1, j - 1) ? pic[i - 1][j - 1] : 0.0) -
-                            5.0 / 32.0 * (inRange(i + 1, j - 1) ? pic[i + 1][j - 1] : 0.0) -
-                            5.0 / 32.0 * (inRange(i - 1, j + 1) ? pic[i - 1][j + 1] : 0.0) -
-                            5.0 / 32.0 * (inRange(i + 1, j + 1) ? pic[i + 1][j + 1] : 0.0);
+                            0.5 * (inRange(i - 1, j, width, height) ? pic[i - 1][j] : 0.0) +
+                            0.5 * (inRange(i + 1, j, width, height) ? pic[i + 1][j] : 0.0) -
+                            5.0 / 32.0 * (inRange(i - 1, j - 1, width, height) ? pic[i - 1][j - 1] : 0.0) -
+                            5.0 / 32.0 * (inRange(i + 1, j - 1, width, height) ? pic[i + 1][j - 1] : 0.0) -
+                            5.0 / 32.0 * (inRange(i - 1, j + 1, width, height) ? pic[i - 1][j + 1] : 0.0) -
+                            5.0 / 32.0 * (inRange(i + 1, j + 1, width, height) ? pic[i + 1][j + 1] : 0.0);
 
 
                         int rd = Math.max(0, Math.min((int) Math.round(red), 255));
@@ -382,20 +402,20 @@ public class RosBagServiceImpl implements RosBagService{
                     if (j % 2 == 0) {
 
                         double blue = 5.0 / 8.0 * pic[i][j] +
-                            0.5 * (inRange(i, j - 1) ? pic[i][j - 1] : 0.0) +
-                            0.5 * (inRange(i, j + 1) ? pic[i][j + 1] : 0.0) -
-                            5.0 / 32.0 * (inRange(i - 1, j - 1) ? pic[i - 1][j - 1] : 0.0) -
-                            5.0 / 32.0 * (inRange(i + 1, j - 1) ? pic[i + 1][j - 1] : 0.0) -
-                            5.0 / 32.0 * (inRange(i - 1, j + 1) ? pic[i - 1][j + 1] : 0.0) -
-                            5.0 / 32.0 * (inRange(i + 1, j + 1) ? pic[i + 1][j + 1] : 0.0);
+                            0.5 * (inRange(i, j - 1, width, height) ? pic[i][j - 1] : 0.0) +
+                            0.5 * (inRange(i, j + 1, width, height) ? pic[i][j + 1] : 0.0) -
+                            5.0 / 32.0 * (inRange(i - 1, j - 1, width, height) ? pic[i - 1][j - 1] : 0.0) -
+                            5.0 / 32.0 * (inRange(i + 1, j - 1, width, height) ? pic[i + 1][j - 1] : 0.0) -
+                            5.0 / 32.0 * (inRange(i - 1, j + 1, width, height) ? pic[i - 1][j + 1] : 0.0) -
+                            5.0 / 32.0 * (inRange(i + 1, j + 1, width, height) ? pic[i + 1][j + 1] : 0.0);
 
                         double red = 5.0 / 8.0 * pic[i][j] +
-                            0.5 * (inRange(i - 1, j) ? pic[i - 1][j] : 0.0) +
-                            0.5 * (inRange(i + 1, j) ? pic[i + 1][j] : 0.0) -
-                            5.0 / 32.0 * (inRange(i - 1, j - 1) ? pic[i - 1][j - 1] : 0.0) -
-                            5.0 / 32.0 * (inRange(i + 1, j - 1) ? pic[i + 1][j - 1] : 0.0) -
-                            5.0 / 32.0 * (inRange(i - 1, j + 1) ? pic[i - 1][j + 1] : 0.0) -
-                            5.0 / 32.0 * (inRange(i + 1, j + 1) ? pic[i + 1][j + 1] : 0.0);
+                            0.5 * (inRange(i - 1, j, width, height) ? pic[i - 1][j] : 0.0) +
+                            0.5 * (inRange(i + 1, j, width, height) ? pic[i + 1][j] : 0.0) -
+                            5.0 / 32.0 * (inRange(i - 1, j - 1, width, height) ? pic[i - 1][j - 1] : 0.0) -
+                            5.0 / 32.0 * (inRange(i + 1, j - 1, width, height) ? pic[i + 1][j - 1] : 0.0) -
+                            5.0 / 32.0 * (inRange(i - 1, j + 1, width, height) ? pic[i - 1][j + 1] : 0.0) -
+                            5.0 / 32.0 * (inRange(i + 1, j + 1, width, height) ? pic[i + 1][j + 1] : 0.0);
 
 
                         int rd = Math.max(0, Math.min((int) Math.round(red), 255));
@@ -406,24 +426,24 @@ public class RosBagServiceImpl implements RosBagService{
                     //blue tile
                     else {
                         double green = 0.5 * pic[i][j] +
-                            0.25 * (inRange(i, j - 1) ? pic[i][j - 1] : 0.0) +
-                            0.25 * (inRange(i, j + 1) ? pic[i][j + 1] : 0.0) +
-                            0.25 * (inRange(i - 1, j) ? pic[i - 1][j] : 0.0) +
-                            0.25 * (inRange(i + 1, j) ? pic[i + 1][j] : 0.0) -
-                            0.125 * (inRange(i, j - 2) ? pic[i][j - 2] : 0.0) -
-                            0.125 * (inRange(i, j + 2) ? pic[i][j + 2] : 0.0) -
-                            0.125 * (inRange(i - 2, j) ? pic[i - 2][j] : 0.0) -
-                            0.125 * (inRange(i + 2, j) ? pic[i + 2][j] : 0.0);
+                            0.25 * (inRange(i, j - 1, width, height) ? pic[i][j - 1] : 0.0) +
+                            0.25 * (inRange(i, j + 1, width, height) ? pic[i][j + 1] : 0.0) +
+                            0.25 * (inRange(i - 1, j, width, height) ? pic[i - 1][j] : 0.0) +
+                            0.25 * (inRange(i + 1, j, width, height) ? pic[i + 1][j] : 0.0) -
+                            0.125 * (inRange(i, j - 2, width, height) ? pic[i][j - 2] : 0.0) -
+                            0.125 * (inRange(i, j + 2, width, height) ? pic[i][j + 2] : 0.0) -
+                            0.125 * (inRange(i - 2, j, width, height) ? pic[i - 2][j] : 0.0) -
+                            0.125 * (inRange(i + 2, j, width, height) ? pic[i + 2][j] : 0.0);
 
                         double red = 0.75 * pic[i][j] +
-                            0.25 * (inRange(i - 1, j - 1) ? pic[i - 1][j - 1] : 0.0) +
-                            0.25 * (inRange(i + 1, j - 1) ? pic[i + 1][j - 1] : 0.0) +
-                            0.25 * (inRange(i - 1, j + 1) ? pic[i - 1][j + 1] : 0.0) +
-                            0.25 * (inRange(i + 1, j + 1) ? pic[i + 1][j + 1] : 0.0) -
-                            3.0 / 16.0 * (inRange(i, j - 2) ? pic[i][j - 2] : 0.0) -
-                            3.0 / 16.0 * (inRange(i, j + 2) ? pic[i][j + 2] : 0.0) -
-                            3.0 / 16.0 * (inRange(i - 2, j) ? pic[i - 2][j] : 0.0) -
-                            3.0 / 16.0 * (inRange(i + 2, j) ? pic[i + 2][j] : 0.0);
+                            0.25 * (inRange(i - 1, j - 1, width, height) ? pic[i - 1][j - 1] : 0.0) +
+                            0.25 * (inRange(i + 1, j - 1, width, height) ? pic[i + 1][j - 1] : 0.0) +
+                            0.25 * (inRange(i - 1, j + 1, width, height) ? pic[i - 1][j + 1] : 0.0) +
+                            0.25 * (inRange(i + 1, j + 1, width, height) ? pic[i + 1][j + 1] : 0.0) -
+                            3.0 / 16.0 * (inRange(i, j - 2, width, height) ? pic[i][j - 2] : 0.0) -
+                            3.0 / 16.0 * (inRange(i, j + 2, width, height) ? pic[i][j + 2] : 0.0) -
+                            3.0 / 16.0 * (inRange(i - 2, j, width, height) ? pic[i - 2][j] : 0.0) -
+                            3.0 / 16.0 * (inRange(i + 2, j, width, height) ? pic[i + 2][j] : 0.0);
 
 
                         int grn = Math.max(0, Math.min((int) Math.round(green), 255));

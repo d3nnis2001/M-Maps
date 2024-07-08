@@ -11,6 +11,9 @@ import {
 import {useQuasar} from "quasar";
 import axios from "axios";
 import {sendImage} from "@/main/vue/api/image";
+import {getUserByToken} from "../../api/admin";
+import {sendUsername} from "../../api/inspection";
+import {useUserStore} from "@/main/vue/stores/UserStore";
 
 
 export default {
@@ -36,6 +39,10 @@ export default {
         const review = ref('');
         const finishedDate = ref('')
 
+        const userStore = useUserStore();
+        const bearbeiter = ref(false);
+        const pruefer = ref(false);
+
         const state = reactive ({
             filter: '',
             columns: [
@@ -45,8 +52,8 @@ export default {
                 { name: 'endLocation', label: 'Zielort', align: 'left', field: 'endLocation', sortable: true },
                 { name: 'startTime', label: 'von', align: 'left', field: 'startTime' },
                 { name: 'endTime', label: 'bis', align: 'left', field: 'endTime' },
-                { name: 'inspectionData', label: 'Messdaten', align: 'left', field: 'inspectionData' },
-                { name: 'department', label: 'Fachabteilung', align: 'left', field: 'department' },
+                { name: 'inspectionData', label: 'Messdaten', align: 'left', field: 'inspectionData', sortable: true },
+                { name: 'department', label: 'Fachabteilung', align: 'left', field: 'department', sortable: true},
                 { name: 'status', label: 'Status', align: 'left', field: 'status' },
                 { name: 'priority', label: 'Priorität', align: 'left', field: 'priority', sortable: true }
             ],
@@ -60,6 +67,11 @@ export default {
         onMounted(async () => {
             checkScreenSize();
             window.addEventListener('resize', checkScreenSize);
+            bearbeiter.value = userStore.hasRole('Bearbeiter')
+            console.log("Bearbeiter: ", bearbeiter.value);
+            pruefer.value = userStore.hasRole('Prüfer');
+            console.log("Prüfer: ", pruefer.value)
+
             await fetchData();
 
         })
@@ -111,9 +123,15 @@ export default {
         }
 
         async function acceptInspectionOrder() {
-            // TODO: UserId Änderung!!!!
-            showDialog.value = false;
+            const token = localStorage.getItem('token')
             const id = currentRow.value.inspectionOrderId;
+            console.log(token)
+            if (token != null) {
+                const userId = await getUserByToken(token)
+                console.log(userId)
+                await sendUsername(id, userId.data)
+            }
+            showDialog.value = false;
             await sendNewStatus(id, "in Bearbeitung");
             updateRowStatus(id, "in Bearbeitung");
 
@@ -128,7 +146,6 @@ export default {
         }
 
         async function markFinished() {
-
             showPictureUploadDialog.value = false;
             showDialog.value = false;
             const id = currentRow.value.inspectionOrderId;
@@ -214,8 +231,6 @@ export default {
                 console.log('Error: ', error);
             };
         };
-
-
 
         async function uploadImage(imageString, name) {
             const res = await sendImage(currentRow.value.inspectionOrderId, imageString, name);
@@ -313,7 +328,9 @@ export default {
             base64String,
             uploadImages,
             upload,
-            finishedDate
+            finishedDate,
+            bearbeiter,
+            pruefer
         }
     },
 }
@@ -359,19 +376,19 @@ export default {
         <q-dialog v-model="showDialog">
             <q-card>
                 <q-card-section>
-                    <div class="option-button" @click="editInspectionOrder">Bearbeiten</div>
-                    <q-separator  />
-                    <div class="option-button" v-if="currentRow.status === 'storniert'" @click="confirmDeleteOrder(currentRow)">Löschen</div>
-                    <q-separator />
-                    <div class="option-button" v-if="currentRow.status === 'abgeschlossen' && currentRow.status !== 'archiviert'" @click="archiveOrder">Archivieren</div>
-                    <q-separator />
-                    <div class="option-button" v-if="currentRow.status !== 'abgeschlossen'" @click="showPictureUploadDialog = true">Auftrag abschließen</div>
-                    <q-separator />
-                    <div class="option-button"  @click="acceptInspectionOrder">Auftrag annehmen </div>
-                    <q-separator />
-                    <div class="option-button" v-if="currentRow.status === 'beauftragt' && currentRow.status !== 'storniert'" @click="markCancelled">Stornieren</div>
-                    <q-separator />
-                    <div class="option-button" v-if="currentRow.status === 'storniert' && currentRow.status !== 'beauftragt'" @click="markOrdered">Beauftragen</div>
+                    <div class="option-button" v-if="bearbeiter" @click="editInspectionOrder">Bearbeiten</div>
+                    <q-separator  v-if="currentRow.status === 'storniert' && bearbeiter"/>
+                    <div class="option-button" v-if="currentRow.status === 'storniert' && bearbeiter" @click="confirmDeleteOrder(currentRow)">Löschen</div>
+                    <q-separator v-if="currentRow.status === 'abgeschlossen' && currentRow.status !== 'archiviert' && bearbeiter"/>
+                    <div class="option-button" v-if="currentRow.status === 'abgeschlossen' && currentRow.status !== 'archiviert' && bearbeiter" @click="archiveOrder">Archivieren</div>
+                    <q-separator v-if="currentRow.status !== 'abgeschlossen' && pruefer"/>
+                    <div class="option-button" v-if="currentRow.status !== 'abgeschlossen' && pruefer" @click="showPictureUploadDialog = true">Auftrag abschließen</div>
+                    <q-separator v-if="currentRow.status !== 'in Bearbeitung' && pruefer"/>
+                    <div class="option-button" v-if="currentRow.status !== 'in Bearbeitung' && pruefer" @click="acceptInspectionOrder">Auftrag annehmen </div>
+                    <q-separator v-if="currentRow.status === 'beauftragt' && currentRow.status !== 'storniert' && bearbeiter"/>
+                    <div class="option-button" v-if="currentRow.status === 'beauftragt' && currentRow.status !== 'storniert' && bearbeiter" @click="markCancelled">Stornieren</div>
+                    <q-separator v-if="currentRow.status === 'storniert' && currentRow.status !== 'beauftragt' && bearbeiter" />
+                    <div class="option-button" v-if="currentRow.status === 'storniert' && currentRow.status !== 'beauftragt' && bearbeiter" @click="markOrdered">Beauftragen</div>
                     <q-separator />
                     <div class="option-button"  @click="showFurtherInformation">Weitere Informationen </div>
                 </q-card-section>
@@ -446,9 +463,9 @@ export default {
                     </div>
                 </div>
                 <div>
-                    <div class="row">
+                    <div class="row info-row">
                         <p style="margin-left: 5px; font-weight: bold; margin-right: 5px"> Bemerkungen: </p>
-                        <p style="">{{ remarks }}</p>
+                        <p style="margin-left: 5px">{{ remarks }}</p>
                     </div>
                 </div>
                 <q-card-section>
@@ -491,4 +508,6 @@ export default {
 
 .q-uploader
     margin-left: 20px
+
+
 </style>

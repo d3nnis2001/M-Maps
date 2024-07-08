@@ -18,7 +18,7 @@ export const checkAccountDetails = async function (email, password){
         const cred = new URLSearchParams()
         cred.append("email", email)
         cred.append("password", password)
-        const response = await axios.post("api/login", cred)
+        const response = await axios.post("/api/login", cred)
         return response.data;
     } catch (error) {
         console.error("Error while logging in:", error);
@@ -41,4 +41,21 @@ export const setPasswordNew = async function (email, password, token){
     return response
 }
 
-export default {emailChecker, checkAccountDetails, resetPassword, setPasswordNew};
+export const getToken = async function (email, password) {
+    const cred = new URLSearchParams()
+    cred.append("email", email)
+    cred.append("password", password)
+    const response = await axios.post("/api/user/getToken", cred)
+    return response // String: token
+}
+
+export const getRoleByToken = async function (token, email) {
+    const cred = new URLSearchParams()
+    cred.append("email", email)
+    cred.append("token", token)
+    const response = await axios.post("/api/user/getRolesByToken", cred)
+    console.log(response.data);
+    return response // roles
+}
+
+export default {emailChecker, checkAccountDetails, resetPassword, setPasswordNew, getToken, getRoleByToken};

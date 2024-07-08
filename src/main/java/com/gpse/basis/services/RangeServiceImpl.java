@@ -8,8 +8,11 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The type Range service.
+ */
 @Service
-public class RangeServiceImpl implements RangeService{
+public class RangeServiceImpl implements RangeService {
 
     private final GleisLageRangeRepository rpr;
 

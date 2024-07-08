@@ -119,4 +119,10 @@ public class ChecklistServiceImpl implements ChecklistService {
             return false;
         }
     }
+
+    public LocalDate getTerminationDate(String id) {
+        ReparaturChecklist reparaturChecklist = loadRepCheckById(id);
+        LocalDate date = reparaturChecklist.getTerminiert();
+        return date;
+    }
 }

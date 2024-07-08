@@ -1,11 +1,22 @@
 package com.gpse.basis.domain;
 
+/**
+ * The type Velodyne point.
+ */
 public class VelodynePoint {
     private double x;
     private double y;
     private double z;
     private double intensity;
 
+    /**
+     * Instantiates a new Velodyne point.
+     *
+     * @param x         the x
+     * @param y         the y
+     * @param z         the z
+     * @param intensity the intensity
+     */
     public VelodynePoint(double x, double y, double z, double intensity) {
         this.x = x;
         this.y = y;
