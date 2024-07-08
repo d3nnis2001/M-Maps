@@ -2,10 +2,11 @@ package com.gpse.basis.services;
 
 import com.gpse.basis.domain.CameraImage;
 import com.gpse.basis.domain.VelodynePoint;
-
-import java.awt.image.BufferedImage;
 import java.util.List;
 
+/**
+ * The interface Ros bag service.
+ */
 public interface RosBagService {
     List<CameraImage> saveCameraImagesForTrack(int trackId, String filename);
 

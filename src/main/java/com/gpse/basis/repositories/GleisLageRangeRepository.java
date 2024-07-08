@@ -5,7 +5,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * GleisLageRangeRepository.
+ * The interface Gleis lage range repository.
  */
 @Repository
 public interface GleisLageRangeRepository extends CrudRepository<GleisLageRange, String> {

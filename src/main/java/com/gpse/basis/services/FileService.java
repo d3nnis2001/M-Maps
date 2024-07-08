@@ -10,6 +10,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The interface File service.
+ */
 public interface FileService {
     List<FileUploadResponse> handleImport(List<String> paths, List<String> streckenIds);
     List<DataSet> getDataSets(String searchString);

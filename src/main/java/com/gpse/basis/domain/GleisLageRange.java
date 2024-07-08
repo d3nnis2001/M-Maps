@@ -3,11 +3,26 @@ package com.gpse.basis.domain;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
+/**
+ * The type Gleis lage range.
+ */
 @Document(collection = "GleisLageRange")
 public class GleisLageRange {
+    /**
+     * The enum Level.
+     */
     public enum Level {
+        /**
+         * Sra level.
+         */
         SRA,
+        /**
+         * Sr 100 level.
+         */
         SR100,
+        /**
+         * Srlim level.
+         */
         SRLIM
     }
 
@@ -21,7 +36,18 @@ public class GleisLageRange {
     private double _160to230_;
     private double _greater230_;
 
-    public GleisLageRange(Level l, double _smaller80_, double _80to120_, double _120to160_, double _160to230_, double _greater230_) {
+    /**
+     * Instantiates a new Gleis lage range.
+     *
+     * @param l            the l
+     * @param _smaller80_  the smaller 80
+     * @param _80to120_    the 80 to 120
+     * @param _120to160_   the 120 to 160
+     * @param _160to230_   the 160 to 230
+     * @param _greater230_ the greater 230
+     */
+    public GleisLageRange(Level l, double _smaller80_, double _80to120_, double _120to160_,
+                          double _160to230_, double _greater230_) {
         this.l = l;
         this._smaller80_ = _smaller80_;
         this._80to120_ = _80to120_;
@@ -86,16 +112,23 @@ public class GleisLageRange {
         this._greater230_ = _greater230_;
     }
 
+    /**
+     * Gets value to velocity.
+     *
+     * @param vel the vel
+     * @return the value to velocity
+     */
     public double getValueToVelocity(int vel) {
-        if(vel <= 80)
+        if (vel <= 80) {
             return _smaller80_;
-        else if(vel >= 80 && vel <= 120)
+        } else if (vel >= 80 && vel <= 120) {
             return _80to120_;
-        else if(vel >= 120 && vel <= 160)
+        } else if (vel >= 120 && vel <= 160) {
             return _120to160_;
-        else if(vel >= 160 && vel <= 230)
+        } else if (vel >= 160 && vel <= 230) {
             return _160to230_;
-        else
+        } else {
             return _greater230_;
+        }
     }
 }
