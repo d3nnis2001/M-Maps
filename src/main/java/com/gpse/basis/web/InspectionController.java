@@ -36,8 +36,12 @@ public class InspectionController {
         this.inspec = inspec;
     }
 
+    /**
+     * Alle Prüfaufträge aus Backend holen.
+     * @return ArrayList
+     */
     @Operation(summary = "Holt Daten aus der Datenbank",
-        description = "Daten werden in einer ArrayList zurückgegeben")
+        description = "Daten werden in einer ArrayList aus Prüfauftragen zurückgegeben")
     @GetMapping("/getdata")
     public ArrayList<InspectionOrder> getData() {
         return inspec.getInspecData();
@@ -49,10 +53,9 @@ public class InspectionController {
      * @param request - Anfrage
      */
     @Operation(summary = "Erstellt Prüfauftrag",
-        description = "Funktion um alle Nutzerdaten beim mounten der Seite in die Tabelle zu laden")
+        description = "Übergibt die Daten, um einen neuen Prüfauftrag zu erstellen")
     @PostMapping("/senddata")
     public void sendData(final WebRequest request) {
-        System.out.println("TEST1-Controller");
         ArrayList<String> inspecArray = new ArrayList<>();
         inspecArray.add(request.getParameter(courseId));
         inspecArray.add(request.getParameter(startLocation));
@@ -66,6 +69,13 @@ public class InspectionController {
         inspec.createInspectionOrder(inspecArray);
     }
 
+    /**
+     * einzelnen Prüfauftrag holen.
+     * @param request - Anfrage
+     * @return InspectionOrder
+     */
+    @Operation(summary = "Holt einen Prüfauftrag nach der Id",
+        description = "Gibt den Prüfauftrag mit der übergebenen Id zurück ")
     @GetMapping("/getById")
     public InspectionOrder getDataById(final WebRequest request) {
         InspectionOrder inspection = inspec.loadInspecById(request.getParameter(inspectionOrderID));
@@ -76,6 +86,8 @@ public class InspectionController {
      * Anhand der ID Daten senden.
      * @param request - Anfrage
      */
+    @Operation(summary = "Prüfauftrag editieren",
+        description = "Übergibt alle ggf. veränderten Attribute, damit der bestehende Prüfauftrag editiert wird")
     @PostMapping("/sendById")
     public void sendDataById(final WebRequest request) {
         InspectionOrder inspectionOrderNew = new InspectionOrder(request.getParameter(inspectionOrderID),
@@ -91,6 +103,8 @@ public class InspectionController {
      * Prüfauftrag löschen.
      * @param request - Anfrage
      */
+    @Operation(summary = "Löscht den Prüfauftrag",
+        description = "Erhält eine Id, dessn der Prüfauftrag gelöscht wird")
     @PostMapping("/deleteInspectionOrder")
     public void deleteInspectionOrder(final WebRequest request) {
         String id = request.getParameter(inspectionOrderID);
@@ -101,6 +115,8 @@ public class InspectionController {
      * neuen Status eintragen.
      * @param request - Anfrage
      */
+    @Operation(summary = "Status des Prüfauftrags editieren",
+        description = "Der Prüfauftrag der übergebenen Id bekommt den übergebenen Status")
     @PostMapping("/sendNewStatus")
     public void sendNewStatus(final WebRequest request) {
         String inspectionOrderId = request.getParameter(inspectionOrderID);
@@ -112,6 +128,8 @@ public class InspectionController {
      * Bewertung abgeben.
      * @param request - Anfrage
      */
+    @Operation(summary = "Bewertung speichern",
+        description = "An den Prüfauftrag mit der übergebenen Id wird eine Bewertung und ein Abschlussdatum übergeben")
     @PostMapping("/sendReview")
     public void sendReview(final WebRequest request) {
         String inspectionOrderId = request.getParameter(inspectionOrderID);
@@ -120,9 +138,15 @@ public class InspectionController {
         inspec.editReview(inspectionOrderId, review, date);
     }
 
+    /**
+     * Prüfauftrag annehmen.
+     * @param request - Anfrage
+     */
+    @Operation(summary = "Prüfauftrag wird angenommen",
+        description = "An den Prüfauftrag mit der übergebenen Id wird ein Username übermittelt")
     @PostMapping("/sendUsername")
     public void sendUsername(final WebRequest request) {
-        String inspectionOrderId = request.getParameter("inspectionOrderId");
+        String inspectionOrderId = request.getParameter(inspectionOrderId);
         String username = request.getParameter("username");
         inspec.editUsername(inspectionOrderId, username);
     }
