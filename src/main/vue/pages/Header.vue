@@ -14,7 +14,9 @@ const links = [
     { name: 'admin', label: 'Nutzerverwaltung', to: '/admin', roles: ['Administrator'] },
     { name: 'dataimport', label: 'Datenverwaltung', to: '/dataimport', roles: ['Datenverwalter', 'Prüfer'] },
     { name: 'dataviewer', label: 'Dataviewer', to: '/dataviewer', roles: ['Administrator', 'Bearbeiter', 'Prüfer', 'Datenverwalter']},
-    { name: 'settings', label: 'Design anpassen', to: '/settings', roles: ['Administrator']}
+    { name: 'settings', label: 'Design anpassen', to: '/settings', roles: ['Administrator']},
+    { name: 'templates', label: 'vorgefertigte Checklisten', to: '/checklists', roles: ['Administrator']}
+
 ]
 const links2 = [
     { name: 'home', label: 'Abmelden', to: '/' },
@@ -98,6 +100,15 @@ const filteredLinks = computed(() => {
             </q-toolbar-title>
             <q-toolbar-title v-if="$route.name === 'editColors'" align="middle">
                 Farben
+            </q-toolbar-title>
+            <q-toolbar-title v-if="$route.name === 'checklistOverview'" align="middle">
+                Vorgefertigte Checklisten
+            </q-toolbar-title>
+            <q-toolbar-title v-if="$route.name === 'checklistCreate'" align="middle">
+                Checkliste erstellen
+            </q-toolbar-title>
+            <q-toolbar-title v-if="$route.name === 'ChecklistEdit'" align="middle">
+                Checkliste bearbeiten
             </q-toolbar-title>
             <q-img :src="'/src/main/resources/db-logo.png'" align="left"></q-img>
         </q-toolbar>
