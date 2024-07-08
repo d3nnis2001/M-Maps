@@ -34,7 +34,8 @@ import checklistCreate from "@/main/vue/pages/Checklists/ChecklistCreate.vue";
 import checklistSingle from "@/main/vue/pages/Checklists/ChecklistSingle.vue";
 import checklistEdit from "@/main/vue/pages/Checklists/ChecklistEdit.vue";
 import UserProfile from "@/main/vue/pages/Nutzerprofil/UserProfile.vue";
-import {useSettingsStore} from "@/main/vue/stores/SettingsStore";
+import axios from "axios";
+import {useUserStore} from "../stores/UserStore";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
