@@ -23,6 +23,7 @@ const links = [
     { name: 'inspectionOrderOverview', label: 'Prüfaufträge', to: '/inspectionOrder'},
     { name: 'admin', label: 'Nutzerverwaltung', to: '/admin' },
     { name: 'dataviewer', label: 'Dataviewer', to: '/dataviewer' },
+    { name: 'templates', label: 'vorgefertigte Checklisten', to: '/checklists'},
     { name: 'settings', label: 'Design anpassen', to: '/settings'}
 ]
 const links2 = [
@@ -104,6 +105,15 @@ function changeBool() {
                 </q-toolbar-title>
                 <q-toolbar-title v-if="$route.name === 'editInspectionOrder'" align="middle">
                     Prüfauftrag editieren
+                </q-toolbar-title>
+                <q-toolbar-title v-if="$route.name === 'checklistOverview'">
+                    vorgefertigte Checklisten
+                </q-toolbar-title>
+                <q-toolbar-title v-if="$route.name === 'checklistCreate'">
+                    neue Checkliste erstellen
+                </q-toolbar-title>
+                <q-toolbar-title v-if="$route.name === 'ChecklistEdit'">
+                    Checkliste bearbeiten
                 </q-toolbar-title>
                 <q-btn dense flat round icon="menu" @click="toggleRightDrawer" align="right" />
             </q-toolbar>
