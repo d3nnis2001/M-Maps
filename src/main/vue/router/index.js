@@ -22,6 +22,17 @@ import EditUser from "@/main/vue/pages/Nutzerverwaltung/EditUser.vue";
 import Dataviewer from "@/main/vue/pages/Dataviewer/Dataviewer.vue";
 import DataviewerRoute from "@/main/vue/pages/Dataviewer/DataviewerRoute.vue";
 import DataviewerPoint from "@/main/vue/pages/Dataviewer/DataviewerPoint.vue";
+import changeSettings from "@/main/vue/pages/Settings/ChangeSettings.vue";
+import editImpressum from "@/main/vue/pages/Settings/EditImpressum.vue";
+import editLogo from "@/main/vue/pages/Settings/editLogo.vue";
+import Impressum from "@/main/vue/pages/Impressum.vue";
+import editColors from "@/main/vue/pages/Settings/editColors.vue";
+import checklistOverview from "@/main/vue/pages/Checklists/ChecklistList.vue";
+import checklistCreate from "@/main/vue/pages/Checklists/ChecklistCreate.vue";
+import checklistSingle from "@/main/vue/pages/Checklists/ChecklistSingle.vue";
+import checklistEdit from "@/main/vue/pages/Checklists/ChecklistEdit.vue";
+import UserProfile from "@/main/vue/pages/Nutzerprofil/UserProfile.vue";
+import {useSettingsStore} from "@/main/vue/stores/SettingsStore";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -124,6 +135,7 @@ const router = createRouter({
         {
             path: "/impressum",
             name: "impressum",
+            component: Impressum
         },
         {
             path: "/dataviewer",
@@ -144,12 +156,59 @@ const router = createRouter({
             path: "/dataviewer/point/:pointId",
             name: "dataviewerPoint",
             component: DataviewerPoint
+
+        },
+        {
+            path: "/settings",
+            name: "settings",
+            component: changeSettings,
+        },
+        {
+            path: "/settings/edit/impressum",
+            name: "editImpressum",
+            component: editImpressum,
+        },
+        {
+            path: "/settings/edit/logo",
+            name: "editLogo",
+            component: editLogo
+        },
+        {
+            path: "/settings/edit/colors",
+            name: "editColors",
+            component: editColors
+        },
+        {
+            path: "/checklists",
+            name: "checklistOverview",
+            component: checklistOverview,
+        },
+        {
+            path: "/checklists/create",
+            name: "checklistCreate",
+            component: checklistCreate,
+        },
+        {
+            path: "/checklists/:name",
+            name: "checklistSingle",
+            component: checklistSingle,
+        },
+        {
+            path: "/checklists/edit/:name",
+            name: "checklistEdit",
+            component: checklistEdit,
+        },
+        {
+            path: "/userprofile/:username",
+            name: "userprofile",
+            component: UserProfile,
         }
     ]
 })
 
-router.beforeEach((to) => {
+router.beforeEach(async (to) => {
     document.title = to.name;
+    await useSettingsStore().getColors()
   // Something which should be executed before each routing
 })
 

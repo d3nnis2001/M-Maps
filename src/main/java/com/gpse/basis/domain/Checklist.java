@@ -3,17 +3,21 @@ package com.gpse.basis.domain;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
-import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * Klasse für die Checkliste.
+ */
 @Document(collection = "Checklist")
 public class Checklist {
     @MongoId
     private String name;
-    private ArrayList<String> items;
+    private List<String> tasks;
+    private List<String> material;
 
-    public Checklist(String name, ArrayList<String> items) {
+    public Checklist(String name, List<String> tasks) {
         this.name = name;
-        this.items = items;
+        this.tasks = tasks;
     }
 
     public String getName() {
@@ -24,17 +28,19 @@ public class Checklist {
         this.name = name;
     }
 
-    public ArrayList<String> getItems() {
-        return items;
+    public List<String> getTasks() {
+        return tasks;
     }
 
-    public void setItems(ArrayList<String> items) {
-        this.items = items;
+    public void setTasks(List<String> tasks) {
+        this.tasks = tasks;
     }
-    public void addItem(String item) {
-        items.add(item);
+
+    public List<String> getMaterial() {
+        return material;
     }
-    public int getItemSize() {
-        return items.size();
+
+    public void setMaterial(List<String> material) {
+        this.material = material;
     }
 }

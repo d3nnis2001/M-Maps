@@ -9,6 +9,7 @@ const links = [
     { name: 'repair', label: 'Reparaturaufträge', to: '/repair' },
     { name: 'inspectionOrderOverview', label: 'Prüfaufträge', to: '/inspectionOrder'},
     { name: 'admin', label: 'Nutzerverwaltung', to: '/admin' },
+    { name: 'userprofile', label: 'Nutzerprofil', to: '/userprofile/:username'},
     { name: 'dataviewer', label: 'Dataviewer', to: '/dataviewer' }
 ]
 const links2 = [
@@ -75,6 +76,9 @@ function toggleRightDrawer() {
                 </q-toolbar-title>
                 <q-toolbar-title v-if="$route.name === 'editInspectionOrder'" align="middle">
                     Prüfauftrag editieren
+                </q-toolbar-title>
+                <q-toolbar-title v-if="$route.name === 'userprofile'" align="middle">
+                    Nutzerprofil
                 </q-toolbar-title>
                 <q-btn dense flat round icon="menu" @click="toggleRightDrawer" align="right" />
             </q-toolbar>
