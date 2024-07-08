@@ -2,6 +2,7 @@ package com.gpse.basis.web;
 
 import com.gpse.basis.domain.InspectionOrder;
 import com.gpse.basis.services.InspectionServices;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,6 +35,9 @@ public class InspectionController {
     public InspectionController(final InspectionServices inspec) {
         this.inspec = inspec;
     }
+
+    @Operation(summary = "Holt Daten aus der Datenbank",
+        description = "Daten werden in einer ArrayList zurückgegeben")
     @GetMapping("/getdata")
     public ArrayList<InspectionOrder> getData() {
         return inspec.getInspecData();
@@ -44,8 +48,11 @@ public class InspectionController {
      * Prüfauftragsdaten senden.
      * @param request - Anfrage
      */
+    @Operation(summary = "Erstellt Prüfauftrag",
+        description = "Funktion um alle Nutzerdaten beim mounten der Seite in die Tabelle zu laden")
     @PostMapping("/senddata")
     public void sendData(final WebRequest request) {
+        System.out.println("TEST1-Controller");
         ArrayList<String> inspecArray = new ArrayList<>();
         inspecArray.add(request.getParameter(courseId));
         inspecArray.add(request.getParameter(startLocation));

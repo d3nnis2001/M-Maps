@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +31,6 @@ public class InspectionServicesImpl implements InspectionServices {
     }
 
     @Override
-    @PreAuthorize("hasRole('Prüfer')")
     public void createInspectionOrder(ArrayList<String> inspecArray) {
         String defaultStatus = "beauftragt";
         String defaultUserId = " ";
@@ -69,11 +67,6 @@ public class InspectionServicesImpl implements InspectionServices {
         inspecOld.setRemarks(inspecNew.getRemarks());
         inspecOld.setPriority(inspecNew.getPriority());
         inspec.save(inspecOld);
-    }
-
-    @Override
-    public void acceptInspectionOrder(InspectionOrder inspectionOrder) {
-
     }
 
     @Override
@@ -147,7 +140,7 @@ public class InspectionServicesImpl implements InspectionServices {
         qu.addCriteria(Criteria.where(inspectionOrderId).is(id));
         template.remove(qu, InspectionOrder.class);
     }
-
+    @Override
     public void editUsername(String inspectionOrderId, String username) {
         InspectionOrder inspec2 = loadInspecById(inspectionOrderId);
         inspec2.setUserId(username);
