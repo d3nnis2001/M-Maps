@@ -26,8 +26,16 @@ public class InitializeDatabase implements InitializingBean {
     private final GeoTrackData geoTrackRepository;
 
     @Autowired
-    public InitializeDatabase(final UserRepository usRepo, final InspectionOrderRepository ioRepo, final ReparaturRepository reRepo,
+    public InitializeDatabase(final UserRepository usRepo, final InspectionOrderRepository ioRepo, final ReperaturRepository reRepo,
                               final ChecklistRepository checkRepo, final GleisLageRangeRepository r, final GeoTrackData gTD, final SettingsRepository settingsRepository) {
+    private final ChecklistRepository checklistRepository;
+    private final GeoTrackData geoTrackRepository;
+
+    @Autowired
+    public InitializeDatabase(final UserRepository usRepo, final InspectionOrderRepository ioRepo, final ReparaturRepository reRepo,
+                              final ChecklistRepository checkRepo, final GleisLageRangeRepository r, final GeoTrackData gTD,
+                              final ChecklistRepository checklistRepository) {
+
         this.usRepo = usRepo;
         this.ioRepo = ioRepo;
         this.reRepo = reRepo;
@@ -35,6 +43,7 @@ public class InitializeDatabase implements InitializingBean {
         this.glrRepo = r;
         this.geoTrackRepository = gTD;
         this.settingsRepository = settingsRepository;
+        this.checklistRepository = checklistRepository;
     }
 
     @Override
@@ -43,9 +52,9 @@ public class InitializeDatabase implements InitializingBean {
         initChecklists();
         initRanges();
         initGeoTrack();
-        initInspectionOrder();
-        initChecklistTemplates();
         initSettings();
+        initInspectionOrder();;
+        initChecklistTemplates();
     }
 
     public void initUsers() {
@@ -95,6 +104,13 @@ public class InitializeDatabase implements InitializingBean {
         glrRepo.save(range1);
         glrRepo.save(range2);
         glrRepo.save(range3);
+    }
+
+    private void initSettings() {
+        Settings settings = new Settings("", new Colors(PRIMARY_AND_DARK_COLOR, "#ec0016",
+            "#1e7f5e", "#e21437", "#fec705", PRIMARY_AND_DARK_COLOR, "#31CCEC"),
+            new byte[0]);
+        settingsRepository.save(settings);
     }
 
     public void initInspectionOrder() {

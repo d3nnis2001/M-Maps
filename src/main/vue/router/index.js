@@ -22,17 +22,19 @@ import EditUser from "@/main/vue/pages/Nutzerverwaltung/EditUser.vue";
 import Dataviewer from "@/main/vue/pages/Dataviewer/Dataviewer.vue";
 import DataviewerRoute from "@/main/vue/pages/Dataviewer/DataviewerRoute.vue";
 import DataviewerPoint from "@/main/vue/pages/Dataviewer/DataviewerPoint.vue";
-import checklistOverview from "@/main/vue/pages/Checklists/ChecklistList.vue";
-import checklistCreate from "@/main/vue/pages/Checklists/ChecklistCreate.vue";
-import checklistSingle from "@/main/vue/pages/Checklists/ChecklistSingle.vue";
-import checklistEdit from "@/main/vue/pages/Checklists/ChecklistEdit.vue";
-import axios from "axios";
-import {useUserStore} from "@/main/vue/stores/UserStore";
+
 import changeSettings from "@/main/vue/pages/Settings/ChangeSettings.vue";
 import editImpressum from "@/main/vue/pages/Settings/EditImpressum.vue";
 import editLogo from "@/main/vue/pages/Settings/editLogo.vue";
 import Impressum from "@/main/vue/pages/Impressum.vue";
 import editColors from "@/main/vue/pages/Settings/editColors.vue";
+
+import checklistOverview from "@/main/vue/pages/Checklists/ChecklistList.vue";
+import checklistCreate from "@/main/vue/pages/Checklists/ChecklistCreate.vue";
+import checklistSingle from "@/main/vue/pages/Checklists/ChecklistSingle.vue";
+import checklistEdit from "@/main/vue/pages/Checklists/ChecklistEdit.vue";
+import UserProfile from "@/main/vue/pages/Nutzerprofil/UserProfile.vue";
+import {useSettingsStore} from "@/main/vue/stores/SettingsStore";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -223,6 +225,11 @@ const router = createRouter({
             name: "editColors",
             component: editColors,
             meta: {showLogin: false, showHeader: true, authorized: true}
+        },
+        {
+            path: "/userprofile/:username",
+            name: "userprofile",
+            component: UserProfile,
         }
     ]
 })
