@@ -146,9 +146,9 @@ public class InspectionController {
         description = "An den Prüfauftrag mit der übergebenen Id wird ein Username übermittelt")
     @PostMapping("/sendUsername")
     public void sendUsername(final WebRequest request) {
-        String inspectionOrderId = request.getParameter(inspectionOrderId);
+        String id = request.getParameter(inspectionOrderID);
         String username = request.getParameter("username");
-        inspec.editUsername(inspectionOrderId, username);
+        inspec.editUsername(id, username);
     }
 
 
