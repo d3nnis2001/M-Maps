@@ -240,7 +240,6 @@ router.beforeEach(async(to, from, next) => {
     const authenticated = axios.defaults.headers['Authorization'] !== null;
     document.title = to.name;
     await useSettingsStore().getColors()
-  // Something which should be executed before each routing
     console.log(to.meta.authorized)
     console.log(authenticated)
     const userStore = useUserStore();
