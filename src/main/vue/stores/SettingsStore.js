@@ -6,7 +6,7 @@ import {ref} from "vue";
 export const useSettingsStore = defineStore('settings', () => {
     const impressum = ref("")
     const success = ref(true)
-    const imageNotEmpty = ref(true)
+    const imageEmpty = ref(true)
     function getImpressum() {
         return new Promise((resolve, reject) => {
             api.settings.getImpressum()
@@ -77,7 +77,7 @@ export const useSettingsStore = defineStore('settings', () => {
         return new Promise((resolve, reject) => {
             api.settings.getLogo()
                 .then(res => {
-                    imageNotEmpty.value = res.data === [];
+                    imageEmpty.value = res.data === "";
                     resolve()
                 })
                 .catch(() => {
@@ -88,7 +88,7 @@ export const useSettingsStore = defineStore('settings', () => {
     return {
         impressum,
         success,
-        imageNotEmpty,
+        imageEmpty,
         getImpressum,
         editImpressum,
         editColors,

@@ -1,16 +1,17 @@
 <script setup>
-import {ref} from 'vue'
+import {onMounted, ref} from 'vue'
 import {RouterView} from 'vue-router'
-import {useSettingsStore} from "@/main/vue/stores/SettingsStore";
 import {storeToRefs} from "pinia";
+import {useSettingsStore} from "@/main/vue/stores/SettingsStore";
 
 let boolStart = true;
 
 const settingsStore = useSettingsStore()
-const {imageNotEmpty} = storeToRefs(settingsStore)
+const {imageEmpty} = storeToRefs(settingsStore)
 
-onMounted(() => {
-    settingsStore.checkLogo()
+onMounted(async () => {
+    await settingsStore.checkLogo()
+    console.log(imageEmpty.value)
 })
 
 
@@ -51,8 +52,8 @@ function changeBool() {
     <q-layout view="hHh lpR fFf" v-else>
         <q-header bordered class="q-py-xs" elevated>
             <q-toolbar>
-                <q-img v-if="imageNotEmpty" src="/api/settings/logo" align="left"></q-img>
-                <q-img v-else :src="`/src/main/resources/db-logo.png`" align="left"></q-img>
+                <q-img v-if="imageEmpty" :src="`/src/main/resources/db-logo.png`" align="left"/>
+                <q-img v-else src="/api/settings/logo" align="left"/>
                 <q-toolbar-title v-if="$route.name === 'map'" align="middle">
                     M-MAPS
                 </q-toolbar-title>
