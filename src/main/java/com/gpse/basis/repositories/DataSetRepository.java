@@ -5,7 +5,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * DataSetRepository.
+ * The interface Data set repository.
  */
 @Repository
 public interface DataSetRepository extends CrudRepository<DataSet, String> {

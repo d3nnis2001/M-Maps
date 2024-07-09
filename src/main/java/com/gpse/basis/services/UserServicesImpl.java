@@ -140,4 +140,74 @@ public class UserServicesImpl implements UserServices {
         userRepo.save(us);
         return true;
     }
+
+    /**
+     * getToken.
+     * @param email - email
+     * @param password - password
+     * @return - token
+     */
+    public String getToken(String email, String password) {
+        UserModel us = getUserByUsername(email);
+        System.out.println("TEST-service-passwort" + us.getPassword());
+        String token = us.setUserToken();
+        userRepo.save(us);
+        System.out.println("TEST-service: " + token);
+        return token;
+    }
+
+    /**
+     * getRoles.
+     * @param email - email
+     * @param token - token
+     * @return - roles
+     */
+    public ArrayList<String> getRoles(String email, String token) {
+        UserModel us = getUserByUsername(email);
+        if (us.getUserToken().equals(token)) {
+            ArrayList<String> roles = us.getRoles();
+            return roles;
+        }
+        return null;
+    }
+
+    /**
+     * getUserByToken.
+     * @param token - token
+     * @return - null
+     */
+    public String getUserByToken(String token) {
+        Iterable<UserModel> al = userRepo.findAll();
+        ArrayList<UserModel> user = new ArrayList<>();
+        for (UserModel userModel : al) {
+            user.add(userModel);
+        }
+        for (int i = 0; i < user.size(); i++) {
+            if (user.get(i).getUserToken().equals(token)) {
+                return user.get(i).getUsername();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * compareFreigabeberechtigter.
+     * @param freigabe - freigabe
+     * @return - null
+     */
+    public String compareFreigabe(String freigabe) {
+        Iterable<UserModel> al = userRepo.findAll();
+        ArrayList<UserModel> user = new ArrayList<>();
+        for (UserModel userModel : al) {
+            user.add(userModel);
+        }
+        for (int i = 0; i < user.size(); i++) {
+            String name = user.get(i).getFirstname() + " " + user.get(i).getLastname();
+            System.out.println("TEST: " + name);
+            if (name.equals(freigabe)) {
+                return user.get(i).getUsername();
+            }
+        }
+        return null;
+    }
 }

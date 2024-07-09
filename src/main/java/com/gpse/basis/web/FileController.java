@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The type File controller.
+ */
 @RestController
 @RequestMapping("/api/files")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -36,11 +39,22 @@ public class FileController {
         return service.getDataSets(searchString);
     }
 
+    /**
+     * Delete files.
+     *
+     * @param ids the ids
+     */
     @DeleteMapping("/deleteFiles")
     public void deleteFiles(@RequestParam("ids[]") List<String> ids) {
             service.deleteDataSetsById(ids);
     }
 
+    /**
+     * Gets folder.
+     *
+     * @param pt the pt
+     * @return the folder
+     */
     @GetMapping("/getFolder")
     public  ResponseEntity<List<List<String>>> getFolder(@RequestParam("p") String pt) {
         System.out.println(pt);

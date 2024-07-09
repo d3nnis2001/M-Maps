@@ -14,9 +14,12 @@ import java.util.List;
  */
 public interface ReparaturService {
     ArrayList<Reparatur> getRepData();
+
     boolean addRepairOrder(int track, LocalDate date1, LocalDate date2, String authorized, Checklist checklist,
                            String remarks, GeoCords geo);
+
     Reparatur loadRepByName(final String repname) throws UsernameNotFoundException;
+
     Boolean changeStatus(String name, String newStatus);
 
     Boolean deleteOrder(String name);
@@ -27,6 +30,7 @@ public interface ReparaturService {
 
     void deleteArchivedRep(String id);
 
-
     List<Reparatur> getReparaturForMap();
+
+    List<Reparatur> getReparaturForPoint(Double latitude, Double longitude);
 }

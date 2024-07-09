@@ -5,7 +5,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * GleisLageDatenRepository.
+ * The interface Gleis lage daten repository.
  */
 @Repository
 public interface GleisLageDatenRepository extends CrudRepository<GleisLageDatenpunkt, String> {

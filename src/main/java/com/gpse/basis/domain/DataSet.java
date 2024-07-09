@@ -5,6 +5,9 @@ import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.util.Date;
 
+/**
+ * The type Data set.
+ */
 @Document(collection = "dataSets")
 public class DataSet {
     @MongoId

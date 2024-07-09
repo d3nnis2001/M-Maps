@@ -2,15 +2,14 @@ package com.gpse.basis.web;
 
 import com.gpse.basis.domain.InspectionOrder;
 import com.gpse.basis.services.InspectionServices;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 
 /**
@@ -36,6 +35,13 @@ public class InspectionController {
     public InspectionController(final InspectionServices inspec) {
         this.inspec = inspec;
     }
+
+    /**
+     * Alle Prüfaufträge aus Backend holen.
+     * @return ArrayList
+     */
+    @Operation(summary = "Holt Daten aus der Datenbank",
+        description = "Daten werden in einer ArrayList aus Prüfauftragen zurückgegeben")
     @GetMapping("/getdata")
     public ArrayList<InspectionOrder> getData() {
         return inspec.getInspecData();
@@ -46,6 +52,8 @@ public class InspectionController {
      * Prüfauftragsdaten senden.
      * @param request - Anfrage
      */
+    @Operation(summary = "Erstellt Prüfauftrag",
+        description = "Übergibt die Daten, um einen neuen Prüfauftrag zu erstellen")
     @PostMapping("/senddata")
     public void sendData(final WebRequest request) {
         ArrayList<String> inspecArray = new ArrayList<>();
@@ -61,6 +69,13 @@ public class InspectionController {
         inspec.createInspectionOrder(inspecArray);
     }
 
+    /**
+     * einzelnen Prüfauftrag holen.
+     * @param request - Anfrage
+     * @return InspectionOrder
+     */
+    @Operation(summary = "Holt einen Prüfauftrag nach der Id",
+        description = "Gibt den Prüfauftrag mit der übergebenen Id zurück ")
     @GetMapping("/getById")
     public InspectionOrder getDataById(final WebRequest request) {
         InspectionOrder inspection = inspec.loadInspecById(request.getParameter(inspectionOrderID));
@@ -71,6 +86,8 @@ public class InspectionController {
      * Anhand der ID Daten senden.
      * @param request - Anfrage
      */
+    @Operation(summary = "Prüfauftrag editieren",
+        description = "Übergibt alle ggf. veränderten Attribute, damit der bestehende Prüfauftrag editiert wird")
     @PostMapping("/sendById")
     public void sendDataById(final WebRequest request) {
         InspectionOrder inspectionOrderNew = new InspectionOrder(request.getParameter(inspectionOrderID),
@@ -86,6 +103,8 @@ public class InspectionController {
      * Prüfauftrag löschen.
      * @param request - Anfrage
      */
+    @Operation(summary = "Löscht den Prüfauftrag",
+        description = "Erhält eine Id, dessn der Prüfauftrag gelöscht wird")
     @PostMapping("/deleteInspectionOrder")
     public void deleteInspectionOrder(final WebRequest request) {
         String id = request.getParameter(inspectionOrderID);
@@ -96,6 +115,8 @@ public class InspectionController {
      * neuen Status eintragen.
      * @param request - Anfrage
      */
+    @Operation(summary = "Status des Prüfauftrags editieren",
+        description = "Der Prüfauftrag der übergebenen Id bekommt den übergebenen Status")
     @PostMapping("/sendNewStatus")
     public void sendNewStatus(final WebRequest request) {
         String inspectionOrderId = request.getParameter(inspectionOrderID);
@@ -107,6 +128,8 @@ public class InspectionController {
      * Bewertung abgeben.
      * @param request - Anfrage
      */
+    @Operation(summary = "Bewertung speichern",
+        description = "An den Prüfauftrag mit der übergebenen Id wird eine Bewertung und ein Abschlussdatum übergeben")
     @PostMapping("/sendReview")
     public void sendReview(final WebRequest request) {
         String inspectionOrderId = request.getParameter(inspectionOrderID);
@@ -115,15 +138,19 @@ public class InspectionController {
         inspec.editReview(inspectionOrderId, review, date);
     }
 
-    @PostMapping("/upload")
-    public void handleFileUpload(@RequestPart(value = "file") final MultipartFile uploadfile) throws IOException {
-        saveUploadedFiles(uploadfile);
+    /**
+     * Prüfauftrag annehmen.
+     * @param request - Anfrage
+     */
+    @Operation(summary = "Prüfauftrag wird angenommen",
+        description = "An den Prüfauftrag mit der übergebenen Id wird ein Username übermittelt")
+    @PostMapping("/sendUsername")
+    public void sendUsername(final WebRequest request) {
+        String id = request.getParameter(inspectionOrderID);
+        String username = request.getParameter("username");
+        inspec.editUsername(id, username);
     }
 
-    private void saveUploadedFiles(final MultipartFile file) throws IOException {
-        final byte[] bytes = file.getBytes();
-        final Path path = Paths.get("src/main/resources/imagesInspectionOrder/" +  "/" + file.getOriginalFilename());
-        Files.write(path, bytes);
-    }
+
 
 }

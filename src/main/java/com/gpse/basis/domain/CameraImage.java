@@ -3,6 +3,9 @@ package com.gpse.basis.domain;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
+/**
+ * The type Camera image.
+ */
 @Document(collection = "CameraImages")
 public class CameraImage {
 
@@ -17,12 +20,34 @@ public class CameraImage {
 
     private String dataSetid;
 
+    /**
+     * Instantiates a new Camera image.
+     *
+     * @param track_id the track id
+     * @param path     the path
+     * @param t        the t
+     * @param dId      the d id
+     * @param index    the index
+     */
     public CameraImage(int track_id, String path, int t, String dId, int index) {
         this.track_id = track_id;
         this.path = path;
         this.type = t;
         this.dataSetid = dId;
         this.index = index;
+    }
+
+    /**
+     * Instantiates a new Camera image.
+     *
+     * @param id       the id
+     * @param track_id the track id
+     * @param path     the path
+     */
+    public CameraImage(String id, int track_id, String path) {
+        this.id = id;
+        this.track_id = track_id;
+        this.path = path;
     }
 
     public CameraImage() {
@@ -36,13 +61,6 @@ public class CameraImage {
     public void setDataSetid(String dataSetid) {
         this.dataSetid = dataSetid;
     }
-
-    public CameraImage(String id, int track_id, String path) {
-        this.id = id;
-        this.track_id = track_id;
-        this.path = path;
-    }
-
     public int getIndex() {
         return index;
     }

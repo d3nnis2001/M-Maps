@@ -35,6 +35,7 @@ public class UserModel implements UserDetails {
     private boolean unlocked;
     private ArrayList<String> region;
     private String service;
+    private String userToken;
 
     @JsonIgnore
     private transient ArrayList<String> roles;
@@ -124,22 +125,22 @@ public class UserModel implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return this.accountNonExpired;
+        return accountNonExpired;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return this.accountNonLocked;
+        return accountNonLocked;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return this.credentialsNonExpired;
+        return credentialsNonExpired;
     }
 
     @Override
     public boolean isEnabled() {
-        return this.enabled;
+        return enabled;
     }
 
     /**
@@ -169,6 +170,21 @@ public class UserModel implements UserDetails {
 
     public String getTokenPassword() {
         return passwordToken;
+    }
+
+    /**
+     * UserToken setzen.
+     * @return - return
+     */
+    public String setUserToken() {
+        SecureRandom random = new SecureRandom();
+        byte[] token = new byte[24];
+        random.nextBytes(token);
+        userToken = Base64  .getUrlEncoder().withoutPadding().encodeToString(token);
+        return userToken;
+    }
+    public String getUserToken() {
+        return this.userToken;
     }
 
     public String getService() {

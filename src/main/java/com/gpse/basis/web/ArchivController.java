@@ -12,9 +12,13 @@ import org.springframework.web.context.request.WebRequest;
 
 import java.util.List;
 
+/**
+ * The type Archiv controller.
+ */
 @RestController
 @RequestMapping("/api/archiv")
 public class ArchivController {
+    public static final String ID = "id";
     private InspectionServices inspservice;
 
     private ReparaturService repservice;
@@ -32,13 +36,13 @@ public class ArchivController {
 
     @PostMapping("/unarchiveInspectionOrder")
     public void unarchiveInspectionOrder(final WebRequest request) {
-        String id = request.getParameter("id");
+        String id = request.getParameter(ID);
         inspservice.unarchiveInspectionOrder(id);
     }
 
     @PostMapping("/deleteArchivedReparatur")
     public void deleteArchivedReparatur(final WebRequest request) {
-        String id = request.getParameter("id");
+        String id = request.getParameter(ID);
         repservice.deleteArchivedRep(id);
     }
 
@@ -49,13 +53,13 @@ public class ArchivController {
 
     @PostMapping("/unarchiveReparatur")
     public void unarchiveReparatur(final WebRequest request) {
-        String id = request.getParameter("id");
+        String id = request.getParameter(ID);
         repservice.unarchiveRep(id);
     }
 
     @PostMapping("/deleteArchivedInspectionOrder")
     public void deleteArchivedInspectionOrder(final WebRequest request) {
-        String id = request.getParameter("id");
+        String id = request.getParameter(ID);
         inspservice.deleteArchivedInspectionOrder(id);
     }
 }

@@ -9,11 +9,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
+import java.util.ArrayList;
+
+/**
+ * UserController.
+ */
 @RestController
 @RequestMapping("/api")
 public class UserController {
     private String email_string = "email";
     private String passwort_string = "password";
+    private String token_string = "token";
     private final UserServices userService;
     private final EmailServices emailService;
     @Autowired
@@ -27,6 +33,13 @@ public class UserController {
         boolean exists = userService.checkExistanceEmail(email.trim());
         return ResponseEntity.ok(exists);
     }
+
+    /**
+     * register.
+     * @param request - Anfrage
+     * @return - Response
+     */
+    @Operation(summary = "Registrierung", description = "Registriert ein Nutzer.")
     @PostMapping("/register")
     public ResponseEntity<Boolean> register(final WebRequest request) {
         String email = request.getParameter(email_string);
@@ -61,6 +74,12 @@ public class UserController {
         return ResponseEntity.ok(false);
     }
 
+    /**
+     * login.
+     * @param request - Anfrage
+     * @return - response
+     */
+    @Operation(summary = "Login", description = "Prüft die Daten mit den Daten in der Datenbank.")
     @PostMapping("/login")
     public ResponseEntity<Boolean> login(final WebRequest request) {
         String email = request.getParameter(email_string);
@@ -70,6 +89,13 @@ public class UserController {
         }
         return ResponseEntity.ok(false);
     }
+
+    /**
+     * resetPasswort.
+     * @param request - Anfrage
+     * @return - response
+     */
+    @Operation(summary = "Passwort Reset", description = "Schickt ein Link per Email-Service für die Passwort Zurücksetzung.")
     @PostMapping("/user/resetPassword")
     public ResponseEntity<Boolean> changePassword(final WebRequest request) {
         String email = request.getParameter(email_string);
@@ -80,10 +106,17 @@ public class UserController {
         }
         return ResponseEntity.ok(false);
     }
+
+    /**
+     * setPassword.
+     * @param request - Anfrage
+     * @return response
+     */
+    @Operation(summary = "Passwort", description = "Setzt das Passwort zurück auf ein neues.")
     @PostMapping("/user/setPassword")
     public ResponseEntity<Boolean> resetPassword(final WebRequest request) {
         String password = request.getParameter(passwort_string);
-        String token = request.getParameter("token");
+        String token = request.getParameter(token_string);
         String email = request.getParameter(email_string);
         boolean response = userService.setPasswordNew(email, password, token);
         if (response) {
@@ -91,5 +124,65 @@ public class UserController {
         } else {
             return ResponseEntity.ok(false);
         }
+    }
+
+    /**
+     * getToken.
+     * @param request - Anfrage
+     * @return - token
+     */
+    @Operation(summary = "Token wird erstellt",
+        description = "Der Token wird im Backend erstellt und als String zurückgegeben")
+    @PostMapping("/user/getToken")
+    public String getToken(final WebRequest request) {
+        String password = request.getParameter(passwort_string);
+        String email = request.getParameter(email_string);
+
+        String token = userService.getToken(email, password);
+        return token;
+    }
+
+    /**
+     * getRolesByToken.
+     * @param request - Anfrage
+     * @return - roles
+     */
+    @Operation(summary = "Rollen zurückgeben per Token",
+        description = "alle Rollen des Users mit dem zugehörigen Token werden in einer ArrayList zurückgegeben")
+    @PostMapping("/user/getRolesByToken")
+    public ArrayList<String> getRolesByToken(final WebRequest request) {
+        String email = request.getParameter(email_string);
+        String token = request.getParameter(token_string);
+
+        ArrayList<String> roles = userService.getRoles(email, token);
+        return roles;
+    }
+
+    /**
+     * getUserByToken.
+     * @param request - Anfrage
+     * @return - username
+     */
+    @Operation(summary = "Username per Token aus der Datenbank holen",
+        description = "Der Username wird mit dem zugehörigen Token zurückgegeben")
+    @PostMapping("/user/getUserByToken")
+    public String getUserByToken(final WebRequest request) {
+        String token = request.getParameter(token_string);
+        String username = userService.getUserByToken(token);
+        return username;
+    }
+
+    /**
+     * compareFreigabe.
+     * @param request - Anfrage
+     * @return - username
+     */
+    @Operation(summary = "Vergleich des Freigabeberechtigten",
+        description = "Der Name des Freigabeberechtigten wird mit dem Username in der Datenbank verglichen")
+    @PostMapping("/user/freigabe")
+    public String compareFreigabe(final WebRequest request) {
+        String freigabe = request.getParameter("freigabe");
+        String username = userService.compareFreigabe(freigabe);
+        return username;
     }
 }

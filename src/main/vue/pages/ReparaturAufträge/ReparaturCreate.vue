@@ -4,6 +4,7 @@ import {getChecklists, sendRepair} from "@/main/vue/api/reparatur";
 import {useQuasar} from "quasar";
 import {useRoute, useRouter} from "vue-router";
 import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";
+import {compareFreigabeberechtigter} from "../../api/admin";
 
 export default {
     components: {StandardInput},
@@ -19,6 +20,7 @@ export default {
         const router = useRouter()
         let vorLatitude = ref('')
         let vorLongitude = ref('')
+        const freigabeValues = ref([])
 
         const route = useRoute();
 
@@ -36,6 +38,8 @@ export default {
                 vorLatitude.value = route.query.latitude
                 vorLongitude.value = route.query.longitude
             }
+            freigabeValues.value.push("Regina S.");
+            freigabeValues.value.push("Manfred D.");
         })
 
 
@@ -69,7 +73,7 @@ export default {
             }
             return true;
         }
-        function sendData() {
+        async function sendData() {
             const err = checkInputs()
             console.log(err)
             if (err) {
@@ -77,11 +81,13 @@ export default {
                     freigabe.value, checkliste.value["label"], bem.value, vorLongitude.value, vorLatitude.value)
                 router.push({ path: "/repair" });
             }
+
         }
 
         return {
             streckenabschnitt,
             freigabe,
+            freigabeValues,
             checkliste,
             date,
             date2,
@@ -144,9 +150,9 @@ export default {
                 </div>
             </div>
             <div class="row extra-mar2">
-                    <div class="mar-right">
+                    <div class="checkListInput">
                         <p style="font-weight: bold;">Freigabeberechtigter</p>
-                        <StandardInput class="" v-model="freigabe" label="Freigabeberechtigter" ></StandardInput>
+                        <q-select class="" outlined v-model="freigabe" :options="freigabeValues" label="Freigabeberechtigter" />
                     </div>
                     <div class="checkListInput">
                         <p style="font-weight: bold;">Checkliste</p>

@@ -76,7 +76,7 @@ export default {
             return true;
         }
 
-        function sendData() {
+        async function sendData() {
             const inputs = checkInputs()
             const priority = ref('');
             if (priorityLow.value) {
@@ -88,10 +88,9 @@ export default {
             }
             console.log(inputs)
             if (inputs) {
-                router.push('/inspectionOrder')
-                return sendInspectionOrder(courseId.value, startLocation.value, endLocation.value, startTime.value,
+                await sendInspectionOrder(courseId.value, startLocation.value, endLocation.value, startTime.value,
                     endTime.value, department.value, inspectionData.value, remarks.value, priority.value)
-
+                await router.push('/inspectionOrder')
             }
         }
 
@@ -135,21 +134,21 @@ export default {
         <div class="outer-container">
             <div class="text-with-input">
                 <p style="font-weight: bold;">StreckenId</p>
-                <StandardInput class="extra-mar" v-model="courseId" label="StreckenId"></StandardInput>
+                <StandardInput class="extra-mar3" v-model="courseId" label="StreckenId"></StandardInput>
                 <div class="row">
                     <div class="text-with-input mar-right">
                         <p style="font-weight: bold;">Startort</p>
-                        <StandardInput class="extra-mar" v-model="startLocation" label="Startort" ></StandardInput>
+                        <StandardInput class="extra-mar3" v-model="startLocation" label="Startort" ></StandardInput>
                     </div>
                     <div class="text-with-input">
                         <p style="font-weight: bold;">Zielort</p>
-                        <StandardInput class="extra-mar" v-model="endLocation" label="Zielort" ></StandardInput>
+                        <StandardInput class="extra-mar3" v-model="endLocation" label="Zielort" ></StandardInput>
                     </div>
                 </div>
                 <div>
                 </div>
                 <p style="font-weight: bold;">Zeitraum (von - bis)</p>
-                <div class="text-with-input row extra-mar">
+                <div class="text-with-input row extra-mar3">
                     <q-input class="input-style mar-right" filled v-model="startTime" mask="date" :rules="['date']">
                         <template v-slot:append>
                             <q-icon name="event" class="cursor-pointer">
@@ -178,7 +177,7 @@ export default {
                     </q-input>
                 </div>
             </div>
-            <div class="row extra-mar">
+            <div class="row extra-mar3">
                 <div class="checkListInput">
                     <p style="font-weight: bold;">Fachabteilung</p>
                     <q-select class="" outlined v-model="department" :options="departmentValues" label="Fachabteilung" />
@@ -253,9 +252,7 @@ p {
     margin-right: 20px;
 }
 
-.extra-mar {
+.extra-mar3 {
     margin-bottom: 20px;
 }
 </style>
-
-
