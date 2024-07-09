@@ -13,12 +13,17 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+
+/**
+ * Implementation des InspectionServices.
+ */
 @Service
 public class InspectionServicesImpl implements InspectionServices {
 
     private InspectionOrderRepository inspec;
 
     private MongoTemplate template;
+    private String inspectionOrderId = "inspectionOrderId";
     @Autowired
     public InspectionServicesImpl(InspectionOrderRepository inspec, MongoTemplate template) {
         this.inspec = inspec;
@@ -33,11 +38,15 @@ public class InspectionServicesImpl implements InspectionServices {
         boolean defaultArchived = false;
 
         InspectionOrder inspectionOrder = new InspectionOrder(inspectionOrderId, inspecArray.get(0), defaultUserId,
-            inspecArray.get(1), inspecArray.get(2), inspecArray.get(3), inspecArray.get(4),
-            inspecArray.get(5), inspecArray.get(6), defaultStatus, inspecArray.get(7), defaultArchived, inspecArray.get(8));
+            inspecArray.get(1), inspecArray.get(2), inspecArray.get(3), inspecArray.get(4), inspecArray.get(5),
+            inspecArray.get(6), defaultStatus, inspecArray.get(7), defaultArchived, inspecArray.get(8));
         inspec.save(inspectionOrder);
     }
 
+    /**
+     * ID generieren.
+     * @return - generierte ID
+     */
     public String generateId() {
         long timestamp = System.currentTimeMillis();
         Random random = new Random();
@@ -58,11 +67,6 @@ public class InspectionServicesImpl implements InspectionServices {
         inspecOld.setRemarks(inspecNew.getRemarks());
         inspecOld.setPriority(inspecNew.getPriority());
         inspec.save(inspecOld);
-    }
-
-    @Override
-    public void acceptInspectionOrder(InspectionOrder inspectionOrder) {
-
     }
 
     @Override
@@ -122,20 +126,26 @@ public class InspectionServicesImpl implements InspectionServices {
     @Override
     public void unarchiveInspectionOrder(String id) {
         var insp = template.findById(id, InspectionOrder.class);
-        if(insp != null) {
+        if (insp != null) {
             insp.setArchived(false);
-            Query q = new Query();
-            q.addCriteria(Criteria.where("inspectionOrderId").is(id));
-            template.replace(q, insp);
+            Query qu = new Query();
+            qu.addCriteria(Criteria.where(inspectionOrderId).is(id));
+            template.replace(qu, insp);
         }
     }
 
     @Override
     public void deleteArchivedInspectionOrder(String id) {
-        Query q = new Query();
-        q.addCriteria(Criteria.where("inspectionOrderId").is(id));
-        template.remove(q, InspectionOrder.class);
+        Query qu = new Query();
+        qu.addCriteria(Criteria.where(inspectionOrderId).is(id));
+        template.remove(qu, InspectionOrder.class);
     }
-
+    @Override
+    public void editUsername(String inspectionOrderId, String username) {
+        InspectionOrder inspec2 = loadInspecById(inspectionOrderId);
+        inspec2.setUserId(username);
+        System.out.println("Success: " + username);
+        inspec.save(inspec2);
+    }
 
 }

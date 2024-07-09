@@ -39,6 +39,7 @@ export const getChecklists = async function getChecklists() {
 }
 
 export const getDetailsByID = async function getDetailsByID(name) {
+    console.log("TEST-getDetailsByID")
     try {
         const response = await axios.get("/api/repair/getbyid", {
             params: {
@@ -127,3 +128,16 @@ export const trackBuilderPathAxios = async function (email, id) {
         console.log("Unseen error when sending the e-mail.")
     }
 }
+
+export const getTerminationDate = async function (id) {
+    try {
+        const cred = new URLSearchParams()
+        cred.append("id", id)
+        console.log(id)
+        const response = await axios.post("api/repair/getTerminationDate",cred)
+        return response
+    } catch (error) {
+        console.log("Unseen error when sending the e-mail.")
+    }
+}
+

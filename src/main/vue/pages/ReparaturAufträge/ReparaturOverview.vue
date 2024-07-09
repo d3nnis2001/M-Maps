@@ -3,6 +3,8 @@ import { ref, reactive, onMounted, onUnmounted } from 'vue';
 import {deleteRepairOrder, repair, trackBuilderPathAxios, updateStatus} from "@/main/vue/api/reparatur";
 import router from "@/main/vue/router";
 import {useQuasar} from "quasar";
+import {useUserStore} from "../../stores/UserStore";
+import {compareFreigabeberechtigter} from "../../api/admin";
 
 const smallScreen = ref(false);
 const largeScreen = ref(true);
@@ -30,7 +32,9 @@ const state = reactive({
 
 const fetchData = async () => {
     const response = await repair();
-    state.rows = response.map(item => ({
+    state.rows = response
+        .filter(row => row.status !== 'archiviert')
+        .map(item => ({
         name: item.id,
         von: item.from,
         bis: item.till,
@@ -96,9 +100,9 @@ const archiveOrder = async () => {
 
 const reapplyOrder = async () => {
     const name = currentRow.name;
-    await updateStatus(name, "neu beauftragt");
-    currentRow.status = "neu beauftragt";
-    updateRowStatus(name, "neu beauftragt");
+    await updateStatus(name, "beauftragt");
+    currentRow.status = "beauftragt";
+    updateRowStatus(name, "beauftragt");
     showDialog.value = false;
 };
 
@@ -158,6 +162,17 @@ const finishRepairOrder = async (name) => {
     updateRowStatus(name, "bestätigt")
     showDialog.value = false;
 }
+
+async function compareFreigabe (name) {
+    const eingetragenderFreigabeberechtigter = await compareFreigabeberechtigter(name)
+    console.log(eingetragenderFreigabeberechtigter)
+    const username = userStore.username;
+    if (username === eingetragenderFreigabeberechtigter.data) {
+        return true
+    }
+    return false
+}
+
 </script>
 
 <template>
@@ -250,19 +265,19 @@ const finishRepairOrder = async (name) => {
         <q-dialog v-model="showDialog">
             <q-card>
                 <q-card-section>
-                    <div class="option-button" @click="editOrder">Bearbeiten</div>
-                    <q-separator v-if="currentRow.status !== 'abgeschlossen'" />
+                    <div class="option-button"  v-if="currentRow.status !== 'terminiert' && currentRow.status !== 'abgeschlossen' && currentRow.status !== 'storniert'" @click="editOrder">Bearbeiten</div>
+                    <q-separator v-if="currentRow.status !== 'terminiert' && currentRow.status !== 'abgeschlossen' && currentRow.status !== 'storniert'" />
                     <div class="option-button" v-if="currentRow.status === 'storniert'" @click="confirmDeleteOrder(currentRow)">Löschen</div>
-                    <q-separator v-if="currentRow.status === 'bestätigt'" />
-                    <div class="option-button" v-if="currentRow.status === 'bestätigt'" @click="archiveOrder">Archivieren</div>
-                    <q-separator v-if="currentRow.status !== 'abgeschlossen'" />
-                    <div class="option-button" v-if="currentRow.status !== 'storniert'" @click="cancelOrder">Stornieren</div>
                     <q-separator v-if="currentRow.status === 'abgeschlossen'" />
+                    <div class="option-button" v-if="currentRow.status === 'abgeschlossen'" @click="archiveOrder">Archivieren</div>
+                    <q-separator v-if="currentRow.status !== 'storniert' && currentRow.status !== 'terminiert'" />
+                    <div class="option-button" v-if="currentRow.status !== 'storniert' && currentRow.status !== 'terminiert'" @click="cancelOrder">Stornieren</div>
+                    <q-separator v-if="currentRow.status === 'storniert'" />
                     <div class="option-button" v-if="currentRow.status === 'storniert'" @click="reapplyOrder">Neu beantragen</div>
                     <q-separator v-if="currentRow.status === 'terminiert'" />
                     <div class="option-button" v-if="currentRow.status === 'terminiert'" @click="showConfirmDialogtwo = true">Link an Gleisbauer</div>
-                    <q-separator v-if="currentRow.status === 'abgeschlossen'" />
-                    <div class="option-button" v-if="currentRow.status === 'abgeschlossen'" @click="finishRepairOrder(currentRow.name)">Bestätigen</div>
+                    <q-separator v-if="currentRow.status === 'abgeschlossen' && compareFreigabe(currentRow.freigabe)" />
+                    <div class="option-button" v-if="currentRow.status === 'abgeschlossen' && compareFreigabe(currentRow.freigabe)" @click="finishRepairOrder(currentRow.name)">Bestätigen</div>
                 </q-card-section>
                 <q-card-section>
                     <q-btn flat label="Schließen" color="primary" @click="showDialog = false"></q-btn>

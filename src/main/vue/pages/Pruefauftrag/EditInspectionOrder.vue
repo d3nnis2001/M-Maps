@@ -161,19 +161,19 @@ export default {
             <q-separator size="2px" color="primary" style="margin-top: 20px "></q-separator>
 
             <p style="font-weight: bold; margin-top: 20px">StreckenId</p>
-            <StandardInput class="extra-mar" v-model="courseId" label="StreckenId" ></StandardInput>
+            <StandardInput class="extra-mar3" v-model="courseId" label="StreckenId" ></StandardInput>
             <div class="row">
                 <div class="text-with-input mar-right">
                     <p style="font-weight: bold;">Startort</p>
-                    <StandardInput class="extra-mar" v-model="startLocation" label="Startort" ></StandardInput>
+                    <StandardInput class="extra-mar3" v-model="startLocation" label="Startort" ></StandardInput>
                 </div>
                 <div class="text-with-input">
                     <p style="font-weight: bold;">Zielort</p>
-                    <StandardInput class="extra-mar" v-model="endLocation" label="Zielort" ></StandardInput>
+                    <StandardInput class="extra-mar3" v-model="endLocation" label="Zielort" ></StandardInput>
                 </div>
             </div>
             <p style="font-weight: bold;">Zeitraum (von - bis)</p>
-            <div class="text-with-input row extra-mar">
+            <div class="text-with-input row extra-mar3">
                 <q-input class="input-style mar-right" filled v-model="startTime" mask="date" :rules="['date']">
                     <template v-slot:append>
                         <q-icon name="event" class="cursor-pointer">
@@ -202,7 +202,7 @@ export default {
                 </q-input>
             </div>
 
-        <div class="row extra-mar">
+        <div class="row extra-mar3">
             <div class="checkListInput">
                 <p style="font-weight: bold;">Fachabteilung</p>
                 <q-select class="" outlined v-model="department" :options="departmentValues" label="Fachabteilung"></q-select>
@@ -271,7 +271,7 @@ p {
     width: 100%;
 }
 
-.extra-mar {
+.extra-mar3 {
     margin-bottom: 20px;
 }
 

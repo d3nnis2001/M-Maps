@@ -131,15 +131,21 @@ onMounted(async () => {
         iconSize: [45, 45],
         iconAnchor: [0, 30]
     });
-    const reparaturData = await getReparaturForMap()
-    reparaturData.forEach((rep) => { reparatur.value.push( {
-        marker: L.marker([rep.geocords.longitude,rep.geocords.latitude], {icon: Icon} ),
-        reparaturAuftrag: rep
+    try {
+        const reparaturData = await getReparaturForMap()
+        if (reparaturData.length !== undefined && reparaturData.length > 0) {
+            reparaturData.forEach((rep) => { reparatur.value.push( {
+                    marker: L.marker([rep.geocords.longitude,rep.geocords.latitude], {icon: Icon} ),
+                    reparaturAuftrag: rep
+                }
+            )
+                reparatur.value[reparatur.value.length - 1].marker.addTo(map.value)
+                reparatur.value[reparatur.value.length - 1].marker.on('click', onReparaturClicked);
+            })
+        }
+    } catch (e) {
+        console.log(e)
     }
-    )
-       reparatur.value[reparatur.value.length - 1].marker.addTo(map.value)
-        reparatur.value[reparatur.value.length - 1].marker.on('click', onReparaturClicked);
-    })
 
     map.value.on('dblclick', doubleClickOnMap);
 
@@ -298,7 +304,7 @@ function isMarkerInsidePolygon2(marker, poly) {
 async function setGeoData(data) {
     markers.forEach((m) => map.value.removeLayer(m.marker));
     data.forEach((m) => markers.push({
-        marker : L.circle([m.longitude, m.latitude], {color: "black", radius: 50}),
+        marker : L.circle([m.longitude, m.latitude], {color: "black", radius: 100, fillOpacity: 1}),
         data: m,
     }));
     markers.forEach((m) => {
@@ -699,11 +705,13 @@ const addEnd = () => {
                             </div>
                         </q-item-section>
                     </q-item>
-                    <q-item clickable v-ripple>
+                    <q-separator></q-separator>
+                    <q-item clickable v-ripple class="column">
+                        <p><b>Heatmap</b></p>
                         <q-item-section>
                             <q-toggle
                                 v-model="toggle_value"
-                                color="red"
+                                color="accent"
                                 keep-color
                                 readonly
                                 label="Geodata / Heatmap"
@@ -718,34 +726,43 @@ const addEnd = () => {
                             <q-checkbox v-model="red_filter" val="Red" label="Red" color="red" :disable="!toggle_value"/>
                         </div>
                     </q-item>
+                    <q-separator></q-separator>
                     <q-item>
-                        <StandardInput v-model="cityName">
+                        <div style="width: 100%;">
+                            <p>
+                                <b>Nach Ort suchen</b>
+                            </p>
+                            <div style="width: 100%; display: flex; flex-direction: row; justify-content: center; align-items: center">
+                                <StandardInput v-model="cityName">
 
-                        </StandardInput>
-                        <q-btn
-                            class=""
-                            icon="search"
-                            round
-                            flat
-                            @click="zoomToCity(cityName)"
-                            aria-label="Center to City"
-                        />
+                                </StandardInput>
+                                <q-btn
+                                    class=""
+                                    icon="search"
+                                    round
+                                    flat
+                                    @click="zoomToCity(cityName)"
+                                    aria-label="Center to City"
+                                />
+                            </div>
+                        </div>
                     </q-item>
+                    <q-separator></q-separator>
                     <q-item>
                         <div class="col">
-                            <p>Regionen</p>
+                            <p><b>Regionen</b></p>
                             <div class="q-gutter-sm">
-                                <q-checkbox v-model="BY"  val="BY" label="BY" color="black"/>
-                                <q-checkbox v-model="BW"  val="BW" label="BW" color="black"/>
-                                <q-checkbox v-model="SW"  val="SW" label="SW" color="black"/>
+                                <q-checkbox v-model="BY"  val="BY" label="BY" color="dark"/>
+                                <q-checkbox v-model="BW"  val="BW" label="BW" color="dark"/>
+                                <q-checkbox v-model="SW"  val="SW" label="SW" color="dark"/>
                                 <q-checkbox v-model="H"  val="H" label="H" color="black"/>
-                                <q-checkbox v-model="SO"  val="SO" label="SO" color="black"/>
+                                <q-checkbox v-model="SO"  val="SO" label="SO" color="dark"/>
                             </div>
                             <div class="q-gutter-sm">
-                                <q-checkbox v-model="NRW"  val="NRW" label="NRW" color="black"/>
-                                <q-checkbox v-model="NO"  val="NO" label="NO" color="black"/>
-                                <q-checkbox v-model="NB"  val="NB" label="NB" color="black"/>
-                                <q-checkbox v-model="N"  val="N" label="N" color="black"/>
+                                <q-checkbox v-model="NRW"  val="NRW" label="NRW" color="dark"/>
+                                <q-checkbox v-model="NO"  val="NO" label="NO" color="dark"/>
+                                <q-checkbox v-model="NB"  val="NB" label="NB" color="dark"/>
+                                <q-checkbox v-model="N"  val="N" label="N" color="dark"/>
                             </div>
                         </div>
                     </q-item>
@@ -999,9 +1016,9 @@ const addEnd = () => {
 }
 
 .expansion_settings {
-    background-color: #e0e0e0;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    background-color: #e0dede;
+    border-radius: 5px;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
 }
 
 .margin-right-con {
@@ -1018,8 +1035,8 @@ const addEnd = () => {
     width: 95vw;
     height: 80vh;
     border: 3px solid $primary;
-    border-radius: 15px;
-    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    box-shadow: 0 12px 10px rgba(0, 0, 0, 0.3);
 }
 
 .mapSettings {

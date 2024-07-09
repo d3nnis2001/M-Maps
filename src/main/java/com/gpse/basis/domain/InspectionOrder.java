@@ -3,7 +3,9 @@ package com.gpse.basis.domain;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
-
+/**
+ * Klasse für die Prüfaufträge.
+ */
 @Document(collection = "inspectionOrder")
 public class InspectionOrder {
     @MongoId
@@ -23,8 +25,25 @@ public class InspectionOrder {
     private String review;
     private String finishedDate;
 
-    public InspectionOrder(String inspectionOrderId, String courseId, String userId, String startLocation, String endLocation, String startTime, String endTime,
-                           String department, String inspectionData, String status, String remarks, boolean archived, String priority) {
+    /**
+     * Konstruktor für die Prüfaufträge.
+     * @param inspectionOrderId - PrüfauftragID
+     * @param courseId - StreckenID
+     * @param userId - UserID
+     * @param startLocation - Startort
+     * @param endLocation - Endort
+     * @param startTime - Startzeit
+     * @param endTime - Endzeit
+     * @param department - Abteilung
+     * @param inspectionData - Prüfdaten
+     * @param status - Status
+     * @param remarks - Bewertungen
+     * @param archived - archiviert
+     * @param priority - Priorität
+     */
+    public InspectionOrder(String inspectionOrderId, String courseId, String userId, String startLocation,
+                           String endLocation, String startTime, String endTime, String department,
+                           String inspectionData, String status, String remarks, boolean archived, String priority) {
         this.inspectionOrderId = inspectionOrderId;
         this.courseId = courseId;
         this.userId = userId;

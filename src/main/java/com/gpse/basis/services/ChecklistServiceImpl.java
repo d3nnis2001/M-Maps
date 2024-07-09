@@ -4,24 +4,73 @@ import com.gpse.basis.domain.Checklist;
 import com.gpse.basis.domain.ReparaturChecklist;
 import com.gpse.basis.repositories.ChecklistRepository;
 import com.gpse.basis.repositories.RepChecklistRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
+import java.util.*;
 
 @Service
 public class ChecklistServiceImpl implements ChecklistService {
-    private ChecklistRepository checkRepo;
-    private RepChecklistRepository repcheckRepo;
-    @Autowired
+    private final ChecklistRepository checkRepo;
+    private final RepChecklistRepository repcheckRepo;
     public ChecklistServiceImpl(ChecklistRepository checkRepo, RepChecklistRepository repcheckRepo) {
         this.checkRepo = checkRepo;
         this.repcheckRepo = repcheckRepo;
     }
+    @Override
+    public List<String> getAllChecklistNames() {
+        List<String> result = new LinkedList<>();
+        checkRepo.findAll().forEach(item -> result.add(item.getName()));
+        return result;
+    }
+
+    @Override
+    public List<Checklist> getALlTemplates() {
+        List<Checklist> result = new LinkedList<>();
+        checkRepo.findAll().forEach(result::add);
+        return result;
+    }
+
+    @Override
+    public boolean addChecklist(String name, List<String> tasks, List<String> material) {
+        if (checkRepo.existsById(name)) {
+            return false;
+        }
+        Checklist newChecklist = new Checklist(name, tasks);
+        newChecklist.setMaterial(material);
+        checkRepo.save(newChecklist);
+        return true;
+    }
+
+    @Override
+    public Optional<Checklist> getTemplate(String name) {
+        return checkRepo.findById(name);
+    }
+
+    @Override
+    public void deleteTemplate(String templateName) {
+        checkRepo.deleteById(templateName);
+    }
+
+    @Override
+    public String duplicateTemplate(Checklist template) {
+        String modifiedTemplateName = template.getName() + " Kopie";
+        while (!addChecklist(modifiedTemplateName, template.getTasks(), template.getMaterial())) {
+            modifiedTemplateName += " Kopie";
+        }
+        return modifiedTemplateName;
+    }
+
+    @Override
+    public boolean editChecklist(Checklist template) {
+        if (!checkRepo.existsById(template.getName())) {
+            return false;
+        }
+        checkRepo.save(template);
+        return true;
+    }
+
     public ArrayList<String> getAllNames() {
         ArrayList<String> arr = new ArrayList<>();
         Iterable it = checkRepo.findAll();
@@ -36,6 +85,13 @@ public class ChecklistServiceImpl implements ChecklistService {
         return checkRepo.findById(name)
             .orElseThrow(() -> new UsernameNotFoundException("Checklist not found"));
     }
+
+    /**
+     * Load rep check by id reparatur checklist.
+     *
+     * @param id the id
+     * @return the reparatur checklist
+     */
     public ReparaturChecklist loadRepCheckById(final String id) {
         return repcheckRepo.findById(id)
             .orElseThrow(() -> new UsernameNotFoundException("Repair Checklist not found!"));
@@ -62,5 +118,11 @@ public class ChecklistServiceImpl implements ChecklistService {
         } catch (Exception r) {
             return false;
         }
+    }
+
+    public LocalDate getTerminationDate(String id) {
+        ReparaturChecklist reparaturChecklist = loadRepCheckById(id);
+        LocalDate date = reparaturChecklist.getTerminiert();
+        return date;
     }
 }

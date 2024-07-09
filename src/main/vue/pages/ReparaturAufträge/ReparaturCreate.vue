@@ -4,6 +4,7 @@ import {getChecklists, sendRepair} from "@/main/vue/api/reparatur";
 import {useQuasar} from "quasar";
 import {useRoute, useRouter} from "vue-router";
 import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";
+import {compareFreigabeberechtigter} from "../../api/admin";
 
 export default {
     components: {StandardInput},
@@ -19,6 +20,7 @@ export default {
         const router = useRouter()
         let vorLatitude = ref('')
         let vorLongitude = ref('')
+        const freigabeValues = ref([])
 
         const route = useRoute();
 
@@ -36,6 +38,8 @@ export default {
                 vorLatitude.value = route.query.latitude
                 vorLongitude.value = route.query.longitude
             }
+            freigabeValues.value.push("Regina S.");
+            freigabeValues.value.push("Manfred D.");
         })
 
 
@@ -69,7 +73,7 @@ export default {
             }
             return true;
         }
-        function sendData() {
+        async function sendData() {
             const err = checkInputs()
             console.log(err)
             if (err) {
@@ -77,11 +81,13 @@ export default {
                     freigabe.value, checkliste.value["label"], bem.value, vorLongitude.value, vorLatitude.value)
                 router.push({ path: "/repair" });
             }
+
         }
 
         return {
             streckenabschnitt,
             freigabe,
+            freigabeValues,
             checkliste,
             date,
             date2,
@@ -100,21 +106,21 @@ export default {
         <div class="outer-container">
             <div class="text-with-input">
                 <p style="font-weight: bold;">Prüfkoordinaten/Streckenabschnitt</p>
-                <StandardInput class="extra-mar" v-model="streckenabschnitt" label="Streckenabschnitt"></StandardInput>
+                <StandardInput class="extra-mar2" v-model="streckenabschnitt" label="Streckenabschnitt"></StandardInput>
                 <div class="row">
                     <div class="text-with-input mar-right">
                         <p style="font-weight: bold;">Latitude</p>
-                        <StandardInput class="extra-mar" v-model="vorLatitude" label="Latitude" ></StandardInput>
+                        <StandardInput class="extra-mar2" v-model="vorLatitude" label="Latitude" ></StandardInput>
                     </div>
                     <div class="text-with-input">
                         <p style="font-weight: bold;">Longitude</p>
-                        <StandardInput class="extra-mar" v-model="vorLongitude" label="Longitude" ></StandardInput>
+                        <StandardInput class="extra-mar2" v-model="vorLongitude" label="Longitude" ></StandardInput>
                     </div>
                 </div>
                 <div>
             </div>
             <p style="font-weight: bold;">Zeitraum (von - bis)</p>
-            <div class="text-with-input row extra-mar">
+            <div class="text-with-input row extra-mar2">
                 <q-input class="input-style mar-right" filled v-model="date" mask="date" :rules="['date']">
                     <template v-slot:append>
                         <q-icon name="event" class="cursor-pointer">
@@ -143,10 +149,10 @@ export default {
                 </q-input>
                 </div>
             </div>
-            <div class="row extra-mar">
-                    <div class="mar-right">
+            <div class="row extra-mar2">
+                    <div class="checkListInput">
                         <p style="font-weight: bold;">Freigabeberechtigter</p>
-                        <StandardInput class="" v-model="freigabe" label="Freigabeberechtigter" ></StandardInput>
+                        <q-select class="" outlined v-model="freigabe" :options="freigabeValues" label="Freigabeberechtigter" />
                     </div>
                     <div class="checkListInput">
                         <p style="font-weight: bold;">Checkliste</p>
@@ -208,7 +214,7 @@ p {
     margin-bottom: 20px;
 }
 
-.extra-mar {
+.extra-mar2 {
     margin-bottom: 20px;
 }
 </style>

@@ -7,6 +7,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+/**
+ * Implementation des ImageServices.
+ */
 @Service
 public class ImageServiceImpl implements ImageService {
 
@@ -25,6 +28,10 @@ public class ImageServiceImpl implements ImageService {
         imRep.save(image);
     }
 
+    /**
+     * ID generieren.
+     * @return ID
+     */
     public String generateId() {
         long timestamp = System.currentTimeMillis();
         Random random = new Random();

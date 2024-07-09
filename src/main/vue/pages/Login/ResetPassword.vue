@@ -4,7 +4,7 @@ import {useQuasar} from 'quasar'
 import {resetPassword, setPasswordNew} from "@/main/vue/api/auth";
 import {useRoute, useRouter} from "vue-router";
 import StandardCard from "@/main/vue/pages/Login/StandardCard.vue";
-import Impressum from "@/main/vue/pages/Login/Impressum.vue";
+import Impressum from "@/main/vue/pages/Login/ImpressumTemplate.vue";
 import Description from "@/main/vue/pages/Login/Description.vue";
 import StandardInput from "@/main/vue/pages/Login/StandardInput.vue";
 import Heading from "@/main/vue/pages/Login/Heading.vue";

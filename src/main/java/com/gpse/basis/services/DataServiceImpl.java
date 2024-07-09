@@ -23,10 +23,20 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
+/**
+ * The type Data service.
+ */
 @Service
 public class DataServiceImpl implements DataService {
+    /**
+     * The constant I_DLOCATION.
+     */
+    public static final String I_DLOCATION = "iDlocation";
+    /**
+     * The constant GLEIS_LAGE_DATEN.
+     */
+    public static final String GLEIS_LAGE_DATEN = "GleisLageDaten";
     private static final Lock lock = new ReentrantLock();
-
     private final MongoTemplate template;
     private final GeoTrackData geoTrack;
 
@@ -49,7 +59,8 @@ public class DataServiceImpl implements DataService {
         private LocalDateTime from = null;
         private LocalDateTime till = null;
 
-        private final MongoTemplate tmpl = new MongoTemplate(new SimpleMongoClientDatabaseFactory("mongodb://localhost:27017/project_12"));
+        private final MongoTemplate tmpl =
+            new MongoTemplate(new SimpleMongoClientDatabaseFactory("mongodb://localhost:27017/project_12"));
 
         Worker(List<GeoData> lst, List<Map.Entry<Colors, String>> l, LocalDateTime from, LocalDateTime till) {
             this.lst = lst;
@@ -61,30 +72,38 @@ public class DataServiceImpl implements DataService {
         @Override
         public void run() {
             List<Thread> mySubWorkers = new ArrayList<>();
-            MatchOperation matchOperation = Aggregation.match(Criteria.where("iDlocation").in(lst.parallelStream().map(GeoData::getId).toList()));
+            MatchOperation matchOperation = Aggregation.match(Criteria.where(I_DLOCATION)
+                .in(lst.parallelStream().map(GeoData::getId).toList()));
             Aggregation aggregation = Aggregation.newAggregation(matchOperation);
-            List<GleisLageDatenpunkt> results = tmpl.aggregate(aggregation, "GleisLageDaten", GleisLageDatenpunkt.class).getMappedResults();
-            if(results.isEmpty())
+            List<GleisLageDatenpunkt> results = tmpl.aggregate(aggregation, GLEIS_LAGE_DATEN,
+                GleisLageDatenpunkt.class).getMappedResults();
+            if (results.isEmpty()) {
                 return;
+            }
 
 
             lst.forEach(geoDat -> {
-                var res = results.parallelStream().filter(w -> Objects.equals(w.getLocation(), geoDat.getId())).toList();
-                if(!res.isEmpty()) {
+                var res = results.parallelStream()
+                    .filter(w -> Objects.equals(w.getLocation(), geoDat.getId())).toList();
+                if (!res.isEmpty()) {
                     List<GleisLageDatenpunkt> v_res = null;
-                    if(from != null && till != null) {
+                    if (from != null && till != null) {
                         v_res = res.parallelStream().filter(obj -> {
-                            LocalDateTime time = Instant.ofEpochSecond((long) obj.getTime_unix()).atZone(ZoneId.systemDefault()).toLocalDate().atStartOfDay();
+                            LocalDateTime time = Instant.ofEpochSecond((long) obj.getTime_unix())
+                                .atZone(ZoneId.systemDefault()).toLocalDate().atStartOfDay();
                             return time.isAfter(from) && time.isBefore(till);
                         }).toList();
-                        if(v_res.isEmpty())
+                        if (v_res.isEmpty()) {
                             return;
-                    }
-                    else {
-                        double newestTime = res.parallelStream().mapToDouble(GleisLageDatenpunkt::getTime_unix).max().getAsDouble();
-                        LocalDateTime maxDate = Instant.ofEpochSecond((long) newestTime).atZone(ZoneId.systemDefault()).toLocalDate().atStartOfDay();
+                        }
+                    } else {
+                        double newestTime = res.parallelStream()
+                            .mapToDouble(GleisLageDatenpunkt::getTime_unix).max().getAsDouble();
+                        LocalDateTime maxDate = Instant.ofEpochSecond((long) newestTime)
+                            .atZone(ZoneId.systemDefault()).toLocalDate().atStartOfDay();
                         v_res = res.parallelStream().filter(obj -> {
-                            LocalDateTime time = Instant.ofEpochSecond((long) obj.getTime_unix()).atZone(ZoneId.systemDefault()).toLocalDate().atStartOfDay();
+                            LocalDateTime time = Instant.ofEpochSecond((long) obj.getTime_unix())
+                                .atZone(ZoneId.systemDefault()).toLocalDate().atStartOfDay();
                             return time.isEqual(maxDate);
                         }).toList();
                     }
@@ -127,7 +146,7 @@ public class DataServiceImpl implements DataService {
             grouped.entrySet().parallelStream().forEach(entry -> {
                 var key = entry.getKey();
                 var value = entry.getValue();
-                if(!value.isEmpty()) {
+                if (!value.isEmpty()) {
                     var max_links = value.parallelStream()
                         .mapToDouble(GleisLageDatenpunkt::getZ_links_railab_3p)
                         .max();
@@ -154,32 +173,30 @@ public class DataServiceImpl implements DataService {
                 double rs100 = grd.get(1).getValueToVelocity(key);
                 double rslim = grd.get(2).getValueToVelocity(key);
 
-                if(rslim <= value)
+                if (rslim <= value) {
                     c.set(3);
-                else if(rs100 <= value)
+                } else if (rs100 <= value) {
                     c.set(Math.max(2, c.get()));
-                else if(rsa <= value)
+                } else if (rsa <= value) {
                     c.set(Math.max(1, c.get()));
-                else
+                } else {
                     c.set(Math.max(0, c.get()));
+                }
             });
 
-            if(c.get() == 0) {
+            if (c.get() == 0) {
                 lock.lock();
                 l.add(new AbstractMap.SimpleEntry<>(Colors.NORMAL, g.getId()));
                 lock.unlock();
-            }
-            else if(c.get() == 1) {
+            } else if (c.get() == 1) {
                 lock.lock();
                 l.add(new AbstractMap.SimpleEntry<>(Colors.LOW, g.getId()));
                 lock.unlock();
-            }
-            else if(c.get() == 2) {
+            } else if (c.get() == 2) {
                 lock.lock();
                 l.add(new AbstractMap.SimpleEntry<>(Colors.MEDIUM, g.getId()));
                 lock.unlock();
-            }
-            else if(c.get() == 3) {
+            } else if (c.get() == 3) {
                 lock.lock();
                 l.add(new AbstractMap.SimpleEntry<>(Colors.HIGH, g.getId()));
                 lock.unlock();
@@ -196,12 +213,12 @@ public class DataServiceImpl implements DataService {
         int sts = lst.size() / no_threads;
         List<Thread> workers = new ArrayList<>(no_threads);
         int index = 0;
-        for(int i = 0; i < no_threads - 1; ++i) {
+        for (int i = 0; i < no_threads - 1; ++i) {
             workers.add(i, new Thread(new Worker(lst.subList(index, index + sts), l, null, null)));
             index += sts;
             workers.get(i).start();
         }
-        workers.add(no_threads-1, new Thread(new Worker(lst.subList(index, lst.size()), l, null, null)));
+        workers.add(no_threads - 1, new Thread(new Worker(lst.subList(index, lst.size()), l, null, null)));
         workers.getLast().start();
 
         workers.forEach(w -> {
@@ -215,18 +232,19 @@ public class DataServiceImpl implements DataService {
         return l;
     }
 
-    private List<Map.Entry<Colors, String>> getColorForDateRange(List<GeoData> lst, LocalDateTime from, LocalDateTime till) {
+    private List<Map.Entry<Colors, String>> getColorForDateRange(List<GeoData> lst,
+                                                                 LocalDateTime from, LocalDateTime till) {
         List<Map.Entry<Colors, String>> l = new ArrayList<>();
         int no_threads = 30;
         int sts = lst.size() / no_threads;
         List<Thread> workers = new ArrayList<>(no_threads);
         int index = 0;
-        for(int i = 0; i < no_threads - 1; ++i) {
+        for (int i = 0; i < no_threads - 1; ++i) {
             workers.add(i, new Thread(new Worker(lst.subList(index, index + sts), l, from, till)));
             index += sts;
             workers.get(i).start();
         }
-        workers.add(no_threads-1, new Thread(new Worker(lst.subList(index, lst.size()), l, from, till)));
+        workers.add(no_threads - 1, new Thread(new Worker(lst.subList(index, lst.size()), l, from, till)));
         workers.getLast().start();
 
         workers.forEach(w -> {
@@ -239,17 +257,14 @@ public class DataServiceImpl implements DataService {
 
         return l;
     }
-
-    // ---------------------------- GEODATA ---------------------------
-
     public List<Map.Entry<Colors, String>> getHeatmap() {
         List<GeoData> gd = template.findAll(GeoData.class);
-        if(gd.isEmpty())
+        if (gd.isEmpty()) {
             return null;
+        }
         List<Map.Entry<Colors, String>> col = getNewestColorsforGeoData(gd);
         return col;
     }
-
     @Override
     public ArrayList<GeoData> getGeoData() {
         Iterable<GeoData> iterable = geoTrack.findAll();
@@ -261,7 +276,6 @@ public class DataServiceImpl implements DataService {
         }
         return geoArr;
     }
-
     public List<Map.Entry<Colors, String>> getGeoDataByDate(int track_id, LocalDateTime from, LocalDateTime till) {
         if (from.isAfter(till)) {
             return null;
@@ -269,23 +283,27 @@ public class DataServiceImpl implements DataService {
         Query query = new Query();
         query.addCriteria(Criteria.where("strecken_id").is(track_id));
         List<GeoData> gd = template.find(query, GeoData.class);
-        if(gd.isEmpty())
+        if (gd.isEmpty()) {
             return null;
+        }
         System.out.println(gd.getFirst().getId());
         List<Map.Entry<Colors, String>> col = getColorForDateRange(gd, from, till);
-        System.out.println("Wir sind im Dataservice: "+col.size());
         return col;
     }
-
     public Double[] getDataForGeoPart(String id) {
-        MatchOperation matchOperation = Aggregation.match(Criteria.where("iDlocation").is(id));
+        MatchOperation matchOperation = Aggregation.match(Criteria.where(I_DLOCATION).is(id));
         Aggregation aggregation = Aggregation.newAggregation(matchOperation);
-        List<GleisLageDatenpunkt> results = template.aggregate(aggregation, "GleisLageDaten", GleisLageDatenpunkt.class).getMappedResults();
-        if(!results.isEmpty()) {
-            double max_left = Math.round(results.parallelStream().mapToDouble(GleisLageDatenpunkt::getZ_links_railab_3p).max().getAsDouble() * 100.0) / 100.0;
-            double max_right = Math.round(results.parallelStream().mapToDouble(GleisLageDatenpunkt::getZ_rechts_railab_3p).max().getAsDouble() * 100.0) / 100.0;
-            double vul_zul = Math.round(results.parallelStream().mapToDouble(GleisLageDatenpunkt::getV_zul).average().getAsDouble() * 100.0) / 100.0;
-            double vul = Math.round(results.parallelStream().mapToDouble(GleisLageDatenpunkt::getGeschwindigkeit).average().getAsDouble() * 100.0) / 100.0;
+        List<GleisLageDatenpunkt> results = template
+            .aggregate(aggregation, GLEIS_LAGE_DATEN, GleisLageDatenpunkt.class).getMappedResults();
+        if (!results.isEmpty()) {
+            double max_left = Math.round(results.parallelStream()
+                .mapToDouble(GleisLageDatenpunkt::getZ_links_railab_3p).max().getAsDouble() * 100.0) / 100.0;
+            double max_right = Math.round(results.parallelStream()
+                .mapToDouble(GleisLageDatenpunkt::getZ_rechts_railab_3p).max().getAsDouble() * 100.0) / 100.0;
+            double vul_zul = Math.round(results.parallelStream()
+                .mapToDouble(GleisLageDatenpunkt::getV_zul).average().getAsDouble() * 100.0) / 100.0;
+            double vul = Math.round(results.parallelStream()
+                .mapToDouble(GleisLageDatenpunkt::getGeschwindigkeit).average().getAsDouble() * 100.0) / 100.0;
             return new Double[] {max_left, max_right, vul_zul, vul};
         }
         return null;

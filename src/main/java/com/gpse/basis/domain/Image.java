@@ -3,6 +3,9 @@ package com.gpse.basis.domain;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
+/**
+ * Eine Klasse für hochgeladene Bilder.
+ */
 @Document(collection = "Images")
 public class Image {
 
@@ -14,6 +17,13 @@ public class Image {
     private String image;
     // in base64
 
+    /**
+     * Der Imagekonstruktor.
+     * @param imageId - ImageID
+     * @param orderId - OrderID
+     * @param image - Bild
+     * @param name - Name
+     */
     public Image(String imageId, String orderId, String image, String name) {
         this.imageId = imageId;
         this.orderId = orderId;

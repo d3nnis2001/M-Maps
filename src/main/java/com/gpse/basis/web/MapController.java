@@ -9,6 +9,7 @@ import com.gpse.basis.services.DataService;
 import com.gpse.basis.services.ReparaturService;
 import com.gpse.basis.services.ReparaturService;
 import com.gpse.basis.services.RosBagService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
@@ -38,13 +39,13 @@ public class MapController {
         this.dataService = dataService;
         this.repService = rps;
     }
-
+    @Operation(summary = "Geodata", description = "Holt alle Geodaten die existieren aus der Datenbank.")
     @GetMapping("/gettracks")
     public ArrayList<GeoData> getAllGeoData() {
         return dataService.getGeoData();
     }
 
-
+    @Operation(summary = "Heatmap Part", description = "Holt einen Teil der Heatmap Daten.")
     @PostMapping("/getpartheatmap")
     public List<ResponseColor> getPartOfHeatmap(final WebRequest request) {
         String strecke = request.getParameter("strecke");
@@ -56,48 +57,55 @@ public class MapController {
         LocalDateTime tillDate = tillD.atStartOfDay();
         System.out.println("Datum-Form: " + fromDate);
         System.out.println("Datum-Till: " + tillDate);
-        List<Map.Entry<DataService.Colors, String>> lst = dataService.getGeoDataByDate(Integer.parseInt(strecke), fromDate, tillDate);
-        List<ResponseColor> k = new ArrayList<>(lst.size());
-        for(int i = 0; i < lst.size(); ++i)
-            k.add(i, new ResponseColor(lst.get(i).getValue(), lst.get(i).getKey()));
-        return k;
+        List<Map.Entry<DataService.Colors, String>> lst = dataService.getGeoDataByDate(Integer.parseInt(strecke),
+            fromDate, tillDate);
+        List<ResponseColor> kolor = new ArrayList<>(lst.size());
+        for (int i = 0; i < lst.size(); ++i) {
+            kolor.add(i, new ResponseColor(lst.get(i).getValue(), lst.get(i).getKey()));
+        }
+        return kolor;
     }
 
+    @Operation(summary = "Heatmap", description = "Holt Heatmap Daten mit zugehöriger Farbe.")
     @PostMapping("/getheatmap")
     public List<Map.Entry<DataService.Colors, String>> getHeatmap() {
         return dataService.getHeatmap();
     }
 
     private class ResponseColor {
-        public String id;
-        public int color;
+        private final String id;
+        private int color;
 
         public ResponseColor(String id, DataService.Colors color) {
             this.id = id;
-            if(color == DataService.Colors.NORMAL)
+            if (color == DataService.Colors.NORMAL) {
                 this.color = 0;
-            else if(color == DataService.Colors.LOW)
+            } else if (color == DataService.Colors.LOW) {
                 this.color = 1;
-            else if(color == DataService.Colors.MEDIUM)
+            } else if (color == DataService.Colors.MEDIUM) {
                 this.color = 2;
-            else if(color == DataService.Colors.HIGH)
+            } else if (color == DataService.Colors.HIGH) {
                 this.color = 3;
+            }
         }
     }
 
-
+    @Operation(summary = "Geodata nach Strecke", description = "Holt Geodata von einer Strecke.")
     @PostMapping("/getDataGeoTrack")
     public Double[] getDatatoGeoTrack(final WebRequest request) {
         String strecke = request.getParameter("id");
-        // links-Abweichung, rechts-abweichung, durschnittliche zulässige geschwindigkeit, durchschnittliche gefahrene Geschwindigkeit
+        // links-Abweichung, rechts-abweichung, durschnittliche zulässige geschwindigkeit,
+        // durchschnittliche gefahrene Geschwindigkeit
         return dataService.getDataForGeoPart(strecke);
     }
 
+    @Operation(summary = "Hol alle Reparaturaufträge", description = "Holt Repaufräge aus der Datenbank.")
     @PostMapping("/getReparaturForMap")
     public List<Reparatur> getReparaturforMap() {
         return repService.getReparaturForMap();
     }
 
+    @Operation(summary = "Images", description = "Holt images von einer Strecke.")
     @PostMapping("/getCameraImageforTrack")
     public List<String> getCameraImageForTrackRequest(final WebRequest request) {
         int trackId = Integer.parseInt(request.getParameter("trackid"));
