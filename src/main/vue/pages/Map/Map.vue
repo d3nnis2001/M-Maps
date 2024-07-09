@@ -68,6 +68,8 @@ const reparatur = ref([])
 const showWeather = ref(false)
 var weatherLat = 0.0
 var weatherLon = 0.0
+const cameraimages = ref([])
+
 
 onMounted(async () => {
     map.value = L.map('map', {
