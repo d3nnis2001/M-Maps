@@ -13,7 +13,6 @@ const links = [
     { name: 'inspectionOrderOverview', label: 'Prüfaufträge', to: '/inspectionOrder', roles: ['Prüfer', 'Bearbeiter']},
     { name: 'admin', label: 'Nutzerverwaltung', to: '/admin', roles: ['Administrator'] },
     { name: 'dataimport', label: 'Datenverwaltung', to: '/dataimport', roles: ['Datenverwalter', 'Prüfer'] },
-    { name: 'dataviewer', label: 'Dataviewer', to: '/dataviewer', roles: ['Administrator', 'Bearbeiter', 'Prüfer', 'Datenverwalter']},
     { name: 'settings', label: 'Design anpassen', to: '/settings', roles: ['Administrator']},
     { name: 'templates', label: 'Checklisten', to: '/checklists', roles: ['Administrator', 'Bearbeiter', 'Prüfer', 'Datenverwalter']},
     { name: 'userprofile', label: 'Nutzerprofil', to: '/userprofile/:username', roles: ['Administrator', 'Bearbeiter', 'Prüfer', 'Datenverwalter']},

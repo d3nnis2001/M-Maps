@@ -25,14 +25,9 @@ import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 import java.io.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -93,6 +88,10 @@ public class FileServiceImpl implements FileService {
      * The constant DATA_SETID.
      */
     public static final String DATA_SETID = "dataSetid";
+    /**
+     * The constant GLEISLAGEDATEN
+     */
+    public static final String GLEISLAGEDATEN = "GleisLageDaten";
     private final DataSetRepository datasetRepro;
 
     private final GleisLageDatenRepository glDatenRepro;
@@ -106,8 +105,6 @@ public class FileServiceImpl implements FileService {
     private final DataService dService;
 
     private final RosBagService rosService;
-
-    Lock lock = new ReentrantLock();
 
     @Autowired
     FileServiceImpl(DataSetRepository repro, GeoTrackData gt, GleisLageDatenRepository rpr,
@@ -571,7 +568,7 @@ public class FileServiceImpl implements FileService {
         System.out.println("matchoperation fertig");
         Aggregation aggregation = Aggregation.newAggregation(matchOperation);
         System.out.println("aggregation fertig");
-        List<GleisLageDatenpunkt> results = tmpl.aggregate(aggregation, "GleisLageDaten",
+        List<GleisLageDatenpunkt> results = tmpl.aggregate(aggregation, GLEISLAGEDATEN,
             GleisLageDatenpunkt.class).getMappedResults();
         System.out.println(results.size());
         return results;
@@ -613,15 +610,15 @@ public class FileServiceImpl implements FileService {
     public ArrayList<GleisLageDatenpunkt> getPointData(String pointId) {
         ArrayList<GleisLageDatenpunkt> dataPoints = new ArrayList<>();
         MongoTemplate template1 = new MongoTemplate(
-            new SimpleMongoClientDatabaseFactory("mongodb://localhost:27017/project_12")
+            new SimpleMongoClientDatabaseFactory(MONGODB_LOCALHOST_27017_PROJECT_12)
         );
         MatchOperation matchOperation = Aggregation.match(
-            Criteria.where("iDlocation").is(pointId)
+            Criteria.where(I_DLOCATION).is(pointId)
         );
         Aggregation aggregation = Aggregation.newAggregation(matchOperation);
         List<GleisLageDatenpunkt> lst = template1.aggregate(
             aggregation,
-            "GleisLageDaten",
+            GLEISLAGEDATEN,
             GleisLageDatenpunkt.class).getMappedResults();
         dataPoints.addAll(lst);
         return dataPoints;
