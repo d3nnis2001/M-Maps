@@ -17,7 +17,7 @@ const links = [
     { name: 'settings', label: 'Design anpassen', to: '/settings', roles: ['Administrator']},
     { name: 'templates', label: 'Checklisten', to: '/checklists', roles: ['Administrator', 'Bearbeiter', 'Prüfer', 'Datenverwalter']},
     { name: 'userprofile', label: 'Nutzerprofil', to: '/userprofile/:username', roles: ['Administrator', 'Bearbeiter', 'Prüfer', 'Datenverwalter']},
-    { name: 'archiv', label: 'Archiv', to: '/archiv', roles: ['Administrator']},
+    { name: 'archiv', label: 'Archiv', to: '/archiv', roles: ['Administrator', 'Bearbeiter', 'Prüfer']},
 ]
 const links2 = [
     { name: 'home', label: 'Abmelden', to: '/' },

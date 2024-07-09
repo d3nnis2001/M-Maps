@@ -243,7 +243,7 @@ router.beforeEach(async(to, from, next) => {
     console.log(to.meta.authorized)
     console.log(authenticated)
     const userStore = useUserStore();
-
+    /*
     if (to.meta.authorized && !authenticated) {
         next({ name: 'start' });
     } else if (authenticated && to.name !== 'start') {
@@ -267,6 +267,53 @@ router.beforeEach(async(to, from, next) => {
         }
     } else {
         next();
+    }
+     */
+
+
+    if (to.meta.authorized && !authenticated) {
+        console.log("2")
+        next({name: 'start'});
+    } else if (authenticated && to.name !== 'start') {
+        if (!userStore.hasRole('Administrator') && ['adminmain', 'editUser', 'checklistOverview', 'checklistCreate', 'checklistEdit', 'checklistSingle', 'settings', 'editImpressum', 'editLogo', 'editColors'].includes(to.name)) {
+            console.log("TEST1")
+            next({name: from.name})
+        } else if (!userStore.hasRole('Prüfer') && ['Repair', 'RepairCreate', 'RepairEdit'].includes(to.name)) {
+            console.log("TEST2")
+            next({name: from.name})
+        } else if ((!userStore.hasRole('Prüfer') && !userStore.hasRole('Bearbeiter')) && ['inspectionOrderOverview', 'createInspectionOrder', 'editInspectionOrder'].includes(to.name)) {
+            console.log(authenticated)
+            if ((!userStore.hasRole('Prüfer') || !userStore.hasRole('Bearbeiter')) && ['inspectionOrderOverview', 'createInspectionOrder', 'editInspectionOrder'].includes(to.name)) {
+                console.log("TEST3.1")
+                console.log(authenticated)
+                next()
+            } else {
+                console.log("TEST3")
+                next({name: from.name})
+            }
+        } else if ((!userStore.hasRole('Prüfer') && !userStore.hasRole('Datenverwalter')) && to.name === 'dataimport' ) {
+            if ((!userStore.hasRole('Prüfer') || !userStore.hasRole('Datenverwalter')) && to.name === 'dataimport' ) {
+                console.log("TEST4.1")
+                console.log(authenticated)
+                next()
+            } else {
+                console.log("TEST4")
+                next({name: from.name})
+            }
+        } else if ((!userStore.hasRole('Prüfer') && !userStore.hasRole('Bearbeiter'))  && to.name === 'archiv' ) {
+            if ((!userStore.hasRole('Prüfer') || !userStore.hasRole('Bearbeiter'))  && to.name === 'archiv' ) {
+                console.log("TEST5.1")
+                console.log(authenticated)
+                next()
+            } else {
+                console.log("TEST5")
+                next({name: from.name})
+            }
+        } else {
+            next();
+        }
+    } else {
+        next()
     }
 });
 
