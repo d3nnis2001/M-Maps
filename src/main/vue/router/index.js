@@ -245,31 +245,29 @@ router.beforeEach(async(to, from, next) => {
     const userStore = useUserStore();
 
     if (to.meta.authorized && !authenticated) {
-        console.log("2")
-        next({name: 'start'});
+        next({ name: 'start' });
     } else if (authenticated && to.name !== 'start') {
-        if (!userStore.hasRole('Administrator') && (to.name === 'adminmain' || to.name === 'EditUser' || to.name === 'checklistOverview' || to.name === 'checklistCreate' || to.name === 'checklistEdit' ||
-            to.name === 'checklistSingle' || to.name === 'settings' || to.name === 'editImpressum' || to.name === 'editLogo' || to.name === 'editColors')) {
-            console.log("TEST1")
-            next({name: from.name})
-        } else if (!userStore.hasRole('Prüfer') && (to.name === 'Repair' || to.name === 'RepairCreate' || to.name === 'RepairEdit')) {
-            console.log("TEST2")
-            next({name: from.name})
-        } else if ((!userStore.hasRole('Prüfer') && !userStore.hasRole('Bearbeiter')) && (to.name === 'inspectionOrderOverview' || to.name === 'createInspectionOrder' || to.name === 'editInspectionOrder')) {
-            console.log("TEST3")
-            next({name: from.name})
-        } else if ((!userStore.hasRole('Prüfer') && !userStore.hasRole('Datenverwalter')) && to.name === 'dataimport' ) {
-            console.log("TEST4")
-            next({name: from.name})
-        } else if ((!userStore.hasRole('Prüfer') && !userStore.hasRole('Bearbeiter'))  && to.name === 'archiv' ) {
-            console.log("TEST5")
-            next({name: from.name})
-        } else {
+        if (['adminmain', 'editUser', 'checklistOverview', 'checklistCreate', 'checklistEdit', 'checklistSingle', 'settings', 'editImpressum', 'editLogo', 'editColors'].includes(to.name) && !userStore.hasRole('Administrator')) {
+            next({ name: from.name });
+        }
+        else if (['Repair', 'RepairCreate', 'RepairEdit'].includes(to.name) && !userStore.hasRole('Prüfer') && !userStore.hasRole('Bearbeiter')) {
+            next({ name: from.name });
+        }
+        else if (['inspectionOrderOverview', 'createInspectionOrder', 'editInspectionOrder'].includes(to.name) && !userStore.hasRole('Prüfer') && !userStore.hasRole('Bearbeiter')) {
+            next({ name: from.name });
+        }
+        else if (to.name === 'dataimport' && !userStore.hasRole('Prüfer') && !userStore.hasRole('Datenverwalter')) {
+            next({ name: from.name });
+        }
+        else if (to.name === 'archiv' && !userStore.hasRole('Prüfer') && !userStore.hasRole('Bearbeiter')) {
+            next({ name: from.name });
+        }
+        else {
             next();
         }
     } else {
-        next()
+        next();
     }
-})
+});
 
 export default router

@@ -67,6 +67,7 @@ const currentRow = reactive({});
 const rowToDelete = ref(null);
 const emailTrackBuilder = ref('');
 const $q = useQuasar();
+const userStore = useUserStore();
 
 const rowClick = (evt, rowData) => {
     Object.assign(currentRow, rowData);
@@ -96,6 +97,7 @@ const archiveOrder = async () => {
     currentRow.status = "archiviert";
     updateRowStatus(name, "archiviert");
     showDialog.value = false;
+    await fetchData();
 };
 
 const reapplyOrder = async () => {
@@ -268,8 +270,8 @@ async function compareFreigabe (name) {
                     <div class="option-button"  v-if="currentRow.status !== 'terminiert' && currentRow.status !== 'abgeschlossen' && currentRow.status !== 'storniert'" @click="editOrder">Bearbeiten</div>
                     <q-separator v-if="currentRow.status !== 'terminiert' && currentRow.status !== 'abgeschlossen' && currentRow.status !== 'storniert'" />
                     <div class="option-button" v-if="currentRow.status === 'storniert'" @click="confirmDeleteOrder(currentRow)">Löschen</div>
-                    <q-separator v-if="currentRow.status === 'abgeschlossen'" />
-                    <div class="option-button" v-if="currentRow.status === 'abgeschlossen'" @click="archiveOrder">Archivieren</div>
+                    <q-separator v-if="currentRow.status === 'bestätigt'" />
+                    <div class="option-button" v-if="currentRow.status === 'bestätigt'" @click="archiveOrder">Archivieren</div>
                     <q-separator v-if="currentRow.status !== 'storniert' && currentRow.status !== 'terminiert'" />
                     <div class="option-button" v-if="currentRow.status !== 'storniert' && currentRow.status !== 'terminiert'" @click="cancelOrder">Stornieren</div>
                     <q-separator v-if="currentRow.status === 'storniert'" />

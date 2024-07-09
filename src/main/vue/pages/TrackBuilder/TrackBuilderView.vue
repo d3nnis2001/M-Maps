@@ -85,6 +85,10 @@ export default {
 
         async function confirmRepairOrder() {
             await updateStatus(route.query.id, "abgeschlossen");
+            $q.notify ({
+                type: 'positive',
+                message: 'The repair order has been successfully updated'
+            })
         }
 
 

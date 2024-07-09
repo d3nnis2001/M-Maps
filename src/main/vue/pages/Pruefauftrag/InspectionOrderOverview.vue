@@ -65,6 +65,8 @@ export default {
         const largeScreen = ref(true);
 
         onMounted(async () => {
+            const authenticated = axios.defaults.headers['Authorization'] !== null;
+            console.log(authenticated)
             checkScreenSize();
             window.addEventListener('resize', checkScreenSize);
             bearbeiter.value = userStore.hasRole('Bearbeiter')
