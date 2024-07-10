@@ -57,7 +57,6 @@ export default {
         };
 
         async function saveRoles() {
-            console.log(updatedRoles.value.selected_roles)
             updatedRoles.value.selected_roles.forEach((data) => {
                 console.log(data)
             })
