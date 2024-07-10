@@ -13,14 +13,12 @@ const {imageEmpty} = storeToRefs(settingsStore)
 
 onMounted(async () => {
     await settingsStore.checkLogo()
-    console.log(imageEmpty.value)
 })
 
 const links = [
     { name: 'map', label: 'Map', to: '/map', roles: ['Administrator', 'Bearbeiter', 'Prüfer', 'Datenverwalter']},
     { name: 'repair', label: 'Reparaturaufträge', to: '/repair', roles: ['Prüfer', 'Freigabeberechtigter'] },
     { name: 'inspectionOrderOverview', label: 'Prüfaufträge', to: '/inspectionOrder', roles: ['Prüfer', 'Bearbeiter']},
-    { name: 'archiv', label: 'Archiv', to: '/archiv', roles: ['Bearbeiter', 'Prüfer', 'Freigabeberechtigter']},
     { name: 'admin', label: 'Nutzerverwaltung', to: '/admin', roles: ['Administrator'] },
     { name: 'dataimport', label: 'Datenverwaltung', to: '/dataimport', roles: ['Datenverwalter', 'Prüfer'] },
     { name: 'settings', label: 'Design anpassen', to: '/settings', roles: ['Administrator']},
