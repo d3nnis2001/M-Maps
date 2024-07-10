@@ -55,9 +55,11 @@ public class ChecklistServiceImpl implements ChecklistService {
 
     @Override
     public String duplicateTemplate(Checklist template) {
-        String modifiedTemplateName = template.getName() + " Kopie";
+        final String kopie = "Kopie";
+        final String whitespace = " ";
+        String modifiedTemplateName = template.getName() + whitespace + kopie;
         while (!addChecklist(modifiedTemplateName, template.getTasks(), template.getMaterial())) {
-            modifiedTemplateName += " Kopie";
+            modifiedTemplateName += whitespace + kopie;
         }
         return modifiedTemplateName;
     }

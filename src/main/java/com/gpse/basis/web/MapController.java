@@ -3,17 +3,13 @@ package com.gpse.basis.web;
 import com.gpse.basis.domain.GeoData;
 import com.gpse.basis.domain.VelodynePoint;
 import com.gpse.basis.services.DataService;
-import com.gpse.basis.services.FileService;
 import com.gpse.basis.domain.Reparatur;
-import com.gpse.basis.services.DataService;
-import com.gpse.basis.services.ReparaturService;
 import com.gpse.basis.services.ReparaturService;
 import com.gpse.basis.services.RosBagService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
-import com.gpse.basis.services.RosBagService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -32,6 +28,7 @@ public class MapController {
     private final ReparaturService repService;
 
     private RosBagService rosBag;
+    private final String trackString = "trackid";
 
     @Autowired
     public MapController(RosBagService ros, DataService dataService, ReparaturService rps) {
@@ -108,25 +105,26 @@ public class MapController {
     @Operation(summary = "Images", description = "Holt images von einer Strecke.")
     @PostMapping("/getCameraImageforTrack")
     public List<String> getCameraImageForTrackRequest(final WebRequest request) {
-        int trackId = Integer.parseInt(request.getParameter("trackid"));
+        int trackId = Integer.parseInt(request.getParameter(trackString));
         return rosBag.getImagesForTrack(trackId);
     }
 
     @PostMapping("/getIRCameraImageforTrack")
     public List<String> getIRCameraImageforTrack(final WebRequest request) {
-        int trackId = Integer.parseInt(request.getParameter("trackid"));
+        int trackId = Integer.parseInt(request.getParameter(trackString));
         return rosBag.getIRImagesForTrack(trackId);
     }
 
     @PostMapping("/getVelodynPointsforTrack")
     public List<List<VelodynePoint>> getVelodynPointsforTrack(final WebRequest request) {
-        int trackId = Integer.parseInt(request.getParameter("trackid"));
+        int trackId = Integer.parseInt(request.getParameter(trackString));
         int index = Integer.parseInt(request.getParameter("index"));
         var lst = rosBag.getVelodynePointsForTrack(trackId);
-        if(!lst.isEmpty())
-            return lst.subList(index, index+1);
-        else
+        if (!lst.isEmpty()) {
+            return lst.subList(index, index + 1);
+        } else {
             return new ArrayList<>();
+        }
     }
 
 }

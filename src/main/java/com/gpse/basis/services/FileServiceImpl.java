@@ -89,7 +89,7 @@ public class FileServiceImpl implements FileService {
      */
     public static final String DATA_SETID = "dataSetid";
     /**
-     * The constant GLEISLAGEDATEN
+     * The constant GLEISLAGEDATEN.
      */
     public static final String GLEISLAGEDATEN = "GleisLageDaten";
     private final DataSetRepository datasetRepro;
@@ -528,7 +528,8 @@ public class FileServiceImpl implements FileService {
 
 
     //return null, if from > till
-    public List<Map.Entry<DataService.Colors, String>> getPartHeatmap(int strecke, LocalDateTime from, LocalDateTime till) {
+    public List<Map.Entry<DataService.Colors, String>> getPartHeatmap(int strecke, LocalDateTime from,
+                                                                      LocalDateTime till) {
         if (from.isAfter(till)) {
             return null;
         }
@@ -662,9 +663,12 @@ public class FileServiceImpl implements FileService {
         File folder = new File(path);
         List<List<String>> lst = new ArrayList<>();
         List<File> files = getAllFiles(folder);
-        files.forEach(f -> lst.add(new ArrayList<String>() { {
-            add(f.getPath());
-            add(f.getName()); } }));
+        files.forEach(f -> lst.add(new ArrayList<String>() {
+            {
+                add(f.getPath());
+                add(f.getName());
+            }
+        }));
 
         return lst;
     }

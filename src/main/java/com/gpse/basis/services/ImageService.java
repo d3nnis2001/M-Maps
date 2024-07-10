@@ -1,11 +1,11 @@
 package com.gpse.basis.services;
+import com.gpse.basis.domain.Image;
+
+import java.util.List;
 
 /**
  * Interface für den ImageService.
  */
-import com.gpse.basis.domain.Image;
-
-import java.util.List;
 
 public interface ImageService {
 

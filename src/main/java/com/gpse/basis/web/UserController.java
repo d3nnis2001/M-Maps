@@ -95,7 +95,8 @@ public class UserController {
      * @param request - Anfrage
      * @return - response
      */
-    @Operation(summary = "Passwort Reset", description = "Schickt ein Link per Email-Service für die Passwort Zurücksetzung.")
+    @Operation(summary = "Passwort Reset", description = "Schickt ein Link per "
+        + "Email-Service für die Passwort Zurücksetzung.")
     @PostMapping("/user/resetPassword")
     public ResponseEntity<Boolean> changePassword(final WebRequest request) {
         String email = request.getParameter(email_string);

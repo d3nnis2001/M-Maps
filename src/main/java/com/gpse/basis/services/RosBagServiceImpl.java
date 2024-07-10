@@ -55,12 +55,18 @@ public class RosBagServiceImpl implements RosBagService {
     /**
      * The constant PNG.
      */
-    public static final String PNG = ".png";
+    private static final String PNG = ".png";
     /**
      * The constant PNG1.
      */
     private static final String PNG1 = "png";
     private static final String URL = "http://localhost:8080";
+
+    private final String minus = "-";
+    private final String name_string = "name";
+    private final String offset_string = "offset";
+    private final String track_id_string = "track_id";
+    private final String type_string = "type";
 
     private final MongoTemplate template;
     private String url;
@@ -137,7 +143,7 @@ public class RosBagServiceImpl implements RosBagService {
                                     }
                                 }
                                 long unixTimestamp = Instant.now().getEpochSecond();
-                                String name = "/IRCameraImage" + "-" + unixTimestamp + xyz + PNG;
+                                String name = "/IRCameraImage" + minus + unixTimestamp + xyz + PNG;
                                 File outputfile = new File(IMAGE_DIRECTORY + name);
                                 xyz.getAndIncrement();
                                 try {
@@ -183,43 +189,48 @@ public class RosBagServiceImpl implements RosBagService {
                                 long point_step = message.<UInt32Type>getField("point_step").getValue();
                                 //System.out.println("Point_step: " + point_step);
                                 var fld = message.<ArrayType>getField("fields").getFields();
-                                int offset_x = 0, offset_y = 0, offset_z = 0, offset_intensity = 0, offset_time = 0;
+                                int offset_x = 0;
+                                int offset_y = 0;
+                                int offset_z = 0;
+                                int offset_intensity = 0;
+                                int offset_time = 0;
                                 for (Field pointField : fld) {
                                     MessageType pointMsg = (MessageType) pointField;
-                                    if (Objects.equals(pointMsg.<StringType>getField("name").getValue(), "x")) {
-                                        offset_x = Math.toIntExact(pointMsg.<UInt32Type>getField("offset").getValue());
+                                    if (Objects.equals(pointMsg.<StringType>getField(name_string).getValue(), "x")) {
+                                        offset_x = Math.toIntExact(pointMsg.<UInt32Type>getField(offset_string).getValue());
                                        // System.out.println("Offset_x: " + offset_x);
-                                    } else if (Objects.equals(pointMsg.<StringType>getField("name").getValue(), "y")) {
-                                        offset_y = Math.toIntExact(pointMsg.<UInt32Type>getField("offset").getValue());
+                                    } else if (Objects.equals(pointMsg.<StringType>getField(name_string).getValue(), "y")) {
+                                        offset_y = Math.toIntExact(pointMsg.<UInt32Type>getField(offset_string).getValue());
                                        // System.out.println("Offset_y: " + offset_y);
-                                    } else if (Objects.equals(pointMsg.<StringType>getField("name").getValue(), "z")) {
-                                        offset_z = Math.toIntExact(pointMsg.<UInt32Type>getField("offset").getValue());
+                                    } else if (Objects.equals(pointMsg.<StringType>getField(name_string).getValue(), "z")) {
+                                        offset_z = Math.toIntExact(pointMsg.<UInt32Type>getField(offset_string).getValue());
                                        // System.out.println("Offset_z: " + offset_z);
-                                    } else if (Objects.equals(pointMsg.<StringType>getField("name")
+                                    } else if (Objects.equals(pointMsg.<StringType>getField(name_string)
                                         .getValue(), "intensity")) {
                                         offset_intensity = Math
-                                            .toIntExact(pointMsg.<UInt32Type>getField("offset").getValue());
+                                            .toIntExact(pointMsg.<UInt32Type>getField(offset_string).getValue());
                                        // System.out.println("Offset_z: " + offset_intensity);
-                                    } else if (Objects.equals(pointMsg.<StringType>getField("name")
+                                    } else if (Objects.equals(pointMsg.<StringType>getField(name_string)
                                         .getValue(), "time")) {
                                         offset_time = Math
-                                            .toIntExact(pointMsg.<UInt32Type>getField("offset").getValue());
+                                            .toIntExact(pointMsg.<UInt32Type>getField(offset_string).getValue());
                                     }
                                 }
                                 var lst = message.<ArrayType>getField(DATA);
                                 byte[] a = lst.getAsBytes();
                                 int size = 0;
                                     for (int i = 0; i < a.length; i += 22) {
-                                        byte[] x_value = new byte[] {a[i+offset_x], a[i+offset_x+1],
-                                            a[i+offset_x+2], a[i+offset_x+3]};
-                                        byte[] y_value = new byte[] {a[i+offset_y], a[i+offset_y+1],
-                                            a[i+offset_y+2], a[i+offset_y+3]};
-                                        byte[] z_value = new byte[] {a[i+offset_z], a[i+offset_z+1],
-                                            a[i+offset_z+2], a[i+offset_z+3]};
-                                        byte[] i_value = new byte[] {a[i+offset_intensity], a[i+offset_intensity+1],
-                                            a[i+offset_intensity+2], a[i+offset_intensity+3]};
-                                        byte[] t_value = new byte[] {a[i+offset_time], a[i+offset_time+1],
-                                            a[i+offset_time+2], a[i+offset_time+3]};
+                                        byte[] x_value = new byte[] {a[i + offset_x], a[i + offset_x + 1],
+                                            a[i + offset_x + 2], a[i + offset_x + 3]};
+                                        byte[] y_value = new byte[] {a[i + offset_y], a[i + offset_y + 1],
+                                            a[i + offset_y + 2], a[i + offset_y + 3]};
+                                        byte[] z_value = new byte[] {a[i + offset_z], a[i + offset_z + 1],
+                                            a[i + offset_z + 2], a[i + offset_z + 3]};
+                                        byte[] i_value = new byte[] {a[i + offset_intensity],
+                                            a[i + offset_intensity + 1], a[i + offset_intensity + 2],
+                                            a[i + offset_intensity + 3]};
+                                        byte[] t_value = new byte[] {a[i + offset_time], a[i + offset_time + 1],
+                                            a[i + offset_time + 2], a[i + offset_time + 3]};
 
                                         float x = byteArrayToFloat(x_value, ByteOrder.LITTLE_ENDIAN);
                                         float y = byteArrayToFloat(y_value, ByteOrder.LITTLE_ENDIAN);
@@ -250,8 +261,8 @@ public class RosBagServiceImpl implements RosBagService {
     public List<String> getImagesForTrack(int trackId) {
         List<String> lst = new ArrayList<>();
         Query q = new Query();
-        q.addCriteria(Criteria.where("track_id").is(trackId));
-        q.addCriteria(Criteria.where("type").is(0));
+        q.addCriteria(Criteria.where(track_id_string).is(trackId));
+        q.addCriteria(Criteria.where(type_string).is(0));
         var itr = template.find(q, CameraImage.class);
         var sort_itr = itr.parallelStream().sorted(Comparator.comparingInt(CameraImage::getIndex)).toList();
         sort_itr.forEach(w -> lst.add(w.getPath()));
@@ -262,8 +273,8 @@ public class RosBagServiceImpl implements RosBagService {
     public List<String> getIRImagesForTrack(int trackId) {
         List<String> lst = new ArrayList<>();
         Query q = new Query();
-        q.addCriteria(Criteria.where("track_id").is(trackId));
-        q.addCriteria(Criteria.where("type").is(1));
+        q.addCriteria(Criteria.where(track_id_string).is(trackId));
+        q.addCriteria(Criteria.where(type_string).is(1));
         var itr = template.find(q, CameraImage.class);
         itr.forEach(w -> lst.add(w.getPath()));
         return lst;
@@ -278,11 +289,11 @@ public class RosBagServiceImpl implements RosBagService {
 
         private final String filename;
 
-        List<CameraImage> cameraImagesList;
-        Lock lock;
-        int xyz;
+        private final List<CameraImage> cameraImagesList;
+        private final Lock lock;
+        private final int xyz;
 
-        int trackId;
+        private final int trackId;
         public Worker(String filename, List<CameraImage> cameraImagesList, Lock lock, int xyz, int trackId) {
             this.filename = filename;
             this.cameraImagesList = cameraImagesList;
@@ -301,12 +312,12 @@ public class RosBagServiceImpl implements RosBagService {
                 var a = lst.getAsBytes();
                 BufferedImage image = demosaic(a, (int) width, (int) height);
                 long unixTimestamp = Instant.now().getEpochSecond();
-                String name = "/BagCameraImage" + "-" + unixTimestamp + xyz + PNG;
+                String name = "/BagCameraImage" + minus + unixTimestamp + xyz + PNG;
                 File outputfile = new File(IMAGE_DIRECTORY + name);
                 try {
                     ImageIO.write(image, PNG1, outputfile);
                     lock.lock();
-                    cameraImagesList.add(new CameraImage(trackId, URL + directory_name + name , 0, "", xyz));
+                    cameraImagesList.add(new CameraImage(trackId, URL + directory_name + name, 0, "", xyz));
                     lock.unlock();
                 } catch (IOException e) {
                     System.out.println(e.getMessage());
@@ -319,7 +330,7 @@ public class RosBagServiceImpl implements RosBagService {
             } catch (Exception e) {
                 System.out.println("Exception: ");
                 e.printStackTrace();
-            } catch(Error e) {
+            } catch (Error e) {
                 System.out.println("Error: ");
                 e.printStackTrace();
             }
@@ -328,7 +339,8 @@ public class RosBagServiceImpl implements RosBagService {
 
   /*
     Demosaic algorithm loosely based on:
-    D. Wang, G. Yu, X. Zhou, C. Wang; Image Demosaicking for Bayer-patterned CFA Images Using Improved Linear Interpolation; IEEE explore
+    D. Wang, G. Yu, X. Zhou, C. Wang; Image Demosaicking for Bayer-patterned CFA Images
+    Using Improved Linear Interpolation; IEEE explore
    */
     private BufferedImage demosaic(byte[] a, int width, int height) {
         int[][] pic = new int[(int) height][(int) width];
@@ -346,46 +358,43 @@ public class RosBagServiceImpl implements RosBagService {
                 for (int j = 0; j < width; ++j) {
                     //red tile
                     if (j % 2 == 0) {
-                        double green = 0.5 * pic[i][j] +
-                            0.25 * (inRange(i, j - 1, width, height) ? pic[i][j - 1] : 0.0) +
-                            0.25 * (inRange(i, j + 1, width, height) ? pic[i][j + 1] : 0.0) +
-                            0.25 * (inRange(i - 1, j, width, height) ? pic[i - 1][j] : 0.0) +
-                            0.25 * (inRange(i + 1, j, width, height) ? pic[i + 1][j] : 0.0) -
-                            0.125 * (inRange(i, j - 2, width, height) ? pic[i][j - 2] : 0.0) -
-                            0.125 * (inRange(i, j + 2, width, height) ? pic[i][j + 2] : 0.0) -
-                            0.125 * (inRange(i - 2, j, width, height) ? pic[i - 2][j] : 0.0) -
-                            0.125 * (inRange(i + 2, j, width, height) ? pic[i + 2][j] : 0.0);
-                        double blue = 0.75 * pic[i][j] +
-                            0.25 * (inRange(i - 1, j - 1, width, height) ? pic[i - 1][j - 1] : 0.0) +
-                            0.25 * (inRange(i + 1, j - 1, width, height) ? pic[i + 1][j - 1] : 0.0) +
-                            0.25 * (inRange(i - 1, j + 1, width, height) ? pic[i - 1][j + 1] : 0.0) +
-                            0.25 * (inRange(i + 1, j + 1, width, height) ? pic[i + 1][j + 1] : 0.0) -
-                            (3.0 / 16.0) * (inRange(i, j - 2, width, height) ? pic[i][j - 2] : 0.0) -
-                            (3.0 / 16.0) * (inRange(i, j + 2, width, height) ? pic[i][j + 2] : 0.0) -
-                            (3.0 / 16.0) * (inRange(i - 2, j, width, height) ? pic[i - 2][j] : 0.0) -
-                            (3.0 / 16.0) * (inRange(i + 2, j, width, height) ? pic[i + 2][j] : 0.0);
+                        double green = 0.5 * pic[i][j]
+                            + 0.25 * (inRange(i, j - 1, width, height) ? pic[i][j - 1] : 0.0)
+                            + 0.25 * (inRange(i, j + 1, width, height) ? pic[i][j + 1] : 0.0)
+                            + 0.25 * (inRange(i - 1, j, width, height) ? pic[i - 1][j] : 0.0)
+                            + 0.25 * (inRange(i + 1, j, width, height) ? pic[i + 1][j] : 0.0)
+                            - 0.125 * (inRange(i, j - 2, width, height) ? pic[i][j - 2] : 0.0)
+                            - 0.125 * (inRange(i, j + 2, width, height) ? pic[i][j + 2] : 0.0)
+                            - 0.125 * (inRange(i - 2, j, width, height) ? pic[i - 2][j] : 0.0)
+                            - 0.125 * (inRange(i + 2, j, width, height) ? pic[i + 2][j] : 0.0);
+                        double blue = 0.75 * pic[i][j]
+                            + 0.25 * (inRange(i - 1, j - 1, width, height) ? pic[i - 1][j - 1] : 0.0)
+                            + 0.25 * (inRange(i + 1, j - 1, width, height) ? pic[i + 1][j - 1] : 0.0)
+                            + 0.25 * (inRange(i - 1, j + 1, width, height) ? pic[i - 1][j + 1] : 0.0)
+                            + 0.25 * (inRange(i + 1, j + 1, width, height) ? pic[i + 1][j + 1] : 0.0)
+                            - (3.0 / 16.0) * (inRange(i, j - 2, width, height) ? pic[i][j - 2] : 0.0)
+                            - (3.0 / 16.0) * (inRange(i, j + 2, width, height) ? pic[i][j + 2] : 0.0)
+                            - (3.0 / 16.0) * (inRange(i - 2, j, width, height) ? pic[i - 2][j] : 0.0)
+                            - (3.0 / 16.0) * (inRange(i + 2, j, width, height) ? pic[i + 2][j] : 0.0);
                         int grn = Math.max(0, Math.min((int) Math.round(green), 255));
                         int blu = Math.max(0, Math.min((int) Math.round(blue), 255));
                         rgbImage.setRGB(j, i, new Color(pic[i][j], grn, blu).getRGB());
+                    } else {
+                        double red = 5.0 / 8.0 * pic[i][j]
+                            + 0.5 * (inRange(i, j - 1, width, height) ? pic[i][j - 1] : 0.0)
+                            + 0.5 * (inRange(i, j + 1, width, height) ? pic[i][j + 1] : 0.0)
+                            - 5.0 / 32.0 * (inRange(i - 1, j - 1, width, height) ? pic[i - 1][j - 1] : 0.0)
+                            - 5.0 / 32.0 * (inRange(i + 1, j - 1, width, height) ? pic[i + 1][j - 1] : 0.0)
+                            - 5.0 / 32.0 * (inRange(i - 1, j + 1, width, height) ? pic[i - 1][j + 1] : 0.0)
+                            - 5.0 / 32.0 * (inRange(i + 1, j + 1, width, height) ? pic[i + 1][j + 1] : 0.0);
 
-                    }
-                    //green tile
-                    else {
-                        double red = 5.0 / 8.0 * pic[i][j] +
-                            0.5 * (inRange(i, j - 1, width, height) ? pic[i][j - 1] : 0.0) +
-                            0.5 * (inRange(i, j + 1, width, height) ? pic[i][j + 1] : 0.0) -
-                            5.0 / 32.0 * (inRange(i - 1, j - 1, width, height) ? pic[i - 1][j - 1] : 0.0) -
-                            5.0 / 32.0 * (inRange(i + 1, j - 1, width, height) ? pic[i + 1][j - 1] : 0.0) -
-                            5.0 / 32.0 * (inRange(i - 1, j + 1, width, height) ? pic[i - 1][j + 1] : 0.0) -
-                            5.0 / 32.0 * (inRange(i + 1, j + 1, width, height) ? pic[i + 1][j + 1] : 0.0);
-
-                        double blue = 5.0 / 8.0 * pic[i][j] +
-                            0.5 * (inRange(i - 1, j, width, height) ? pic[i - 1][j] : 0.0) +
-                            0.5 * (inRange(i + 1, j, width, height) ? pic[i + 1][j] : 0.0) -
-                            5.0 / 32.0 * (inRange(i - 1, j - 1, width, height) ? pic[i - 1][j - 1] : 0.0) -
-                            5.0 / 32.0 * (inRange(i + 1, j - 1, width, height) ? pic[i + 1][j - 1] : 0.0) -
-                            5.0 / 32.0 * (inRange(i - 1, j + 1, width, height) ? pic[i - 1][j + 1] : 0.0) -
-                            5.0 / 32.0 * (inRange(i + 1, j + 1, width, height) ? pic[i + 1][j + 1] : 0.0);
+                        double blue = 5.0 / 8.0 * pic[i][j]
+                            + 0.5 * (inRange(i - 1, j, width, height) ? pic[i - 1][j] : 0.0)
+                            + 0.5 * (inRange(i + 1, j, width, height) ? pic[i + 1][j] : 0.0)
+                            - 5.0 / 32.0 * (inRange(i - 1, j - 1, width, height) ? pic[i - 1][j - 1] : 0.0)
+                            - 5.0 / 32.0 * (inRange(i + 1, j - 1, width, height) ? pic[i + 1][j - 1] : 0.0)
+                            - 5.0 / 32.0 * (inRange(i - 1, j + 1, width, height) ? pic[i - 1][j + 1] : 0.0)
+                            - 5.0 / 32.0 * (inRange(i + 1, j + 1, width, height) ? pic[i + 1][j + 1] : 0.0);
 
 
                         int rd = Math.max(0, Math.min((int) Math.round(red), 255));
@@ -394,56 +403,52 @@ public class RosBagServiceImpl implements RosBagService {
 
                     }
                 }
-            }
-            //blue row
-            else {
+            } else {
                 for (int j = 0; j < width; ++j) {
                     //green tile
                     if (j % 2 == 0) {
 
-                        double blue = 5.0 / 8.0 * pic[i][j] +
-                            0.5 * (inRange(i, j - 1, width, height) ? pic[i][j - 1] : 0.0) +
-                            0.5 * (inRange(i, j + 1, width, height) ? pic[i][j + 1] : 0.0) -
-                            5.0 / 32.0 * (inRange(i - 1, j - 1, width, height) ? pic[i - 1][j - 1] : 0.0) -
-                            5.0 / 32.0 * (inRange(i + 1, j - 1, width, height) ? pic[i + 1][j - 1] : 0.0) -
-                            5.0 / 32.0 * (inRange(i - 1, j + 1, width, height) ? pic[i - 1][j + 1] : 0.0) -
-                            5.0 / 32.0 * (inRange(i + 1, j + 1, width, height) ? pic[i + 1][j + 1] : 0.0);
+                        double blue = 5.0 / 8.0 * pic[i][j]
+                            + 0.5 * (inRange(i, j - 1, width, height) ? pic[i][j - 1] : 0.0)
+                            + 0.5 * (inRange(i, j + 1, width, height) ? pic[i][j + 1] : 0.0)
+                            - 5.0 / 32.0 * (inRange(i - 1, j - 1, width, height) ? pic[i - 1][j - 1] : 0.0)
+                            - 5.0 / 32.0 * (inRange(i + 1, j - 1, width, height) ? pic[i + 1][j - 1] : 0.0)
+                            - 5.0 / 32.0 * (inRange(i - 1, j + 1, width, height) ? pic[i - 1][j + 1] : 0.0)
+                            - 5.0 / 32.0 * (inRange(i + 1, j + 1, width, height) ? pic[i + 1][j + 1] : 0.0);
 
-                        double red = 5.0 / 8.0 * pic[i][j] +
-                            0.5 * (inRange(i - 1, j, width, height) ? pic[i - 1][j] : 0.0) +
-                            0.5 * (inRange(i + 1, j, width, height) ? pic[i + 1][j] : 0.0) -
-                            5.0 / 32.0 * (inRange(i - 1, j - 1, width, height) ? pic[i - 1][j - 1] : 0.0) -
-                            5.0 / 32.0 * (inRange(i + 1, j - 1, width, height) ? pic[i + 1][j - 1] : 0.0) -
-                            5.0 / 32.0 * (inRange(i - 1, j + 1, width, height) ? pic[i - 1][j + 1] : 0.0) -
-                            5.0 / 32.0 * (inRange(i + 1, j + 1, width, height) ? pic[i + 1][j + 1] : 0.0);
+                        double red = 5.0 / 8.0 * pic[i][j]
+                            + 0.5 * (inRange(i - 1, j, width, height) ? pic[i - 1][j] : 0.0)
+                            + 0.5 * (inRange(i + 1, j, width, height) ? pic[i + 1][j] : 0.0)
+                            - 5.0 / 32.0 * (inRange(i - 1, j - 1, width, height) ? pic[i - 1][j - 1] : 0.0)
+                            - 5.0 / 32.0 * (inRange(i + 1, j - 1, width, height) ? pic[i + 1][j - 1] : 0.0)
+                            - 5.0 / 32.0 * (inRange(i - 1, j + 1, width, height) ? pic[i - 1][j + 1] : 0.0)
+                            - 5.0 / 32.0 * (inRange(i + 1, j + 1, width, height) ? pic[i + 1][j + 1] : 0.0);
 
 
                         int rd = Math.max(0, Math.min((int) Math.round(red), 255));
                         int blu = Math.max(0, Math.min((int) Math.round(blue), 255));
                         rgbImage.setRGB(j, i, new Color(rd, pic[i][j], blu).getRGB());
 
-                    }
-                    //blue tile
-                    else {
-                        double green = 0.5 * pic[i][j] +
-                            0.25 * (inRange(i, j - 1, width, height) ? pic[i][j - 1] : 0.0) +
-                            0.25 * (inRange(i, j + 1, width, height) ? pic[i][j + 1] : 0.0) +
-                            0.25 * (inRange(i - 1, j, width, height) ? pic[i - 1][j] : 0.0) +
-                            0.25 * (inRange(i + 1, j, width, height) ? pic[i + 1][j] : 0.0) -
-                            0.125 * (inRange(i, j - 2, width, height) ? pic[i][j - 2] : 0.0) -
-                            0.125 * (inRange(i, j + 2, width, height) ? pic[i][j + 2] : 0.0) -
-                            0.125 * (inRange(i - 2, j, width, height) ? pic[i - 2][j] : 0.0) -
-                            0.125 * (inRange(i + 2, j, width, height) ? pic[i + 2][j] : 0.0);
+                    } else {
+                        double green = 0.5 * pic[i][j]
+                            + 0.25 * (inRange(i, j - 1, width, height) ? pic[i][j - 1] : 0.0)
+                            + 0.25 * (inRange(i, j + 1, width, height) ? pic[i][j + 1] : 0.0)
+                            + 0.25 * (inRange(i - 1, j, width, height) ? pic[i - 1][j] : 0.0)
+                            + 0.25 * (inRange(i + 1, j, width, height) ? pic[i + 1][j] : 0.0)
+                            - 0.125 * (inRange(i, j - 2, width, height) ? pic[i][j - 2] : 0.0)
+                            - 0.125 * (inRange(i, j + 2, width, height) ? pic[i][j + 2] : 0.0)
+                            - 0.125 * (inRange(i - 2, j, width, height) ? pic[i - 2][j] : 0.0)
+                            - 0.125 * (inRange(i + 2, j, width, height) ? pic[i + 2][j] : 0.0);
 
-                        double red = 0.75 * pic[i][j] +
-                            0.25 * (inRange(i - 1, j - 1, width, height) ? pic[i - 1][j - 1] : 0.0) +
-                            0.25 * (inRange(i + 1, j - 1, width, height) ? pic[i + 1][j - 1] : 0.0) +
-                            0.25 * (inRange(i - 1, j + 1, width, height) ? pic[i - 1][j + 1] : 0.0) +
-                            0.25 * (inRange(i + 1, j + 1, width, height) ? pic[i + 1][j + 1] : 0.0) -
-                            3.0 / 16.0 * (inRange(i, j - 2, width, height) ? pic[i][j - 2] : 0.0) -
-                            3.0 / 16.0 * (inRange(i, j + 2, width, height) ? pic[i][j + 2] : 0.0) -
-                            3.0 / 16.0 * (inRange(i - 2, j, width, height) ? pic[i - 2][j] : 0.0) -
-                            3.0 / 16.0 * (inRange(i + 2, j, width, height) ? pic[i + 2][j] : 0.0);
+                        double red = 0.75 * pic[i][j]
+                            + 0.25 * (inRange(i - 1, j - 1, width, height) ? pic[i - 1][j - 1] : 0.0)
+                            + 0.25 * (inRange(i + 1, j - 1, width, height) ? pic[i + 1][j - 1] : 0.0)
+                            + 0.25 * (inRange(i - 1, j + 1, width, height) ? pic[i - 1][j + 1] : 0.0)
+                            + 0.25 * (inRange(i + 1, j + 1, width, height) ? pic[i + 1][j + 1] : 0.0)
+                            - 3.0 / 16.0 * (inRange(i, j - 2, width, height) ? pic[i][j - 2] : 0.0)
+                            - 3.0 / 16.0 * (inRange(i, j + 2, width, height) ? pic[i][j + 2] : 0.0)
+                            - 3.0 / 16.0 * (inRange(i - 2, j, width, height) ? pic[i - 2][j] : 0.0)
+                            - 3.0 / 16.0 * (inRange(i + 2, j, width, height) ? pic[i + 2][j] : 0.0);
 
 
                         int grn = Math.max(0, Math.min((int) Math.round(green), 255));
@@ -452,7 +457,6 @@ public class RosBagServiceImpl implements RosBagService {
 
                     }
                 }
-
             }
         }
         return rgbImage;

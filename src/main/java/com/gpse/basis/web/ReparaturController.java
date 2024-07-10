@@ -46,10 +46,10 @@ public class ReparaturController {
     public ResponseEntity<Boolean> sendData(final WebRequest request) {
         String track = request.getParameter("track");
         String date1 = request.getParameter("from");
-        LocalDate acDate1 = LocalDate.parse(date1.replace("/", "-"), formatter);
+        LocalDate acDate1 = LocalDate.parse(date1.replace("/", minus), formatter);
         System.out.println(acDate1.toString());
         String date2 = request.getParameter("till");
-        LocalDate acDate2 = LocalDate.parse(date2.replace("/", "-"), formatter);
+        LocalDate acDate2 = LocalDate.parse(date2.replace("/", minus), formatter);
         String authorized = request.getParameter("authorized");
         String checklist = request.getParameter("checklist");
         String remarks = request.getParameter("remarks");
@@ -109,7 +109,7 @@ public class ReparaturController {
     @GetMapping("/getticked")
     public ResponseEntity<ArrayList<String>> getTickedList(final WebRequest request) {
         String id = request.getParameter(id_string);
-        return ResponseEntity.ok(checkService.getTickedwithId(id));
+        return ResponseEntity.ok(checkService.getTickedwithId(id_string));
     }
     @Operation(summary = "Setz auf terminiert", description = "Setzt Reparaturauftrag auf terminiert"
         + " aus der Datenbank.")
@@ -129,8 +129,8 @@ public class ReparaturController {
     }
     @PostMapping("/getTerminationDate")
     public String getTerminationDate(final WebRequest request) {
-        String id = request.getParameter("id");
-        String date = checkService.getTerminationDate(id).toString();
+        String id = request.getParameter(id_string);
+        String date = checkService.getTerminationDate(id_string).toString();
         return date;
     }
 

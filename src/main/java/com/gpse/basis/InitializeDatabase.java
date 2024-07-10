@@ -76,17 +76,29 @@ public class InitializeDatabase implements InitializingBean {
      * Initialize users for testing.
      */
     public void initUsers() {
+        final String admin = "Admin";
+        final String administrator = "Administrator";
+        final String pruefer = "Prüfer";
+        final String bearbeiter = "Bearbeiter";
+        final String datenverwalter = "Datenverwalter";
+
         // Test User 1
+        UserModel userAdmin = new UserModel("admin@admin.com", "admin", admin, admin);
+        userAdmin.addRole(administrator);
+        userAdmin.addRole(pruefer);
+        userAdmin.addRole(bearbeiter);
+        userAdmin.addRole(datenverwalter);
         UserModel user = new UserModel("d3nnis.s@web.de", "hello", "Georg", "Bauer");
-        user.addRole("Prüfer");
-        user.addRole("Administrator");
+        user.addRole(pruefer);
+        user.addRole(administrator);
         UserModel user2 = new UserModel("mauricemeise@gmx.net", "asdf", "Jochen", "Bau");
-        user2.addRole("Bearbeiter");
+        user2.addRole(bearbeiter);
         UserModel user3 = new UserModel("affe@web.de", "affe", "Charlie", "Monkey");
-        user3.addRole("Datenverwalter");
+        user3.addRole(datenverwalter);
         usRepo.save(user);
         usRepo.save(user2);
         usRepo.save(user3);
+        usRepo.save(userAdmin);
     }
 
     /**
