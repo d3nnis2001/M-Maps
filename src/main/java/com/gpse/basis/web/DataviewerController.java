@@ -1,54 +1,69 @@
 package com.gpse.basis.web;
 
-import com.gpse.basis.domain.DataSet;
-import com.gpse.basis.domain.GeoData;
-import com.gpse.basis.domain.GleisLageDatenpunkt;
-import com.gpse.basis.domain.UserModel;
+import com.gpse.basis.domain.*;
 import com.gpse.basis.services.FileService;
+import com.gpse.basis.services.ImageService;
+import com.gpse.basis.services.ReparaturService;
 import com.gpse.basis.services.UserServices;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import io.swagger.v3.oas.annotations.Operation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+
+/**
+ * Controller for the Dataviewer
+ */
 
 @RestController
 @RequestMapping("/api/dataviewer")
 public class DataviewerController {
     public final FileService fileService;
     private final UserServices userServices;
-
-    public DataviewerController(FileService fileService, UserServices userServices) {
+    private final ReparaturService reparaturService;
+    private final ImageService imageService;
+    @Autowired
+    public DataviewerController(FileService fileService, UserServices userServices,
+                                ReparaturService reparaturService, ImageService imageService) {
         this.fileService = fileService;
         this.userServices = userServices;
+        this.reparaturService = reparaturService;
+        this.imageService = imageService;
     }
-    /*
-    @GetMapping("/getTrackData")
-    public ArrayList<DataSet> getAllTrackLayoutData() { return fileService.getAllTrackData}
-    */
 
-    @GetMapping("/getTrackData")
-    public ArrayList<GleisLageDatenpunkt> getAllTrackLayoutData() { return fileService.getTrackData(6100);}
-
+    @Operation(summary = "Lädt Gleislagedaten zu Strecke",
+        description = "Funktion um alle Gleislagedaten zu einer gegebenen Strecke beim mounten zu laden")
     @GetMapping("/getTrackData2")
-    public ArrayList<GleisLageDatenpunkt> getAllTrackLayoutData2(@RequestParam int trackId) { return fileService.getData(trackId);}
+    public ArrayList<GleisLageDatenpunkt> getAllTrackLayoutData2(@RequestParam int trackId) {
+        return fileService.getData(trackId);
+    }
 
+    @Operation(summary = "Lädt Gleislagedaten zu Punkt",
+        description = "Funktion um alle Gleislagedaten zu einem gegebenem Punkt beim mounten zu laden")
     @GetMapping("/getPointData")
-    public ArrayList<GleisLageDatenpunkt> getAllPointLayoutData(@RequestParam String pointId) { return fileService.getPointData(pointId);}
+    public ArrayList<GleisLageDatenpunkt> getAllPointLayoutData(@RequestParam String pointId) {
+        return fileService.getPointData(pointId);
+    }
 
+    @Operation(summary = "Lädt Punktinformationen",
+        description = "Funktion um die Geodaten zu einem gegebenem Punkt beim mounten zu laden")
     @GetMapping("/getPointInfo")
-    public GeoData getPointInfo(@RequestParam String pointId) { return fileService.getPointInformation(pointId);}
+    public GeoData getPointInfo(@RequestParam String pointId) {
+        return fileService.getPointInformation(pointId);
+    }
 
-    /*
-    @GetMapping("/getTrackData")
-    public ArrayList<DataSet> getAllTrackLayoutData() {
-        ArrayList<DataSet> dataSets = new ArrayList<>();
-        List<DataSet> lst = fileService.getDataSets("all");
-        for (int i = 0; i < lst.size(); i++) {
-            dataSets.add(lst.get(i));
-        }
-        return dataSets;
-    }*/
+    @Operation(summary = "Lädt Reparaturaufträge zu Punkt",
+        description = "Funktion um die Reparaturaufträge zu einem gegebenem Punkt beim mounten zu laden")
+    @GetMapping("/getPointRep")
+    public List<Reparatur> getPointRep(@RequestParam Double lat, Double lon) {
+        return reparaturService.getReparaturForPoint(lat, lon);
+    }
+
+    @Operation(summary = "Lädt Bilder",
+        description = "Funktion um alle Bilder zu einem gegebenem Reparaturauftrag zu laden")
+    @GetMapping("/getPointPic")
+    public List<Image> getPointPic(@RequestParam String repId) {
+        return imageService.getImagesForOrder(repId);
+    }
 }

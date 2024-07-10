@@ -1,11 +1,19 @@
 <script setup>
-import {computed, ref} from 'vue'
+import {onMounted, computed, ref} from 'vue'
 import {RouterView} from 'vue-router'
+import {storeToRefs} from "pinia";
+import {useSettingsStore} from "@/main/vue/stores/SettingsStore";
 import {useUserStore} from "@/main/vue/stores/UserStore";
 import router from "../router";
 
 const rightDrawerOpen = ref(false)
 const userStore = useUserStore()
+const settingsStore = useSettingsStore()
+const {imageEmpty} = storeToRefs(settingsStore)
+
+onMounted(async () => {
+    await settingsStore.checkLogo()
+})
 
 const links = [
     { name: 'map', label: 'Map', to: '/map', roles: ['Administrator', 'Bearbeiter', 'Prüfer', 'Datenverwalter']},
@@ -59,6 +67,9 @@ const filteredLinks = computed(() => {
             </q-toolbar-title>
             <q-toolbar-title v-if="$route.name === 'Repair'" align="middle">
                 Reparaturaufträge
+            </q-toolbar-title>
+            <q-toolbar-title v-if="$route.name === 'archiv'" align="middle">
+                Archiv
             </q-toolbar-title>
             <q-toolbar-title v-if="$route.name === 'RepairCreate'" align="middle">
                 Reparaturauftrag erstellen
@@ -117,7 +128,8 @@ const filteredLinks = computed(() => {
             <q-toolbar-title v-if="$route.name === 'archiv'" align="middle">
                 Archiv
             </q-toolbar-title>
-            <q-img :src="'/src/main/resources/db-logo.png'" align="left"></q-img>
+            <q-img v-if="imageEmpty" :src="`/src/main/resources/db-logo.png`" align="left"/>
+            <q-img v-else src="/api/settings/logo" align="left"/>
         </q-toolbar>
     </q-header>
 

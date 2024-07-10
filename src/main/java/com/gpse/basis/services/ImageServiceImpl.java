@@ -5,8 +5,7 @@ import com.gpse.basis.repositories.ImageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Implementation des ImageServices.
@@ -20,6 +19,7 @@ public class ImageServiceImpl implements ImageService {
     public ImageServiceImpl(ImageRepository im) {
         this.imRep = im;
     }
+
     @Override
     public void saveImage(String orderId, String imageString, String name) {
         String newImageId = generateId();
@@ -43,5 +43,19 @@ public class ImageServiceImpl implements ImageService {
     public String getImage(String id) {
         Optional<Image> image = imRep.findById(id);
         return image.get().getImage();
+    }
+
+    @Override
+    public List<Image> getImagesForOrder(String orderId) {
+        Iterable it = imRep.findAll();
+        List<Image> images = new ArrayList<>();
+        Iterator<Image> iterator = it.iterator();
+        while (iterator.hasNext()) {
+            Image image = iterator.next();
+            if (image.getOrderId().equals(orderId)) {
+                images.add(image);
+            }
+        }
+        return images;
     }
 }

@@ -45,7 +45,7 @@ async function getData() {
                 username: user.username,
                 firstname: user.firstname,
                 lastname: user.lastname,
-                roles: user.roles,
+                roles: user.roles.sort().join(', '),
                 unlocked: "Needs Activation!"
             })
         } else {
@@ -53,7 +53,7 @@ async function getData() {
                 username: user.username,
                 firstname: user.firstname,
                 lastname: user.lastname,
-                roles: user.roles,
+                roles: user.roles.sort().join(', '),
             })
         }
     })
@@ -150,7 +150,7 @@ const removeRow = (selectedUser) => {
             v-show="!smallScreen && largeScreen"
             class="my-sticky-header-table"
             flat bordered
-            title="User Data"
+            title="Nutzerverwaltung"
             :rows="table.rows"
             :columns="table.columns"
             row-key="username"
@@ -185,7 +185,7 @@ const removeRow = (selectedUser) => {
             grid
             grid-header
             hide-header
-            title="User Data"
+            title="Nutzerverwaltung"
             :rows="table.rows"
             :columns="table.columns"
             row-key="username"

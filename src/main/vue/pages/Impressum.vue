@@ -12,16 +12,15 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="text-align padding">
-        {{impressum}}
+    <div class="margin">
+        <q-card flat bordered>
+            <q-card-section v-html="impressum" />
+        </q-card>
     </div>
 </template>
 
 <style scoped>
-.text-align {
-    text-align: center;
-}
-.padding {
-    padding: 32px
+.margin {
+    margin: 32px;
 }
 </style>

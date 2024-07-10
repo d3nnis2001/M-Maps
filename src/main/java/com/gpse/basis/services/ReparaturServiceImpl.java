@@ -122,4 +122,19 @@ public class ReparaturServiceImpl implements ReparaturService {
         }
         return repArr;
     }
+
+    @Override
+    public List<Reparatur> getReparaturForPoint(Double latitude, Double longitude) {
+        Iterable it = rep.findAll();
+        List<Reparatur> reparaturs = new ArrayList<>();
+        Iterator<Reparatur> iterator = it.iterator();
+        while (iterator.hasNext()) {
+            Reparatur repSolo = iterator.next();
+            if (repSolo.getGeocords().getLatitude().equals(latitude.toString())
+                && repSolo.getGeocords().getLongitude().equals(longitude.toString())) {
+                reparaturs.add(repSolo);
+            }
+        }
+        return reparaturs;
+    }
 }

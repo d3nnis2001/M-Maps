@@ -12,8 +12,9 @@ export default {
         const courseId = ref('')
         const startLocation = ref('')
         const endLocation = ref('')
-        const startTime = ref('2024/01/01')
-        const endTime = ref('2024/01/02')
+        const today = new Date();
+        const startTime = ref(today.toISOString().slice(0, 10))
+        const endTime = ref(new Date(today.setDate(today.getDate() + 42)).toISOString().slice(0, 10))
         const department = ref('')
         const departmentValues = ref([])
         const inspectionData = ref('')

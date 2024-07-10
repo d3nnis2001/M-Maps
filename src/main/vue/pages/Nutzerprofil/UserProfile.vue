@@ -62,13 +62,13 @@ onUnmounted(() => {
             <div class="col-12 col-md-8">
                 <q-card>
                     <q-card-section>
-                        <div class="text-h6">User Data Overview</div>
+                        <div class="text-h6">Nutzer Informationen</div>
                     </q-card-section>
                     <q-card-section>
                         <q-list>
                             <q-item>
                                 <q-item-section>
-                                    <q-item-label>Username</q-item-label>
+                                    <q-item-label>Nutzer ID</q-item-label>
                                 </q-item-section>
                                 <q-item-section side>
                                     <q-item-label>{{ username }}</q-item-label>
@@ -76,7 +76,7 @@ onUnmounted(() => {
                             </q-item>
                             <q-item>
                                 <q-item-section>
-                                    <q-item-label>Firstname</q-item-label>
+                                    <q-item-label>Vorname</q-item-label>
                                 </q-item-section>
                                 <q-item-section side>
                                     <q-item-label>{{ firstname }}</q-item-label>
@@ -84,7 +84,7 @@ onUnmounted(() => {
                             </q-item>
                             <q-item>
                                 <q-item-section>
-                                    <q-item-label>Lastname</q-item-label>
+                                    <q-item-label>Nachname</q-item-label>
                                 </q-item-section>
                                 <q-item-section side>
                                     <q-item-label>{{ lastname }}</q-item-label>
@@ -92,15 +92,15 @@ onUnmounted(() => {
                             </q-item>
                             <q-item>
                                 <q-item-section>
-                                    <q-item-label>Roles</q-item-label>
+                                    <q-item-label>Rollen</q-item-label>
                                 </q-item-section>
                                 <q-item-section side>
-                                    <q-item-label>{{ roles.selected_roles }}</q-item-label>
+                                    <q-item-label>{{ roles.selected_roles.sort().join(', ') }}</q-item-label>
                                 </q-item-section>
                             </q-item>
                             <q-item>
                                 <q-item-section>
-                                    <q-item-label>Regions</q-item-label>
+                                    <q-item-label>Regionen</q-item-label>
                                 </q-item-section>
                                 <q-item-section side>
                                     <q-item-label>{{ regions }}</q-item-label>
@@ -123,7 +123,7 @@ onUnmounted(() => {
                 <q-list class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3">
                     <q-item>
                         <q-item-section>
-                            <q-item-label>Username</q-item-label>
+                            <q-item-label>Nutzer ID</q-item-label>
                         </q-item-section>
                         <q-item>
                             <q-item-section side>
@@ -133,7 +133,7 @@ onUnmounted(() => {
                     </q-item>
                     <q-item>
                         <q-item-section>
-                            <q-item-label>Firstname</q-item-label>
+                            <q-item-label>Vorname</q-item-label>
                         </q-item-section>
                         <q-item>
                             <q-item-section side>
@@ -143,7 +143,7 @@ onUnmounted(() => {
                     </q-item>
                     <q-item>
                         <q-item-section>
-                            <q-item-label>Lastname</q-item-label>
+                            <q-item-label>Nachname</q-item-label>
                         </q-item-section>
                         <q-item>
                             <q-item-section side>
@@ -153,21 +153,21 @@ onUnmounted(() => {
                     </q-item>
                     <q-item class="q-pt-md">
                         <q-item-section>
-                            <q-item-label>Roles</q-item-label>
+                            <q-item-label>Rollen</q-item-label>
                         </q-item-section>
                         <q-item>
-                            <q-item-section side  style="max-width: 160px">
-                                <q-item-label>{{ roles.selected_roles }}</q-item-label>
+                            <q-item-section side  style="max-width: 100px">
+                                <q-item-label>{{ roles.selected_roles.sort().join(', ') }}</q-item-label>
                             </q-item-section>
                         </q-item>
                     </q-item>
                     <q-item>
                         <q-item-section>
-                            <q-item-label>Regions</q-item-label>
+                            <q-item-label>Regionen</q-item-label>
                         </q-item-section>
                         <q-item>
                             <q-item-section side>
-                                <q-item-label>{{ regions }}</q-item-label>
+                                <q-item-label>{{ regions.join(', ') }}</q-item-label>
                             </q-item-section>
                         </q-item>
                     </q-item>

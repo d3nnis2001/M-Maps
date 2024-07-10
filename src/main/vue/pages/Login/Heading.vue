@@ -1,11 +1,21 @@
 <script setup>
+import {useSettingsStore} from "@/main/vue/stores/SettingsStore";
+import {storeToRefs} from "pinia";
+import {onMounted} from "vue";
 
+const settingsStore = useSettingsStore()
+const {imageEmpty} = storeToRefs(settingsStore)
+
+onMounted(async () => {
+    await settingsStore.checkLogo()
+})
 </script>
 
 <template>
     <div class="items-center">
         <div class="row-auto text-align padding-sm">
-            <img src="../../../resources/db-logo.png" alt="Nicht verfügbar">
+            <q-img v-if="imageEmpty" :src="`/src/main/resources/db-logo.png`" align="left"/>
+            <q-img v-else src="/api/settings/logo" align="left"/>
         </div>
         <h1 class="text-h4 text-align text-bold">
             <slot></slot>

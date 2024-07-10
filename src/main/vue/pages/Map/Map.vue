@@ -68,6 +68,8 @@ const reparatur = ref([])
 const showWeather = ref(false)
 var weatherLat = 0.0
 var weatherLon = 0.0
+const cameraimages = ref([])
+
 
 onMounted(async () => {
     map.value = L.map('map', {
@@ -627,6 +629,25 @@ const createRepairOrder = async () => {
     });
 }
 
+// ------------------------ DATAVIEWER ------------------------------------
+
+const openDataForPoint = async () => {
+    const pointId = selectedMarker.value.data.id
+    await router.push(`/dataviewer/point/${pointId}`)
+}
+
+const openDataForTrack = async () => {
+    const from = kmStart.value
+    const to = kmEnd.value
+    console.log(from, to)
+    const trackId = selectedMarker.value.data.strecken_id
+    if (from === "" || to === "") {
+        await router.push(`/dataviewer/route/${trackId}/from/${null}/to/${null}`)
+    } else {
+        await router.push(`/dataviewer/route/${trackId}/from/${from}/to/${to}`)
+    }
+}
+
 // ------------------------- HANDLING FOR PART OF MAP -------------------------
 
 const getPartOfGeoData = async () => {
@@ -866,6 +887,36 @@ const addEnd = () => {
                             v-close-popup
                         />
                     </q-card-actions>
+                </q-card>
+                <q-card flat square bordered>
+                    <q-card flat square bordered>
+                        <div class="row">
+                            <div class="col-4">
+                                <q-btn
+                                    style="align-items: end; justify-content: end"
+                                    flat
+                                    no-caps
+                                    @click="openDataForPoint"
+                                    label="Dataviewer-Point"
+                                    color="primary"
+                                    v-close-popup
+                                >
+                                </q-btn>
+                            </div>
+                            <div class="col-4">
+                                <q-btn
+                                    style="align-items: end; justify-content: end"
+                                    flat
+                                    no-caps
+                                    @click="openDataForTrack"
+                                    label="Dataviewer-Track"
+                                    color="primary"
+                                    v-close-popup
+                                >
+                                </q-btn>
+                            </div>
+                        </div>
+                    </q-card>
                 </q-card>
                 <q-card flat square bordered>
                     <div class="row">
