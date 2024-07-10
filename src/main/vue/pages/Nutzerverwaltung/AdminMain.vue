@@ -45,7 +45,7 @@ async function getData() {
                 username: user.username,
                 firstname: user.firstname,
                 lastname: user.lastname,
-                roles: user.roles,
+                roles: user.roles.sort().join(', '),
                 unlocked: "Needs Activation!"
             })
         } else {
@@ -53,7 +53,7 @@ async function getData() {
                 username: user.username,
                 firstname: user.firstname,
                 lastname: user.lastname,
-                roles: user.roles,
+                roles: user.roles.sort().join(', '),
             })
         }
     })
