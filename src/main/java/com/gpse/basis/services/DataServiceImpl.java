@@ -42,6 +42,12 @@ public class DataServiceImpl implements DataService {
 
     private List<GleisLageRange> grd;
 
+    /**
+     * Instantiates a new Data service.
+     *
+     * @param tmp      the tmp
+     * @param geoTrack the geo track
+     */
     @Autowired
     DataServiceImpl(
         MongoTemplate tmp,
@@ -53,6 +59,9 @@ public class DataServiceImpl implements DataService {
     }
 
     private class Worker implements Runnable {
+        /**
+         * The L.
+         */
         List<Map.Entry<Colors, String>> l;
         private List<GeoData> lst;
 
@@ -62,6 +71,14 @@ public class DataServiceImpl implements DataService {
         private final MongoTemplate tmpl =
             new MongoTemplate(new SimpleMongoClientDatabaseFactory("mongodb://localhost:27017/project_12"));
 
+        /**
+         * Instantiates a new Worker.
+         *
+         * @param lst  the lst
+         * @param l    the l
+         * @param from the from
+         * @param till the till
+         */
         Worker(List<GeoData> lst, List<Map.Entry<Colors, String>> l, LocalDateTime from, LocalDateTime till) {
             this.lst = lst;
             this.l = l;
@@ -134,6 +151,13 @@ public class DataServiceImpl implements DataService {
         private GeoData g;
 
 
+        /**
+         * Instantiates a new Sub worker.
+         *
+         * @param l   the l
+         * @param g   the g
+         * @param col the col
+         */
         SubWorker(List<GleisLageDatenpunkt> l, GeoData g, List<Map.Entry<Colors, String>> col) {
             this.k = l;
             this.g = g;
@@ -257,6 +281,10 @@ public class DataServiceImpl implements DataService {
 
         return l;
     }
+    /**
+     * Gets Heatmap Data with Color.
+     * @return Color with Datapoint.
+     */
     public List<Map.Entry<Colors, String>> getHeatmap() {
         List<GeoData> gd = template.findAll(GeoData.class);
         if (gd.isEmpty()) {
@@ -276,6 +304,13 @@ public class DataServiceImpl implements DataService {
         }
         return geoArr;
     }
+    /**
+     * Gets Heatmap Data with Color with filter on time.
+     * @param track_id is track id.
+     * @param from is start time.
+     * @param till is end time.
+     * @return Heatmap data.
+     */
     public List<Map.Entry<Colors, String>> getGeoDataByDate(int track_id, LocalDateTime from, LocalDateTime till) {
         if (from.isAfter(till)) {
             return null;
@@ -290,6 +325,11 @@ public class DataServiceImpl implements DataService {
         List<Map.Entry<Colors, String>> col = getColorForDateRange(gd, from, till);
         return col;
     }
+    /**
+     * Gets Geo data with track id.
+     * @param id is track id.
+     * @return Geo data of track id.
+     */
     public Double[] getDataForGeoPart(String id) {
         MatchOperation matchOperation = Aggregation.match(Criteria.where(I_DLOCATION).is(id));
         Aggregation aggregation = Aggregation.newAggregation(matchOperation);

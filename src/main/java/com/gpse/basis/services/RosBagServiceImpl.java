@@ -72,6 +72,11 @@ public class RosBagServiceImpl implements RosBagService {
     private String url;
 
 
+    /**
+     * Instantiates a new Ros bag service.
+     *
+     * @param tmp the tmp
+     */
     @Autowired
     RosBagServiceImpl(MongoTemplate tmp) {
         template = tmp;
@@ -294,6 +299,16 @@ public class RosBagServiceImpl implements RosBagService {
         private final int xyz;
 
         private final int trackId;
+
+        /**
+         * Instantiates a new Worker.
+         *
+         * @param filename         the filename
+         * @param cameraImagesList the camera images list
+         * @param lock             the lock
+         * @param xyz              the xyz
+         * @param trackId          the track id
+         */
         public Worker(String filename, List<CameraImage> cameraImagesList, Lock lock, int xyz, int trackId) {
             this.filename = filename;
             this.cameraImagesList = cameraImagesList;
@@ -462,6 +477,13 @@ public class RosBagServiceImpl implements RosBagService {
         return rgbImage;
     }
 
+    /**
+     * Byte array to float float.
+     *
+     * @param bytes     the bytes
+     * @param byteOrder the byte order
+     * @return the float
+     */
     public float byteArrayToFloat(byte[] bytes, ByteOrder byteOrder) {
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
         buffer.order(byteOrder);

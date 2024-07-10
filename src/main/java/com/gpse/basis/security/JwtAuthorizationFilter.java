@@ -18,12 +18,22 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 
 import java.io.IOException;
 
+/**
+ * The type Jwt authorization filter.
+ */
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
     private static final Logger LOG = LoggerFactory.getLogger(JwtAuthorizationFilter.class);
     private final UserDetailsService userDetailsService;
     private final SecurityConstants securityConstants;
 
+    /**
+     * Instantiates a new Jwt authorization filter.
+     *
+     * @param authenticationManager the authentication manager
+     * @param userDetailsService    the user details service
+     * @param securityConstants     the security constants
+     */
     public JwtAuthorizationFilter(final AuthenticationManager authenticationManager,
                                   final UserDetailsService userDetailsService,
                                   final SecurityConstants securityConstants) {

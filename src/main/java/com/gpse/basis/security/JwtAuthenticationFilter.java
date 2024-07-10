@@ -16,6 +16,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * The type Jwt authentication filter.
+ */
 public final class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private static final int TEN_DAYS_IN_MILLIS = 864_000_000;
@@ -24,6 +27,12 @@ public final class JwtAuthenticationFilter extends UsernamePasswordAuthenticatio
 
     private final SecurityConstants securityConstants;
 
+    /**
+     * Instantiates a new Jwt authentication filter.
+     *
+     * @param authenticationManager the authentication manager
+     * @param securityConstants     the security constants
+     */
     public JwtAuthenticationFilter(AuthenticationManager authenticationManager, SecurityConstants securityConstants) {
         this.authenticationManager = authenticationManager;
         this.securityConstants = securityConstants;

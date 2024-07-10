@@ -19,6 +19,7 @@ public class WebConfiguration implements WebMvcConfigurer {
      * Redirects all routes not set to the frontend index.html.
      * Explicitly excludes '/index.html' to avoid self looping callback.
      * Explicitly excludes '/static/**' files to load .css and .js files properly.
+     * @return WebMvcConfigurer
      */
     @Bean
     public WebMvcConfigurer forwardToIndex() {

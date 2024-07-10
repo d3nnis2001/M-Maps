@@ -16,6 +16,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * The type Reparatur service.
+ */
 @Service
 
 public class ReparaturServiceImpl implements ReparaturService {
@@ -25,13 +28,24 @@ public class ReparaturServiceImpl implements ReparaturService {
     private final RepChecklistRepository checkRepo;
 
     private final MongoTemplate template;
+
+    /**
+     * Instantiates a new Reparatur service.
+     *
+     * @param rep       the rep
+     * @param checkRepo the check repo
+     * @param template  the template
+     */
     @Autowired
     public ReparaturServiceImpl(ReparaturRepository rep, RepChecklistRepository checkRepo, MongoTemplate template) {
         this.rep = rep;
         this.checkRepo = checkRepo;
         this.template = template;
     }
-
+    /**
+     * Gets all repair orders.
+     * @return List of repair orders.
+     */
     public ArrayList<Reparatur> getRepData() {
         Iterable it = rep.findAll();
         ArrayList<Reparatur> repArr = new ArrayList<>();
@@ -44,6 +58,17 @@ public class ReparaturServiceImpl implements ReparaturService {
         }
         return repArr;
     }
+    /**
+     * adds repair order to database.
+     * @param track id of track
+     * @param date1 start date
+     * @param date2 end date
+     * @param authorized name of authorized person
+     * @param checklist checklist
+     * @param remarks remarks
+     * @param geo geocoords
+     * @return if it was successful or not
+     */
     public boolean addRepairOrder(int track, LocalDate date1,
                            LocalDate date2, String authorized, Checklist checklist, String remarks, GeoCords geo) {
         Utils util = new Utils();
@@ -62,7 +87,12 @@ public class ReparaturServiceImpl implements ReparaturService {
         return rep.findById(repname)
             .orElseThrow(() -> new UsernameNotFoundException("Reparatur name " + repname + " not found."));
     }
-
+    /**
+     * Changes status of repair order.
+     * @param name Name of repair order
+     * @param newStatus new status of repair order
+     * @return if it was successful or not
+     */
     public Boolean changeStatus(String name, String newStatus) {
         Reparatur repa = loadRepByName(name);
         repa.setStatus(newStatus);
@@ -72,7 +102,11 @@ public class ReparaturServiceImpl implements ReparaturService {
         rep.save(repa);
         return true;
     }
-
+    /**
+     * Deletes a repair order.
+     * @param name Name of repair order
+     * @return if it was successful or not
+     */
     public Boolean deleteOrder(String name) {
         try {
             Reparatur repa = loadRepByName(name);

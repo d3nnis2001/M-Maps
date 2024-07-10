@@ -106,6 +106,17 @@ public class FileServiceImpl implements FileService {
 
     private final RosBagService rosService;
 
+    /**
+     * Instantiates a new File service.
+     *
+     * @param repro the repro
+     * @param gt    the gt
+     * @param rpr   the rpr
+     * @param tmp   the tmp
+     * @param rprr  the rprr
+     * @param dstr  the dstr
+     * @param ros   the ros
+     */
     @Autowired
     FileServiceImpl(DataSetRepository repro, GeoTrackData gt, GleisLageDatenRepository rpr,
                     MongoTemplate tmp, GleisVDataRepository rprr, DataService dstr, RosBagService ros) {
@@ -301,7 +312,10 @@ public class FileServiceImpl implements FileService {
         Matcher matcher = pattern.matcher(fileName);
         return matcher.find();
     }
-
+    /**
+     * Saves LLH-file in MongoDB.
+     * @param file file to store.
+     */
     public void saveLHHFile(File file) throws IOException, IndexOutOfBoundsException {
         List<GeoData> lst = new ArrayList<>();
         BufferedReader reader = new BufferedReader(new FileReader(file));
@@ -330,6 +344,16 @@ public class FileServiceImpl implements FileService {
         geoTrack.saveAll(lst);
     }
 
+    /**
+     * Save file string.
+     *
+     * @param file       the file
+     * @param streckenId the strecken id
+     * @return the string
+     * @throws IOException               the io exception
+     * @throws IndexOutOfBoundsException the index out of bounds exception
+     * @throws RuntimeException          the runtime exception
+     */
     public String saveFile(File file, int streckenId) throws IOException, IndexOutOfBoundsException, RuntimeException {
             Date uploadDate = new Date();
 
@@ -403,6 +427,9 @@ public class FileServiceImpl implements FileService {
     }
 
     private static class Thr implements Runnable {
+        /**
+         * The Batch size.
+         */
         final int batchSize = 40000;
 
         private final List<GleisLageDatenpunkt> lst;
@@ -418,6 +445,13 @@ public class FileServiceImpl implements FileService {
 
        private final List<GleisVData> lst3;
 
+        /**
+         * Instantiates a new Thr.
+         *
+         * @param lt  the lt
+         * @param k   the k
+         * @param trk the trk
+         */
         Thr(List<GleisLageDatenpunkt> lt, List<GeoData> k, List<GleisVData> trk) {
             lst = lt;
             l = k;
@@ -527,7 +561,15 @@ public class FileServiceImpl implements FileService {
     }
 
 
-    //return null, if from > till
+    /**
+     * Gets part heatmap.
+     *
+     * @param strecke the strecke
+     * @param from    the from
+     * @param till    the till
+     * @return the part heatmap
+     */
+//return null, if from > till
     public List<Map.Entry<DataService.Colors, String>> getPartHeatmap(int strecke, LocalDateTime from,
                                                                       LocalDateTime till) {
         if (from.isAfter(till)) {
@@ -535,7 +577,11 @@ public class FileServiceImpl implements FileService {
         }
          return dService.getGeoDataByDate(strecke, from, till);
     }
-
+    /**
+     * Gets data for trackid.
+     * @param trackId is track id
+     * @return Geo data of track id.
+     */
     public ArrayList<String> getDataforId(int trackId) {
         List<DataSet> sets = getDataSets(ALL);
         ArrayList<String> dataIds = new ArrayList<>();
@@ -546,7 +592,10 @@ public class FileServiceImpl implements FileService {
         }
         return dataIds;
     }
-
+    /**
+     * Gets all Gleislagedaten.
+     * @return All Gleislagedaten.
+     */
     public ArrayList<GleisLageDatenpunkt> getAllTrackData() {
         Iterable<GleisLageDatenpunkt> iterable = glDatenRepro.findAll();
         ArrayList<GleisLageDatenpunkt> dataPoints = new ArrayList<>();
@@ -559,6 +608,12 @@ public class FileServiceImpl implements FileService {
     }
 
 
+    /**
+     * Gets data points for track.
+     *
+     * @param trackId the track id
+     * @return the data points for track
+     */
     public List<GleisLageDatenpunkt> getDataPointsForTrack(int trackId) {
         MongoTemplate tmpl = new MongoTemplate(
             new SimpleMongoClientDatabaseFactory(MONGODB_LOCALHOST_27017_PROJECT_12));
@@ -574,7 +629,11 @@ public class FileServiceImpl implements FileService {
         System.out.println(results.size());
         return results;
     }
-
+    /**
+     * Gets Gleislagedaten for a trackid.
+     * @param trackId the track id
+     * @return Gleislagedaten for trackid.
+     */
     public ArrayList<GleisLageDatenpunkt> getData(int trackId) {
         List<GleisLageDatenpunkt> lst = getDataPointsForTrack(trackId);
         System.out.println(lst.size());
@@ -593,7 +652,11 @@ public class FileServiceImpl implements FileService {
         }
         return dataPoints;
     }
-
+    /**
+     * Gets all Information about Geopoint.
+     * @param pointId the point id
+     * @return All relevant information for that geopoint.
+     */
     public GeoData getPointInformation(String pointId) {
         Iterable<GeoData> iterable = geoTrack.findAll();
         GeoData geoData = null;
@@ -607,7 +670,11 @@ public class FileServiceImpl implements FileService {
         }
         return null;
     }
-
+    /**
+     * Gets all Information about Geopoint.
+     * @param pointId the point id
+     * @return All relevant information for that geopoint.
+     */
     public ArrayList<GleisLageDatenpunkt> getPointData(String pointId) {
         ArrayList<GleisLageDatenpunkt> dataPoints = new ArrayList<>();
         MongoTemplate template1 = new MongoTemplate(

@@ -18,6 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The type Map controller.
+ */
 @RestController
 @RequestMapping("/api/map")
 public class MapController {
@@ -30,18 +33,37 @@ public class MapController {
     private RosBagService rosBag;
     private final String trackString = "trackid";
 
+    /**
+     * Instantiates a new Map controller.
+     *
+     * @param ros         the ros
+     * @param dataService the data service
+     * @param rps         the rps
+     */
     @Autowired
     public MapController(RosBagService ros, DataService dataService, ReparaturService rps) {
         this.rosBag = ros;
         this.dataService = dataService;
         this.repService = rps;
     }
+
+    /**
+     * Gets all geo data.
+     *
+     * @return the all geo data
+     */
     @Operation(summary = "Geodata", description = "Holt alle Geodaten die existieren aus der Datenbank.")
     @GetMapping("/gettracks")
     public ArrayList<GeoData> getAllGeoData() {
         return dataService.getGeoData();
     }
 
+    /**
+     * Gets part of heatmap.
+     *
+     * @param request the request
+     * @return the part of heatmap
+     */
     @Operation(summary = "Heatmap Part", description = "Holt einen Teil der Heatmap Daten.")
     @PostMapping("/getpartheatmap")
     public List<ResponseColor> getPartOfHeatmap(final WebRequest request) {
@@ -63,6 +85,11 @@ public class MapController {
         return kolor;
     }
 
+    /**
+     * Gets heatmap.
+     *
+     * @return the heatmap
+     */
     @Operation(summary = "Heatmap", description = "Holt Heatmap Daten mit zugehöriger Farbe.")
     @PostMapping("/getheatmap")
     public List<Map.Entry<DataService.Colors, String>> getHeatmap() {
@@ -73,6 +100,12 @@ public class MapController {
         private final String id;
         private int color;
 
+        /**
+         * Instantiates a new Response color.
+         *
+         * @param id    the id
+         * @param color the color
+         */
         public ResponseColor(String id, DataService.Colors color) {
             this.id = id;
             if (color == DataService.Colors.NORMAL) {
@@ -87,6 +120,12 @@ public class MapController {
         }
     }
 
+    /**
+     * Get datato geo track double [ ].
+     *
+     * @param request the request
+     * @return the double [ ]
+     */
     @Operation(summary = "Geodata nach Strecke", description = "Holt Geodata von einer Strecke.")
     @PostMapping("/getDataGeoTrack")
     public Double[] getDatatoGeoTrack(final WebRequest request) {
@@ -96,12 +135,23 @@ public class MapController {
         return dataService.getDataForGeoPart(strecke);
     }
 
+    /**
+     * Gets reparaturfor map.
+     *
+     * @return the reparaturfor map
+     */
     @Operation(summary = "Hol alle Reparaturaufträge", description = "Holt Repaufräge aus der Datenbank.")
     @PostMapping("/getReparaturForMap")
     public List<Reparatur> getReparaturforMap() {
         return repService.getReparaturForMap();
     }
 
+    /**
+     * Gets camera image for track request.
+     *
+     * @param request the request
+     * @return the camera image for track request
+     */
     @Operation(summary = "Images", description = "Holt images von einer Strecke.")
     @PostMapping("/getCameraImageforTrack")
     public List<String> getCameraImageForTrackRequest(final WebRequest request) {
@@ -109,12 +159,24 @@ public class MapController {
         return rosBag.getImagesForTrack(trackId);
     }
 
+    /**
+     * Gets ir camera imagefor track.
+     *
+     * @param request the request
+     * @return the ir camera imagefor track
+     */
     @PostMapping("/getIRCameraImageforTrack")
     public List<String> getIRCameraImageforTrack(final WebRequest request) {
         int trackId = Integer.parseInt(request.getParameter(trackString));
         return rosBag.getIRImagesForTrack(trackId);
     }
 
+    /**
+     * Gets velodyn pointsfor track.
+     *
+     * @param request the request
+     * @return the velodyn pointsfor track
+     */
     @PostMapping("/getVelodynPointsforTrack")
     public List<List<VelodynePoint>> getVelodynPointsforTrack(final WebRequest request) {
         int trackId = Integer.parseInt(request.getParameter(trackString));

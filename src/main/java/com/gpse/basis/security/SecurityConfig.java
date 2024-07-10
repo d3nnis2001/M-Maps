@@ -23,6 +23,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 
+/**
+ * The type Security config.
+ */
 @Configuration
 @EnableConfigurationProperties(SecurityConstants.class)
 @EnableWebSecurity
@@ -32,6 +35,13 @@ public class SecurityConfig {
     private final SecurityConstants securityConstants;
     private final AuthenticationConfiguration configuration;
 
+    /**
+     * Instantiates a new Security config.
+     *
+     * @param userDetailsService the user details service
+     * @param securityConstants  the security constants
+     * @param configuration      the configuration
+     */
     @Autowired
     public SecurityConfig(final UserDetailsService userDetailsService, final SecurityConstants securityConstants,
                           final AuthenticationConfiguration configuration) {
@@ -40,6 +50,14 @@ public class SecurityConfig {
         this.securityConstants = securityConstants;
         this.configuration = configuration;
     }
+
+    /**
+     * Filter chain security filter chain.
+     *
+     * @param http the http
+     * @return the security filter chain
+     * @throws Exception the exception
+     */
     @Bean
     public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
 
@@ -55,16 +73,32 @@ public class SecurityConfig {
 
     }
 
+    /**
+     * Authentication manager authentication manager.
+     *
+     * @return the authentication manager
+     * @throws Exception the exception
+     */
     @Bean
     public AuthenticationManager authenticationManager() throws Exception {
         return configuration.getAuthenticationManager();
     }
 
+    /**
+     * Password encoder password encoder.
+     *
+     * @return the password encoder
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
+    /**
+     * Cors configuration source cors configuration source.
+     *
+     * @return the cors configuration source
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

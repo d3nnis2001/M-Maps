@@ -10,10 +10,20 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.*;
 
+/**
+ * The type Checklist service.
+ */
 @Service
 public class ChecklistServiceImpl implements ChecklistService {
     private final ChecklistRepository checkRepo;
     private final RepChecklistRepository repcheckRepo;
+
+    /**
+     * Instantiates a new Checklist service.
+     *
+     * @param checkRepo    the check repo
+     * @param repcheckRepo the repcheck repo
+     */
     public ChecklistServiceImpl(ChecklistRepository checkRepo, RepChecklistRepository repcheckRepo) {
         this.checkRepo = checkRepo;
         this.repcheckRepo = repcheckRepo;
@@ -72,7 +82,11 @@ public class ChecklistServiceImpl implements ChecklistService {
         checkRepo.save(template);
         return true;
     }
-
+    /**
+     * Gets all names of all checklists.
+     *
+     * @return all Checklist names in String array
+     */
     public ArrayList<String> getAllNames() {
         ArrayList<String> arr = new ArrayList<>();
         Iterable it = checkRepo.findAll();
@@ -98,6 +112,13 @@ public class ChecklistServiceImpl implements ChecklistService {
         return repcheckRepo.findById(id)
             .orElseThrow(() -> new UsernameNotFoundException("Repair Checklist not found!"));
     }
+    /**
+     * Changes Repair Checklist.
+     *
+     * @param id the id
+     * @param arr the arr
+     * @return if repair was changed successfully or not
+     */
     public Boolean changeRepChecklist(final String id, String[]arr) {
         ReparaturChecklist rep1 = repcheckRepo.findById(id)
             .orElseThrow(() -> new UsernameNotFoundException("Repair Checklist not found"));
@@ -110,7 +131,12 @@ public class ChecklistServiceImpl implements ChecklistService {
         ReparaturChecklist repCheck = loadRepCheckById(id);
         return repCheck.getCheckSel();
     }
-
+    /**
+     * Sets date on terminated.
+     * @param id is id of repair order
+     * @param term is termination date
+     * @return if was successful or not
+     */
     public Boolean setTerminatedDate(String id, LocalDate term) {
         try {
             ReparaturChecklist r1 = loadRepCheckById(id);
@@ -121,7 +147,11 @@ public class ChecklistServiceImpl implements ChecklistService {
             return false;
         }
     }
-
+    /**
+     * Gets termination date.
+     * @param id is id of repair order
+     * @return termination date
+     */
     public LocalDate getTerminationDate(String id) {
         ReparaturChecklist reparaturChecklist = loadRepCheckById(id);
         LocalDate date = reparaturChecklist.getTerminiert();
