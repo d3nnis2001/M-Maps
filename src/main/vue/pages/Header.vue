@@ -1,16 +1,26 @@
 <script setup>
-import {computed, ref} from 'vue'
+import {onMounted, computed, ref} from 'vue'
 import {RouterView} from 'vue-router'
+import {storeToRefs} from "pinia";
+import {useSettingsStore} from "@/main/vue/stores/SettingsStore";
 import {useUserStore} from "@/main/vue/stores/UserStore";
 import router from "../router";
 
 const rightDrawerOpen = ref(false)
 const userStore = useUserStore()
+const settingsStore = useSettingsStore()
+const {imageEmpty} = storeToRefs(settingsStore)
+
+onMounted(async () => {
+    await settingsStore.checkLogo()
+    console.log(imageEmpty.value)
+})
 
 const links = [
     { name: 'map', label: 'Map', to: '/map', roles: ['Administrator', 'Bearbeiter', 'Prüfer', 'Datenverwalter']},
     { name: 'repair', label: 'Reparaturaufträge', to: '/repair', roles: ['Prüfer', 'Freigabeberechtigter'] },
     { name: 'inspectionOrderOverview', label: 'Prüfaufträge', to: '/inspectionOrder', roles: ['Prüfer', 'Bearbeiter']},
+    { name: 'archiv', label: 'Archiv', to: '/archiv', roles: ['Bearbeiter', 'Prüfer', 'Freigabeberechtigter']},
     { name: 'admin', label: 'Nutzerverwaltung', to: '/admin', roles: ['Administrator'] },
     { name: 'dataimport', label: 'Datenverwaltung', to: '/dataimport', roles: ['Datenverwalter', 'Prüfer'] },
     { name: 'dataviewer', label: 'Dataviewer', to: '/dataviewer', roles: ['Administrator', 'Bearbeiter', 'Prüfer', 'Datenverwalter']},
@@ -113,7 +123,8 @@ const filteredLinks = computed(() => {
             <q-toolbar-title v-if="$route.name === 'userprofile'" align="middle">
                 Nutzerprofil
             </q-toolbar-title>
-            <q-img :src="'/src/main/resources/db-logo.png'" align="left"></q-img>
+            <q-img v-if="imageEmpty" :src="`/src/main/resources/db-logo.png`" align="left"/>
+            <q-img v-else src="/api/settings/logo" align="left"/>
         </q-toolbar>
     </q-header>
 
