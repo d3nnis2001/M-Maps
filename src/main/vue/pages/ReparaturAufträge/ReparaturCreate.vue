@@ -13,8 +13,9 @@ export default {
         const freigabe = ref('')
         const checkliste = ref('')
         const checkvals = ref([])
-        const date = ref('2024/01/01')
-        const date2 = ref('2024/01/02')
+        const today = new Date();
+        const date = ref(today.toISOString().slice(0, 10))
+        const date2 = ref(new Date(today.setDate(today.getDate() + 42)).toISOString().slice(0, 10))
         const $q = useQuasar()
         const bem = ref('')
         const router = useRouter()
