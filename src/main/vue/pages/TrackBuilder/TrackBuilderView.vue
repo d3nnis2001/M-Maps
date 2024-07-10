@@ -174,7 +174,9 @@ export default {
             onFileRemoved,
             onFileAdded,
             uploadImages,
-            files
+            files,
+            largeScreen,
+            smallScreen
         };
     }
 }
@@ -182,47 +184,107 @@ export default {
 
 <template>
     <q-layout view="hHh lpR fFf">
-        <q-header class="bg-white text-dark q-px-md q-py-sm">
-            <q-toolbar class="justify-center">
-                <q-img src="/src/main/resources/db-logo.png" style="width: 50px; height: auto; margin-right: 10px;"/>
-                <q-toolbar-title class="text-center">Gleisbauer</q-toolbar-title>
-            </q-toolbar>
-        </q-header>
-
-        <q-page-container>
-            <div class="outline">
-                <div class="outer-layer">
-                    <div>
-                        <div class="row">
-                            <p style="margin-right: 5px">ID: </p>
-                            <p style="font-weight: bold">{{ repairDetails.id }}</p>
-                        </div>
-                        <div class="row">
-                            <p style="margin-right: 5px">Zeitraum: </p>
-                            <p style="font-weight: bold">
-                                {{ "   von   " + repairDetails.from + "   bis   " + repairDetails.till }}</p>
-                        </div>
-                        <div class="row">
-                            <p style="margin-right: 5px">Freigabeberechtigter: </p>
-                            <p style="font-weight: bold">{{ repairDetails.freigabeberechtigter }}</p>
-                        </div>
-                        <div class="row">
-                            <p style="margin-right: 5px">Status: </p>
-                            <p style="font-weight: bold">{{"terminiert zum   " + terminationDate.data}}</p>
-                        </div>
-                    </div>
-                    <q-separator size="2px" color="primary" style="margin-top: 30px"></q-separator>
-                    <p class="checklist">Checkliste</p>
-                    <div class="row extra-mar">
-                    <div class="outline-nomar">
-                        <div class="q-pa-md">
-                            <div v-for="item in options" :key="item.value" class="checklist-item">
-                                {{ item.label }}
+        <div v-if="largeScreen && !smallScreen">
+            <q-header class="bg-white text-dark q-px-md q-py-sm">
+                <q-toolbar class="justify-center">
+                    <q-img src="/src/main/resources/db-logo.png" style="width: 50px; height: auto; margin-right: 10px;"/>
+                    <q-toolbar-title class="text-center">Gleisbauer</q-toolbar-title>
+                </q-toolbar>
+            </q-header>
+            <q-page-container>
+                <div class="outline">
+                    <div class="outer-layer">
+                        <div>
+                            <div class="row">
+                                <p style="margin-right: 5px">ID: </p>
+                                <p style="font-weight: bold">{{ repairDetails.id }}</p>
+                            </div>
+                            <div class="row">
+                                <p style="margin-right: 5px">Zeitraum: </p>
+                                <p style="font-weight: bold">
+                                    {{ "   von   " + repairDetails.from + "   bis   " + repairDetails.till }}</p>
+                            </div>
+                            <div class="row">
+                                <p style="margin-right: 5px">Freigabeberechtigter: </p>
+                                <p style="font-weight: bold">{{ repairDetails.freigabeberechtigter }}</p>
+                            </div>
+                            <div class="row">
+                                <p style="margin-right: 5px">Status: </p>
+                                <p style="font-weight: bold">{{"terminiert zum   " + terminationDate.data}}</p>
                             </div>
                         </div>
-                    </div>
-                    <div class="q-pa-md">
+                        <q-separator size="2px" color="primary" style="margin-top: 30px"></q-separator>
+                        <p class="checklist">Checkliste</p>
+                        <div class="row extra-mar">
+                        <div class="outline-nomar">
+                            <div class="q-pa-md">
+                                <div v-for="item in options" :key="item.value" class="checklist-item">
+                                    {{ item.label }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="q-pa-md">
 
+                                <q-uploader
+                                    v-model="files"
+                                    label="Laden Sie Ihre Fotos hoch"
+                                    @added="onFileAdded"
+                                    @removed="onFileRemoved"
+                                    no-auto-upload="true"
+                                    multiple
+                                    no-thumbnails
+                                />
+                            <div align="middle">
+                                <q-btn style="width: 100%; max-width: 218px" no-caps rounded size="16px" label="Fotos hochladen" color="primary" @click="uploadImages"></q-btn>
+                            </div>
+                        </div>
+                        </div>
+                        <q-btn style="width: 100%; max-width: 218px" size="16px" no-caps rounded label="Bestätigen" color="primary" @click=confirmRepairOrder></q-btn>
+                    </div>
+                </div>
+            </q-page-container>
+        </div>
+        <div v-if="!largeScreen && smallScreen">
+            <q-header class="bg-white text-dark q-px-md q-py-sm">
+                <q-toolbar class="justify-center">
+                    <q-img src="/src/main/resources/db-logo.png" style="width: 50px; height: auto; margin-right: 10px;"/>
+                    <q-toolbar-title class="text-center">Gleisbauer</q-toolbar-title>
+                </q-toolbar>
+            </q-header>
+            <q-page-container>
+                <div class="outline">
+                    <div class="outer-layer">
+                        <div>
+                            <div class="row">
+                                <p style="margin-right: 5px">ID: </p>
+                                <p style="font-weight: bold">{{ repairDetails.id }}</p>
+                            </div>
+                            <div class="row">
+                                <p style="margin-right: 5px">Zeitraum: </p>
+                                <p style="font-weight: bold">
+                                    {{ "   von   " + repairDetails.from + "   bis   " + repairDetails.till }}</p>
+                            </div>
+                            <div class="row">
+                                <p style="margin-right: 5px">Freigabeberechtigter: </p>
+                                <p style="font-weight: bold">{{ repairDetails.freigabeberechtigter }}</p>
+                            </div>
+                            <div class="row">
+                                <p style="margin-right: 5px">Status: </p>
+                                <p style="font-weight: bold">{{"terminiert zum   " + terminationDate.data}}</p>
+                            </div>
+                        </div>
+                        <q-separator size="2px" color="primary" style="margin-top: 30px"></q-separator>
+                        <p class="checklist">Checkliste</p>
+                        <div class="row extra-mar">
+                            <div class="outline-nomar">
+                                <div class="q-pa-md">
+                                    <div v-for="item in options" :key="item.value" class="checklist-item">
+                                        {{ item.label }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="q-pa-md q-pa-md-upload">
                             <q-uploader
                                 v-model="files"
                                 label="Laden Sie Ihre Fotos hoch"
@@ -232,13 +294,15 @@ export default {
                                 multiple
                                 no-thumbnails
                             />
-                            <q-btn flat label="Upload" color="primary" @click="uploadImages"></q-btn>
+                            <div align="middle">
+                                <q-btn style="width: 100%; max-width: 218px" margin-top="10px" size="16px" no-caps rounded label="Fotos hochladen" color="primary" @click="uploadImages"></q-btn>
+                            </div>
+                        </div>
+                        <q-btn style="width: 100%; max-width: 218px" size="16px" no-caps rounded label="Bestätigen" color="primary" @click=confirmRepairOrder></q-btn>
                     </div>
-                    </div>
-                    <q-btn style="width: 100%; max-width: 218px" size="16px" no-caps rounded label="Bestätigen" color="primary" @click=confirmRepairOrder></q-btn>
                 </div>
-            </div>
-        </q-page-container>
+            </q-page-container>
+        </div>
     </q-layout>
 </template>
 
@@ -307,6 +371,15 @@ p {
 
 .btn {
     margin-top: 40px;
-    margin-left: 60px
+    margin-left: 60px;
 }
+
+
+.q-pa-md-upload {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 100%;
+}
+
 </style>
