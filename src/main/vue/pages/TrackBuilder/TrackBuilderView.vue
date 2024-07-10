@@ -284,8 +284,9 @@ export default {
                                 </div>
                             </div>
                         </div>
-                        <div class="q-pa-md q-pa-md-upload">
+                        <div class="q-pa-md q-pa-md-upload2" style="max-width: 100%; margin-bottom: 10px">
                             <q-uploader
+                                style="max-width: 150%"
                                 v-model="files"
                                 label="Laden Sie Ihre Fotos hoch"
                                 @added="onFileAdded"
@@ -295,7 +296,7 @@ export default {
                                 no-thumbnails
                             />
                             <div align="middle">
-                                <q-btn style="width: 100%; max-width: 218px" margin-top="10px" size="16px" no-caps rounded label="Fotos hochladen" color="primary" @click="uploadImages"></q-btn>
+                                <q-btn style="width: 100%; max-width: 218px" margin-bottom="10px" size="16px" no-caps rounded label="Fotos hochladen" color="primary" @click="uploadImages"></q-btn>
                             </div>
                         </div>
                         <q-btn style="width: 100%; max-width: 218px" size="16px" no-caps rounded label="Bestätigen" color="primary" @click=confirmRepairOrder></q-btn>
@@ -375,11 +376,12 @@ p {
 }
 
 
-.q-pa-md-upload {
+.q-pa-md-upload2 {
     display: flex;
     flex-direction: column;
     align-items: center;
     max-width: 100%;
+    margin-bottom: 10px;
 }
 
 </style>
