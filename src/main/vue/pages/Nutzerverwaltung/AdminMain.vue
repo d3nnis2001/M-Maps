@@ -150,7 +150,7 @@ const removeRow = (selectedUser) => {
             v-show="!smallScreen && largeScreen"
             class="my-sticky-header-table"
             flat bordered
-            title="User Data"
+            title="Nutzerverwaltung"
             :rows="table.rows"
             :columns="table.columns"
             row-key="username"
@@ -185,7 +185,7 @@ const removeRow = (selectedUser) => {
             grid
             grid-header
             hide-header
-            title="User Data"
+            title="Nutzerverwaltung"
             :rows="table.rows"
             :columns="table.columns"
             row-key="username"
