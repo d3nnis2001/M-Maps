@@ -23,10 +23,10 @@ const links = [
     { name: 'archiv', label: 'Archiv', to: '/archiv', roles: ['Bearbeiter', 'Prüfer', 'Freigabeberechtigter']},
     { name: 'admin', label: 'Nutzerverwaltung', to: '/admin', roles: ['Administrator'] },
     { name: 'dataimport', label: 'Datenverwaltung', to: '/dataimport', roles: ['Datenverwalter', 'Prüfer'] },
-    { name: 'dataviewer', label: 'Dataviewer', to: '/dataviewer', roles: ['Administrator', 'Bearbeiter', 'Prüfer', 'Datenverwalter']},
     { name: 'settings', label: 'Design anpassen', to: '/settings', roles: ['Administrator']},
     { name: 'templates', label: 'Checklisten', to: '/checklists', roles: ['Administrator', 'Bearbeiter', 'Prüfer', 'Datenverwalter']},
     { name: 'userprofile', label: 'Nutzerprofil', to: '/userprofile/:username', roles: ['Administrator', 'Bearbeiter', 'Prüfer', 'Datenverwalter']},
+    { name: 'archiv', label: 'Archiv', to: '/archiv', roles: ['Administrator', 'Bearbeiter', 'Prüfer', 'Datenverwalter']},
 ]
 const links2 = [
     { name: 'home', label: 'Abmelden', to: '/' },
@@ -68,6 +68,9 @@ const filteredLinks = computed(() => {
             </q-toolbar-title>
             <q-toolbar-title v-if="$route.name === 'Repair'" align="middle">
                 Reparaturaufträge
+            </q-toolbar-title>
+            <q-toolbar-title v-if="$route.name === 'archiv'" align="middle">
+                Archiv
             </q-toolbar-title>
             <q-toolbar-title v-if="$route.name === 'RepairCreate'" align="middle">
                 Reparaturauftrag erstellen

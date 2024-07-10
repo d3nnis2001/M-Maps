@@ -6,10 +6,15 @@ import com.gpse.basis.services.ImageService;
 import com.gpse.basis.services.ReparaturService;
 import com.gpse.basis.services.UserServices;
 import io.swagger.v3.oas.annotations.Operation;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+
+/**
+ * Controller for the Dataviewer
+ */
 
 @RestController
 @RequestMapping("/api/dataviewer")
@@ -18,7 +23,7 @@ public class DataviewerController {
     private final UserServices userServices;
     private final ReparaturService reparaturService;
     private final ImageService imageService;
-
+    @Autowired
     public DataviewerController(FileService fileService, UserServices userServices,
                                 ReparaturService reparaturService, ImageService imageService) {
         this.fileService = fileService;

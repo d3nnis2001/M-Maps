@@ -57,7 +57,6 @@ export default {
         };
 
         async function saveRoles() {
-            console.log(updatedRoles.value.selected_roles)
             updatedRoles.value.selected_roles.forEach((data) => {
                 console.log(data)
             })
@@ -124,7 +123,7 @@ export default {
                     </div>
                 </div>
 
-                <div class="q-pa-lg">
+                <div class="q-pa-lg" style="display: grid; grid-auto-flow: row; margin-top: 25px">
                     <div class="checkbox-container" style="margin-right: 50px" v-for="role in allRoles">
                         <q-checkbox
                             :label="role"
