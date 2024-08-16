@@ -36,6 +36,7 @@ import checklistEdit from "@/main/vue/pages/Checklists/ChecklistEdit.vue";
 import UserProfile from "@/main/vue/pages/Nutzerprofil/UserProfile.vue";
 import axios from "axios";
 import {useUserStore} from "../stores/UserStore";
+import emailVorlagen from "@/main/vue/pages/emailVorlagen.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -232,6 +233,12 @@ const router = createRouter({
             name: "userprofile",
             component: UserProfile,
             meta: {showHeader: true, authorized: true}
+        },
+        {
+            path: "/emailVorlagen",
+            name: "emailVorlagen",
+            component: emailVorlagen,
+            meta: {showHeader: true, authorized: true}
         }
     ]
 })
@@ -275,7 +282,7 @@ router.beforeEach(async(to, from, next) => {
         console.log("2")
         next({name: 'start'});
     } else if (authenticated && to.name !== 'start') {
-        if (!userStore.hasRole('Administrator') && ['adminmain', 'editUser', 'checklistOverview', 'checklistCreate', 'checklistEdit', 'checklistSingle', 'settings', 'editImpressum', 'editLogo', 'editColors'].includes(to.name)) {
+        if (!userStore.hasRole('Administrator') && ['adminmain', 'editUser', 'checklistOverview', 'checklistCreate', 'checklistEdit', 'checklistSingle', 'settings', 'editImpressum', 'editLogo', 'editColors', 'emailVorlagen'].includes(to.name)) {
             console.log("TEST1")
             next({name: from.name})
         } else if (!userStore.hasRole('Prüfer') && ['Repair', 'RepairCreate', 'RepairEdit'].includes(to.name)) {

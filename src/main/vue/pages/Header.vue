@@ -26,6 +26,7 @@ const links = [
     { name: 'templates', label: 'Checklisten', to: '/checklists', roles: ['Administrator', 'Bearbeiter', 'Prüfer', 'Datenverwalter']},
     { name: 'userprofile', label: 'Nutzerprofil', to: '/userprofile/:username', roles: ['Administrator', 'Bearbeiter', 'Prüfer', 'Datenverwalter']},
     { name: 'archiv', label: 'Archiv', to: '/archiv', roles: ['Administrator', 'Bearbeiter', 'Prüfer']},
+    { name: 'E-Mail Vorlagen', label: 'E-Mail Vorlagen', to: '/emailVorlagen', roles: ['Administrator']},
 ]
 const links2 = [
     { name: 'home', label: 'Abmelden', to: '/' },
@@ -127,6 +128,9 @@ const filteredLinks = computed(() => {
             </q-toolbar-title>
             <q-toolbar-title v-if="$route.name === 'archiv'" align="middle">
                 Archiv
+            </q-toolbar-title>
+            <q-toolbar-title v-if="$route.name === 'emailVorlagen'" align="middle">
+                E-Mail Vorlagen
             </q-toolbar-title>
             <q-img v-if="imageEmpty" :src="`/src/main/resources/db-logo.png`" align="left"/>
             <q-img v-else src="/api/settings/logo" align="left"/>

@@ -42,6 +42,7 @@ public class InitializeDatabase implements InitializingBean {
 
     private final GeoTrackData geoTrackRepository;
     private final UserRepository usRepo;
+    private final VorlagenRepository vorlagenRepo;
 
     /**
      * InitializeDatabase.
@@ -51,7 +52,7 @@ public class InitializeDatabase implements InitializingBean {
     public InitializeDatabase(final UserRepository usRepo, final InspectionOrderRepository ioRepo,
                               final ChecklistRepository checkRepo,
                               final GleisLageRangeRepository r, final GeoTrackData gTD,
-                              final SettingsRepository settingsRepository) {
+                              final SettingsRepository settingsRepository, final VorlagenRepository vorlagenRepo) {
 
         this.usRepo = usRepo;
         this.ioRepo = ioRepo;
@@ -59,6 +60,7 @@ public class InitializeDatabase implements InitializingBean {
         this.glrRepo = r;
         this.geoTrackRepository = gTD;
         this.settingsRepository = settingsRepository;
+        this.vorlagenRepo = vorlagenRepo;
     }
 
     @Override
@@ -70,6 +72,7 @@ public class InitializeDatabase implements InitializingBean {
         initSettings();
         initInspectionOrder();
         initChecklistTemplates();
+        initVorlage();
     }
 
     /**
@@ -189,5 +192,12 @@ public class InitializeDatabase implements InitializingBean {
         Checklist example = new Checklist("Template 1", tasks);
         example.setMaterial(material);
         checkRepo.save(example);
+    }
+
+    public void initVorlage() {
+        Vorlage vorlage1 = new Vorlage("1", "Passwort zurücksetzen", "Setzen Sie ihr Passwort zurück" );
+        Vorlage vorlage2 = new Vorlage("2", "Gleisbauer", "Bearbeiten Sie Link" );
+        vorlagenRepo.save(vorlage1);
+        vorlagenRepo.save(vorlage2);
     }
 }
