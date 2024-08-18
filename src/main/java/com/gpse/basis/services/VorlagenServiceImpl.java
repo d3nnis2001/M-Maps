@@ -37,7 +37,6 @@ public class VorlagenServiceImpl implements VorlagenService {
         Iterator<Vorlage> iterator = iterable.iterator();
         while (iterator.hasNext()) {
             Vorlage vorlage = iterator.next();
-            System.out.println("Erstes findall: " + vorlage.getStringBody());
             vorlagenArray.add(vorlage);
         }
         return vorlagenArray;
@@ -51,14 +50,10 @@ public class VorlagenServiceImpl implements VorlagenService {
             Iterator<Vorlage> iterator = iterable.iterator();
             while (iterator.hasNext()) {
                 Vorlage vorlage = iterator.next();
-                System.out.println("zweites findall: " + vorlage.getStringBody());
                 if(vorlagenId.equals(vorlage.getVorlagenId())){
                     vorlagenrepo.deleteById(vorlage.getVorlagenId());
                 }
             }
-            /*Vorlage vorlage = loadVorlageById(vorlagenId);
-            vorlagenrepo.delete(vorlage);
-            System.out.println("deleteVorlageInTry " + vorlagenId);*/
             return true;
         } catch (Exception e) {
             System.out.println("CATCH");

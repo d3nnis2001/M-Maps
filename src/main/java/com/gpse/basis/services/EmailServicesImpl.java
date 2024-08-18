@@ -1,9 +1,13 @@
 package com.gpse.basis.services;
 
+import com.gpse.basis.domain.Vorlage;
+import com.gpse.basis.repositories.VorlagenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 
 /**
  * Implementation des EmailServices.
@@ -12,6 +16,12 @@ import org.springframework.stereotype.Service;
 public class EmailServicesImpl implements EmailServices {
     @Autowired
     private JavaMailSender mailSender;
+    private VorlagenRepository vorlagenrepo;
+    private VorlagenService vorlagenService;
+
+    public EmailServicesImpl(VorlagenService vorlagenService) {
+        this.vorlagenService = vorlagenService;
+    }
 
     /**
      * Konstruktur zum Versenden der Email.
@@ -36,12 +46,21 @@ public class EmailServicesImpl implements EmailServices {
      * @param receiver - Empfänger
      * @param token - token
      */
+    //Hier Vorlage holen, wie mache ich das mit den Platzhaltern?
     public void sendEmailwithToken(String receiver, String token) {
+        ArrayList<Vorlage> aktuellesVorlagenArray = vorlagenService.getVorlagenData();
+        System.out.println(aktuellesVorlagenArray);
+        Vorlage aktuelleVorlage = aktuellesVorlagenArray.stream()
+            .filter(vorlage -> vorlage.getVorlagenId().equals("1"))
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("Vorlage mit ID 1 nicht gefunden"));
+        System.out.println(aktuelleVorlage);
+        String subject = aktuelleVorlage.getStringSubject();
+        System.out.println(subject);
+        String body = aktuelleVorlage.getStringBody();
+        System.out.println(body);
         String link = "http://localhost:8080/reset-password?email=" + receiver + "&token=" + token;
-        String subject = "Password Reset";
-        String body = "Hello,\n\nYou have requested to reset your password. "
-            + "Please click on the link below to reset your password:\n\n"
-            + link + "\n\nIf you did not request a password reset, please ignore this email.";
+        body = body.replace("${Link}", link);
         sendEmail(receiver, subject, body);
     }
 
@@ -51,10 +70,20 @@ public class EmailServicesImpl implements EmailServices {
      * @param id - ID
      */
     public void builtEmailTrackBuilder(String receiver, String id) {
+        ArrayList<Vorlage> aktuellesVorlagenArray = vorlagenService.getVorlagenData();
+        System.out.println(aktuellesVorlagenArray);
+        Vorlage aktuelleVorlage = aktuellesVorlagenArray.stream()
+            .filter(vorlage -> vorlage.getVorlagenId().equals("2"))
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("Vorlage mit ID 2 nicht gefunden"));
+        System.out.println(aktuelleVorlage);
+        String subject = aktuelleVorlage.getStringSubject();
+        System.out.println(subject);
+        String body = aktuelleVorlage.getStringBody();
+        System.out.println(body);
         String link = "http://localhost:8080/repair-order-trackbuilder?id=" + id;
-        String subject = "Repair Order";
-        String body = "Hello,\n\nYou have a new repair order. "
-            + "Please click on the link below to open the repair order:\n\n" + link;
+        body = body.replace("${Link}", link);
+        body = body.replace("${Auftragsnummer}", id);
         sendEmail(receiver, subject, body);
     }
 }

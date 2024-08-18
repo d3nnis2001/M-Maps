@@ -5,11 +5,18 @@ export default {
     data() {
         return {
             emailTemplates: [
-                { vorlagenId: "1", title: "Passwort vergessen", subject: "Betreff der Passwort vergessen Vorlage", body: "Inhalt der Vorlage für Passwort vergessen"},
-                { vorlagenId: "2", title: "Gleisbauer", subject: "Betreff der Gleisbauer Vorlage", body: "Inhalt der Vorlage für Gleisbauer"},
+                { vorlagenId: "1", title: "Passwort vergessen", subject: "Password Reset", body: "Hello,\n\nYou have requested to reset your password. "
+                        + "Please click on the link below to reset your password:\n\n"
+                        + "${link}" + "\n\nIf you did not request a password reset, please ignore this email."},
+                { vorlagenId: "2", title: "Gleisbauer", subject: "Repair Order for TrackBuilder", body: "Hello,\n\nYou have a new repair order. "
+                        + "Please click on the link below to open the repair order:\n\n" + "{Link}"},
             ],
             selectedTemplate: null,
             showPopUp: false,
+            placeholders: [
+                { key: "${Auftragsnummer}", description: "Die ID eines Auftrags" },
+                { key: "${Link}", description: "Der Link für den Gleisbauer" },
+            ],
         };
     },
 
@@ -71,6 +78,15 @@ export default {
                 <label for="body">Body:</label>
                 <textarea v-model="selectedTemplate.body" id="body"></textarea>
 
+                <div>
+                    <h2>Verfügbare Platzhalter:</h2>
+                    <ul>
+                        <li v-for="placeholder in placeholders" :key="placeholder.key">
+                            <strong>{{ placeholder.key }}</strong>: {{ placeholder.description }}
+                        </li>
+                    </ul>
+                </div>
+
 
                 <button @click="saveTemplate">Speichern</button>
             </div>
@@ -102,6 +118,7 @@ export default {
 
 .modal-content h2 {
     font-size: 2.2em;
+    margin-bottom: 10px;
 }
 label {
     font-size: 1.2em;
@@ -109,6 +126,7 @@ label {
 
 button {
     font-size: 1.4em;
+    margin-top: 20px;
 }
 
 
