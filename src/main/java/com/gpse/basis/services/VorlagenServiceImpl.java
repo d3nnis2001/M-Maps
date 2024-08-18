@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+/**
+ * Implementation des Vorlagenservices.
+ */
 @Service
 public class VorlagenServiceImpl implements VorlagenService {
 
@@ -50,7 +53,7 @@ public class VorlagenServiceImpl implements VorlagenService {
             Iterator<Vorlage> iterator = iterable.iterator();
             while (iterator.hasNext()) {
                 Vorlage vorlage = iterator.next();
-                if(vorlagenId.equals(vorlage.getVorlagenId())){
+                if (vorlagenId.equals(vorlage.getVorlagenId())) {
                     vorlagenrepo.deleteById(vorlage.getVorlagenId());
                 }
             }

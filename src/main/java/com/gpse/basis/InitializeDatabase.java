@@ -35,6 +35,7 @@ public class InitializeDatabase implements InitializingBean {
      */
     public static final String HOCH = "hoch";
     private static final String PRIMARY_AND_DARK_COLOR = "#282D37";
+    private String one = "1";
     private final InspectionOrderRepository ioRepo;
     private final ChecklistRepository checkRepo;
     private final GleisLageRangeRepository glrRepo;
@@ -178,7 +179,7 @@ public class InitializeDatabase implements InitializingBean {
             }
         });
         if (!found.get()) {
-            geoTrackRepository.save(new GeoData(1, 52.17027, 9.08446, 0, "1"));
+            geoTrackRepository.save(new GeoData(1, 52.17027, 9.08446, 0, one));
         }
     }
 
@@ -194,9 +195,12 @@ public class InitializeDatabase implements InitializingBean {
         checkRepo.save(example);
     }
 
+    /**
+     * Initialize Vorlagen.
+     */
     public void initVorlage() {
-        Vorlage vorlage1 = new Vorlage("1", "Passwort zurücksetzen", "Setzen Sie ihr Passwort zurück" );
-        Vorlage vorlage2 = new Vorlage("2", "Gleisbauer", "Bearbeiten Sie Link" );
+        Vorlage vorlage1 = new Vorlage(one, "Passwort zurücksetzen", "Setzen Sie ihr Passwort zurück");
+        Vorlage vorlage2 = new Vorlage("2", "Gleisbauer", "Bearbeiten Sie Link");
         vorlagenRepo.save(vorlage1);
         vorlagenRepo.save(vorlage2);
     }

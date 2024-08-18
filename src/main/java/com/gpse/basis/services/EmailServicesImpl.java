@@ -18,6 +18,7 @@ public class EmailServicesImpl implements EmailServices {
     private JavaMailSender mailSender;
     private VorlagenRepository vorlagenrepo;
     private VorlagenService vorlagenService;
+    private String link_string = "${Link}";
 
     public EmailServicesImpl(VorlagenService vorlagenService) {
         this.vorlagenService = vorlagenService;
@@ -60,7 +61,7 @@ public class EmailServicesImpl implements EmailServices {
         String body = aktuelleVorlage.getStringBody();
         System.out.println(body);
         String link = "http://localhost:8080/reset-password?email=" + receiver + "&token=" + token;
-        body = body.replace("${Link}", link);
+        body = body.replace(link_string, link);
         sendEmail(receiver, subject, body);
     }
 
@@ -82,7 +83,7 @@ public class EmailServicesImpl implements EmailServices {
         String body = aktuelleVorlage.getStringBody();
         System.out.println(body);
         String link = "http://localhost:8080/repair-order-trackbuilder?id=" + id;
-        body = body.replace("${Link}", link);
+        body = body.replace(link_string, link);
         body = body.replace("${Auftragsnummer}", id);
         sendEmail(receiver, subject, body);
     }
