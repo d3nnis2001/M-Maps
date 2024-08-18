@@ -9,12 +9,12 @@ export default {
                         + "Please click on the link below to reset your password:\n\n"
                         + "${link}" + "\n\nIf you did not request a password reset, please ignore this email."},
                 { vorlagenId: "2", title: "Gleisbauer", subject: "Repair Order for TrackBuilder", body: "Hello,\n\nYou have a new repair order. "
-                        + "Please click on the link below to open the repair order:\n\n" + "{Link}"},
+                        + "Please click on the link below to open the repair order:\n\n" + "${Link}"},
             ],
             selectedTemplate: null,
             showPopUp: false,
             placeholders: [
-                { key: "${Auftragsnummer}", description: "Die ID eines Auftrags" },
+                { key: "${Auftragsnummer}", description: "Die ID eines Auftrags (nur für den Gleisbauer)" },
                 { key: "${Link}", description: "Der Link für den Gleisbauer" },
             ],
         };
@@ -150,6 +150,10 @@ input[type="text"], textarea {
     margin: 10px 0;
     box-sizing: border-box;
     font-size: 1.2em;
+}
+textarea {
+    height: 150px;
+    min-height: 100px;
 }
 li h3 {
     font-size: 1.5em;
